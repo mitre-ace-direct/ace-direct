@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "DEBUG=ace:*,JsSIP:* nodemon --watch src --exec node src/index",
-    "build": "node ./build.js",
-    "build2": "node ./build2.js",
+    "build": "node ./build.js && npm run sequelize db:migrate",
+    "build2": "node ./build2.js && npm run sequelize db:migrate",
     "clean": "rm -rf node_modules >/dev/null && rm -rf vendor/kurento-client-js/node_modules && rm -rf vendor/kurento-jsonrpc/node_modules && rm -rf vendor/reconnect-ws/node_modules && rm -rf call-metrics/node_modules && rm -rf ACEKurento-js/node_modules && rm -rf static/bower_components",
     "postinstall": "cd static && bower install",
     "sequelize": "sequelize",
@@ -25,6 +25,7 @@
     "kurento-client": "./vendor/kurento-client-js",
     "minimist": "^1.2.3",
     "mysql2": "^1.6.4",
+    "nconf": "^0.11.2",
     "param": "^1.1.0",
     "passport": "^0.4.0",
     "sequelize": "^4.41.2",
@@ -36,5 +37,9 @@
     "bower": "^1.8.8",
     "nodemon": "^1.19.1",
     "sequelize-cli-no-vulnerability": "latest"
-  }
+  },
+  "description": "A Web and signaling server application that uses Kurento Media Server to make/receive one to one calls to/from Asterisk",
+  "main": "build.js",
+  "author": "",
+  "license": "ISC"
 }

@@ -57,6 +57,7 @@
   {
     "name":"Signaling Server",
     "script": "src/index.js",
+    "args": "--config ../dat/config.json",
     "cwd": "./acedirect-kurento",
     "restart_delay": 5000,
     "autorestart": false,
