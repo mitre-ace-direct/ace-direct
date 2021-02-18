@@ -1,0 +1,7 @@
+{
+	"name"    		:  "ACR-CDR",
+	"version" 		:  "1.0.0",
+	"description"	:  "A RESTFul Service for returning Call Data Records from the Asterisk PBX Server.",
+	"title"			:  "ACR-CDR API Document",
+	"url" 			:  "<hostname>"
+}
