@@ -1,0 +1,21 @@
+; /etc/kurento/modules/kurento/WebRtcEndpoint.conf.ini
+;
+; Only IP address are supported, not domain names for addresses
+; You have to find a valid stun server. You can check if it works
+; usin this tool:
+;   http://webrtc.github.io/samples/src/content/peerconnection/trickle-ice/
+;stunServerAddress = public stun IP
+;;stunServerPort= Stun server listening port
+stunServerAddress=xx.xx.xx.xx
+stunServerPort=xx
+
+; turnURL gives the necessary info to configure TURN for WebRTC.
+;    'address' must be an IP (not a domain).
+;    'transport' is optional (UDP by default).
+;    turnURL = username:password@private IP of TURN server
+turnURL=un:pw@xx.xx.xx.xx
+
+;pemCertificate is deprecated. Please use pemCertificateRSA instead
+;pemCertificate=<path>
+;pemCertificateRSA=<path>
+;pemCertificateECDSA=<path>
