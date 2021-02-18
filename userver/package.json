@@ -1,0 +1,23 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "This folder is not required for the Provider portal.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rm -rf node_modules >/dev/null",
+    "build": "node ./build.js || true"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "clear": "0.0.1",
+    "express": "^4.13.4",
+    "https": "^1.0.0",
+    "log4js": "^3.0.6",
+    "minimist": "^1.2.5",
+    "mysql": "^2.10.2",
+    "nconf": "^0.8.4"
+  }
+}
