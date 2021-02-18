@@ -1,6 +1,4 @@
 config*.json
 process*.json
-color_config.json
-default_color_config.json
 *.swp
 .DS_Store
