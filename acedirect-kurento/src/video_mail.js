@@ -53,7 +53,7 @@ class VideoMail extends Events {
 
   async start() {
     this._instructions = true;
-    const files = param('videomail.instructions_media');
+    const files = param('videomailss.instructions_media');
     for (const file of files) {
       const times = file.endsWith('png') || file.endsWith('jpg') ? 5 : 1;
       try { 
@@ -92,7 +92,7 @@ class VideoMail extends Events {
     if(dtmf.tone === '1') {
       this._player && this._player.stop();
       this._instructions = false;
-      const files = param('videomail.instructions_media');
+      const files = param('videomailss.instructions_media');
       await this._playFile(files[files.length - 1]);
       await this._startRecording();
     } else if (dtmf.tone === '*') {
@@ -101,8 +101,8 @@ class VideoMail extends Events {
   }
 
   async _startRecording() {
-    const dir = param('videomail.directory');
-    const profile = param('videomail.media_profile');
+    const dir = param('videomailss.directory');
+    const profile = param('videomailss.media_profile');
     const ext = profile.toLowerCase();
     const filename = `${this._id}.${ext}`;
     
