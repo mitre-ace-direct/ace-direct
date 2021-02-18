@@ -18,9 +18,9 @@ class ConfManager extends Events {
   }
 
   register(user, pass) {
-    const host = param('asterisk.host');
-    const port = param('asterisk.port');
-    const protocol = param('asterisk.protocol');
+    const host = param('asteriskss.host');
+    const port = param('asteriskss.port');
+    const protocol = param('asteriskss.protocol');
     const uri = `${protocol}://${host}:${port}/ws`;
     const socket = new NodeWS(uri);
     const ua = new SIP.UA({
