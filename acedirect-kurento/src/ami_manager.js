@@ -18,10 +18,10 @@ class AmiManager extends Events {
   async init_ami() {
 
     let ami = null;
-    const id = param('asterisk.ami.id');
-    const port = param('asterisk.ami.port');
-    const ip = param('asterisk.ami.ip');
-    const pass = param('asterisk.ami.passwd');
+    const id = param('asteriskss.ami.id');
+    const port = param('asteriskss.ami.port');
+    const ip = param('asteriskss.ami.ip');
+    const pass = param('asteriskss.ami.passwd');
 
     try {
       this.ami = new astm(parseInt(port), ip, id, pass, true);
