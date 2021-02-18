@@ -1,0 +1,10 @@
+.DS_Store
+node_modules
+config.json
+nbproject
+bower_components
+/.vscode/
+*.swp
+.env
+public/assets/
+uploads/
