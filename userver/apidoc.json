@@ -1,0 +1,7 @@
+{
+	"name"    		:  "UServer",
+	"version" 		:  "1.0.0",
+	"description"	:  "A RESTFul Service for returning VRS User Data.",
+	"title"			:  "UServer API Document",
+	"url" 			:  "<hostname>"
+}

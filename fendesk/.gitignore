@@ -1,0 +1,7 @@
+api/v2/tickets/*.json
+apidoc/
+node_modules/
+config.json
+*.log
+logs/
+.env
