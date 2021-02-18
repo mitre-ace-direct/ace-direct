@@ -19,7 +19,7 @@ class ClientSession extends Events {
     this._session = null;
     this._queue   = [];
     this._ami     = ami;
-    this._asteriskQueueNames = param('asterisk.ami.queue_names');
+    this._asteriskQueueNames = param('asteriskss.ami.queue_names');
     this._isMemberQueue = false;
     this._isAgent = null;
     this._sipIntervalTimeout = null;
@@ -462,7 +462,7 @@ class ClientSession extends Events {
   }
 
   async requestKeyframeAndSleep() {
-    let ms = param('asterisk.sip_media_request_interval');
+    let ms = param('asteriskss.sip_media_request_interval');
     if (ms) {
       await this.handleSipInfo();
       return new Promise(resolve => {
