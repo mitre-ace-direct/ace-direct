@@ -8,7 +8,7 @@
     "build": "npm run build:acedirect && npm run build:acedirect-kurento && npm run build:acr-cdr && npm run build:aserver && npm run build:fendesk && npm run build:managementportal && npm run build:userver",
     "clean": "npm run clean:acedirect && npm run clean:acedirect-kurento && npm run clean:acr-cdr && npm run clean:aserver && npm run clean:fendesk && npm run clean:managementportal && npm run clean:userver",
     "build:acedirect": "cd acedirect && npm run build",
-    "build:acedirect-kurento": "cd acedirect-kurento && npm run build",
+    "build:acedirect-kurento": "cd acedirect-kurento && rm -rf node_modules && npm install && npm run build",
     "build:acr-cdr": "cd acr-cdr && npm run build",
     "build:aserver": "cd aserver && npm run build",
     "build:fendesk": "cd fendesk && npm run build",
