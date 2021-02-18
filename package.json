@@ -1,0 +1,34 @@
+{
+  "name": "ace-direct",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build:acedirect && npm run build:acedirect-kurento && npm run build:acr-cdr && npm run build:aserver && npm run build:fendesk && npm run build:managementportal && npm run build:userver",
+    "clean": "npm run clean:acedirect && npm run clean:acedirect-kurento && npm run clean:acr-cdr && npm run clean:aserver && npm run clean:fendesk && npm run clean:managementportal && npm run clean:userver",
+    "build:acedirect": "cd acedirect && npm run build",
+    "build:acedirect-kurento": "cd acedirect-kurento && npm run build",
+    "build:acr-cdr": "cd acr-cdr && npm run build",
+    "build:aserver": "cd aserver && npm run build",
+    "build:fendesk": "cd fendesk && npm run build",
+    "build:managementportal": "cd managementportal && npm run build",
+    "build:userver": "cd userver && npm run build",
+    "clean:acedirect": "cd acedirect && npm run clean",
+    "clean:acedirect-kurento": "cd acedirect-kurento && npm run clean",
+    "clean:acr-cdr": "cd acr-cdr && npm run clean",
+    "clean:aserver": "cd aserver && npm run clean",
+    "clean:fendesk": "cd fendesk && npm run clean",
+    "clean:managementportal": "cd managementportal && npm run clean",
+    "clean:userver": "cd userver && npm run clean"
+  },
+  "author": "",
+  "license": "ISC",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@git.codev.mitre.org/acrdemo/ace-direct.git"
+  }
+}
