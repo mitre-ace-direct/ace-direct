@@ -1,0 +1,7 @@
+{
+	"name"    		:  "AServer",
+	"version" 		:  "1.0.0",
+	"description"	:  "A RESTFul Service for returning CSR Agent User Data.",
+	"title"			:  "AServer API Document",
+	"url" 			:  "<hostname>"
+}
