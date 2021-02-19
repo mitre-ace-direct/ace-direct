@@ -6,7 +6,7 @@
 
 * Language Translation – The Agent and Consumer portals now provide the option to display captions and text chats in languages other than the default English language. The Agent or Consumer must select their preferred language prior to accepting or making a call.
 * Agent Auto Away – The Agent portal now automatically changes the Agent’s status from Ready to Away after missing consecutive inbound calls. The default setting is 3, however, this is configurable.
-* Agent to Agent Chat/Broadcast Messaging – The Agent portal now provides messaging from Agent to Agent or to multiple agents simultaneously. 
+* Agent to Agent Chat/Broadcast Messaging – The Agent portal now provides messaging from Agent to Agent or to multiple agents simultaneously.
 * Agent Call Totals – The Management portal now allows the manager to see the total number of calls as part of the Report feature. Also displayed in the Report option is the call data Top 10 States, Top 10 Area Codes, and Top 10 VRS Numbers.
 
 ## Release v4.1, 10/30/2020
@@ -25,7 +25,7 @@
 * Containerization – OpenAM and Asterisk are now available as Docker containers.
 * Agent, Consumer, and Management Portal UI Enhancements – The web portals have better aspect ratios for video, element locations, element placement, and button sizing.
 * Captioning Demo Capability – ACE Direct now has a captioning preview feature that plays a mock captioning conversation between a Consumer and an Agent. This feature is for demonstration purposes only.
-* Multi-Party Calling – ACE Direct Agents and Consumers are able to participate in calls with up to four simultaneous callers on the same call. 
+* Multi-Party Calling – ACE Direct Agents and Consumers are able to participate in calls with up to four simultaneous callers on the same call.
 * Screen Sharing – ACE Direct allows the caller to share their screen with another caller.
 * File Sharing – ACE Direct allows users to share/transfer filesfrom one user to another.
 
@@ -233,4 +233,3 @@ Release v1.0 of ACE Direct (initial public release)
 * Complaint_form: added error class for invalid phone number format
 * Complaint_form: phone number validation
 * CSR Portal: new script logic function
-
