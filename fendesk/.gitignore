@@ -3,5 +3,4 @@ apidoc/
 node_modules/
 config.json
 *.log
-logs/
 .env
