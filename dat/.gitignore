@@ -1,4 +1,3 @@
 config*.json
-process*.json
 *.swp
 .DS_Store
