@@ -22,7 +22,7 @@ ACE Direct services use [pm2](https://pm2.keymetrics.io/) for process management
 $  cd ace-direct
 $
 $  # starting
-$  pm2 start process.json   # first time
+$  pm2 start dat/process.json   # first time
 $  pm2 start all  # subsequent times
 $  pm2 status  # get status
 $
