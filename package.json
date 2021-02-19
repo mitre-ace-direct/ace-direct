@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build:acedirect && npm run build:acedirect-kurento && npm run build:acr-cdr && npm run build:aserver && npm run build:fendesk && npm run build:managementportal && npm run build:userver",
+    "build": "npm run build:acedirect && npm run build:acedirect-kurento && npm run build:acr-cdr && npm run build:aserver && npm run build:fendesk && npm run build:managementportal && npm run build:userver && cat dat/ad.txt ",
     "clean": "npm run clean:acedirect && npm run clean:acedirect-kurento && npm run clean:acr-cdr && npm run clean:aserver && npm run clean:fendesk && npm run clean:managementportal && npm run clean:userver",
     "build:acedirect": "cd acedirect && npm run build",
     "build:acedirect-kurento": "cd acedirect-kurento && rm -rf node_modules && npm install && npm run build",
