@@ -39,10 +39,14 @@ $  pm2 delete all
 
 The URLs depend on your `dat/config.json` settings. Sample ACE Direct URLs are:
 
-Agent portal: `https://company.fqdn.com/ACEDirect/agent`
-Consumer portal: `https://company.fqdn.com/ACEDirect/call`
-Management portal: `https://company.fqdn.com/ManagementPortal`
+* Agent portal: `https://company.fqdn.com/ACEDirect/agent`
+* Consumer portal: `https://company.fqdn.com/ACEDirect/call`
+* Management portal: `https://company.fqdn.com/ManagementPortal`
 
 ## Documentation
 
 See the [docs](docs/) folder for complete documentation, including the user guide and installation manual.
+
+## Release Notes
+
+See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
