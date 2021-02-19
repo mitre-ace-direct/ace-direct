@@ -148,7 +148,6 @@ async function go() {
   s = await execCommand('ls config.json','../dat',null,'ERROR: ../dat/config.json is missing!');
   s = await execCommand('ls default_color_config.json','../dat',null,'ERROR: ../dat/default_color_config.json is missing!');
   s = await execCommand('ls color_config.json','../dat',null,'ERROR: ../dat/color_config.json is missing!');
-  s = await execCommand('cp process.json_TEMPLATE ../process.json','../dat',null,null);
 
   console.log('building...');
   s = await execCommand('rm -rf node_modules >/dev/null  # removing node_modules','.',null,null);
