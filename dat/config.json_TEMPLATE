@@ -4,7 +4,7 @@
     "version":"5.0",
     "year":"2021",
     "debug_level": "ERROR",
-    "fqdn": "host.machine.com",
+    "fqdn": "host.domain.com",
     "private_ip": "0.0.0.0",
     "https": {
       "certificate": "/etc/ssl/cert.pem",
@@ -19,42 +19,42 @@
   },
   "signaling_server": {
       "proto": "wss",
-      "public": "some.domain.com",
+      "public": "test.domain.com",
       "port": 8005,
-      "dev_url": "wss://host.machine.com/username/acedirect-kurento/signaling"
+      "dev_url": "wss://nginx.domain.com/username/acedirect-kurento/signaling"
   },
   "media_server": {
       "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
   },
   "asterisk": {
     "sip": {
-      "public": "asteriskhost.domain.com",
-      "private_ip": "private asterisk IP",
+      "public": "asterisk.domain.com",
+      "private_ip": "0.0.0.0",
       "ws_port": "443",
-      "stun": "stunhost.domain.com",
+      "stun": "stun.domain.com",
       "stun_port": "3478",
-      "turn": "turnhost.domain.com",
+      "turn": "turn.domain.com",
       "turn_port": "",
       "turn_user": "user",
       "turn_cred": "password",
       "channel": "SIP"
     },
     "ami": {
-      "id": "asterisk-ami-id",
-      "passwd": "asterisk-ami-password",
+      "id": "<asterisk ami userid>",
+      "passwd": "<asterisk ami password>",
       "port": "5038"
     },
     "extensions": {
       "start_number": "90001",
       "end_number": "90005",
-      "secret": "<password>"
+      "secret": "<extensions password>"
     },
     "queues": {
       "complaint": {
-        "number": "000000"
+        "number": "575791"
       },
       "videomail": {
-        "number": "000000"
+        "number": "575795"
       }
     }
   },
@@ -86,14 +86,14 @@
     "mysql": {
       "host": "0.0.0.0",
       "port": "3306",
-      "user": "dbuser",
-      "password": "dbpass",
-      "ad_database_name": "ace direct db name",
-      "cdr_database_name": "cdr db name",
-      "cdr_table_name": "cdr table name",
-      "ssuser": "signaling server db user",
-      "sspassword": "signaling server db password",
-      "ssdatabase": "signaling server db name"
+      "user": "<db user name>",
+      "password": "<db password>",
+      "ad_database_name": "<db name>",
+      "cdr_database_name": "<cdr db name>",
+      "cdr_table_name": "<cdr table name>",
+      "ssuser": "<signaling server db user>",
+      "sspassword": "<signaling server db password>",
+      "ssdatabase": "<signaling server db name>"
     },
     "redis": {
       "host": "127.0.0.1",
@@ -127,7 +127,7 @@
     "consumer" : "true"
   },
   "nginx": {
-    "fqdn": "host.machine.com",
+    "fqdn": "nginx.domain.com",
     "private_ip": "0.0.0.0",
     "port": "443",
     "ad_path": "/ACEDirect",
@@ -140,8 +140,8 @@
     "private_ip": "0.0.0.0",
     "port": "443",
     "path": "ace",
-    "user": "adminLogin",
-    "password": "adminPassword"
+    "user": "<admin username>",
+    "password": "<admin password>"
   },
   "ace_direct": {
     "https_listen_port": "9001"
@@ -150,7 +150,7 @@
     "https_listen_port": "9002",
     "queues" : "GeneralQuestionsQueue,ComplaintsQueue,MailQueue",
     "poll_interval" : "2000",
-    "force_logout_password": "super_secure_password"
+    "force_logout_password": "<super secure password>"
   },
   "zendesk": {
     "private_ip": "0.0.0.0",
@@ -186,7 +186,7 @@
     "enabled": "true"
   },
   "webserver": {
-    "comment1": "for acedirect-kurento",
+    "comment1": "signaling server only",
     "port": 9009,
     "cert":"/etc/ssl/cert.pem",
     "key": "/etc/ssl/key.pem",
@@ -195,9 +195,9 @@
     "token": "__DEV_TOKEN__"
   },
   "asteriskss": {
-    "comment1": "for acedirect-kurento",
+    "comment1": "signaling server only",
     "protocol": "wss",
-    "host": "asterisk.hostname.com",
+    "host": "asterisk.domain.com",
     "ip": "<asterisk private IP>",
     "port": 443,
     "sip_media_request_interval": 5000,
@@ -212,8 +212,8 @@
     }
   },
   "kurento": {
-    "comment1": "for acedirect-kurento",
-    "url": "wss://kurento.host.com:8443/kurento",
+    "comment1": "signaling server only",
+    "url": "wss://kurento.domain.com:8443/kurento",
     "stats_interval": 10000,
     "sdes_crypto": "AES_128_CM_HMAC_SHA1_80",
     "monitoring_enabled": false,
@@ -224,9 +224,9 @@
     "video_webrtc_min_bitrate": 100,
     "video_rtp_max_bitrate": 8000,
     "video_webrtc_codec": "H264",
-    "_comment": "42001F fixes some problems. 42E015 - try this too - RFC3984 - page 38",
-    "_comment": "Alberto had tried 42e01f - did not work",
-    "_comment" : "profile-level-id=42001F;packetization-mode=0;level-asymmetry-allowed=1",
+    "_comment2": "42001F fixes some problems. 42E015 - try this too - RFC3984 - page 38",
+    "_comment3": "Alberto had tried 42e01f - did not work",
+    "_comment4" : "profile-level-id=42001F;packetization-mode=0;level-asymmetry-allowed=1",
     "h264_config": "profile-level-id=42E01F;packetization-mode=0;level-asymmetry-allowed=0",
     "aws": {
       "s3": {
@@ -240,16 +240,16 @@
   },
   "ice": [
     { 
-      "urls": "stun:stun.host.com:3478"
+      "urls": "stun:stun.domain.com:3478"
     },
     { 
-      "urls": "turn:coturn.host.com:3478",
-      "username": "turnusername",
-      "credential": "turncred"
+      "urls": "turn:coturn.domain.com:3478",
+      "username": "<turnusername>",
+      "credential": "<turncred>"
     } 
   ],  
   "videomailss": {
-    "comment1": "for acedirect-kurento",
+    "comment1": "signaling server only",
     "directory": "/tmp/videomail/",
     "instructions_media": [
       "/tmp/videomail/instructions/video.mp4",
