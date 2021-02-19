@@ -1,180 +1,260 @@
 {
   "common": {
-    "cleartext": "A non-empty string indicates that the file is in clear text (not encoded).",
-    "version": "ACE Direct Version number for display only. This release is: 2.1",
-    "year": "The Copyright year for display only. The year is: 2018",
-    "debug_level": "Logging level: ALL TRACE DEBUG INFO WARN ERROR FATAL OFF",
-    "private_ip": "Private IP address of this server",
-    "fqdn": "Fully qualified domain name of this server",
+    "cleartext": "true",
+    "version":"5.0",
+    "year":"2021",
+    "debug_level": "ERROR",
+    "fqdn": "host.machine.com",
+    "private_ip": "0.0.0.0",
     "https": {
-      "certificate": "Full path to the certificate file",
-      "private_key": "Full path to the private key file"
-    }
-  },
-  "asterisk": {
-    "sip": {
-      "public": "Fully qualified domain name of the Asterisk server",
-      "private_ip": "Private IP address of the Asterisk server",
-      "stun": "Fully qualified domain name of the stun server",
-      "stun_port": "Port of the stun server",
-      "turn": "Fully qualified domain name of turn server",
-      "turn_port": "string; port number of turn server; may be empty",
-      "turn_user": "turn server username",
-      "turn_cred": "turn server password",
-      "ws_port": "Websocket port",
-      "channel": "default to SIP"
-    },
-    "ami": {
-      "id": "Asterisk AMI userid",
-      "passwd": "Asterisk AMI password",
-      "port": "Asterisk AMI port"
-    },
-    "extensions": {
-      "start_number": "First consumer extension",
-      "end_number": "Last consumer extension",
-      "secret": "Consumer extension password"
-    },
-    "queues": {
-      "complaint": {
-        "number": "Asterisk dial-in number for the complaint queue"
-      },
-      "videomail": {
-        "number": "Asterisk dial-in number for the videomail queue"
-      }
+      "certificate": "/etc/ssl/cert.pem",
+      "private_key": "/etc/ssl/key.pem"
     }
   },
   "proxy_server": {
-      "proto": "protocol (e.g., wss) of SIP proxy server",
-      "public": "FQDN of SIP proxy server",
-      "port": "port number of SIP proxy server, (e.g., 443)",
-      "path": "path of SIP proxy server (e.g., /ws)"
+      "proto": "wss",
+      "public": "sipproxy.domain.com",
+      "port": 443,
+      "path": "/ws"
   },
   "signaling_server": {
-      "proto": "protocol (e.g., wss) of signaling server",
-      "public": "FQDN:port of signaling server", 
-      "port": "port number of signaling server",
-      "dev_url": "nginx path of personal signaling server (DEV) or empty string (PROD)"
+      "proto": "wss",
+      "public": "some.domain.com",
+      "port": 8005,
+      "dev_url": "wss://host.machine.com/username/acedirect-kurento/signaling"
+  },
+  "media_server": {
+      "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
+  },
+  "asterisk": {
+    "sip": {
+      "public": "asteriskhost.domain.com",
+      "private_ip": "private asterisk IP",
+      "ws_port": "443",
+      "stun": "stunhost.domain.com",
+      "stun_port": "3478",
+      "turn": "turnhost.domain.com",
+      "turn_port": "",
+      "turn_user": "user",
+      "turn_cred": "password",
+      "channel": "SIP"
+    },
+    "ami": {
+      "id": "asterisk-ami-id",
+      "passwd": "asterisk-ami-password",
+      "port": "5038"
+    },
+    "extensions": {
+      "start_number": "90001",
+      "end_number": "90005",
+      "secret": "<password>"
+    },
+    "queues": {
+      "complaint": {
+        "number": "000000"
+      },
+      "videomail": {
+        "number": "000000"
+      }
+    }
   },
   "videomail": {
-    "max_record_secs": "Maximum time (seconds) for a video mail",
-    "outbound_timeout_secs": "Integer; maximum seconds to wait for outbound videomail server to respond"
+    "max_record_secs": "90",
+    "outbound_timeout_secs": 60
   },
   "missed_calls": {
-    "max_missed_calls": "Number of consecutive missed calls before forcing the agent to Away status"
+    "max_missed_calls": "3"
   },
   "web_security": {
     "json_web_token": {
-      "encoding": "Encoding scheme for the JSON web token",
-      "secret_key": "Unique string key for the JSON web token",
-      "timeout": "timeout in ms: 15000",
-      "handshake": "Handshake? true or false"
+      "encoding": "base64",
+      "secret_key": "someKey",
+      "timeout": "15000",
+      "handshake": "true"
     },
     "session": {
-      "secret_key": "Unique string key for the session",
-      "resave": "Resave? true or false",
-      "save_uninitialized": "Save uninitialized? true or false",
-      "secure": "Secure? true or false",
-      "http_only": "HTTP only? true or false",
-      "rolling": "Rolling? true or false",
-      "max_age": "Max. age: 2400000"
+      "secret_key": "someSecretKey",
+      "resave": "true",
+      "save_uninitialized": "true",
+      "secure": "true",
+      "http_only": "true",
+      "rolling": "true",
+      "max_age": "2400000"
     }
   },
   "database_servers": {
     "mysql": {
-      "host": "Private IP address of the ACE Direct MySQL server",
-      "user": "Username for the ACE Direct MySQL user",
-      "password": "Password for the ACE Direct MySQL user",
-      "ad_database_name": "ACE Direct database name",
-      "cdr_database_name": "Asterisk database name",
-      "cdr_table_name": "Asterisk table name",
-      "port": "Port number for the ACE Direct MySQL server"
+      "host": "0.0.0.0",
+      "port": "3306",
+      "user": "dbuser",
+      "password": "dbpass",
+      "ad_database_name": "ace direct db name",
+      "cdr_database_name": "cdr db name",
+      "cdr_table_name": "cdr table name",
+      "ssuser": "signaling server db user",
+      "sspassword": "signaling server db password",
+      "ssdatabase": "signaling server db name"
     },
     "redis": {
-      "host": "Local IP address of the Redis server: 127.0.0.1",
-      "auth": "Redis authentication string",
-      "port": "Redis server port"
+      "host": "127.0.0.1",
+      "port": "6379",
+      "auth": "NotUsedInDevEnvironment"
     },
     "mongodb": {
-      "connection_uri": "Mongo DB connection URI; leave blank to disable",
-      "caption_database_name": "database to log captions to",
-      "caption_collection_name": "collection to log captions to",
-      "logAMIevents": "true/false boolean - log AMI events",
-	  "logCallData": "true/false boolean - log Call Data",
-      "logStats": "true/false boolean - log stats",
-      "logStatsFreq": "frequency(milliseconds) to log stats"
+      "connection_uri": "mongodb://localhost:27017/test",
+      "caption_database_name": "caption_db",
+      "caption_collection_name": "captions",
+      "logAMIevents": false,
+      "logCallData": false,
+      "logStats": false,
+      "logStatsFreq": "60000"
     }
   },
   "complaint_redirect": {
-    "active": "Complaint portal redirect? true or false",
-    "desc": "Description of redirect website",
-    "url": "URL of redirect website"
+    "active": "true",
+    "desc": "Landing Page",
+    "url": "./logout"
   },
   "popticket": {
-    "url": "URL of zendesk pop ticket; omit this field to skip zendesk pop"
+    "url": "https://FQDN:PORT/DTK_HttpServices/json/CallDTKEventUsingJSONviaPOSTStream?async=true"
   },
   "skinny_mode" : {
-    "agent": "Enable skinny mode for agent portal: true or false",
-    "consumer": "Enable skinny mode for consumer portal: true or false"
+    "agent": "false",
+    "consumer": "false"
   },
   "caption_mode" : {
-    "agent": "Enable captions for the agent portal",
-    "consumer" : "Enable captions for the consumer portal"
-  },
-  "openam": {
-    "fqdn": "Fully qualified domain name of the NGINX server",
-    "private_ip": "Private IP address of the NGINX server",
-    "port": "NGINX server port number",
-    "path": "OpenAM web path",
-    "user": "openAM admin user name",
-    "password": "openAM admin password"
+    "agent": "true",
+    "consumer" : "true"
   },
   "nginx": {
-    "fqdn": "Fully qualified domain name of this server",
-    "ad_path": "NGINX path for agent/consumer portals",
-    "mp_path": "NGINX path for management portal",
-    "private_ip": "Private IP address of the nginx server",
-    "port": "NGINX server port number",
-    "agent_route": "Used for agent portal url",
-    "consumer_route": "Used for consumer portal url"
+    "fqdn": "host.machine.com",
+    "private_ip": "0.0.0.0",
+    "port": "443",
+    "ad_path": "/ACEDirect",
+    "mp_path": "/ManagementPortal",
+    "agent_route": "/agent",
+    "consumer_route": "/call"
+  },
+  "openam": {
+    "fqdn": "openam.domain.com",
+    "private_ip": "0.0.0.0",
+    "port": "443",
+    "path": "ace",
+    "user": "adminLogin",
+    "password": "adminPassword"
   },
   "ace_direct": {
-    "https_listen_port": "Port that the ACE Direct portal listens on"
+    "https_listen_port": "9001"
   },
   "management_portal": {
-    "https_listen_port": "Port that the Management Portal listens on",
-    "queues" : "Comma-separated values of the Asterisk queues",
-    "poll_interval" : "Poll frequency (seconds) of the Management Portal statistics"
+    "https_listen_port": "9002",
+    "queues" : "GeneralQuestionsQueue,ComplaintsQueue,MailQueue",
+    "poll_interval" : "2000",
+    "force_logout_password": "super_secure_password"
   },
   "zendesk": {
-    "private_ip": "IP address of the zendesk/fendesk server",
-    "port": "Port number of the zendesk/fendesk server",
-    "protocol": "Use http for zendesk, https for fendesk",
-    "user_id": "email address of the zendesk user",
-    "token": "token of the zendesk user"
+    "private_ip": "0.0.0.0",
+    "port": "9003",
+    "protocol": "https",
+    "user_id": "user@email.com",
+    "token": "userToken"
   },
   "acr_cdr": {
-    "https_listen_port": "Port that the ACR CDR portal listens on"
+    "https_listen_port": "9004"
   },
   "user_service": {
-    "port": "Port number of the USERVER server",
-    "itrs_mode": "Use ITRS to verify numbers? true|false"
+    "port": "9005",
+    "itrs_mode": "false"
   },
   "agent_service": {
-    "port": "Port number of the ASERVER server"
+    "port": "9006"
   },
   "agent_chat": {
-    "save_agent_chats":"boolean string (true/false) that enables or disables saving the agent chats to MongoDB"
+    "save_agent_chats": "false"
   },
   "agent_incall_audio": {
-    "mute_all_audio": "boolean string (true/false) that enables or disables muting the agent audio at the beginning of a call"
+    "mute_all_audio": "false"
   },
   "busylight": {
-    "enabled": "boolean string (true/false) that enables or disables the busylight in ACE Direct",
-    "awayBlink": "boolean string (true/false) that enables blinking while Away, if callers are in queue"
+    "enabled": "true",
+    "awayBlink": "true"
   },
   "translation_server": {
-    "private_ip": "IP address of the translation server",
-    "port": "Port number of the translation server",
-    "protocol": "Protocol (http/https) of the translation server"
-  }
+    "private_ip": "0.0.0.0",
+    "port": "8005",
+    "protocol": "http",
+    "enabled": "true"
+  },
+  "webserver": {
+    "comment1": "for acedirect-kurento",
+    "port": 9009,
+    "cert":"/etc/ssl/cert.pem",
+    "key": "/etc/ssl/key.pem",
+    "csr": "/etc/ssl/asterisk.csr",
+    "static": "./static",
+    "token": "__DEV_TOKEN__"
+  },
+  "asteriskss": {
+    "comment1": "for acedirect-kurento",
+    "protocol": "wss",
+    "host": "asterisk.hostname.com",
+    "ip": "<asterisk private IP>",
+    "port": 443,
+    "sip_media_request_interval": 5000,
+    "ami": {
+      "ip": "<asterisk private IP>",
+      "enabled": true,
+      "id": "<asterisk AMI userid>",
+      "passwd": "<asterisk AMI password>",
+      "port": "5038",
+      "queue_names": ["GeneralQuestionsQueue","ComplaintsQueue"],
+      "queue_extensions": ["<GenQuest dial-in number>","<CompQueue dial-in number>"]
+    }
+  },
+  "kurento": {
+    "comment1": "for acedirect-kurento",
+    "url": "wss://kurento.host.com:8443/kurento",
+    "stats_interval": 10000,
+    "sdes_crypto": "AES_128_CM_HMAC_SHA1_80",
+    "monitoring_enabled": false,
+    "recording_all_enabled": false,
+    "recording_media_profile": "MP4",
+    "recording_limit_length_in_sec": 30,
+    "video_webrtc_max_bitrate": 8000,
+    "video_webrtc_min_bitrate": 100,
+    "video_rtp_max_bitrate": 8000,
+    "video_webrtc_codec": "H264",
+    "_comment": "42001F fixes some problems. 42E015 - try this too - RFC3984 - page 38",
+    "_comment": "Alberto had tried 42e01f - did not work",
+    "_comment" : "profile-level-id=42001F;packetization-mode=0;level-asymmetry-allowed=1",
+    "h264_config": "profile-level-id=42E01F;packetization-mode=0;level-asymmetry-allowed=0",
+    "aws": {
+      "s3": {
+        "key": "{$AWS_KEY}",
+        "secret": "{$AWS_SECRET}",
+        "region": "{$AWS_BUCKET_REGION}",
+        "bucket": "{$AWS_BUCKET_NAME}"
+      }
+    },
+    "conference_max_participants": 4
+  },
+  "ice": [
+    { 
+      "urls": "stun:stun.host.com:3478"
+    },
+    { 
+      "urls": "turn:coturn.host.com:3478",
+      "username": "turnusername",
+      "credential": "turncred"
+    } 
+  ],  
+  "videomailss": {
+    "comment1": "for acedirect-kurento",
+    "directory": "/tmp/videomail/",
+    "instructions_media": [
+      "/tmp/videomail/instructions/video.mp4",
+      "/tmp/videomail/instructions/final.jpg"
+    ],
+    "media_profile": "MP4"
+  }   
 }
