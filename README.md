@@ -6,6 +6,14 @@
 1. The global configuration file is `dat/config.json`. If this is a new deployment, copy `dat/config.json_TEMPLATE` to `dat/config.json`.
 1. Update all values in `dat/config.json` to match your environment.
 
+## Setup
+
+```bash
+$  cd ace-direct
+$
+$  npm install jslint -g  # use sudo if running locally
+```
+
 ## Building
 
 ```bash
