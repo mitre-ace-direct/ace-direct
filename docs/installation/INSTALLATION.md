@@ -30,7 +30,7 @@ Here are important prerequisites to complete _before_ proceeding with an ACE Dir
   * Servers should be CentOS, RHEL Linux, or Amazon Linux 2. Other Linux flavors _may_ work with little or no changes to these instructions. For this document, CentOS is assumed.
 * *Database* - Deploy a MySQL database and note the root user and password. This may be either a standard MySQL server or an AWS RDS MySQL service.
 * *Internet access* - An Internet connection is required on some servers to install or update the ACE Direct software. This allows the build processes to download software and other external dependencies.
-* *Install Git* - Git is required on to clone the public repos. Install Git, for example on CentOS: `sudo yum install git`.
+* *Install Git* - Git is required to clone the public repos. Install Git, for example on CentOS: `sudo yum install git`.
 * *ACE Direct User Account* - Identify a user account on `acenode` for the Node servers, for example `/home/acedirect`. All ACE Direct Node.js servers will install here.
 
 ## Installation and configuration
@@ -67,15 +67,15 @@ The `aceopenam` server is the _identity and access management_ server, implement
 
 ### acesip
 
-The `acesip.domain.com` server is the Asterisk server. To install Asterisk, clone the `asterisk` repo and follow the installation instructions.
+The `acesip.domain.com` server is the Asterisk server. Log into the Asterisk server, clone the `asterisk` repo, and follow the installation instructions.
 
 ### aceproxy
 
-The `aceproxy.domain.com` server is the SIP proxy server. Clone the `kamailio` repo and follow the installation instructions.
+The `aceproxy.domain.com` server is the SIP proxy server. Log into the SIP proxy server, clone the `kamailio` repo and follow the installation instructions.
 
 ### acekms
 
-The `acekms.domain.com` server is the Kurento media server. Clone the `kurento` repo and follow the installation instructions.
+The `acekms.domain.com` server is the Kurento media server. Log into the Kurento media server, clone the `kurento` repo and follow the installation instructions.
 
 Additionally, install the videomail server on `acekms`. Clone the `kurento-asterisk-servlet` and follow the instructions.
 
@@ -116,62 +116,29 @@ The **acenode** server hosts several Node.js and application servers. Here are i
 1. Install and configure MongoDB. See [MongoDB installation instructions](https://docs.mongodb.com/manual/).
 1. Update the `/etc/hosts` file with the private IP addresses of `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
 1. From the terminal, go into the ACE Direct user account: `cd /home/acedirect`).
-1. Clone the following repos:
-
-    * `acedirect`
-    * `acedirect-kurento`
-    * `acr-cdr`
-    * `aserver`
-    * `dat`
-    * `fendesk`
-    * `managementportal`
-    * `userver`
-
+1. Clone the `ace-direct` repo. See additional instructions in that repo to install, configure, and deploy the ACE Direct Node servers.
 1. Configure ACE Direct
 
   ```bash
-  $  cd dat
+  $  cd ace-direct/dat
   $
   $  cp config.json_TEMPLATE config.json  # first time only!
   $  vi config.json  # configure (see dat/parameter_desc.json for help)  
   ```
 
-1. Build repos - Go into each of these folders, and execute `npm run build`:
+1. Build repos
 
-    * `acedirect`
-    * `acedirect-kurento` (if this fails, try `npm run build2`)
-    * `acr-cdr`
-    * `aserver`
-    * `fendesk`
-    * `managementportal`
-    * `userver`
-
-1. `acedirect-kurento` configuration
-
-    * Edit/configure the following files:
-
-      ```bash
-      $  cd acedirect-kurento
-      $
-      $  vi confs/kurento/WebRtcEndpoint.conf.ini
-      $  vi src/config/development.json
-      $  vi src/config/db.js
-      ```
-
-    * Configure DB:
-
-      ```bash
-      $  cd acedirect-kurento
-      $
-      $  npm run sequelize db:migrate
-      ```
+  ```bash
+  $  npm run build
+  $
+  ```
 
 1. Starting/stopping ACE Direct Node.js on `acenode`:
 
   ```bash
-  $  cd /home/acedirect  # ACE Direct user account
+  $  cd /home/acedirect/ace-direct
   $
-  $  pm2 start process.json  # first time
+  $  pm2 start dat/process.json  # first time
   $  pm2 restart all  # subsequent
   $  pm2 stop all  # stop
   $  pm2 stop 0  # stop ID 0
@@ -181,9 +148,9 @@ The **acenode** server hosts several Node.js and application servers. Here are i
 1. Making Node.js servers start on reboot:
 
   ```bash
-  $  cd  # ACE Direct user account
+  $  cd  /home/acedirect/ace-direct
   $
-  $  pm2 start process.json  # start all node servers
+  $  pm2 start dat/process.json  # start all node servers
   $  pm2 save
   $  pm2 startup
   $  # now node.js servers will start on boot
@@ -250,14 +217,14 @@ After rebooting servers, ACE Direct requires starting services in a specific ord
   * Delete all Node services from `pm2` management: `pm2 delete all`
   * Add and start all Node services to `pm2`: `pm2 start process.json`
 
-* Set the `common:debug_level` parameter in `/home/acedirect/dat/config.json` to *ALL* to receive all messages in the log files.
-* Check the `logs` folder in each application folder for errors or warnings: `ls /home/acedirect/*/logs/*.log`
+* Set the `common:debug_level` parameter in `/home/acedirect/ace-direct/dat/config.json` to *ALL* to receive all messages in the log files.
+* Check the `logs` folder in each application folder for errors or warnings: `ls /home/acedirect/ace-direct/*/logs/*.log`
 * Verify that OpenAM, Redis, MongoDB, NGINX, and MySQL are running.
 * Verify that there are no firewalls blocking internal ports (e.g., `firewalld` on OpenAM blocking access to `8443`).
 * Does the BusyLight device respond? Try the self-test mode on the `lightserver.jar` UI.
 * Verify that the `/etc/hosts` file is configured correctly.
 * Verify that the `/etc/nginx/nginx.conf` file is configured correctly.
-* Verify that `/home/acedirect/dat/config.json` is configured correctly.
+* Verify that `/home/acedirect/ace-direct/dat/config.json` is configured correctly.
 * Check if `asterisk` is publicly accessible: Visit `https://ASTERISK_FQDN/ws`. The page should display `Upgrade Required`.
 * Management Portal installation - for any `lodash` errors, try installing the `lodash` library globally as root: `sudo npm install lodash -g`.
 * NGINX cannot proxy to the NODE server - when using FQDNs for ACEDirect in `/etc/nginx/nginx.conf`, the FQDNs may force traffic through a proxy. To resolve this, map the FQDN to the private IP instead using a private host zone. *Or*, simply use private IP addresses in place of FQDN in `/etc/nginx/nginx.conf` for the ACEDirect, ManagementPortal, and ace (OpenAM) paths.
@@ -266,3 +233,11 @@ After rebooting servers, ACE Direct requires starting services in a specific ord
 * Consumer portal cannot reach Asterisk; ERR_CONNECTION_REFUSED - make sure Asterisk is configured to use valid certificates.
 * Cannot connect to portals - possibly remap the elastic IPs or try running `nslookup` on the NGINX FQDN and verify its FQDN and public IP.
 * NGINX errors when trying to connect to portals, but all servers are up and running - make sure all servers have the correct time, synced with each other.
+* If `acedirect-kurento` fails to build, try running `build2`:
+
+  ```bash
+  $  cd /home/acedirect/ace-direct/acedirect-kurento
+  $
+  $  npm run build2
+  ```
+  
