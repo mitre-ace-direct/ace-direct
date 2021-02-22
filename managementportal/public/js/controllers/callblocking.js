@@ -1,3 +1,4 @@
+//'use strict';
 var selectedCallBlock = 0;
 var selectedCallBlockVrs = 0;
 $(document).ready(function () {
