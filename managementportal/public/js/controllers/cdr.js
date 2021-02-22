@@ -1,3 +1,4 @@
+'use strict';
 var socket; // = io.connect('http://' + window.location.host); // opens socket.io connection
 var toggle = true; // toggle boolean for CDR table
 
