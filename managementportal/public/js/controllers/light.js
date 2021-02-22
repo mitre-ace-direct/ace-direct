@@ -1,4 +1,4 @@
-//'use strict';
+'use strict';
 var socket;
 
 /**
@@ -22,10 +22,10 @@ function reset_color_config() {
 */
 function disable_colors(color, old_color, status_name) {
     var options = document.getElementsByTagName("option");
-    for (option in options) {
+    for (var option in options) {
         if (color != "off")  //can select "off" for mutliple statuses
         {
-            option_status_id = "option_" + status_name;  //to compare option id with status name, so we don't disable an option that is currently selected
+            var option_status_id = "option_" + status_name;  //to compare option id with status name, so we don't disable an option that is currently selected
             if (options[option].value == color && options[option].id != option_status_id) {
                 options[option].disabled = true;
                 options[option].style.color = "#cecece";
