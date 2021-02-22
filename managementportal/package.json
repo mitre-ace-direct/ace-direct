@@ -13,6 +13,7 @@
     "test": "echo \"Error \" && exit 1",
     "clean": "rm -rf node_modules",
     "start": "node server-db.js",
+    "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
     "build": "npm run clean && npm install && find ./public/assets/ ! -type d ! -name '*.gitignore' -exec rm '{}' + && node ./build.js || true"
   },
   "devDependencies": {},
