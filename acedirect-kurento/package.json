@@ -10,6 +10,7 @@
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
     "postinstall": "cd static && bower install",
     "sequelize": "sequelize",
+    "lint": "echo 'TODO'",
     "bower": "cd static && bower install"
   },
   "dependencies": {
