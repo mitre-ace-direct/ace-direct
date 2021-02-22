@@ -1,4 +1,5 @@
-//'use strict';
+'use strict';
+var socket;
 var selectedCallBlock = 0;
 var selectedCallBlockVrs = 0;
 $(document).ready(function () {
