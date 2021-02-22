@@ -7,8 +7,10 @@
     "build": "node ./build.js && npm run sequelize db:migrate",
     "build2": "node ./build2.js && npm run sequelize db:migrate",
     "clean": "rm -rf node_modules >/dev/null && rm -rf vendor/kurento-client-js/node_modules && rm -rf vendor/kurento-jsonrpc/node_modules && rm -rf vendor/reconnect-ws/node_modules && rm -rf call-metrics/node_modules && rm -rf ACEKurento-js/node_modules && rm -rf static/bower_components",
+    "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
     "postinstall": "cd static && bower install",
     "sequelize": "sequelize",
+    "lint": "echo 'TODO'",
     "bower": "cd static && bower install"
   },
   "dependencies": {
