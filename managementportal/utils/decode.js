@@ -1,3 +1,4 @@
+'use strict';
 /*
                                  NOTICE
 
@@ -17,16 +18,16 @@ var nconf = require('nconf');
 
 var clearText = false;
 if (typeof (nconf.get('cleartext')) !== "undefined") {
-	console.log('clearText field is in config.json. Assuming file is in clear text');
-	clearText = true;
+    console.log('clearText field is in config.json. Assuming file is in clear text');
+    clearText = true;
 }
 
-module.exports = function(encodedString){
+module.exports = function (encodedString) {
     var decodedString = null;
-	if (clearText) {
-		decodedString = encodedString;
-	} else {
-		decodedString = Buffer.from(encodedString, 'base64');
-	}
-	return (decodedString.toString());
+    if (clearText) {
+        decodedString = encodedString;
+    } else {
+        decodedString = Buffer.from(encodedString, 'base64');
+    }
+    return (decodedString.toString());
 };
