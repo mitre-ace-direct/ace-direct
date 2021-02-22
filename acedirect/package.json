@@ -45,6 +45,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf node_modules >/dev/null && rm -f public/assets/css/* public/assets/fonts/* public/assets/js/* public/assets/webfonts/*",
+    "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
     "start": "node ./adserver.js",
     "build": "mkdir -p public/assets; node ./build.js || true"
   },
