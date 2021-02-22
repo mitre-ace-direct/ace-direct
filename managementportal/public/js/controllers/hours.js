@@ -38,7 +38,6 @@ function updateHoursOfOperation() {
     socket.emit('hours-of-operation-update', data);
 }
 
-
 var setOperatingHours = function (data) {
     /*
     $("#start_time").wickedpicker({
