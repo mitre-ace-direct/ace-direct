@@ -4,7 +4,7 @@
   "description": "## Installation Instructions ### Configure corporate proxy server 1. npm config set proxy _HTTP-PROXY-URL_ 1. npm config set https-proxy _HTTPS-PROXY-URL_",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --exit",
     "clean": "rm -rf node_modules >/dev/null",
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
     "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -not -path './public/js/*' -print0 | xargs -0 jslint",
@@ -28,5 +28,11 @@
     "mysql": "^2.17.1",
     "nconf": "0.8.4",
     "negotiator": "^0.6.1"
+  },
+  "devDependencies": {
+    "install": "^0.13.0",
+    "mocha": "^8.3.0",
+    "npm": "^7.5.6",
+    "supertest": "^6.1.3"
   }
 }
