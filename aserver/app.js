@@ -149,7 +149,7 @@ var credentials = {
 };
 var server = https.createServer(credentials, app);
 
-server.listen(parseInt(getConfigVal('agent_service:port')));
+const appServer = server.listen(parseInt(getConfigVal('agent_service:port')));
 console.log('https web server for agent portal up and running on port %s   (Ctrl+C to Quit)', parseInt(getConfigVal('agent_service:port')));
 
 /**
@@ -179,3 +179,5 @@ function getConfigVal(param_name) {
   }
   return (decodedString.toString());
 }
+module.exports = appServer;
+module.exports.myCleanup = myCleanup;
