@@ -9,22 +9,22 @@ nconf.file({ file: cfile });
 
 var logname = 'server-db';
 log4js.configure({
-	appenders: {
-	  server_db: {
-		type: 'dateFile',
-		filename: 'logs/' + logname + '.log',
-		alwaysIncludePattern: false,
-		maxLogSize: 20480,
-		backups: 10
-	  }
-	},
-	categories: {
-	  default: {
-		appenders: ['server_db'],
-		level: 'error'
-	  }
-	}
-  })
+    appenders: {
+        server_db: {
+            type: 'dateFile',
+            filename: 'logs/' + logname + '.log',
+            alwaysIncludePattern: false,
+            maxLogSize: 20480,
+            backups: 10
+        }
+    },
+    categories: {
+        default: {
+            appenders: ['server_db'],
+            level: 'error'
+        }
+    }
+});
 
 var debugLevel = getConfigVal('common:debug_level');
 
