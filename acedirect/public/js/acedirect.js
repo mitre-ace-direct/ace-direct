@@ -574,11 +574,11 @@ function connect_socket() {
 				}).on('agent-resp', function(data) { //Load the agent table in the multi party modal
 					console.log("The agents are " + JSON.stringify(data));
 				}).on('fileListAgent', function(data){
-					// $('#fileSent').hide();
+					$('#fileSent').hide();
 					addFileToAgentDownloadList(data);
 				}).on('fileListConsumer', function(data) {
 					//file confirmation
-					// $('#fileSent').show();
+					$('#fileSent').show();
 					$('#fileInput').val('');
 				}).on('screenshareRequest', function(data){
 					//$('#screenshareButtons').show()
@@ -1204,7 +1204,6 @@ function clearScreen() {
 	clearAgentDownloadList();
 	$('#fileInput').val('');
 	$('#fileSent').hide();
-	$('#fileSentError').hide();
 }
 
 function changeStatusLight(state) {
@@ -1793,6 +1792,7 @@ function videomail_status_change(id, videoStatus) {
 
 //Marks the videomail read when the agent clicks it and doesn't close the videomail view
 function videomail_read_onclick(id) {
+	videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS');
 	socket.emit('videomail-read-onclick', {
 		"id": id,
 		"extension": extensionMe
@@ -2519,8 +2519,6 @@ function disallowScreenShare(){
 //Functionality for fileshare
 function ShareFile(){
 	if (agentStatus == 'IN_CALL' && document.getElementById("fileInput").files[0]) {
-		$('#fileSentError').hide();
-		$('#fileSent').hide();
 		console.log("Sending file " + document.getElementById("fileInput").files[0]);
 		var vrs = $('#callerPhone').val();
 		var formData = new FormData();
@@ -2533,12 +2531,11 @@ function ShareFile(){
 			contentType: false,
 			processData: false,
 			success: function (data) {
+				console.log(JSON.stringify(data, null, 2))
 				socket.emit('get-file-list-agent', {"vrs" : vrs});
-				$('#fileSent').show();
 			},
 			error: function (jXHR, textStatus, errorThrown) {
 				console.log("ERROR");
-				$('#fileSentError').show();
 			}
 		});
 	}
@@ -2547,6 +2544,12 @@ function ShareFile(){
 $("#fullscreen-element").dblclick(function(){
 	enterFullscreen();
 })
+
+//Update videomail status when it reaches the end of playing
+//$("#remoteView").addEventListener('ended', function() {
+document.getElementById('remoteView').onended = function() {
+	videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ');
+}
 
 //Alert message function
 function showAlert(alertType, alertText){
@@ -2820,29 +2823,19 @@ function resizeChat() {
 }
 
 function resetLayout() {
-	var defaultLayout = [
-		{
-			"id": "gsvideobox",
-			"x": 0,
-			"y": 0,
-			"width": 8,
-			"height": 16
-		}, 
-		{
-			"id": "gschatbox",
-			"x": 8,
-			"y": 0,
-			"width": 4,
-			"height": 10
-		},
-		{
-			"id": "gsfilebox",
-			"x": 8,
-			"y": 11,
-			"width": 4,
-			"height": 10
-		},
-	];
+	var defaultLayout = [{
+		"id": "gsvideobox",
+		"x": 0,
+		"y": 0,
+		"width": 8,
+		"height": 16
+	}, {
+		"id": "gschatbox",
+		"x": 8,
+		"y": 0,
+		"width": 4,
+		"height": 10
+	}];
 	loadGridLayout(defaultLayout);
 	if (!loadingGridLayout) {
 		saveGridLayout();
@@ -3122,10 +3115,6 @@ function collapseVideoBox() {
     $('#VideoBox').attr('style', "background-color:white;"); //removes the background when collapsing the box
 }
 
-function collapseFilesBox() {
-    $('#filesbox').attr('style', "background-color:white;"); //removes the background when collapsing the box
-}
-
 function collapseChatBox() {
     console.log('collapse chat box');
     $('#userchat').attr('style', "background-color:white;"); //removes the background when collapsing the box
@@ -3139,7 +3128,6 @@ function clearAgentDownloadList() {
 function addFileToAgentDownloadList(data) {
 	$("#agent-file-group").show();
 	$('#agent-file-list').append(
-		$('<li class="list-group-item btn-primary btn btn-flat">')
-		.append('<a style="color:white" target="_blank" href="./downloadFile?id=' + data.id + '">' + data.original_filename + '</a>')
+		$('<li class="list-group-item">').append('<a target="_blank" style="color:black" href="./downloadFile?id=' + data.id + '">' + data.original_filename + '</a>')
 	);
 }
