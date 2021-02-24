@@ -1,3 +1,4 @@
+//'use strict';
 var selectedUser = 0;
 $(document).ready(function () {
     $("#sidebaragentmanagement").addClass("active");
@@ -64,7 +65,7 @@ $(document).ready(function () {
         var col = table.cell(this).index().column;
         //console.log("cell clicked with col: " + col + " data: " + JSON.stringify(data));
 
-        if (col != 5) {			// do not load agent info if the clicked cell is the checkbox
+        if (col != 5) {     // do not load agent info if the clicked cell is the checkbox
             var url = "./GetAgent/" + data[3];
             console.log("GetAgent url: " + url);
             selectedUser = data[0];
