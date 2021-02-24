@@ -1,11 +1,11 @@
+'use strict';
+
 $("#sidebaroperatinghours").addClass("active");
 var socket = null;
 
 $('#business_mode_dropdown').select2({
     minimumResultsForSearch: Infinity
 });
-
-
 
 var updateTime = function () {
     var timeFormat = 'h:mm A';
@@ -38,13 +38,12 @@ function updateHoursOfOperation() {
     socket.emit('hours-of-operation-update', data);
 }
 
-
 var setOperatingHours = function (data) {
     /*
     $("#start_time").wickedpicker({
         now: formatTime(data.start)
     });
-    
+
     $("#end_time").wickedpicker({
         now: formatTime(data.end)
     });
