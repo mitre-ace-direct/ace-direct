@@ -251,6 +251,7 @@ $('.glyphicon-eye-open').on('mouseover mouseout', function (_e) {
   }
 });
 
+let socket;
 $.ajax({
   url: './token',
   type: 'GET',
