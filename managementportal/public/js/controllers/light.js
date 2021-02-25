@@ -48,7 +48,7 @@ function DisableColors(color, oldColor, statusName) {
 function SubmitForm() {
   document.getElementById('message').innerHTML = '';
   const inputs = $('#form_input :input').not(':button'); // all input fields (not button because bootstrap-select makes them into buttons)
-  const parsedInputs = new Array(); // only the values of the statuses
+  const parsedInputs = []; // only the values of the statuses
   inputs.each(function () {
     parsedInputs.push(this.value);
   });
@@ -139,6 +139,7 @@ function AppendHtml(jsonData) {
 function SetupHtml(data) {
   const jsonData = JSON.parse(data);
   AppendHtml(jsonData);
+
   for (const status in jsonData.statuses) {
     // set currently selected color
     const selectedOption = GetSelectedOptionId(jsonData, status);
