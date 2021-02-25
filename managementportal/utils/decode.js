@@ -1,4 +1,3 @@
-'use strict';
 /*
                                  NOTICE
 
@@ -14,20 +13,20 @@ McLean, VA 22102-7539, (703) 983-6000.
                         ©2018 The MITRE Corporation.
 */
 
-var nconf = require('nconf');
+const nconf = require('nconf');
 
-var clearText = false;
-if (typeof (nconf.get('cleartext')) !== "undefined") {
-    console.log('clearText field is in config.json. Assuming file is in clear text');
-    clearText = true;
+let clearText = false;
+if (typeof (nconf.get('cleartext')) !== 'undefined') {
+  console.log('clearText field is in config.json. Assuming file is in clear text');
+  clearText = true;
 }
 
-module.exports = function (encodedString) {
-    var decodedString = null;
-    if (clearText) {
-        decodedString = encodedString;
-    } else {
-        decodedString = Buffer.from(encodedString, 'base64');
-    }
-    return (decodedString.toString());
+module.exports = function Decode(encodedString) {
+  let decodedString = null;
+  if (clearText) {
+    decodedString = encodedString;
+  } else {
+    decodedString = Buffer.from(encodedString, 'base64');
+  }
+  return (decodedString.toString());
 };
