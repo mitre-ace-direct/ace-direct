@@ -7,8 +7,8 @@ let end = moment().endOf('day'); // today
 
 function getTimeZoneOffset() {
   const mins = moment().utcOffset();
-  const h = Math.abs(mins) / 60 | 0;
-  const m = Math.abs(mins) % 60 | 0;
+  const h = Math.trunc(Math.abs(mins) / 60);
+  const m = Math.trunc(Math.abs(mins) % 60);
 
   let offset = '00:00';
   if (mins !== 0) {
