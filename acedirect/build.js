@@ -136,14 +136,7 @@ function execCommand(cmd,wdir,expected,hint) {
 
 async function go() {
   console.log('\nBuilding acedirect...\n');
-
-  console.log('checking for required tools...');
-  s = await execCommand('which gulp >/dev/null  ','.',null,'Try... sudo npm install -g gulp-cli');
-  s = await execCommand('which npm >/dev/null  ','.',null,null);
-  s = await execCommand('which bower >/dev/null  ','.',null,null);
-  s = await execCommand('which node >/dev/null  ','.',null,null);
-  s = await execCommand('which pm2 >/dev/null  ','.',null,null);
-
+  console.log('Assuming you already ran:  npm run preinstall ...');
   console.log('checking for dat/ configuration files...');
   s = await execCommand('ls config.json','../dat',null,'ERROR: ../dat/config.json is missing!');
   s = await execCommand('ls default_color_config.json','../dat',null,'ERROR: ../dat/default_color_config.json is missing!');
