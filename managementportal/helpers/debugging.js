@@ -1,4 +1,3 @@
-'use strict';
 // These are functions that are not called by code.
 // They look like they are called by a person during an interactive debugging session.
 // Extracted from server-db.js
@@ -10,11 +9,10 @@
  * @returns {unresolved} Not used
  */
 function findAgentName(Agents, agent) {
-    for (var i = 0; i < Agents.length; i++) {
-        if (Agents[i].agent === agent)
-            return Agents[i].name;
-    }
-    return null;
+  for (let i = 0; i < Agents.length; i += 1) {
+    if (Agents[i].agent === agent) return Agents[i].name;
+  }
+  return null;
 }
 
 /**
@@ -25,18 +23,18 @@ function findAgentName(Agents, agent) {
  * @returns {unresolved}
  */
 function findAgentInQueue(Agents, agent, queue) { // find agent by name (extension) and queue
-    logger.debug("findAgentInQueue() Entering:  agent= " + agent + ", queue= " + queue);
-    for (var i = 0; i < Agents.length; i++) {
-        logger.debug(Agents[i]);
-        if ((Agents[i].agent === agent) && (Agents[i].queue === queue)) {
-            logger.debug("findAgentInQueue(): found Agent " + agent + ", queue:" + queue);
-            return Agents[i];
-        } else if ((Agents[i].agent === agent) && (Agents[i].queue === "--")) { // queue not set
-            logger.debug("findAgentInQueue(): empty queue");
-            return Agents[i];
-        }
+  logger.debug(`findAgentInQueue() Entering:  agent= ${agent}, queue= ${queue}`);
+  for (let i = 0; i < Agents.length; i += 1) {
+    logger.debug(Agents[i]);
+    if ((Agents[i].agent === agent) && (Agents[i].queue === queue)) {
+      logger.debug(`findAgentInQueue(): found Agent ${agent}, queue:${queue}`);
+      return Agents[i];
+    } if ((Agents[i].agent === agent) && (Agents[i].queue === '--')) { // queue not set
+      logger.debug('findAgentInQueue(): empty queue');
+      return Agents[i];
     }
-    return null;
+  }
+  return null;
 }
 
 /**
@@ -45,10 +43,10 @@ function findAgentInQueue(Agents, agent, queue) { // find agent by name (extensi
  * @returns {undefined} Not used
  */
 function printAgent(Agents) {
-    logger.debug("Entering printAgent() ");
-    for (var i = 0; i < Agents.length; i++) {
-        logger.debug(Agents[i]);
-    }
+  logger.debug('Entering printAgent() ');
+  for (let i = 0; i < Agents.length; i += 1) {
+    logger.debug(Agents[i]);
+  }
 }
 
 /**
@@ -58,9 +56,9 @@ function printAgent(Agents) {
  * @returns {undefined} Not used
  */
 function setCallMap(Asterisk_queuenames, map) {
-    for (var i = 0; i < Asterisk_queuenames.length; i++) {
-        map.set(Asterisk_queuenames[i], 0); // set the total call to 0
-    }
+  for (let i = 0; i < Asterisk_queuenames.length; i += 1) {
+    map.set(Asterisk_queuenames[i], 0); // set the total call to 0
+  }
 }
 
 /**
@@ -69,9 +67,9 @@ function setCallMap(Asterisk_queuenames, map) {
  * @returns {undefined} Not used
  */
 function printCallMap(m) {
-    m.forEach(function (call, queue) {
-        logger.debug("printCallMap(): " + queue + " " + call);
-    });
+  m.forEach((call, queue) => {
+    logger.debug(`printCallMap(): ${queue} ${call}`);
+  });
 }
 
 /**
@@ -80,7 +78,7 @@ function printCallMap(m) {
  * @returns {undefined} Not used
  */
 function showEvent(evt) {
-    if (evt) {
-        logger.debug('Event: ' + evt.event);
-    }
+  if (evt) {
+    logger.debug(`Event: ${evt.event}`);
+  }
 }
