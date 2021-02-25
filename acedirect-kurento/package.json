@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "DEBUG=ace:*,JsSIP:* nodemon --watch src --exec node src/index",
-    "build": "node ./build.js && npm run sequelize db:migrate",
-    "build2": "node ./build2.js && npm run sequelize db:migrate",
+    "build": "node ./build.js",
+    "build2": "node ./build2.js",
     "clean": "rm -rf node_modules >/dev/null && rm -rf vendor/kurento-client-js/node_modules && rm -rf vendor/kurento-jsonrpc/node_modules && rm -rf vendor/reconnect-ws/node_modules && rm -rf call-metrics/node_modules && rm -rf ACEKurento-js/node_modules && rm -rf static/bower_components",
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
-    "postinstall": "cd static && bower install",
+    "postinstall": "npm run sequelize db:migrate",
     "sequelize": "sequelize",
     "lint": "echo 'TODO'",
     "bower": "cd static && bower install"
