@@ -4,8 +4,8 @@ let chatinput;
 let socket;
 let id;
 let chats;
-let realtimearea;
-const realtimetext = false;
+// let realtimearea;
+// const realtimetext = false;
 let newline = true;
 let currentli = null;
 
@@ -58,11 +58,15 @@ function showProperty(msg, obj) {
   console.log(`${msg}========================================`);
   if (!obj) return;
 
-  Object.keys(obj).forEach((key) => console.log(`${key} = ${obj[key]}`));
+  //Object.keys(obj).forEach((key) => console.log(`${key} = ${obj[key]}`));
 
-  // for (const key in obj) {
+  // obj.forEach((key) => {
   //   console.log(`${key} = ${obj[key]}`);
-  // }
+  // });
+
+  for (const key in obj) {
+    console.log(`${key} = ${obj[key]}`);
+  }
 }
 
 function sendChat(key) {
