@@ -14,10 +14,14 @@
     "clean": "rm -rf node_modules",
     "start": "node server-db.js",
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
-    "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -print0 | xargs -0 jslint",
+    "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -print0 | xargs -0 eslint",
     "build": "npm run clean && npm install && find ./public/assets/ ! -type d ! -name '*.gitignore' -exec rm '{}' + && node ./build.js || true"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^7.20.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  },
   "dependencies": {
     "@forgerock/openam-agent": "^4.0.5",
     "acorn": "^8.0.5",

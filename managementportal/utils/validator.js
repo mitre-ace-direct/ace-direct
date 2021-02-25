@@ -1,4 +1,3 @@
-'use strict';
 /*
                                  NOTICE
 
@@ -15,77 +14,76 @@ McLean, VA 22102-7539, (703) 983-6000.
 */
 
 module.exports = {
-    isUniqueId: function (uniqueId) {
-        let isFormatCorrect = false;
-        if (uniqueId)
-            isFormatCorrect = (!isNaN(uniqueId) && (uniqueId.toString().length < 32) && (uniqueId.toString().indexOf(".") != -1));
-        return isFormatCorrect;
-    },
-    isDtmfDigit: function (dtmf) {
-        let isFormatCorrect = false;
-        if (dtmf)
-            isFormatCorrect = (!isNaN(dtmf) && (dtmf.toString().length == 1));
-        return isFormatCorrect;
-    },
-    isChannel: function (channel) {
-        let isFormatCorrect = false;
-        if (channel){
-            let re = /^SIP.{0,30}$/;
-            isFormatCorrect = re.test(channel);
-        }
-        return isFormatCorrect;
-    },
-    isPasswordComplex: function (password) {
-        let isFormatCorrect = false;
-        if (password) {
-            let re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,15}$/;
-            isFormatCorrect = re.test(password);
-        }
-        return isFormatCorrect;
-    },
-    isUsernameValid: function (username) {
-        let isFormatCorrect = false;
-        if (username) {
-            let legalChars = /^[a-zA-Z0-9_]+$/; // allow letters, numbers, and underscores
-            isFormatCorrect = ((username.length >= 4) && (username.length <= 10) && (legalChars.test(username)));
-
-        }
-        return isFormatCorrect;
-    },
-    isEmailValid: function (email) {
-        let isFormatCorrect = false;
-        if (email) {
-            let legalChars = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-            isFormatCorrect = ((email.length >= 1) && (email.length <= 40) && (legalChars.test(email)));
-
-        }
-        return isFormatCorrect;
-    },
-    isVrsNumberValid: function (phone) {
-        let isFormatCorrect = false;
-        if (phone) {
-            let legalChars = /^\d{10}$/;
-            isFormatCorrect = ((phone.length == 10) && (legalChars.test(phone)));
-
-        }
-        return isFormatCorrect;
-    },
-    isPhoneValid: function (phone) {
-        let isFormatCorrect = false;
-        if (phone) {
-            let legalChars = /^[1-9]\d{2}-\d{3}-\d{4}/;
-            isFormatCorrect = ((phone.length >= 1) && (phone.length <= 12) && (legalChars.test(phone)));
-
-        }
-        return isFormatCorrect;
-    },
-    isNameValid: function (name) {
-        let isFormatCorrect = false;
-        if (name) {
-            let legalChars = /^[A-Za-z\/\s\.'-]+$/;
-            isFormatCorrect = ((name.length >= 1) && (name.length <= 20) && (legalChars.test(name)));
-
-        }
-        return isFormatCorrect;
+  isUniqueId(uniqueId) {
+    let isFormatCorrect = false;
+    if (uniqueId) isFormatCorrect = (!Number.isNaN(uniqueId) && (uniqueId.toString().length < 32) && (uniqueId.toString().indexOf('.') !== -1));
+    return isFormatCorrect;
+  },
+  isDtmfDigit(dtmf) {
+    let isFormatCorrect = false;
+    if (dtmf) isFormatCorrect = (!Number.isNaN(dtmf) && (dtmf.toString().length === 1));
+    return isFormatCorrect;
+  },
+  isChannel(channel) {
+    let isFormatCorrect = false;
+    if (channel) {
+      const re = /^SIP.{0,30}$/;
+      isFormatCorrect = re.test(channel);
     }
+    return isFormatCorrect;
+  },
+  isPasswordComplex(password) {
+    let isFormatCorrect = false;
+    if (password) {
+      const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,15}$/;
+      isFormatCorrect = re.test(password);
+    }
+    console.log(`isPasswordComplex ${isFormatCorrect}`);
+    return isFormatCorrect;
+  },
+  isUsernameValid(username) {
+    let isFormatCorrect = false;
+    if (username) {
+      const legalChars = /^[a-zA-Z0-9_]+$/; // allow letters, numbers, and underscores
+      isFormatCorrect = ((username.length >= 4) && (username.length <= 10)
+        && (legalChars.test(username)));
+    }
+    console.log(`isUsernameValid ${isFormatCorrect}`);
+    return isFormatCorrect;
+  },
+  isEmailValid(email) {
+    let isFormatCorrect = false;
+    if (email) {
+      const legalChars = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+      isFormatCorrect = ((email.length >= 1) && (email.length <= 40) && (legalChars.test(email)));
+    }
+    console.log(`isEmailValid ${isFormatCorrect}`);
+    return isFormatCorrect;
+  },
+  isVrsNumberValid(phone) {
+    let isFormatCorrect = false;
+    if (phone) {
+      const legalChars = /^\d{10}$/;
+      isFormatCorrect = ((phone.length === 10) && (legalChars.test(phone)));
+    }
+    return isFormatCorrect;
+  },
+  isPhoneValid(phone) {
+    let isFormatCorrect = false;
+    if (phone) {
+      const legalChars = /^[1-9]\d{2}-\d{3}-\d{4}/;
+      isFormatCorrect = ((phone.length >= 1) && (phone.length <= 12) && (legalChars.test(phone)));
+    }
+    console.log(`isPhoneValid ${isFormatCorrect} ${phone}`);
+    return isFormatCorrect;
+  },
+  isNameValid(name) {
+    let isFormatCorrect = false;
+    if (name) {
+      const legalChars = /^[A-Za-z\/\s\.'-]+$/;
+      isFormatCorrect = ((name.length >= 1) && (name.length <= 20) && (legalChars.test(name)));
+    }
+    console.log(`isPhoneValid ${isFormatCorrect}`);
+    return isFormatCorrect;
+  }
 };
