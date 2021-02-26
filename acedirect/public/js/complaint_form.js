@@ -105,6 +105,7 @@ function clearScreen() {
 	clearDownloadList();
 	$('#fileInput').val('');
 	$('#fileSent').hide();
+	$('#fileSentError').hide();
 }
 
 function connect_socket() {
@@ -462,11 +463,11 @@ function connect_socket() {
 					}
 				}).on('fileListConsumer', function(data){
 					$('#fileSent').hide();
+					$('#fileSentError').hide();
 					addFileToDownloadList(data);   
 				}).on('fileListAgent', function(data) {
 					//file sent confirmation
-					console.log('file successfully sent');
-					$('#fileSent').show();
+					
 					$('#fileInput').val('');
 				}).on('screenshareResponse', function(data){
 					console.log("screen request received " + data.permission);
@@ -846,6 +847,8 @@ function enable_initial_buttons() {
 
 //Fileshare for consumer portal
 function shareFileConsumer() {
+	$('#fileSent').hide();
+	$('#fileSentError').hide();
 	if ($("#fileInput")[0].files[0]) {
 		var formData = new FormData();
 		console.log('uploading:');
@@ -860,9 +863,12 @@ function shareFileConsumer() {
 			success: function (data) {
 				console.log(JSON.stringify(data, null, 2))
 				socket.emit('get-file-list-consumer', {vrs : $('#callerPhone').val().replace(/^1|[^\d]/g, '')});
+				console.log('file successfully sent');
+				$('#fileSent').show();
 			},
 			error: function (jXHR, textStatus, errorThrown) {
 				console.log("ERROR");
+				$('#fileSentError').show();
 			}
 		});
 	}
@@ -934,7 +940,7 @@ function addFileToDownloadList(data) {
 	$("#consumer-file-group").show();
 	$('#consumer-file-list ').append(
 		$('<li class="list-group-item btn-primary btn btn-flat">')
-		.append('<a style="color:white" target="_blank" href="./downloadFile?id=' + data.id + '">' + data.original_filename + '</a>')
+		.append('<a style="color:white;display:block;" target="_blank" href="./downloadFile?id=' + data.id + '">' + data.original_filename + '</a>')
 	);  
 }
 
