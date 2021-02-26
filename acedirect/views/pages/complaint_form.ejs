@@ -485,6 +485,17 @@
 									<br>
 									<br>
 
+									<div class="alert alert-success" alert-dismissable id="fileSent"
+										style="margin-top: 10px;" hidden>
+										<span class="close" onclick="$('#fileSent').hide();"
+											style="text-decoration:none">×</span>
+										<strong>Success!</strong> File Sent
+									</div>
+									<div class="alert alert-danger"  alert-dismissable id="fileSentError" style="margin-top: 10px;" hidden>
+										<span class="close" onclick="$('#fileSentError').hide();" style="text-decoration:none">×</span>
+										<strong>Error!</strong>  Error sending file
+									</div>
+
 									<div class="btn-group">
 										<input type="file" id="fileInput" name="fileInput"
 											class="form-control-file btn btn-default"
@@ -498,13 +509,6 @@
 										<span>Select the file to download:</span>
 										<ul class="list-group" id="consumer-file-list">
 										</ul>
-									</div>
-
-									<div class="alert alert-success" alert-dismissable id="fileSent"
-										style="margin-top: 10px;" hidden>
-										<span class="close" onclick="$('#fileSent').hide();"
-											style="text-decoration:none">×</span>
-										<strong>Success!</strong> File Sent
 									</div>
 
 								</div>
