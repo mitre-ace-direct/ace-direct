@@ -9,6 +9,18 @@
         </div>
     </div>
     <div class="box-body">
+        <div class="box-footer" id="chat-footer">
+            <div class="row">
+                <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
+                    <span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
+                    <strong>Success!</strong>  File Sent
+                </div>
+                <div class="alert alert-danger"  alert-dismissable id="fileSentError" style="margin-top: 10px;" hidden>
+                    <span class="close" onclick="$('#fileSentError').hide();" style="text-decoration:none">×</span>
+                    <strong>Error!</strong>  Error sending file
+                </div>
+            </div>
+        </div>
         <p>
             <a id="sidebar-fileShare" class="cap-setting config-hide nav-item">
                 <span>
@@ -30,16 +42,5 @@
         </div>
         
     </div>
-    <div class="box-footer" id="chat-footer">
-        <div class="row">
-            <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
-                <span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
-                <strong>Success!</strong>  File Sent
-            </div>
-            <div class="alert alert-danger"  alert-dismissable id="fileSentError" style="margin-top: 10px;" hidden>
-                <span class="close" onclick="$('#fileSentError').hide();" style="text-decoration:none">×</span>
-                <strong>Error!</strong>  Error sending file
-            </div>
-        </div>
-    </div>
+   
 </div>
