@@ -11,7 +11,7 @@
 ```bash
 $  cd ace-direct
 $
-$  npm install jslint -g  # use sudo if running locally
+$  npm run preinstall  # one time
 ```
 
 ## Building
