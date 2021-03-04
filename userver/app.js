@@ -157,5 +157,8 @@ app.use(bodyParser.json({ type: 'application/vnd/api+json' }));
 require('./routes/routes.js')(app, connection, itrsMode);
 
 const httpsServer = https.createServer(credentials, app);
-httpsServer.listen(parseInt(getConfigVal('user_service:port'), 10));
+const appServer = httpsServer.listen(parseInt(getConfigVal('user_service:port'), 10));
 console.log('https web server for agent portal up and running on port=%s   (Ctrl+C to Quit)', parseInt(getConfigVal('user_service:port'), 10));
+
+module.exports = appServer;
+module.exports.myCleanup = myCleanup;
