@@ -1415,6 +1415,7 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
 	}).get();
 
 	console.log('Click event for playing video');
+	
 	console.log('vidId: ' + tableData[4]);
 	$("#videomailId").attr("name", tableData[4]);
 	$("#callbacknum").attr("name", tableData[0]);
@@ -1712,11 +1713,15 @@ function playVideomail(id, duration, vidStatus) {
 	toggle_incall_buttons(false);
 	toggle_videomail_buttons(true);
 	updateVideoTime(duration, "vmail-total-time");
-	if (vidStatus === "UNREAD") {
-		videomail_read_onclick(id);
-	}
+	videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS');
 	seekBar.value = 0;
 	remoteView.currentTime = 0;
+	
+	//Add the event listener for when the videomail finishes playing
+	document.getElementById('remoteView').addEventListener('ended', (event) => {
+		console.log("Finished playing videomail");
+		videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ');
+	});
 }
 
 //Update the time progress in the videomail seekbar
@@ -1787,15 +1792,6 @@ function videomail_status_change(id, videoStatus) {
 		"id": id,
 		"extension": extensionMe,
 		"status": videoStatus
-	});
-}
-
-//Marks the videomail read when the agent clicks it and doesn't close the videomail view
-function videomail_read_onclick(id) {
-	videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS');
-	socket.emit('videomail-read-onclick', {
-		"id": id,
-		"extension": extensionMe
 	});
 }
 
@@ -2544,12 +2540,6 @@ function ShareFile(){
 $("#fullscreen-element").dblclick(function(){
 	enterFullscreen();
 })
-
-//Update videomail status when it reaches the end of playing
-//$("#remoteView").addEventListener('ended', function() {
-document.getElementById('remoteView').onended = function() {
-	videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ');
-}
 
 //Alert message function
 function showAlert(alertType, alertText){
