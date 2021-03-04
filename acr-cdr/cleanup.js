@@ -1,30 +1,24 @@
-function noOp() {};
+function noOp() {}
+
 exports.Cleanup = function Cleanup(callback) {
-  callback = callback || noOp;
-  process.on('cleanup',callback);
-  process.on('exit', function () {
+  const callbackInt = callback || noOp;
+  process.on('cleanup', callbackInt);
+  process.on('exit', () => {
     process.emit('cleanup');
   });
-  process.on('SIGINT', function () {
-    console.log('Ctrl-C...');
+  process.on('SIGINT', () => {
     process.exit(2);
   });
-  process.on('SIGUSR1', function () {
-    console.log('Kill 1 caught...');
+  process.on('SIGUSR1', () => {
     process.exit(3);
   });
-  process.on('SIGUSR2', function () {
-    console.log('Kill 2 caught...');
+  process.on('SIGUSR2', () => {
     process.exit(4);
   });
-  process.on('SIGTERM', function () {
-    console.log('SIGTERM...');
+  process.on('SIGTERM', () => {
     process.exit(5);
   });
-  process.on('uncaughtException', function(e) {
-    console.log('Uncaught Exception...');
-    console.log(e.stack);
+  process.on('uncaughtException', () => {
     process.exit(99);
   });
 };
-
