@@ -1074,6 +1074,41 @@ $('#language-select').on('change', function () {
 var recognition = null;
 function multipartyCaptionsStart() {
 	var language = $('#language-select').val();
+	switch (language) {
+        case 'en': // English US
+			language = "en-US"
+            break;
+        case 'es': // Spanish (Mexican)
+			language = "es-US"
+            break;
+        case 'ar': // Arabic (Modern Standard)
+			language  = "ar-EG";
+            break;
+        case 'pt': // Brazilian Portuguese
+			language = "pt-PT"
+            break;
+        case 'zh': // Chinese (Mandarin)
+			language = "zh"
+            break;
+        case 'nl': // Dutch
+			language = "nl-NL"
+            break;
+        case 'fr': // French
+			language = "fr-FR";
+            break;
+        case 'de': // German
+			language = "de-DE"
+            break;
+        case 'it': // Italian
+			language = "it-IT"
+            break;
+        case 'ja': // Japanese
+			language = "ja-JP"
+            break;
+        case 'ko': // Korean
+			language = "ko-KR"
+            break;
+    }
 	recognition = new webkitSpeechRecognition();
 	recognition.continuous = true;
 	recognition.lang = language;
@@ -1105,5 +1140,5 @@ function multipartyCaptionsEnd() {
 	if(recognition)
 		recognition.abort();
 	recognition = null;
-	callParticipants = []
+	callParticipants = [];
 }
