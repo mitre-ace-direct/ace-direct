@@ -1,22 +1,24 @@
 // This is the main JS for the fendesk RESTFul server
-var https = require('https');
-var express = require('express');
-var bodyParser = require('body-parser');
-var app = express();
-var fs = require('fs');
-var clear = require('clear');
-var log4js = require('log4js');
-var nconf = require('nconf');
-var cfile = null;
-var ip = require("ip");
+const https = require('https');
+const express = require('express');
+const bodyParser = require('body-parser');
+const fs = require('fs');
+const log4js = require('log4js');
+const nconf = require('nconf');
+const ip = require('ip');
+const path = require('path');
+
+const app = express();
+const cfile = '../dat/config.json';
+let clearText = false;
 
 // Initialize log4js
-var logname = 'fendesk';
+const logname = 'fendesk';
 log4js.configure({
   appenders: {
     fendesk: {
       type: 'dateFile',
-      filename: 'logs/' + logname + '.log',
+      filename: `logs/${logname}.log`,
       alwaysIncludePattern: false,
       maxLogSize: 20480,
       backups: 10
@@ -28,37 +30,65 @@ log4js.configure({
       level: 'error'
     }
   }
-})
+});
+
 // Get the name of the config file from the command line (optional)
 nconf.argv().env();
 
-cfile = '../dat/config.json';
-
-//Validate the incoming JSON config file
+// Validate the incoming JSON config file
 try {
-	var content = fs.readFileSync(cfile,'utf8');
-	var myjson = JSON.parse(content);
+  const content = fs.readFileSync(cfile, 'utf8');
+  JSON.parse(content);
 } catch (ex) {
-    console.log("");
-    console.log("*******************************************************");
-    console.log("Error! Malformed configuration file: " + cfile);
-    console.log('Exiting...');
-    console.log("*******************************************************");
-    console.log("");
-    process.exit(1);
+  console.log('');
+  console.log('*******************************************************');
+  console.log(`Error! Malformed configuration file: ${cfile}`);
+  console.log('Exiting...');
+  console.log('*******************************************************');
+  console.log('');
+  process.exit(1);
 }
 
-var logger = log4js.getLogger('fendesk');
+const logger = log4js.getLogger('fendesk');
 
-nconf.file({file: cfile});
-var configobj = JSON.parse(fs.readFileSync(cfile,'utf8'));
+nconf.file({
+  file: cfile
+});
 
-//the presence of a populated cleartext field in config.json means that the file is in clear text
-//remove the field or set it to "" if the file is encoded
-var clearText = false;
-if (typeof(nconf.get('common:cleartext')) !== "undefined"  && nconf.get('common:cleartext') !== ""    ) {
-    console.log('clearText field is in config.json. assuming file is in clear text');
-    clearText = true;
+// the presence of a populated cleartext field in config.json means that the file is in clear text
+// remove the field or set it to "" if the file is encoded
+if (typeof (nconf.get('common:cleartext')) !== 'undefined' && nconf.get('common:cleartext') !== '') {
+  console.log('clearText field is in config.json. assuming file is in clear text');
+  clearText = true;
+}
+
+/**
+ * Function to verify the config parameter name and
+ * decode it from Base64 (if necessary).
+ * @param {type} paramName of the config parameter
+ * @returns {unresolved} Decoded readable string.
+ */
+function getConfigVal(paramName) {
+  const val = nconf.get(paramName);
+  let decodedString = null;
+  if (typeof val !== 'undefined' && val !== null) {
+    // found value for paramName
+    decodedString = null;
+    if (clearText) {
+      decodedString = val;
+    } else {
+      decodedString = Buffer.alloc(val.length, val, 'base64');
+    }
+  } else {
+    // did not find value for paramName
+    logger.error('');
+    logger.error('*******************************************************');
+    logger.error(`ERROR!!! Config parameter is missing: ${paramName}`);
+    logger.error('*******************************************************');
+    logger.error('');
+    decodedString = '';
+  }
+  return (decodedString.toString());
 }
 
 // Set log4js level from the config file
@@ -69,58 +99,32 @@ logger.info('INFO messages enabled.');
 logger.warn('WARN messages enabled.');
 logger.error('ERROR messages enabled.');
 logger.fatal('FATAL messages enabled.');
-logger.info('Using config file: ' + cfile);
+logger.info(`Using config file: ${cfile}`);
 
-
-var credentials = {
-	key: fs.readFileSync(getConfigVal('common:https:private_key')),
-	cert: fs.readFileSync(getConfigVal('common:https:certificate'))
+const credentials = {
+  key: fs.readFileSync(getConfigVal('common:https:private_key')),
+  cert: fs.readFileSync(getConfigVal('common:https:certificate'))
 };
 
 // Start the server
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/apidoc',express.static(__dirname + '/apidoc'));
-app.use(bodyParser.json({type: 'application/vnd/api+json'}));
 
-var routes = require('./routes/routes.js')(app,fs,ip,getConfigVal('zendesk:port'),logger);
-var httpsServer = https.createServer(credentials,app);
-const appServer = httpsServer.listen(parseInt(getConfigVal('zendesk:port')));
-logger.debug('HTTPS Fendesk server running on port=%s   (Ctrl+C to Quit)', parseInt(getConfigVal('zendesk:port')));
+const staticFilePath = path.join(__dirname, '/apidoc');
+app.use(express.static(staticFilePath));
 
+app.use(bodyParser.json({ type: 'application/vnd/api+json' }));
+
+require('./routes/routes.js')(app, fs, ip, getConfigVal('zendesk:port'), logger);
+
+const httpsServer = https.createServer(credentials, app);
+const appServer = httpsServer.listen(parseInt(getConfigVal('zendesk:port'), 10));
+logger.debug('HTTPS Fendesk server running on port=%s   (Ctrl+C to Quit)', parseInt(getConfigVal('zendesk:port'), 10));
 
 // Handle Ctrl-C (graceful shutdown)
-process.on('SIGINT', function() {
+process.on('SIGINT', () => {
   logger.debug('Exiting...');
   process.exit(0);
 });
-
-/**
- * Function to verify the config parameter name and
- * decode it from Base64 (if necessary).
- * @param {type} param_name of the config parameter
- * @returns {unresolved} Decoded readable string.
- */
-function getConfigVal(param_name) {
-  var val = nconf.get(param_name);
-  if (typeof val !== 'undefined' && val !== null) {
-    //found value for param_name
-    var decodedString = null;
-    if (clearText) {
-      decodedString = val;
-    } else {
-      decodedString = new Buffer(val, 'base64');
-    }
-  } else {
-    //did not find value for param_name
-    logger.error('');
-    logger.error('*******************************************************');
-    logger.error('ERROR!!! Config parameter is missing: ' + param_name);
-    logger.error('*******************************************************');
-    logger.error('');
-    decodedString = "";
-  }
-  return (decodedString.toString());
-}
 
 module.exports = appServer;
