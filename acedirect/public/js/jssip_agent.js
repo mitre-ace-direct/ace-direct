@@ -510,7 +510,7 @@ function terminate_call() {
 	mute_captions();
 	disable_chat_buttons();
 	enable_initial_buttons();
-	multipartyCaptionsEnd()
+	multipartyCaptionsEnd();
 	$("#start-call-buttons").show();
 	exitFullscreen();
 	$("#sidebar-dialpad").on('click', showDialpad);
@@ -1076,38 +1076,40 @@ function multipartyCaptionsStart() {
 	var language = $('#language-select').val();
 	switch (language) {
         case 'en': // English US
-			language = "en-US"
+			language = "en-US";
             break;
         case 'es': // Spanish (Mexican)
-			language = "es-US"
+			language = "es-US";
             break;
         case 'ar': // Arabic (Modern Standard)
 			language  = "ar-EG";
             break;
         case 'pt': // Brazilian Portuguese
-			language = "pt-PT"
+			language = "pt-PT";
             break;
         case 'zh': // Chinese (Mandarin)
-			language = "zh"
+			language = "zh";
             break;
         case 'nl': // Dutch
-			language = "nl-NL"
+			language = "nl-NL";
             break;
         case 'fr': // French
 			language = "fr-FR";
             break;
         case 'de': // German
-			language = "de-DE"
+			language = "de-DE";
             break;
         case 'it': // Italian
-			language = "it-IT"
+			language = "it-IT";
             break;
         case 'ja': // Japanese
-			language = "ja-JP"
+			language = "ja-JP";
             break;
         case 'ko': // Korean
-			language = "ko-KR"
-            break;
+			language = "ko-KR";
+			break;
+		default:
+			language = "en-US";
     }
 	recognition = new webkitSpeechRecognition();
 	recognition.continuous = true;
