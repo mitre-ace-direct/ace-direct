@@ -4,7 +4,7 @@
   "description": "This folder is not required for the Provider portal.",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --exit",
     "clean": "rm -rf node_modules >/dev/null",
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
     "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -not -path './public/js/*' -print0 | xargs -0 jslint",
@@ -20,7 +20,14 @@
     "ip": "^1.1.5",
     "log4js": "^3.0.6",
     "minimist": "^1.2.5",
+    "mocha": "^8.3.0",
     "mysql": "^2.10.2",
-    "nconf": "^0.8.4"
+    "nconf": "^0.8.4",
+    "supertest": "^6.1.3"
+  },
+  "devDependencies": {
+    "eslint": "^7.21.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
   }
 }
