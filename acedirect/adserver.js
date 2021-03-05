@@ -824,6 +824,25 @@ io.sockets.on('connection', function (socket) {
 		  });
 	});
 
+	socket.on('multiparty-caption-agent', function(data){
+		if(data.final){ //only send finals during a multiparty call, browser caption engine fragments sentences
+			let d = new Date();
+			data.timestamp = d.getTime();
+			data.msgid = d.getTime();
+			console.log('$$$$$$$$$$',JSON.stringify(data))
+			if(data.participants && data.participants.length > 0){
+				data.participants.forEach(p => {
+					redisClient.hget(rExtensionToVrs, Number(p), function (err, vrsNum) {
+            					if (!err){ 
+							p = (vrsNum) ? vrsNum : p;
+							io.to(Number(p)).emit('multiparty-caption', data);
+						}
+					});
+				});
+			}
+		}
+	});
+
 	socket.on('requestScreenshare', function(data){
 		console.log("Receiving screenshare request to " + data.agentNumber);
 		io.to(Number(data.agentNumber)).emit('screenshareRequest', {
@@ -1850,7 +1869,7 @@ io.sockets.on('connection', function (socket) {
 								languageFrom = language;
 								console.log('language from for user', fromNumber, languageFrom);
 								if (!languageFrom) {
-									languageFrom = 'en'; // default English
+									languageFrom = 'en-US'; // default English
 								}
 
 								resolve();
@@ -1866,7 +1885,7 @@ io.sockets.on('connection', function (socket) {
 							else {
 								languageTo = language;
 								if (!languageTo) {
-									languageTo = 'en'; // default English
+									languageTo = 'en-US'; // default English
 								}
 								resolve();
 							}
@@ -1883,6 +1902,7 @@ io.sockets.on('connection', function (socket) {
 						console.log('same language!');
 						socket.emit('caption-translated', {
 							'transcript' : data.transcripts.transcript.trim(),
+							'displayname' : data.transcripts.displayname,
 							'msgid': msgid,
 							'final': final
 						});
@@ -1902,6 +1922,7 @@ io.sockets.on('connection', function (socket) {
 								console.error("GET translation error: " + error);
 								socket.emit('caption-translated', {
 									'transcript' : 'Error using translation server: ' + translationUrl,
+									'displayname' : data.transcripts.displayname,
 									'msgid': msgid,
 									'final': final
 								});
@@ -1911,6 +1932,7 @@ io.sockets.on('connection', function (socket) {
 								// fixme will this be wrong if multiple clients/agents?
 								socket.emit('caption-translated', {
 									'transcript' : data.translation,
+									'displayname' : data.transcripts.displayname,
 									'msgid': msgid,
 									'final': final
 									});
