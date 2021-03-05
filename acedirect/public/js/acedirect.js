@@ -590,10 +590,8 @@ function connect_socket() {
 				}).on('caption-translated', function (transcripts) {
 						console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
 					if(acekurento.isMultiparty){
-						//TODO: clear Regular Transcripts
-						updateCaptionsMultiparty(transcripts)
+						updateCaptionsMultiparty(transcripts);
 					}else{
-						//TODO: clear Multiparty Transcripts
 						updateCaptions(transcripts); // in jssip_agent.js
 					}
 				}).on('multiparty-caption', function (transcripts) {
