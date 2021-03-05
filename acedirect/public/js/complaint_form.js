@@ -481,9 +481,20 @@ function connect_socket() {
 						console.log("No permission");
 						$("#requestAck").html("Permission has been denied.");
 					}
+				}).on('multiparty-caption', function (transcripts) {
+					console.log(JSON.stringify(transcripts))
+					socket.emit('translate-caption', {
+						"transcripts": transcripts,
+						"callerNumber": exten
+					});
 				}).on('caption-translated', function (transcripts) {
 					console.log('consumer received translation', transcripts);
-					updateConsumerCaptions(transcripts); // in jssip_consumer.js
+					if(acekurento.isMultiparty){
+						//TODO: clear Regular Transcripts
+						updateCaptionsMultiparty(transcripts);
+					} else {
+						updateConsumerCaptions(transcripts); // in jssip_consumer.js
+					}
 				}).on('enable-translation', function() {
 					// Activate flag/language dropdown
 					$("#language-select").msDropDown(
