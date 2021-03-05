@@ -105,7 +105,7 @@
 						setTimeout(function(){disable_video_privacy()},1000);
 					} else {
 						var transcripts = JSON.parse(e.msg);
-						if(transcripts.transcript) {
+						if(transcripts.transcript && !acekurento.isMultiparty) {
 							// Acedirect will skip translation service if languages are the same
 							console.log('sending caption:', transcripts.transcript, myExtension);
 							socket.emit('translate-caption', {
@@ -544,7 +544,7 @@
 		var color = current.substring(0,current.lastIndexOf(',')+1) + alpha + ')';
 		document.documentElement.style.setProperty('--caption-bg-color', color);
 	});
-
+	var tempDivTimeout = null;
 	function updateConsumerCaptions(transcripts) {
 		console.log('--- WV: transcripts.transcript ---\n');
 		console.log('consumer uc: ', transcripts)
@@ -556,7 +556,9 @@
 			temp.innerHTML = transcripts.transcript;
 			temp.classList.add("transcripttext");
 			document.getElementById("transcriptoverlay").appendChild(temp);
+			tempDivTimeout = setTimeout(function () { temp.remove() }, 5000);
 		} else {
+			clearTimeout(tempDivTimeout);
 			tDiv.innerHTML = transcripts.transcript;
 			if(transcripts.final || call_terminated) {
 				setTimeout(function(){tDiv.remove();},5000);
@@ -666,3 +668,11 @@
 	}
 
 
+function updateCaptionsMultiparty(transcripts) {
+	var temp = document.createElement("div");
+	temp.id = transcripts.msgid;
+	temp.innerHTML = transcripts.displayname + ": " + transcripts.transcript;
+	temp.classList.add("transcripttext");
+	document.getElementById("transcriptoverlay").appendChild(temp);
+	setTimeout(function () { temp.remove() }, 5000);
+}
