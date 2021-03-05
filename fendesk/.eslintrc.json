@@ -15,7 +15,8 @@
     "rules": {
         "no-console": "off",
         "comma-dangle": ["error", "never"],
-        "no-unused-vars": [2, {"args": "after-used", "argsIgnorePattern": "^_"}]
+        "no-unused-vars": [2, {"args": "after-used", "argsIgnorePattern": "^_"}],
+        "prefer-destructuring": ["error", {"object": true, "array": false}]
     }
   }
   
