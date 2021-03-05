@@ -591,7 +591,6 @@ function connect_socket() {
 						console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
 					if(acekurento.isMultiparty){
 						//TODO: clear Regular Transcripts
-						console.log("$$$$$$$$",JSON.stringify(transcripts))
 						updateCaptionsMultiparty(transcripts)
 					}else{
 						//TODO: clear Multiparty Transcripts
