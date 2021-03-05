@@ -85,7 +85,7 @@ app.use(bodyParser.json({type: 'application/vnd/api+json'}));
 
 var routes = require('./routes/routes.js')(app,fs,ip,getConfigVal('zendesk:port'),logger);
 var httpsServer = https.createServer(credentials,app);
-httpsServer.listen(parseInt(getConfigVal('zendesk:port')));
+const appServer = httpsServer.listen(parseInt(getConfigVal('zendesk:port')));
 logger.debug('HTTPS Fendesk server running on port=%s   (Ctrl+C to Quit)', parseInt(getConfigVal('zendesk:port')));
 
 
@@ -122,3 +122,5 @@ function getConfigVal(param_name) {
   }
   return (decodedString.toString());
 }
+
+module.exports = appServer;
