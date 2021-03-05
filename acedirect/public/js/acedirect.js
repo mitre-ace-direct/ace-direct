@@ -588,8 +588,21 @@ function connect_socket() {
 						keyboard: false
 					});
 				}).on('caption-translated', function (transcripts) {
-					console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
-					updateCaptions(transcripts); // in jssip_agent.js
+						console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
+					if(acekurento.isMultiparty){
+						//TODO: clear Regular Transcripts
+						console.log("$$$$$$$$",JSON.stringify(transcripts))
+						updateCaptionsMultiparty(transcripts)
+					}else{
+						//TODO: clear Multiparty Transcripts
+						updateCaptions(transcripts); // in jssip_agent.js
+					}
+				}).on('multiparty-caption', function (transcripts) {
+					console.log(JSON.stringify(transcripts))
+					socket.emit('translate-caption', {
+						"transcripts": transcripts,
+						"callerNumber": extensionMe
+					});
 				}).on('new-agent-chat', function(data) {
 					var count = 0;
 					if(!isAgentChatSaved && $('#chatHeader').html() !== data.displayname) {
