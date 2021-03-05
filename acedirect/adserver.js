@@ -829,7 +829,6 @@ io.sockets.on('connection', function (socket) {
 			let d = new Date();
 			data.timestamp = d.getTime();
 			data.msgid = d.getTime();
-			console.log('$$$$$$$$$$',JSON.stringify(data))
 			if(data.participants && data.participants.length > 0){
 				data.participants.forEach(p => {
 					redisClient.hget(rExtensionToVrs, Number(p), function (err, vrsNum) {
