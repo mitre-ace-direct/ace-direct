@@ -22,6 +22,7 @@ var incomingCall = null;
 var recording = false;
 var outbound_timer = null;
 var callParticipants = [];
+var isMuted = false;
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -637,6 +638,7 @@ function mute_audio() {
 		mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
 		mute_audio_icon.classList.add("fa-microphone-slash");
 		mute_audio_icon.classList.remove("fa-microphone");
+		isMuted = true;
 	}
 }
 
@@ -648,6 +650,7 @@ function unmute_audio() {
 		mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
 		mute_audio_icon.classList.add("fa-microphone");
 		mute_audio_icon.classList.remove("fa-microphone-slash");
+		isMuted = false;
 	}
 }
 
@@ -1077,7 +1080,7 @@ function multipartyCaptionsStart() {
 	recognition.interimResults = false;
 	recognition.maxAlternatives = 1;
 	recognition.onresult = function (event) {
-		if(event && event.results && (event.results.length > 0)){
+		if(!isMuted && event && event.results && (event.results.length > 0)){
 			var lastResult = event.results.length - 1;
 			socket.emit('multiparty-caption-agent', {
 				"transcript":event.results[lastResult][0].transcript,
@@ -1092,8 +1095,7 @@ function multipartyCaptionsStart() {
 	};
 
 	recognition.onend = function (event) {
-		console.log("ENDED!!!!!!!!!!!!!!! WHAT TO DO????????")
-		if(acekurento.isMultiparty)
+		if(acekurento.isMultiparty && (callParticipants.length > 2))
 			multipartyCaptionsStart();	
 	}
 	recognition.start();
@@ -1103,4 +1105,5 @@ function multipartyCaptionsEnd() {
 	if(recognition)
 		recognition.abort();
 	recognition = null;
+	callParticipants = []
 }
