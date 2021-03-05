@@ -558,7 +558,7 @@
 			document.getElementById("transcriptoverlay").appendChild(temp);
 			tempDivTimeout = setTimeout(function () { temp.remove() }, 5000);
 		} else {
-			clearTimeout(tempDivTimeout)
+			clearTimeout(tempDivTimeout);
 			tDiv.innerHTML = transcripts.transcript;
 			if(transcripts.final || call_terminated) {
 				setTimeout(function(){tDiv.remove();},5000);
