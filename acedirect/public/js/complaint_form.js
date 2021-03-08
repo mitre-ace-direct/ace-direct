@@ -21,7 +21,7 @@ $(document).ready(function () {
 	//JSSIP components
 	$('#login-full-background').hide();
 	$('#login-box').hide();
-	$('#webcam').show();
+	$('#consumer-webcam').show();
 
 	$('#complaint').keyup(function () {
 		var left = 2000 - $(this).val().length;
@@ -370,7 +370,7 @@ function connect_socket() {
 						$("#video-section").removeClass(function (index, className) {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
-						$("#video-section").addClass("col-lg-7");
+						$("#video-section").addClass("col-lg-6");
 						$("#chat-section").removeClass(function (index, className) {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
