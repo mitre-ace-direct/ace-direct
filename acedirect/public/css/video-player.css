@@ -1,11 +1,25 @@
 #fullscreen-element {
 	padding: 0;
 	height: 100%;
-	overflow: hidden;
+	/* overflow: auto; */
 }
 #webcam {
 	height: 100%;
 	position: relative;
+}
+
+#consumer-webcam {
+  height: 70%;
+	position: relative;
+}
+
+#consumer-captions {
+  background-color:black;
+  margin-top: -6px;
+  height:100px;
+  position:relative;
+  overflow-y:auto;
+   /* max-height: fit-content; */
 }
 
 #selfView { 
