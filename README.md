@@ -12,14 +12,12 @@
 $  cd ace-direct
 $
 $  npm run preinstall  # one time
-```
-
-## Building
-
-```bash
-$  cd ace-direct
+$  npm run build  # build
 $
-$  npm run build
+$  npm run test  # automated tests
+$  npm run lint  # run linting tests
+$  npm run clean  # remove all external libs
+$  npm run clean:logs  # remove log files
 ```
 
 ## Deploying
