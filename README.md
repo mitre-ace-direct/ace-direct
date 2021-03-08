@@ -53,7 +53,7 @@ The URLs depend on your `dat/config.json` settings. Sample ACE Direct URLs are:
 
 See the [docs](docs/) folder for complete documentation, including the user guide and installation manual.
 
-For installation help, see the [docs/installation](docs/installation/) folder.
+For installation help, see the [docs/installation](docs/installation/) folder. See the [INSTALLATION.md](docs/installation/INSTALLATION.md) file.
 
 ## Release Notes
 
