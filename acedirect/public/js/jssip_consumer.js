@@ -287,6 +287,7 @@
 		$("#agent-name").text("");
 		exitFullscreen();
 		$('#transcriptoverlay').html('');
+		$('#consumer-captions').hide();
 
 		//reset the incall mute button
 		mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
@@ -342,10 +343,10 @@
 		}
 		removeElement("selfView");
 		removeElement("remoteView");
-		addElement("webcam", "video", "remoteView");
+		addElement("consumer-webcam", "video", "remoteView");
 		remoteView.setAttribute("autoplay", "autoplay");
 		remoteView.setAttribute("poster", "images/acedirect-logo-trim.png");
-		addElement("webcam", "video", "selfView");
+		addElement("consumer-webcam", "video", "selfView");
 		selfView.setAttribute("style", "right: 11px");
 		selfView.setAttribute("autoplay", "autoplay");
 		selfView.setAttribute("muted", true);
@@ -546,22 +547,24 @@
 	});
 	var tempDivTimeout = null;
 	function updateConsumerCaptions(transcripts) {
+		$('#consumer-captions').show();
 		console.log('--- WV: transcripts.transcript ---\n');
 		console.log('consumer uc: ', transcripts)
 
 		var tDiv = document.getElementById(transcripts.msgid);
+		let caption = "AGENT: " + transcripts.transcript;
 		if(!tDiv) {
 			var temp = document.createElement("div");
 			temp.id = transcripts.msgid;
-			temp.innerHTML = transcripts.transcript;
+			temp.innerHTML = caption;
 			temp.classList.add("transcripttext");
 			document.getElementById("transcriptoverlay").appendChild(temp);
-			tempDivTimeout = setTimeout(function () { temp.remove() }, 5000);
+			let elem = $('#consumer-captions')
+			elem.scrollTop(elem.prop("scrollHeight")); // Scroll to bottom
 		} else {
-			clearTimeout(tempDivTimeout);
-			tempDivTimeout = setTimeout(function(){tDiv.remove();},5000);
-			tDiv.innerHTML = transcripts.transcript;
+			tDiv.innerHTML = caption;
 			if(transcripts.final || call_terminated) {
+				// setTimeout(function(){tDiv.remove();},5000);
 
 				//var captionBubble = '<div><b>' +transcripts.timestamp + ':</b>&nbsp;'+transcripts.transcript+'<br/><div>';
 				//$(captionBubble).appendTo($("#caption-messages"));
