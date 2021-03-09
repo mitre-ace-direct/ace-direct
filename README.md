@@ -8,6 +8,31 @@
 
 ## Setup
 
+Set up your local Node.js environment:
+
+1. Make sure Node.js is already installed.
+1. Add `N_PREFIX` to your  `~/.bash_profile`:
+
+  ```bash
+  N_PREFIX=$HOME/.n
+  PATH=$N_PREFIX/bin:$PATH:$HOME/.local/bin:$HOME/bin
+  export PATH N_PREFIX
+  ```
+
+1. From a terminal, install Node `n` manager:
+
+  ```bash
+  $  cd
+  $
+  $  . .bash_profile
+  $  mkdir .n
+  $  npm install -g n
+  $  n 12.18.2  # for example
+  $  node -v
+  ```
+
+## Build
+
 ```bash
 $  cd ace-direct
 $
