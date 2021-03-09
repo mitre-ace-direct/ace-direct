@@ -11,15 +11,14 @@
 ```bash
 $  cd ace-direct
 $
-$  npm install jslint -g  # use sudo if running locally
-```
-
-## Building
-
-```bash
-$  cd ace-direct
+$  npm run preinstall  # one time
+$  npm run build  # build
+$  npm run postinstall  # right now, one time
 $
-$  npm run build
+$  npm run test  # automated tests
+$  npm run lint  # run linting tests
+$  npm run clean  # remove all external libs
+$  npm run clean:logs  # remove log files
 ```
 
 ## Deploying
@@ -55,7 +54,7 @@ The URLs depend on your `dat/config.json` settings. Sample ACE Direct URLs are:
 
 See the [docs](docs/) folder for complete documentation, including the user guide and installation manual.
 
-For installation help, see the [docs/installation](docs/installation/) folder.
+For installation help, see the [docs/installation](docs/installation/) folder. See the [INSTALLATION.md](docs/installation/INSTALLATION.md) file.
 
 ## Release Notes
 
