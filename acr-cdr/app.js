@@ -159,5 +159,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 require('./routes/routes.js')(app, connection, logger, cdrTable);
 
 const httpsServer = https.createServer(credentials, app);
-httpsServer.listen(listenPort);
+const appServer = httpsServer.listen(listenPort);
 console.log('CDR listening on port=%s ...   (Ctrl+C to Quit)', listenPort);
+
+module.exports = appServer;
+module.exports.myCleanup = myCleanup;
