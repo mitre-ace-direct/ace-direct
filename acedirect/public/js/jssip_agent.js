@@ -15,12 +15,14 @@ var mute_captions_icon = document.getElementById("mute-captions-off-icon");
 var transcript_overlay = document.getElementById("transcriptoverlay");
 var hide_video_icon = document.getElementById("mute-camera-off-icon");
 var hold_button = document.getElementById("hold-call");
-var screenShareEnabled = false; 
+var screenShareEnabled = false;
 var debug = true; //console logs event info if true
 var jssip_debug = true; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
 var incomingCall = null;
 var recording = false;
 var outbound_timer = null;
+var callParticipants = [];
+var isMuted = false;
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -51,18 +53,38 @@ function register_jssip() {
 			try {
 				var transcripts = JSON.parse(e.msg);
 				if (transcripts.transcript) {
-					// Acedirect will skip translation service if languages are the same
-					console.log('sending caption:', transcripts.transcript, extensionMe);
-					socket.emit('translate-caption', {
-						"transcripts": transcripts,
-						"callerNumber": extensionMe
-					});
-					// acedirect.js is listening for 'caption-translated' and will call updateCaptions directly with the translation
-					
+					if (acekurento.isMultiparty) {
+                        			socket.emit('multiparty-caption-agent', {
+							"transcript": transcripts.transcript,
+							"final": transcripts.final,
+							"language": transcripts.langCd,
+							"displayname": $('#callerFirstName').val() + " " + $('#callerLastName').val(),
+							"agent": false,
+							"participants": callParticipants
+						});
+					} else {
+						// Acedirect will skip translation service if languages are the same
+						console.log('sending caption:', transcripts.transcript, extensionMe);
+						socket.emit('translate-caption', {
+							"transcripts": transcripts,
+							"callerNumber": extensionMe
+						});
+					}
 				}
 			} catch (err) {
 				console.log(err);
 			}
+
+		},
+		'participantsUpdate': function(e) {
+			console.log('--- WV: Participants Update ---\n');
+			console.log('--- WV: ' + JSON.stringify(e));
+			callParticipants = e.participants.map(function (p) { return p.ext; });
+			if(callParticipants.length > 2){
+				multipartyCaptionsStart();
+			} else {
+				multipartyCaptionsEnd()
+			}                      
 
 		},
 		'registerResponse': function (error) {
@@ -119,24 +141,24 @@ function register_jssip() {
 		'failed': function (e) {
 			console.log('--- WV: Failed ---\n' + e);
 		},
-                'restartCallResponse': function (e) {
-                        console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e) );
-                        if (selfStream.srcObject) {
-                          selfStream.srcObject.getVideoTracks()[0].onended = function () {
-                            screenShareEnabled = false;
-                            acekurento.screenshare(false);
-                          };
-                        }
-                        if (remoteStream.srcObject) {
-                          remoteStream.srcObject.getVideoTracks()[0].onended = function () {
-                            screenShareEnabled = false;
-                            acekurento.screenshare(false);
-                          };
-                        }
-                },
+		'restartCallResponse': function (e) {
+			console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e));
+			if (selfStream.srcObject) {
+				selfStream.srcObject.getVideoTracks()[0].onended = function () {
+					screenShareEnabled = false;
+					acekurento.screenshare(false);
+				};
+			}
+			if (remoteStream.srcObject) {
+				remoteStream.srcObject.getVideoTracks()[0].onended = function () {
+					screenShareEnabled = false;
+					acekurento.screenshare(false);
+				};
+			}
+		},
 		'ended': function (e) {
-                        screenShareEnabled = false;
-                        acekurento.screenshare(false);
+			screenShareEnabled = false;
+			acekurento.screenshare(false);
 			if (acekurento.isMultiparty == false) {
 				//Wont enter wrap up
 			}
@@ -146,17 +168,17 @@ function register_jssip() {
 			duration = $('#duration').html();
 			var currentTime = new Date();
 			callDate = (currentTime.getHours() + ":"
-					+ (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
-					+ (currentTime.getMonth() + 1) + "/"
-					+ (currentTime.getDate()) + "/"
-					+ (currentTime.getFullYear()));
+				+ (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
+				+ (currentTime.getMonth() + 1) + "/"
+				+ (currentTime.getDate()) + "/"
+				+ (currentTime.getFullYear()));
 			socket.emit('callHistory', {
-					"callerName": callerName,
-					"callerNumber": callerNumber,
-					"direction" : direction,
-					"duration" : duration,
-					"endpoint" : endpoint,
-					"callDate" : callDate
+				"callerName": callerName,
+				"callerNumber": callerNumber,
+				"direction": direction,
+				"duration": duration,
+				"endpoint": endpoint,
+				"callDate": callDate
 			});
 			//console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
 			loadCallHistory();
@@ -185,7 +207,7 @@ function register_jssip() {
 			socket.emit('wrapup', null);
 			changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
 			changeStatusLight('WRAP_UP');
-                        $('#modalWrapup').modal('show');
+			$('#modalWrapup').modal('show');
 			$('#modalWrapup').modal({
 				backdrop: 'static',
 				keyboard: false
@@ -198,35 +220,35 @@ function register_jssip() {
 }
 
 $("#modalOutboundFailed").on("hidden.bs.modal", function () {
-  console.log('wrapping up...');
-  $('#duration').timer('pause');
-  $('#user-status').text('Wrap Up');
-  $('#complaintsInCall').hide();
-  $('#geninfoInCall').hide();
-  socket.emit('wrapup', null);
-  changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
-  changeStatusLight('WRAP_UP');
-  $('#modalWrapup').modal({
-    backdrop: 'static',
-    keyboard: false
-  }); 
+	console.log('wrapping up...');
+	$('#duration').timer('pause');
+	$('#user-status').text('Wrap Up');
+	$('#complaintsInCall').hide();
+	$('#geninfoInCall').hide();
+	socket.emit('wrapup', null);
+	changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
+	changeStatusLight('WRAP_UP');
+	$('#modalWrapup').modal({
+		backdrop: 'static',
+		keyboard: false
+	});
 });
 function callTimedOut() {
-  console.log('*** ACE Direct TIME OUT ('+outVidTimeout+' seconds) waiting for videomail server response ***');
-  terminate_call();
-  clearScreen();
-  $('#outboundFailedBody').html('Could not leave videomail. Please try again later.');
-  $('#modalOutboundFailed').modal({
-    backdrop: 'static',
-    keyboard: false
-  }); 
+	console.log('*** ACE Direct TIME OUT (' + outVidTimeout + ' seconds) waiting for videomail server response ***');
+	terminate_call();
+	clearScreen();
+	$('#outboundFailedBody').html('Could not leave videomail. Please try again later.');
+	$('#modalOutboundFailed').modal({
+		backdrop: 'static',
+		keyboard: false
+	});
 }
 
 //makes a call
 //@param other_sip_uri: is the sip uri of the person to call
 function start_call(other_sip_uri) {
 
-        outbound_timer = setTimeout(callTimedOut, outVidTimeout); //config var
+	outbound_timer = setTimeout(callTimedOut, outVidTimeout); //config var
 	exitVideomail();
 	//Used for call history
 	callerNumber = other_sip_uri;
@@ -262,10 +284,10 @@ function start_call(other_sip_uri) {
 	$("#remoteView")[0].onplay = function () {
 		$('#modalOutboundCall').modal('hide');
 		console.log("ANSWER -- Option 1: add onplay event to the remoteVideo after acekurento.call. Good: fires after video stream starts. Bad: in the case of 1 way video this may not fire.")
-                clearTimeout(outbound_timer);
-				if (document.getElementById("muteAudio").checked == true) {
-					mute_audio();
-				}
+		clearTimeout(outbound_timer);
+		if (document.getElementById("muteAudio").checked == true) {
+			mute_audio();
+		}
 		setTimeout(() => {
 			calibrateVideo(2000);
 		}, 1000);
@@ -285,7 +307,7 @@ var calibrating = false;
 function calibrateVideo(duration) {
 	console.log("Calibrate Video")
 	let mediaStream = acekurento.mediaStream()
-	
+
 	if (!calibrating && mediaStream.getVideoTracks()[0] && mediaStream.getVideoTracks()[0].enabled) {
 		start_video_calibration()
 		calibrating = true;
@@ -488,6 +510,7 @@ function terminate_call() {
 	mute_captions();
 	disable_chat_buttons();
 	enable_initial_buttons();
+	multipartyCaptionsEnd();
 	$("#start-call-buttons").show();
 	exitFullscreen();
 	$("#sidebar-dialpad").on('click', showDialpad);
@@ -516,7 +539,7 @@ function terminate_call() {
 	document.getElementById("screenShareButton").removeAttribute('style');
 
 	// doesn't reset the agent and consumer who can share files if an agent leaves a multiparty call
-	if (!(acekurento.isMultiparty)){
+	if (!(acekurento.isMultiparty)) {
 		//resets the agent and consumer who can share files
 		socket.emit('call-ended');
 	}
@@ -615,6 +638,7 @@ function mute_audio() {
 		mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
 		mute_audio_icon.classList.add("fa-microphone-slash");
 		mute_audio_icon.classList.remove("fa-microphone");
+		isMuted = true;
 	}
 }
 
@@ -626,6 +650,7 @@ function unmute_audio() {
 		mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
 		mute_audio_icon.classList.add("fa-microphone");
 		mute_audio_icon.classList.remove("fa-microphone-slash");
+		isMuted = false;
 	}
 }
 
@@ -849,8 +874,8 @@ function shareScreen() {
 				acekurento.selfStream = document.getElementById('selfView');
 			}
 		}
- 		acekurento.screenshare(false);
- 		acekurento.screenshare(true);
+		acekurento.screenshare(false);
+		acekurento.screenshare(true);
 	}
 }
 
@@ -888,17 +913,17 @@ function transferCall(isBlind) {
 	}
 }
 
-function recordScreen(){
-	if(recording == false){
+function recordScreen() {
+	if (recording == false) {
 		console.log("Recording screen");
 		acekurento.startRecording();
 		showAlert('info', 'This video is now being recorded.  You can click this button again to stop the recording.');
-		$('#recordIcon').attr('class','fa fa-circle text-green');
+		$('#recordIcon').attr('class', 'fa fa-circle text-green');
 		recording = true;
-	} else if(recording == true){
+	} else if (recording == true) {
 		console.log("Stopping record");
 		acekurento.stopRecording();
-		$('#recordIcon').attr('class','fa fa-circle text-red');
+		$('#recordIcon').attr('class', 'fa fa-circle text-red');
 		recording = false;
 	}
 }
@@ -1000,6 +1025,7 @@ function testCaptions() {
 	} else { console.log('demo running'); }
 }
 
+var tempDivTimeout = null;
 function updateCaptions(transcripts) {
 	console.log('transcripts in UC are ', transcripts)
 	var tDiv = document.getElementById(transcripts.msgid);
@@ -1010,7 +1036,9 @@ function updateCaptions(transcripts) {
 		temp.innerHTML = transcripts.transcript;
 		temp.classList.add("transcripttext");
 		document.getElementById("transcriptoverlay").appendChild(temp);
+		tempDivTimeout = setTimeout(function () { temp.remove() }, 5000);
 	} else {
+		clearTimeout(tempDivTimeout);
 		tDiv.innerHTML = transcripts.transcript;
 		if (transcripts.final) {
 			setTimeout(function () { tDiv.remove() }, 5000);
@@ -1022,11 +1050,97 @@ function updateCaptions(transcripts) {
 	}
 }
 
+function updateCaptionsMultiparty(transcripts) {
+	var tDiv = document.getElementById(transcripts.msgid);
+	if(!tDiv){//prevents duplicate captions
+		var temp = document.createElement("div");
+		temp.id = transcripts.msgid;
+		temp.innerHTML = transcripts.displayname + ": " + transcripts.transcript;
+		temp.classList.add("transcripttext");
+		document.getElementById("transcriptoverlay").appendChild(temp);
+		setTimeout(function () { temp.remove() }, 5000);
+	}
+}
 
-$('#language-select').on('change', function() {
+
+$('#language-select').on('change', function () {
 	console.log('Setting agent language', this.value, extensionMe)
 	socket.emit('set-agent-language', {
 		"language": this.value,
 		"extension": extensionMe
 	});
 });
+
+var recognition = null;
+function multipartyCaptionsStart() {
+	var language = $('#language-select').val();
+	switch (language) {
+        case 'en': // English US
+			language = "en-US";
+            break;
+        case 'es': // Spanish (Mexican)
+			language = "es-US";
+            break;
+        case 'ar': // Arabic (Modern Standard)
+			language  = "ar-EG";
+            break;
+        case 'pt': // Brazilian Portuguese
+			language = "pt-PT";
+            break;
+        case 'zh': // Chinese (Mandarin)
+			language = "zh";
+            break;
+        case 'nl': // Dutch
+			language = "nl-NL";
+            break;
+        case 'fr': // French
+			language = "fr-FR";
+            break;
+        case 'de': // German
+			language = "de-DE";
+            break;
+        case 'it': // Italian
+			language = "it-IT";
+            break;
+        case 'ja': // Japanese
+			language = "ja-JP";
+            break;
+        case 'ko': // Korean
+			language = "ko-KR";
+			break;
+		default:
+			language = "en-US";
+    }
+	recognition = new webkitSpeechRecognition();
+	recognition.continuous = true;
+	recognition.lang = language;
+	recognition.interimResults = false;
+	recognition.maxAlternatives = 1;
+	recognition.onresult = function (event) {
+		if(!isMuted && event && event.results && (event.results.length > 0)){
+			var lastResult = event.results.length - 1;
+			socket.emit('multiparty-caption-agent', {
+				"transcript":event.results[lastResult][0].transcript,
+				"final": event.results[lastResult].isFinal, 
+				"language": language,
+				"displayname": $('#agentname-sidebar').html().trim(),
+				"extension": extensionMe,
+				"agent": true,
+				"participants": callParticipants
+			});
+		}
+	};
+
+	recognition.onend = function (event) {
+		if(acekurento.isMultiparty && (callParticipants.length > 2))
+			multipartyCaptionsStart();	
+	}
+	recognition.start();
+}
+
+function multipartyCaptionsEnd() {
+	if(recognition)
+		recognition.abort();
+	recognition = null;
+	callParticipants = [];
+}
