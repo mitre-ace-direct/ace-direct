@@ -12,15 +12,15 @@ Here are important prerequisites to complete _before_ proceeding with an ACE Dir
 
 * *Acquire domain and subdomain names*
   * Contact a domain name registrar to register the desired _domain_ and _subdomain_ names. It may take *several days* to activate the domain after registration.
-  * Domain names **must be three-level domain names**. This is a requirement by OpenAM.
-  * Do not use special characters in the domain names.
-  * The suggested format for domain names are: `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`. Note that `portal` is the only public facing server.
+  * Domain names **must be three-level domain names**. This is a requirement by our OpenAM identity and access management server.
+  * Do **not** use special characters in the domain names.
+  * Here is the suggested format for the domain names: `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`. Note that `portal` is the only public facing server.
 * *Create _A_ records* - Connect your IP addresses to host names with _A records_ ([link](https://www.godaddy.com/help/add-an-a-record-19238)).
 * *Update provider peering lists* - Contact video/softphone providers to update their peering lists. It could take *two weeks* to fulfill this request.
 * *Create website certificates*
   * Certificates should be *wildcard* certs to have flexibility with domain names.
   * Name the certificates `cert.pem` and `key.pem`.
-  * Place certificates in the expected folders on all the servers, for example: `/etc/ssl/`. Certificates must have `644` permissions. Remember this location for the configuration step.
+  * Place certificates in the expected folders on all the servers, for example: `/etc/ssl/`. Certificates must have `644` permissions. Remember this location for future configuration steps.
   * If the certificate is new, you may need to execute `restorecon`, for example: `restorecon -R -v cert.pem`
   * _For local testing only_, you can create self-signed certs: `openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out cert.pem`
 * *Create the AWS instances for the ACE Direct servers*
@@ -67,7 +67,7 @@ The `aceopenam` server is the _identity and access management_ server, implement
 
 ### acesip
 
-The `acesip.domain.com` server is the Asterisk server. Log into the Asterisk server, clone the `asterisk` repo, and follow the installation instructions.
+The `acesip.domain.com` server is the Asterisk server. Log into the Asterisk server, clone the `asterisk` repo, and follow the installation instructions. Additionally, you can install the _ACE Quill_ `acequill-service` repo and configure it with `asterisk` to include captioning and language translation.
 
 ### aceproxy
 
@@ -191,7 +191,7 @@ After rebooting servers, ACE Direct requires starting services in a specific ord
 
 * `aceturn` - TURN
 * `acestun` - STUN
-* `acesip` - Asterisk
+* `acesip` - Asterisk and ACE Quill
 * `aceproxy` - SIP proxy
 * `aceopenam` - OpenAM
 * `portal` - NGINX
