@@ -13,6 +13,7 @@ $  cd ace-direct
 $
 $  npm run preinstall  # one time
 $  npm run build  # build
+$  npm run postinstall  # right now, one time
 $
 $  npm run test  # automated tests
 $  npm run lint  # run linting tests
