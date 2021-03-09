@@ -10,7 +10,8 @@
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
     "postinstall": "npm run sequelize db:migrate",
     "sequelize": "sequelize",
-    "lint": "echo 'TODO'",
+    "test": "echo \"No tests available\" && exit 0",
+    "lint": "echo 'linting not yet available'",
     "bower": "cd static && bower install"
   },
   "dependencies": {
