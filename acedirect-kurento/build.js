@@ -99,11 +99,6 @@ async function go() {
   s = await execCommand('echo ' + stun_port + ' >> WebRtcEndpoint.conf.ini','./confs/kurento');
   s = await execCommand('echo ' + turn_url + ' >> WebRtcEndpoint.conf.ini','./confs/kurento');
 
-  console.log('');
-  console.log('TODO:');
-  console.log('npm run sequelize db:migrate  ');
-  console.log('npm run dev   # to start, or run with PM2: pm2 start process.json  ');
-  console.log('');
 }
 
 go(); //MAIN
