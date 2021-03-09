@@ -18,8 +18,8 @@ function execCommand(cmd, wdir) {
 }
 
 async function go() {
-  await execCommand('rm -rf node_modules >/dev/null  # removing node_modules', '.');
-  await execCommand('npm install >/dev/null  # main install', '.');
+  await execCommand('rm -rf node_modules >/dev/null  2>&1 || true ', '.');
+  await execCommand('npm install >/dev/null  ', '.');
 }
 
 go(); // MAIN
