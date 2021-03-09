@@ -29,6 +29,9 @@ Set up your local Node.js environment:
   $  npm install -g n
   $  n 12.18.2  # for example
   $  node -v
+  $
+  $  # for Windows
+  $  npm config set script-shell bash
   ```
 
 ## Build
