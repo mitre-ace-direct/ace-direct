@@ -135,22 +135,18 @@ function execCommand(cmd,wdir,expected,hint) {
 }
 
 async function go() {
-  console.log('\nBuilding acedirect...\n');
+  console.log('Building acedirect...');
   console.log('checking for dat/ configuration files...');
   s = await execCommand('ls config.json','../dat',null,'ERROR: ../dat/config.json is missing!');
   s = await execCommand('ls default_color_config.json','../dat',null,'ERROR: ../dat/default_color_config.json is missing!');
   s = await execCommand('ls color_config.json','../dat',null,'ERROR: ../dat/color_config.json is missing!');
 
-  console.log('building...');
-  s = await execCommand('rm -rf node_modules >/dev/null  # removing node_modules','.',null,null);
-  s = await execCommand('npm install >/dev/null  # main install','.',null,null);
-  s = await execCommand('rm -f public/assets/css/* public/assets/fonts/* public/assets/js/* public/assets/webfonts/* || true > /dev/null 2>&1 ','.',null,null);
+  s = await execCommand('rm -rf node_modules >/dev/null 2>&1 || true ','.',null,null);
+  s = await execCommand('npm install ','.',null,null);
+  s = await execCommand('rm -f public/assets/css/* public/assets/fonts/* public/assets/js/* public/assets/webfonts/* > /dev/null 2>&1 || true ','.',null,null);
 
   buildAssets();
-  console.log();
   console.log('SUCCESS!');
-  console.log();
-
 }
 
 go(); //MAIN
