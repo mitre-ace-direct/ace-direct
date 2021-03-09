@@ -36,9 +36,9 @@ Set up your local Node.js environment:
 ```bash
 $  cd ace-direct
 $
-$  npm run preinstall  # one time
+$  npm install
 $  npm run build  # build
-$  npm run postinstall  # right now, one time
+$  npm run config
 $
 $  npm run test  # automated tests
 $  npm run lint  # run linting tests
