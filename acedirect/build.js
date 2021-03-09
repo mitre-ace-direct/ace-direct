@@ -112,20 +112,20 @@ function buildAssets() {
 //wdir is the working dir
 //return a Promise
 function execCommand(cmd,wdir,expected,hint) {
-  console.log('  executing  ' + cmd + '  ...');
+  console.log('executing  ' + cmd + '  ...');
   const exec = require('child_process').exec;
   return new Promise((resolve, reject) => {
     exec(cmd, {cwd: wdir}, (error, stdout, stderr) => {
       if (error) {
         console.log();
-        console.error('  FAILED! Please resolve: ' + error.cmd);
+        console.error('FAILED! Please resolve: ' + error.cmd);
         console.log();
         process.exit(99);
       } else if (expected) {
         expected = expected.trim();
         stdout = stdout.trim();
         if (stdout !== expected) {
-          console.log('  FAILED! Incorrect version: ' + stdout + '. expected: ' + expected);
+          console.log('FAILED! Incorrect version: ' + stdout + '. expected: ' + expected);
           process.exit(99);
         }
       }
@@ -136,7 +136,6 @@ function execCommand(cmd,wdir,expected,hint) {
 
 async function go() {
   console.log('\nBuilding acedirect...\n');
-  console.log('Assuming you already ran:  npm run preinstall ...');
   console.log('checking for dat/ configuration files...');
   s = await execCommand('ls config.json','../dat',null,'ERROR: ../dat/config.json is missing!');
   s = await execCommand('ls default_color_config.json','../dat',null,'ERROR: ../dat/default_color_config.json is missing!');
