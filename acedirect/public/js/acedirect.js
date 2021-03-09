@@ -574,11 +574,11 @@ function connect_socket() {
 				}).on('agent-resp', function(data) { //Load the agent table in the multi party modal
 					console.log("The agents are " + JSON.stringify(data));
 				}).on('fileListAgent', function(data){
-					$('#fileSent').hide();
+					//$('#fileSent').hide();
 					addFileToAgentDownloadList(data);
 				}).on('fileListConsumer', function(data) {
 					//file confirmation
-					$('#fileSent').show();
+					//$('#fileSent').show();
 					$('#fileInput').val('');
 				}).on('screenshareRequest', function(data){
 					//$('#screenshareButtons').show()
@@ -1214,6 +1214,7 @@ function clearScreen() {
 	clearAgentDownloadList();
 	$('#fileInput').val('');
 	$('#fileSent').hide();
+	$('#fileSentError').hide();
 }
 
 function changeStatusLight(state) {
@@ -2525,6 +2526,8 @@ function disallowScreenShare(){
 //Functionality for fileshare
 function ShareFile(){
 	if (agentStatus == 'IN_CALL' && document.getElementById("fileInput").files[0]) {
+		$('#fileSentError').hide();
+		$('#fileSent').hide();
 		console.log("Sending file " + document.getElementById("fileInput").files[0]);
 		var vrs = $('#callerPhone').val();
 		var formData = new FormData();
@@ -2539,9 +2542,11 @@ function ShareFile(){
 			success: function (data) {
 				console.log(JSON.stringify(data, null, 2))
 				socket.emit('get-file-list-agent', {"vrs" : vrs});
+				$('#fileSent').show();
 			},
 			error: function (jXHR, textStatus, errorThrown) {
 				console.log("ERROR");
+				$('#fileSentError').show();
 			}
 		});
 	}
@@ -3113,6 +3118,10 @@ function resetShortcuts() {
 function collapseVideoBox() {
     console.log('collapse video box');
     $('#VideoBox').attr('style', "background-color:white;"); //removes the background when collapsing the box
+}
+
+function collapseFilesBox(){
+	$('#filesbox').attr('style', "background-color:white;");
 }
 
 function collapseChatBox() {
