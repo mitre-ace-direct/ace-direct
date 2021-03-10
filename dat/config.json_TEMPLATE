@@ -4,7 +4,7 @@
     "version":"5.0",
     "year":"2021",
     "debug_level": "ERROR",
-    "fqdn": "host.domain.com",
+    "fqdn": "acenode.domain.com",
     "private_ip": "0.0.0.0",
     "https": {
       "certificate": "/etc/ssl/cert.pem",
@@ -13,41 +13,41 @@
   },
   "proxy_server": {
       "proto": "wss",
-      "public": "sipproxy.domain.com",
+      "public": "aceproxy.domain.com",
       "port": 443,
       "path": "/ws"
   },
   "signaling_server": {
-      "proto": "wss",
-      "public": "test.domain.com",
-      "port": 8005,
-      "dev_url": "wss://nginx.domain.com/username/acedirect-kurento/signaling"
+      "proto": "",
+      "public": "",
+      "port": 1234,
+      "dev_url": "wss://portal.domain.com/SOMEUSER/acedirect-kurento/signaling"
   },
   "media_server": {
       "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
   },
   "asterisk": {
     "sip": {
-      "public": "asterisk.domain.com",
+      "public": "acesip.domain.com",
       "private_ip": "0.0.0.0",
       "ws_port": "443",
-      "stun": "stun.domain.com",
+      "stun": "acestun.domain.com",
       "stun_port": "3478",
-      "turn": "turn.domain.com",
+      "turn": "aceturn.domain.com",
       "turn_port": "",
-      "turn_user": "user",
+      "turn_user": "username",
       "turn_cred": "password",
       "channel": "SIP"
     },
     "ami": {
-      "id": "<asterisk ami userid>",
-      "passwd": "<asterisk ami password>",
+      "id": "userid",
+      "passwd": "password",
       "port": "5038"
     },
     "extensions": {
       "start_number": "90001",
       "end_number": "90005",
-      "secret": "<extensions password>"
+      "secret": "password"
     },
     "queues": {
       "complaint": {
@@ -68,7 +68,7 @@
   "web_security": {
     "json_web_token": {
       "encoding": "base64",
-      "secret_key": "someKey",
+      "secret_key": "someGlobalKey",
       "timeout": "15000",
       "handshake": "true"
     },
@@ -86,19 +86,19 @@
     "mysql": {
       "host": "0.0.0.0",
       "port": "3306",
-      "user": "<db user name>",
-      "password": "<db password>",
-      "ad_database_name": "<db name>",
-      "cdr_database_name": "<cdr db name>",
-      "cdr_table_name": "<cdr table name>",
-      "ssuser": "<signaling server db user>",
-      "sspassword": "<signaling server db password>",
-      "ssdatabase": "<signaling server db name>"
+      "user": "username",
+      "password": "password",
+      "ad_database_name": "adDbName",
+      "cdr_database_name": "cdrDbName",
+      "cdr_table_name": "cdrTableName",
+      "ssuser": "signalingServerDbUser",
+      "sspassword": "signalingServerDbPassword",
+      "ssdatabase": "signalingServerDbName"
     },
     "redis": {
       "host": "127.0.0.1",
       "port": "6379",
-      "auth": "NotUsedInDevEnvironment"
+      "auth": "someAuthPasswordIfEnabled"
     },
     "mongodb": {
       "connection_uri": "mongodb://localhost:27017/test",
@@ -112,11 +112,11 @@
   },
   "complaint_redirect": {
     "active": "true",
-    "desc": "Landing Page",
-    "url": "./logout"
+    "desc": "FCC.gov",
+    "url": "https://www.fcc.gov"
   },
   "popticket": {
-    "url": "https://FQDN:PORT/DTK_HttpServices/json/CallDTKEventUsingJSONviaPOSTStream?async=true"
+    "url": ""
   },
   "skinny_mode" : {
     "agent": "false",
@@ -127,7 +127,7 @@
     "consumer" : "true"
   },
   "nginx": {
-    "fqdn": "nginx.domain.com",
+    "fqdn": "portal.domain.com",
     "private_ip": "0.0.0.0",
     "port": "443",
     "ad_path": "/ACEDirect",
@@ -136,12 +136,12 @@
     "consumer_route": "/call"
   },
   "openam": {
-    "fqdn": "openam.domain.com",
+    "fqdn": "portal.domain.com",
     "private_ip": "0.0.0.0",
     "port": "443",
     "path": "ace",
-    "user": "<admin username>",
-    "password": "<admin password>"
+    "user": "adminUsername",
+    "password": "adminPassword"
   },
   "ace_direct": {
     "https_listen_port": "9001"
@@ -149,11 +149,11 @@
   "management_portal": {
     "https_listen_port": "9002",
     "queues" : "GeneralQuestionsQueue,ComplaintsQueue,MailQueue",
-    "poll_interval" : "2000",
-    "force_logout_password": "<super secure password>"
+    "poll_interval" : "1000",
+    "force_logout_password": "secureForceLogoutPassword"
   },
   "zendesk": {
-    "private_ip": "0.0.0.0",
+    "private_ip": "<private IP address of acenode.domain.com>",
     "port": "9003",
     "protocol": "https",
     "user_id": "user@email.com",
@@ -180,13 +180,13 @@
     "awayBlink": "true"
   },
   "translation_server": {
-    "private_ip": "0.0.0.0",
+    "private_ip": "<private IP address of acesip.domain.com>",
     "port": "8005",
     "protocol": "http",
     "enabled": "true"
   },
   "webserver": {
-    "comment1": "signaling server only",
+    "comment1": "for acedirect-kurento",
     "port": 9009,
     "cert":"/etc/ssl/cert.pem",
     "key": "/etc/ssl/key.pem",
@@ -195,25 +195,25 @@
     "token": "__DEV_TOKEN__"
   },
   "asteriskss": {
-    "comment1": "signaling server only",
+    "comment1": "for acedirect-kurento",
     "protocol": "wss",
-    "host": "asterisk.domain.com",
-    "ip": "<asterisk private IP>",
+    "host": "acesip.domain.com",
+    "ip": "<private IP address of acesip.domain.com>",
     "port": 443,
     "sip_media_request_interval": 5000,
     "ami": {
-      "ip": "<asterisk private IP>",
+      "ip": "<private IP address of acesip.domain.com>",
       "enabled": true,
-      "id": "<asterisk AMI userid>",
-      "passwd": "<asterisk AMI password>",
+      "id": "userid",
+      "passwd": "password",
       "port": "5038",
       "queue_names": ["GeneralQuestionsQueue","ComplaintsQueue"],
-      "queue_extensions": ["<GenQuest dial-in number>","<CompQueue dial-in number>"]
+      "queue_extensions": ["575781","575791"]
     }
   },
   "kurento": {
     "comment1": "signaling server only",
-    "url": "wss://kurento.domain.com:8443/kurento",
+    "url": "wss://acekms.domain.com:8443/kurento",
     "stats_interval": 10000,
     "sdes_crypto": "AES_128_CM_HMAC_SHA1_80",
     "monitoring_enabled": false,
@@ -225,7 +225,7 @@
     "video_rtp_max_bitrate": 8000,
     "video_webrtc_codec": "H264",
     "_comment2": "42001F fixes some problems. 42E015 - try this too - RFC3984 - page 38",
-    "_comment3": "Alberto had tried 42e01f - did not work",
+    "_comment3": "Tried 42e01f - did not work",
     "_comment4" : "profile-level-id=42001F;packetization-mode=0;level-asymmetry-allowed=1",
     "h264_config": "profile-level-id=42E01F;packetization-mode=0;level-asymmetry-allowed=0",
     "aws": {
@@ -240,12 +240,12 @@
   },
   "ice": [
     { 
-      "urls": "stun:stun.domain.com:3478"
+      "urls": "stun:acestun.domain.com:3478"
     },
     { 
-      "urls": "turn:coturn.domain.com:3478",
-      "username": "<turnusername>",
-      "credential": "<turncred>"
+      "urls": "turn:aceturn.domain.com:3478",
+      "username": "username",
+      "credential": "password"
     } 
   ],  
   "videomailss": {
