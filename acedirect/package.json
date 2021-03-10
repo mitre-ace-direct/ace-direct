@@ -40,13 +40,16 @@
     "util": "^0.12.3"
   },
   "devDependencies": {
-    "bootstrap": "^3.4.1"
+    "bootstrap": "^3.4.1",
+    "eslint": "^7.21.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
   },
   "scripts": {
     "test": "echo \"No tests available\" && exit 0",
     "clean": "rm -rf node_modules >/dev/null 2>&1 && rm -f public/assets/css/* public/assets/fonts/* public/assets/js/* public/assets/webfonts/* >/dev/null 2>&1 || true ",
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
-    "lint": "echo 'linting not yet available'",
+    "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -not -path './public/js/*' -print0 | xargs -0 eslint",
     "start": "node ./adserver.js",
     "build": "mkdir -p public/assets; node ./build.js"
   },
