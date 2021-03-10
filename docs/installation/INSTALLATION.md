@@ -158,7 +158,9 @@ The **acenode** server hosts several Node.js and application servers. Here are i
 
 ### Database Server
 
-Here are full instructions to install and configure the ACE Direct databases:
+The database is a MySQL server. You may use a cloud database like Amazon AWS RDS or a local database.
+
+The following instructions assume a local MySQL server:
 
 1. Install MySQL Server Version `5.6.37` or a compatible version.
 1. Install a MySQL client on `acenode`, for example, `sudo yum install mysql`.
