@@ -574,11 +574,11 @@ function connect_socket() {
 				}).on('agent-resp', function(data) { //Load the agent table in the multi party modal
 					console.log("The agents are " + JSON.stringify(data));
 				}).on('fileListAgent', function(data){
-					// $('#fileSent').hide();
+					//$('#fileSent').hide();
 					addFileToAgentDownloadList(data);
 				}).on('fileListConsumer', function(data) {
 					//file confirmation
-					// $('#fileSent').show();
+					//$('#fileSent').show();
 					$('#fileInput').val('');
 				}).on('screenshareRequest', function(data){
 					//$('#screenshareButtons').show()
@@ -1426,6 +1426,7 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
 	}).get();
 
 	console.log('Click event for playing video');
+	
 	console.log('vidId: ' + tableData[4]);
 	$("#videomailId").attr("name", tableData[4]);
 	$("#callbacknum").attr("name", tableData[0]);
@@ -1723,11 +1724,15 @@ function playVideomail(id, duration, vidStatus) {
 	toggle_incall_buttons(false);
 	toggle_videomail_buttons(true);
 	updateVideoTime(duration, "vmail-total-time");
-	if (vidStatus === "UNREAD") {
-		videomail_read_onclick(id);
-	}
+	videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS');
 	seekBar.value = 0;
 	remoteView.currentTime = 0;
+	
+	//Add the event listener for when the videomail finishes playing
+	document.getElementById('remoteView').addEventListener('ended', (event) => {
+		console.log("Finished playing videomail");
+		videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ');
+	});
 }
 
 //Update the time progress in the videomail seekbar
@@ -1798,14 +1803,6 @@ function videomail_status_change(id, videoStatus) {
 		"id": id,
 		"extension": extensionMe,
 		"status": videoStatus
-	});
-}
-
-//Marks the videomail read when the agent clicks it and doesn't close the videomail view
-function videomail_read_onclick(id) {
-	socket.emit('videomail-read-onclick', {
-		"id": id,
-		"extension": extensionMe
 	});
 }
 
@@ -2543,6 +2540,7 @@ function ShareFile(){
 			contentType: false,
 			processData: false,
 			success: function (data) {
+				console.log(JSON.stringify(data, null, 2))
 				socket.emit('get-file-list-agent', {"vrs" : vrs});
 				$('#fileSent').show();
 			},
@@ -3132,8 +3130,8 @@ function collapseVideoBox() {
     $('#VideoBox').attr('style', "background-color:white;"); //removes the background when collapsing the box
 }
 
-function collapseFilesBox() {
-    $('#filesbox').attr('style', "background-color:white;"); //removes the background when collapsing the box
+function collapseFilesBox(){
+	$('#filesbox').attr('style', "background-color:white;");
 }
 
 function collapseChatBox() {
