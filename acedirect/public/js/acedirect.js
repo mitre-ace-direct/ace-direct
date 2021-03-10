@@ -60,6 +60,15 @@ var isChatListOpen = false;
 var isAgentChatSaved;
 var tempSavedMessages = [[]];
 
+//transfer call variables
+var isTransfer = false;
+var originalExt;
+var transferExt;
+var transferVRS;
+var transferAccepted = false;
+var callerExt;
+var isColdTransfer;
+
 setInterval(function () {
 	busylight.light(this.agentStatus);
 }, 2000);
@@ -369,6 +378,7 @@ function connect_socket() {
 							"<tr><td>Name</td>" +
 							"<td>Extension</td>" +
 							"<td>Status</td>" +
+							"<td>Transfer Call</td>" + 
 							"<td>Multi-Party Invite</td>"+
 							"<td>Chat</td></tr>"
 						);
@@ -422,6 +432,11 @@ function connect_socket() {
 									sBlinking = missed_call_blinking;
 									statusTxt = "Missed Call";
 									break;
+								case "TRANSFERRED_CALL":
+									sColor = transferred_call_color;
+									sBlinking = transferred_call_blinking;
+									statusTxt = "Transfer Call";
+									break;
 								default:
 									sColor = "gray";
 									statusTxt = "Unknown";
@@ -445,6 +460,9 @@ function connect_socket() {
 								"name": data.agents[i].name,
 								"extension": data.agents[i].extension,
 								"queues": queues,
+								"transferCall": (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != data.agents[i].name) 
+                                ? '<Button class=\"demo-btn\" onClick="transferCall(\'' + data.agents[i].extension + '\',\'' + true + '\')"><i class=\"fa fa-share-square\"></i></Button>' 
+                                : "<Button class=\"secondary\" disabled><i class=\"fa fa-share-square\"></i></Button>",
 								"multipartyInvite" : (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != data.agents[i].name)
 								? "<Button class=\"demo-btn\" onClick=multipartyinvite(" + data.agents[i].extension + ")><i class=\"fa fa-users\"></i></Button>"
 								: "<Button class=\"secondary\" disabled><i class=\"fa fa-users\"></i></Button>",
@@ -838,6 +856,9 @@ $('#agenttable').DataTable({
 			"mDataProp": "queues"
 		},
 		{
+            "mDataProp": "transferCall"
+        },
+		{
 			"mDataProp": "multipartyInvite"
 		},
 		{
@@ -1207,6 +1228,7 @@ function clearScreen() {
 	$('#ticketTab').removeClass("bg-pink");
 	clearInterval(ticketTabFade);
 
+	$('#modalWrapupTransfer').modal('hide');
 	$('#modalWrapup').modal('hide');
 	$('#modalOutboundCall').modal('hide');
 
@@ -1261,6 +1283,23 @@ function updateColors(data) {
 		return (className.match(/\bbtn-\S+/g) || []).join(' ');
 	});
 	$("#wrapup-color").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+
+	//remove colors from transfer wrapup modal 
+	$("#away-btn-transfer").removeClass(function (index, className) {
+		return (className.match(/\bbtn-\S+/g) || []).join(' ');
+	});
+	$("#away-color-transfer").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	$("#ready-color-transfer").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	$("#ready-btn-transfer").removeClass(function (index, className) {
+		return (className.match(/\bbtn-\S+/g) || []).join(' ');
+	});
+	$("#wrapup-color-transfer").removeClass(function (index, className) {
 		return (className.match(/\btext-\S+/g) || []).join(' ');
 	});
 
@@ -1333,6 +1372,16 @@ function updateColors(data) {
 	else $('#ready-color').addClass("text-" + ready_color);
 	$('#away-btn').addClass("btn-" + away_color);
 	$('#ready-btn').addClass("btn-" + ready_color);
+
+	//add colors to transfer wrapup modal
+	if (wrap_up_color === "white") $('#wrapup-color-transfer').addClass("text-gray");
+	else $('#wrapup-color-transfer').addClass("text-" + wrap_up_color);
+	if (away_color === "white") $('#away-color-transfer').addClass("text-gray");
+	else $('#away-color-transfer').addClass("text-" + away_color);
+	if (ready_color === "white") $('#ready-color-transfer').addClass("text-gray");
+	else $('#ready-color-transfer').addClass("text-" + ready_color);
+	$('#away-btn-transfer').addClass("btn-" + away_color);
+	$('#ready-btn-transfer').addClass("btn-" + ready_color);
 
 	//add new color to status-icon element
 	if ($("#status-icon").hasClass("currently-away")) changeStatusIcon(away_color, "away", away_blinking);
