@@ -17,3 +17,23 @@
     </div>
     <!-- /.modal-dialog -->
 </div>
+
+<div class="modal fade" id="modalWrapupTransfer" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Wrap Up</h4>
+            </div>
+            <div class="modal-body">
+                <p>The call has successfully been transferred. You are currently in a <span id='wrapup-color-transfer'><b>Wrap Up</b></span> state. You may return to a <span id='ready-color-transfer'><b>Ready</b></span> or <span id='away-color-transfer'><b>Away</b></span> state, or just dismiss this window.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id = "ready-btn-transfer" class="btn" onclick="finished(1);">Return to Ready</button>
+                <button type="button" id="away-btn-transfer" class="btn" onclick="finished(0);">Return to Away</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
