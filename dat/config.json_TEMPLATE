@@ -1,8 +1,8 @@
 {
   "common": {
     "cleartext": "true",
-    "version":"5.0",
-    "year":"2021",
+    "version": "5.0",
+    "year": "2021",
     "debug_level": "ERROR",
     "fqdn": "acenode.domain.com",
     "private_ip": "0.0.0.0",
@@ -12,19 +12,19 @@
     }
   },
   "proxy_server": {
-      "proto": "wss",
-      "public": "aceproxy.domain.com",
-      "port": 443,
-      "path": "/ws"
+    "proto": "wss",
+    "public": "aceproxy.domain.com",
+    "port": 443,
+    "path": "/ws"
   },
   "signaling_server": {
-      "proto": "",
-      "public": "",
-      "port": 1234,
-      "dev_url": "wss://portal.domain.com/SOMEUSER/acedirect-kurento/signaling"
+    "proto": "",
+    "public": "",
+    "port": 1234,
+    "dev_url": "wss://portal.domain.com/SOMEUSER/acedirect-kurento/signaling"
   },
   "media_server": {
-      "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
+    "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
   },
   "asterisk": {
     "sip": {
@@ -118,13 +118,13 @@
   "popticket": {
     "url": ""
   },
-  "skinny_mode" : {
+  "skinny_mode": {
     "agent": "false",
     "consumer": "false"
   },
-  "caption_mode" : {
+  "caption_mode": {
     "agent": "true",
-    "consumer" : "true"
+    "consumer": "true"
   },
   "nginx": {
     "fqdn": "portal.domain.com",
@@ -148,8 +148,8 @@
   },
   "management_portal": {
     "https_listen_port": "9002",
-    "queues" : "GeneralQuestionsQueue,ComplaintsQueue,MailQueue",
-    "poll_interval" : "1000",
+    "queues": "GeneralQuestionsQueue,ComplaintsQueue,MailQueue",
+    "poll_interval": "1000",
     "force_logout_password": "secureForceLogoutPassword"
   },
   "zendesk": {
@@ -188,7 +188,7 @@
   "webserver": {
     "comment1": "for acedirect-kurento",
     "port": 9009,
-    "cert":"/etc/ssl/cert.pem",
+    "cert": "/etc/ssl/cert.pem",
     "key": "/etc/ssl/key.pem",
     "csr": "/etc/ssl/asterisk.csr",
     "static": "./static",
@@ -207,8 +207,14 @@
       "id": "userid",
       "passwd": "password",
       "port": "5038",
-      "queue_names": ["GeneralQuestionsQueue","ComplaintsQueue"],
-      "queue_extensions": ["575781","575791"]
+      "queue_names": [
+        "GeneralQuestionsQueue",
+        "ComplaintsQueue"
+      ],
+      "queue_extensions": [
+        "575781",
+        "575791"
+      ]
     }
   },
   "kurento": {
@@ -226,7 +232,7 @@
     "video_webrtc_codec": "H264",
     "_comment2": "42001F fixes some problems. 42E015 - try this too - RFC3984 - page 38",
     "_comment3": "Tried 42e01f - did not work",
-    "_comment4" : "profile-level-id=42001F;packetization-mode=0;level-asymmetry-allowed=1",
+    "_comment4": "profile-level-id=42001F;packetization-mode=0;level-asymmetry-allowed=1",
     "h264_config": "profile-level-id=42E01F;packetization-mode=0;level-asymmetry-allowed=0",
     "aws": {
       "s3": {
@@ -239,15 +245,15 @@
     "conference_max_participants": 4
   },
   "ice": [
-    { 
+    {
       "urls": "stun:acestun.domain.com:3478"
     },
-    { 
+    {
       "urls": "turn:aceturn.domain.com:3478",
       "username": "username",
       "credential": "password"
-    } 
-  ],  
+    }
+  ],
   "videomailss": {
     "comment1": "signaling server only",
     "directory": "/tmp/videomail/",
@@ -256,5 +262,5 @@
       "/tmp/videomail/instructions/final.jpg"
     ],
     "media_profile": "MP4"
-  }   
+  }
 }
