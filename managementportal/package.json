@@ -15,7 +15,7 @@
     "start": "node server-db.js",
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
     "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -print0 | xargs -0 eslint",
-    "build": "npm run clean && npm install && find ./public/assets/ ! -type d ! -name '*.gitignore' -exec rm '{}' + && node ./build.js || true"
+    "build": "npm run clean && npm install && find ./public/assets/ ! -type d ! -name '*.gitignore' -exec rm '{}' + && node ./build.js"
   },
   "devDependencies": {
     "eslint": "^7.20.0",
