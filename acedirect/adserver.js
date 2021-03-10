@@ -1743,25 +1743,6 @@ io.sockets.on('connection', function (socket) {
 			}
 		});
 	});
-	//changes the videomail status to READ if it was UNREAD before
-	socket.on("videomail-read-onclick", function (data) {
-		logger.debug('updating MySQL entry');
-
-		let vm_sql_query = `UPDATE ${vmTable} SET status = 'READ',
-			processed = CURRENT_TIMESTAMP, processing_agent = ? WHERE id = ?;`;
-		let vm_sql_params = [token.extension, data.id];
-
-		logger.debug(vm_sql_query + " " + vm_sql_params);
-
-		dbConnection.query(vm_sql_query, vm_sql_params,function (err, result) {
-			if (err) {
-				logger.error('VIDEOMAIL-READ ERROR: '+ err.code);
-			} else {
-				logger.debug(result);
-				io.to(token.extension).emit('changed-status', result);
-			}
-		});
-	});
 	//updates videomail records when the agent deletes the videomail. Keeps it in db but with a deleted flag
 	socket.on("videomail-deleted", function (data) {
 		logger.debug('updating MySQL entry');
