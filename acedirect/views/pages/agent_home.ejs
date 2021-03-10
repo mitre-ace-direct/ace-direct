@@ -103,7 +103,7 @@
         <%- include("../partials/acedirect_footer") %>
 
             <!-- Control Sidebar -->
-            <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark" style="width: 500px; right:-500px">
+            <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark" style="width: 565px; right:-565px">
                 <!-- Create the tabs -->
                 <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
                     <li class="active">
@@ -136,6 +136,7 @@
                                         <th>Agent</th>
                                         <th>Ext</th>
                                         <th>Queues</th>
+                                        <th>Transfer Call</th>
                                         <th>Multi-Party Invite</th>
                                         <th>Chat</th>
                                     </tr>
@@ -753,6 +754,30 @@
             <!-- /.modal-dialog -->
         </div>
         <!--End agent chat-->
+
+         <!-- Incoming Transfer Call Modal -->
+        <div id="modalTransferCall" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 text-align="center" class="modal-title">Incoming Transfer Call</h2>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img src="/images/phoneRinging.gif" alt="Phone Ringing" height="100">
+                        <h2 id='incomingTransferExtension' class="modal-title text-center"></h2>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <div class="btn-group" style="width: 100%;">
+                            <button id="accept-transfer" type="button" onclick="transferResponse(true)" data-dismiss="modal" class="btn btn-success btn-style" style="width: 50%; height: 50px;">
+                                Accept </button>
+                            <button id="decline-transfer" type="button" onclick="transferResponse(false)" data-dismiss="modal" class="btn btn-danger btn-style" style="width: 50%; height: 50px;">
+                                Decline </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Jssip hidden data -->
         <div hidden>
