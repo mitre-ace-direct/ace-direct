@@ -51,6 +51,9 @@ function PostLightCode(color) {
 }
 
 Busylight.prototype.updateConfigs = function updateConfigs(configs) {
+  if (!configs) {
+    return;
+  }
   this.statusCd = {};
   let i;
   for (i = 0; i < configs.length; i += 1) {
