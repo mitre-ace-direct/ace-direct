@@ -2828,19 +2828,29 @@ function resizeChat() {
 }
 
 function resetLayout() {
-	var defaultLayout = [{
-		"id": "gsvideobox",
-		"x": 0,
-		"y": 0,
-		"width": 8,
-		"height": 16
-	}, {
-		"id": "gschatbox",
-		"x": 8,
-		"y": 0,
-		"width": 4,
-		"height": 10
-	}];
+	var defaultLayout = [
+		{
+			"id": "gsvideobox",
+			"x": 0,
+			"y": 0,
+			"width": 8,
+			"height": 16
+		}, 
+		{
+			"id": "gschatbox",
+			"x": 8,
+			"y": 0,
+			"width": 4,
+			"height": 10
+		},
+		{
+			"id": "gsfilebox",
+			"x": 8,
+			"y": 11,
+			"width": 4,
+			"height": 10
+		},
+	];
 	loadGridLayout(defaultLayout);
 	if (!loadingGridLayout) {
 		saveGridLayout();
