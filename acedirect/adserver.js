@@ -4238,6 +4238,14 @@ app.get('/getagentstatus/:token', function (req, res) {
 						resObj.blink = true;
 						resObj.stop = false;
 						break;
+					case 'TRANSFERRED_CALL':
+						resObj.status = status;
+						resObj.r = 255;
+						resObj.g = 255;
+						resObj.b = 255;
+						resObj.blink = true;
+						resObj.stop = false;
+						break;
 					case 'INCALL':
 						resObj.status = status;
 						resObj.r = 255;
