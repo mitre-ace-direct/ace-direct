@@ -63,7 +63,7 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.2</version>
         <configuration>
-          <mainClass>org.mitre.busylightapi.lightserver</mainClass>
+          <mainClass>org.mitre.busylightapi.olightserver</mainClass>
         </configuration>
       </plugin>
 
@@ -72,7 +72,7 @@
           <configuration>
               <archive>
                   <manifest>
-                      <mainClass>org.mitre.busylightapi.lightserver</mainClass>
+                      <mainClass>org.mitre.busylightapi.olightserver</mainClass>
                   </manifest>
               </archive>
               <descriptorRefs>
