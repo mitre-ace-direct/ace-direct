@@ -548,8 +548,7 @@ public class olightserver extends Application {
       //send any response
       String response = "";
       Headers headers = t.getResponseHeaders();
-	  headers.add("Access-Control-Allow-Origin", "*");
-	  //headers.add("Content-Security-Policy", "default-src http://127.0.0.1:6298/setbusylight; script-src http://127.0.0.1:6298/setbusylight; connect-src http://127.0.0.1:6298/setbusylight");
+	    headers.add("Access-Control-Allow-Origin", "*");
 
       t.sendResponseHeaders(200, response.length());
       OutputStream os = t.getResponseBody();
