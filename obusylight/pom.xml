@@ -4,7 +4,7 @@
   <groupId>org.openjfx</groupId>
   <artifactId>obusylight</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <name>demo</name>
   <url>http://maven.apache.org</url>
 
