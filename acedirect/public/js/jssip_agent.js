@@ -937,7 +937,7 @@ function multipartyinvite(extension) {
  * @param {string} ext - agent extension to receive the transfer
  * @param {boolean} isCold 
  */
- function transferCall(ext, isCold) {
+ function sendTransferInvite(ext, isCold) {
 	if (agentStatus == 'IN_CALL') {
 		transferExt = ext;
 		showAlert('info', 'Call transfer initiated. Waiting for response...');
