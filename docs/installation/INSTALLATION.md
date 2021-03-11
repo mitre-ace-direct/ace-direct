@@ -54,8 +54,7 @@ Install the `strongSwan` server. See [STRONGSWAN.md](STRONGSWAN.md).
 This is the NGINX server for ACE Direct. This server acts as a _reverse proxy_, hiding internal Node.js servers from public access.
 
 * Log into the `portal.domain.com` server.
-* Clone the `nginx` repo.
-* Install and configure NGINX. See the the `nginx` repo for complete instructions. This repo provides a template for the `nginx.conf` file.
+* See the [nginx](nginx/) folder for installation instructions.
 
 ### aceopenam
 
@@ -183,9 +182,9 @@ The following instructions assume a local MySQL server:
 
 * Install and configure the stun server on _stunace_.
 * Install and configure Asterisk on _sipace_. See the `asterisk/README.md` file for detailed instructions.
-* Install and connect the BusyLight to the agent computer:
+* Install and connect the _BusyLight_ device (if available) to the agent computer:
   * Connect the USB BusyLight to the agent computer.
-  * Download the `busylightapi/exe/lightserver.jar` Java program from the `busylightapi` repo. Run it locally on the Agent's client computer.
+  * See the [obusylight](../../obusylight/) folder for instructions on deploying the BusyLight server program on the agent computer.
 
 ## ACE Direct Reboot Checklist
 
@@ -223,7 +222,7 @@ After rebooting servers, ACE Direct requires starting services in a specific ord
 * Check the `logs` folder in each application folder for errors or warnings: `ls /home/acedirect/ace-direct/*/logs/*.log`
 * Verify that OpenAM, Redis, MongoDB, NGINX, and MySQL are running.
 * Verify that there are no firewalls blocking internal ports (e.g., `firewalld` on OpenAM blocking access to `8443`).
-* Does the BusyLight device respond? Try the self-test mode on the `lightserver.jar` UI.
+* Does the BusyLight device respond? Try the self-test mode on the BusyLight server app.
 * Verify that the `/etc/hosts` file is configured correctly.
 * Verify that the `/etc/nginx/nginx.conf` file is configured correctly.
 * Verify that `/home/acedirect/ace-direct/dat/config.json` is configured correctly.
