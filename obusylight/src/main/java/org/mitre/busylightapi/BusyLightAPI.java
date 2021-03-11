@@ -12,15 +12,15 @@ import org.hid4java.event.HidServicesEvent;
 
 public class BusyLightAPI implements HidServicesListener {
 
-	//vendor IDs
+	// vendor IDs
 	public static enum Vendor { PLENOM };
 	private static int[] vendors = new int[]{ 0x27BB };
 
-	//product IDs
+	// product IDs
 	public static enum Product { PRODUCT_OMEGA_ID, PRODUCT_ALPHA_ID, PRODUCT_UC_ID, PRODUCT_KUANDO_BOX_ID, PRODUCT_BOOTLOADER_ID}; 
 	private static int[] products = new int[]{ 0x3BCD, 0x3BCA, 0x3BCB, 0x3BCC, 0x3BC0 };
 
-	//colors
+	// colors
 	public static enum BLColor { RED, GREEN, BLUE, ORANGE, YELLOW, PINK, AQUA, WHITE, INDIGO, VIOLET };
 	private static short[][] colors = new short[][] {
 		{0x64, 0x00, 0x00},
