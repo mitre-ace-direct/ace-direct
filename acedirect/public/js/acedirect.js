@@ -110,6 +110,9 @@ $(document).ready(function () {
 	}
 
 	enable_persist_view();
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
+		alignDataTableHeaders();
+	 });
 });
 
 function connect_socket() {
@@ -463,9 +466,7 @@ function connect_socket() {
 								"name": data.agents[i].name,
 								"extension": data.agents[i].extension,
 								"queues": queues,
-								"transferCall": (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != data.agents[i].name) 
-                                ? '<Button class=\"demo-btn\" onClick="transferCall(\'' + data.agents[i].extension + '\',\'' + true + '\')"><i class=\"fa fa-share-square\"></i></Button>' 
-                                : "<Button class=\"secondary\" disabled><i class=\"fa fa-share-square\"></i></Button>",
+								"transferCall": transferAvailability(data.agents[i].status, data.agents[i].name, data.agents[i].extension),
 								"multipartyInvite" : (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != data.agents[i].name)
 								? "<Button class=\"demo-btn\" onClick=multipartyinvite(" + data.agents[i].extension + ")><i class=\"fa fa-users\"></i></Button>"
 								: "<Button class=\"secondary\" disabled><i class=\"fa fa-users\"></i></Button>",
@@ -489,6 +490,7 @@ function connect_socket() {
 						if (tabledata.data.length > 0) {
 							$('#agenttable').dataTable().fnAddData(tabledata.data);
 						}
+						alignDataTableHeaders();	
 					}
 				}).on('new-caller-ringing', function (data) {
 					debugtxt('new-caller-ringing', data);
@@ -943,8 +945,19 @@ $('#agenttable').DataTable({
 	searching: false,
 	paging: false,
 	scrollY: 600,
+	scrollX: '100%',
 	order: []
 });
+
+function alignDataTableHeaders() {
+	$($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+}
+
+function transferAvailability(status, name, ext) {
+	return (status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != name) 
+  	? '<Button class=\"demo-btn\" onClick="sendTransferInvite(\'' + ext + '\',\'' + true + '\')"><i class=\"fa fa-share-square\"></i></Button>' 
+	: "<Button class=\"secondary\" disabled><i class=\"fa fa-share-square\"></i></Button>"
+}
 
 $("#ivrsnum").keyup(function (event) {
 	if (event.keyCode === 13) {
