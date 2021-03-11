@@ -45,7 +45,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-public class lightserver extends Application {
+public class olightserver extends Application {
 
   private BusyLightAPI light;
   private String sPath = "/setbusylight";
