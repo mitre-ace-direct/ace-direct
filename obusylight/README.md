@@ -132,37 +132,29 @@ $  javac -version
 $  mvn -version
 ```
 
-## Install JAR files
-
-From a terminal:
-
-```bash
-$  cd openjdk
-$
-$  mvn install:install-file -Dfile=../lib/java-json.jar -DgroupId=org.json -DartifactId=json -Dversion=1 -Dpackaging=jar
-$  mvn install:install-file -Dfile=../lib/javax.ws.rs-api-2.0.1.jar -DgroupId=javax -DartifactId=javax.ws.rs-api-jar -Dversion=2.0.1 -Dpackaging=jar
-```
-
-## Running the project
+## Building and running the project
 
 * Clone this repo to your computer
 * **Plug in a BusyLight device to a USB port on your computer** (make sure it lights up briefly)
 * Run this project, following one of the three methods below.
 
-### In VS Code
+### VS Code
 
 * Start _VS Code_
-* Open this folder: File > Open... > openjdk
+* Open this folder: File > Open... > obusylight
 * Terminal > New Terminal
-* From the Terminal, go to this folder: `cd openjdk`
+* From the Terminal, go to this folder: `cd obusylight`
 * Run the project: `mvn clean javafx:run`
-* Build the JAR: `mvn clean install assembly:single package`
+* Build the executable JAR: `mvn clean install assembly:single package`
 
-### From the terminal
+### Terminal
 
-```
-$  cd openjdk
+```bash
+$  cd obusylight
+$
 $  ./run.sh
+$
+$ # Or...
 $  mvn clean javafx:run  # or run it this way
 $  mvn clean install assembly:single package  # build jar file
 ```
@@ -170,23 +162,18 @@ $  mvn clean install assembly:single package  # build jar file
 ### Eclipse
 
 * File > Import... > Maven > Existing Maven Projects
-* Navigate to `openjdk`
+* Navigate to `obusylight`
 * Right-click project > Run As... > Maven build...
 * Goal - Run from Eclipse: `clean javafx:run`
-* Goal - Build executable JAR: `mvn clean install assembly:single package` 
+* Goal - Build executable JAR: `mvn clean install assembly:single package`
 * Run
 
 ### Running the JAR file
 
-```
+```bash
 $  cd obusylight
+$
 $  java --module-path ${OPENFX_SDK}/lib --add-modules=javafx.controls -jar target/obusylight-1.0-jar-with-dependencies.jar
 ```
-
-## Deployment
-
-See the `deploy` folder `README.md` file.
-
-
 
 _End._
