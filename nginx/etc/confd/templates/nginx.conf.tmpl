@@ -1,0 +1,100 @@
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log warn;
+error_log /var/log/nginx/debug.log debug;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   65;
+    types_hash_max_size 2048;
+
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+#    include /etc/nginx/conf.d/*.conf;
+
+    server {
+        listen       80 default_server;
+        listen       [::]:80 default_server;
+        listen       443 ssl;
+        ssl on;
+
+       # Specify the location of the cert and key
+        ssl_certificate /etc/ssl/cert.pem;
+        ssl_certificate_key /etc/ssl/key.pem;
+        server_name  _/;
+        root         /usr/share/nginx/html;
+
+# Load configuration files for the default server block.
+#        include /etc/nginx/default.d/*.conf;
+
+        error_page 404 /404.html;
+            location = /40x.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+            location = /50x.html {
+        }
+
+
+        location /openam {
+                proxy_pass https://<OPENAM FQDN>:<OPENAM PORT>;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header Host <OPENAM FQDN>:<OPENAM PORT>;
+
+        }
+
+
+        location /ACEDirect/ {
+                proxy_pass https://<ACE DIRECT HOST>:<ACE DIRECT PORT>/;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host $host;
+                proxy_cache_bypass $http_upgrade;
+                        
+                sub_filter_once off;        
+                sub_filter /node /;
+
+                sub_filter 'href="/' 'href="/ACEDirect/';
+                sub_filter "href='/" "href='/ACEDirect/";
+                sub_filter 'src="/' 'src="/ACEDirect/';
+                sub_filter "src='/" "src='/ACEDirect/";
+
+                proxy_redirect https://<ACE DIRECT HOST>:<ACE DIRECT PORT>/ACEDirect/ /ACEDirect/;
+       }
+
+       location /ManagementPortal/ {
+                proxy_pass https://<ACE DIRECT HOST>:<MANAGEMENT PORTAL PORT>/;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection 'upgrade';
+                proxy_set_header Host $host;
+                proxy_cache_bypass $http_upgrade;
+
+                sub_filter_once off;
+                sub_filter /node /;
+
+                proxy_redirect https://<ACE DIRECT HOST>:<MANAGEMENT PORTAL PORT>/ManagementPortal/ /ManagementPortal/;
+       }
+    }
+}
