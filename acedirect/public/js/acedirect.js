@@ -66,7 +66,6 @@ var originalExt;
 var transferExt;
 var transferVRS;
 var transferAccepted = false;
-var callerExt;
 var isColdTransfer;
 
 setInterval(function () {
@@ -283,6 +282,10 @@ function connect_socket() {
 				}).on('new-caller-complaints', function (endpoint_type) {
 					// a new complaints caller has connected
 					debugtxt('new-caller-complaints', data);
+					if(isTransfer && !transferVRS) {
+					    //provider call bring transferred
+						endpoint_type = "Provider_Complaints";
+					}
 					$('#duration').timer('reset');
 					inCallADComplaints(endpoint_type);
 				}).on('no-ticket-info', function (data) {
@@ -490,23 +493,47 @@ function connect_socket() {
 				}).on('new-caller-ringing', function (data) {
 					debugtxt('new-caller-ringing', data);
 					$('#myRingingModal').addClass('fade');
-					changeStatusLight('INCOMING_CALL');
-					changeStatusIcon(incoming_call_color, "incoming-call", incoming_call_blinking);
-					$('#user-status').text('Incoming Call');
-					if(data.phoneNumber){
-						$('#myRingingModalPhoneNumber').html(data.phoneNumber);
-						recipientNumber = data.phoneNumber;
-						callerNumber = data.phoneNumber;
-					} else{
-						$('#myRingingModalPhoneNumber').html(data.callerNumber);
-					}
-					$('#myRingingModal').modal({
+
+					if (isTransfer) {
+						//automatically accept the incoming call so the agent doesn't have to do it twice
+						
+						if(data.phoneNumber){
+							$('#myRingingModalPhoneNumber').html(data.phoneNumber);
+							recipientNumber = data.phoneNumber;
+							callerNumber = data.phoneNumber;
+						} else{
+							$('#myRingingModalPhoneNumber').html(data.callerNumber);
+						}
+						
+						$('#myRingingModal').modal({
+							show: false,
+							backdrop: 'static',
+							keyboard: false
+						});
+
+						setTimeout(() => {
+							$('#accept-btn').trigger('click');
+						}, 1000);
+					} else {
+						$('#incoming-header').html('Incoming Call');
+						changeStatusLight('INCOMING_CALL');
+						changeStatusIcon(incoming_call_color, "incoming-call", incoming_call_blinking);
+						$('#user-status').text('Incoming Call');
+						if(data.phoneNumber){
+							$('#myRingingModalPhoneNumber').html(data.phoneNumber);
+							recipientNumber = data.phoneNumber;
+							callerNumber = data.phoneNumber;
+						} else{
+							$('#myRingingModalPhoneNumber').html(data.callerNumber);
+						}
+						$('#myRingingModal').modal({
 						show: true,
 						backdrop: 'static',
 						keyboard: false
-					});
-					//Did come with null
-					socket.emit('incomingcall', null);
+						});
+						//Did come with null
+						socket.emit('incomingcall', null);
+					}
 				}).on('new-missed-call', function (data) {
 					maxMissedCalls = data.max_missed;
 					if (maxMissedCalls == '') {
@@ -827,7 +854,55 @@ function connect_socket() {
 					$('.language-select-li').show();
 					$("#language-select").msDropDown();
 
-				});
+				}).on('receiveTransferInvite', function(data) {
+					isTransfer = true;
+					originalExt = data.originalExt;
+					transferVRS = data.vrs;
+					transferExt = data.transferExt;
+                    
+					$('#modalTransferCall').show();
+					$('#modalTransferCall').addClass('fade');
+					$('#incomingTransferExtension').html(data.originalExt)
+					$('#modalTransferCall').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					changeStatusLight('TRANSFERRED_CALL');
+					changeStatusIcon(transferred_call_color, "transferred_call", transferred_call_blinking);
+					$('#user-status').text('Transfer Call');
+					socket.emit('incomingtransferredcall', null);
+				}).on('transferDenied', function() {
+                    if ($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#shortcuts-tab').hasClass('active')) {
+                        $('#agents-btn').trigger('click');
+                    }
+                    showAlert('info', 'Transfer Denied. Please try again.');
+                    //reset transfer variables
+                    isTransfer = false;
+					originalExt = null;
+					transferVRS = null;
+					transferAccepted = false;
+					isColdTransfer = false;
+                }).on('beginTransfer', function() {
+					// initiate the call transfer in the signaling server
+					if (isColdTransfer) {
+						acekurento.callTransfer(transferExt.toString(), true);
+					}
+				}).on('transferJoined', function() {
+					var vrs = $('#callerPhone').val();
+                    socket.emit('transferSuccess',{'vrs':vrs})
+
+                    //close the sidebar if it's open
+                    if ($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#shortcuts-tab').hasClass('active')) {
+                        $('#agents-btn').trigger('click');
+					}
+
+					showTransferModal = true;
+					if (isColdTransfer) {
+						//we terminate the call for the original agent
+						terminate_call();
+						socket.emit('call-ended'); //stop allowing file share between consumer and original agent
+					}
+                });
 
 			} else {
 				//we do nothing with bad connections
@@ -2445,6 +2520,26 @@ function multipartyModal(){
 		backdrop: 'static',
 		keyboard: false
 	})
+}
+
+function transferResponse(isAccepted) {
+	$('#modalTransferCall').hide();
+
+	if (!isAccepted) {
+		socket.emit('denyingTransfer', {'originalExt':originalExt})
+		unpauseQueues();
+	 
+		isTransfer = false;
+		originalExt = null;
+		transferExt = null;
+		transferVRS = null;
+		transferAccepted = false;
+	} else {
+		socket.emit('transferInviteAccepted', {
+			'originalExt': originalExt,
+			'transferVRS': transferVRS
+		});
+	}
 }
 
 //Check if status needs to be changed
