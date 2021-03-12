@@ -44,7 +44,6 @@ const updateTime = function UpdateTime() {
 updateTime();
 setInterval(updateTime, 1000);
 
-// Used from onclick in hours.ejs
 function updateHoursOfOperation() {
   $('#updateBtn').attr('disabled', 'disabled');
 
@@ -80,6 +79,10 @@ function SetOperatingStatus(isOpen) {
     $('#opStatus').html('Closed').addClass('badge-danger').removeClass('badge-success');
   }
 }
+
+$('#updateBtn').on('click', () => {
+  updateHoursOfOperation();
+});
 
 $.ajax({
   url: './token',
