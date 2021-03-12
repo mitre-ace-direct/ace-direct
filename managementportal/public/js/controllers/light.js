@@ -11,6 +11,7 @@ function addMessage() {
  * reders the data in default_color_config.json on the screen.
  * NOTE: does not save the data, user still has to hit "save"
 */
+
 function ResetColorConfig() {
   socket.emit('reset-color-config');
 }
@@ -23,7 +24,7 @@ function ResetColorConfig() {
 */
 function DisableColors(color, oldColor, statusName) {
   const options = document.getElementsByTagName('option');
-  for (const option in options) {
+  Object.keys(options).forEach((option) => {
     // can select "off" for mutliple statuses
     if (color !== 'off') {
       // to compare option id with status name, so we don't disable an option
@@ -38,7 +39,8 @@ function DisableColors(color, oldColor, statusName) {
       options[option].disabled = false;
       options[option].style.color = '#333';
     }
-  }
+  });
+
   $('.selectpicker').selectpicker('refresh');
 }
 
@@ -49,7 +51,7 @@ function SubmitForm() {
   document.getElementById('message').innerHTML = '';
   const inputs = $('#form_input :input').not(':button'); // all input fields (not button because bootstrap-select makes them into buttons)
   const parsedInputs = []; // only the values of the statuses
-  inputs.each(function () {
+  inputs.each(function PushParsedInputs() {
     parsedInputs.push(this.value);
   });
 
@@ -84,7 +86,7 @@ function GetSelectedOptionId(jsonData, status) {
  *@param {jsonData} a json object of the color_config.json file
 */
 function AppendHtml(jsonData) {
-  for (const status in jsonData.statuses) {
+  Object.keys(jsonData.statuses).forEach((status) => {
     const statusId = jsonData.statuses[status].id;
     const statusName = CapitalizeFirstLetter(jsonData.statuses[status].name);
 
@@ -104,8 +106,8 @@ function AppendHtml(jsonData) {
     // "<option> id" is the word option concatinated with the status id, "option_away" for example
     // the div class name in "data-content" is for the circle icon,
     // "green-blinking" or "green-solid"
-    for (const color in jsonData.colors) {
-      for (const action in jsonData.actions) {
+    Object.keys(jsonData.colors).forEach((color) => {
+      Object.keys(jsonData.actions).every((action) => {
         const circleIconClass = `${jsonData.colors[color].toLowerCase()}-${jsonData.actions[action].toLowerCase()}`;
         const nameShown = `${CapitalizeFirstLetter(jsonData.colors[color])} - ${jsonData.actions[action]}`;
         const value = `${jsonData.colors[color].toLowerCase()}_${jsonData.actions[action].toLowerCase()}`;
@@ -114,21 +116,23 @@ function AppendHtml(jsonData) {
           $(`#${statusId}`).append(
             `<option data-content="<span class='circle gray'></span><div style='font-size:20px;'> Off </div>" value = "off" id = "option_${statusId}"> </option>`
           );
-          break;
-        } else {
-          $(`#${statusId}`).append(
-            `<option data-content="<span class='circle ${circleIconClass}'></span><div style='font-size:20px;'>${nameShown}</div>" value = "${value}" id = "option_${statusId}"> </option>`
-          );
+          return false;
         }
-      }
-    }
+        $(`#${statusId}`).append(
+          `<option data-content="<span class='circle ${circleIconClass}'></span><div style='font-size:20px;'>${nameShown}</div>" value = "${value}" id = "option_${statusId}"> </option>`
+        );
+        return true;
+      });
+    });
+
     // finish appending html
     $('#form_table').append(
       '</select">'
             + '</th>'
             + '</tr>'
     );
-  }
+  });
+
   $('.selectpicker').selectpicker('refresh');
 }
 
@@ -140,7 +144,7 @@ function SetupHtml(data) {
   const jsonData = JSON.parse(data);
   AppendHtml(jsonData);
 
-  for (const status in jsonData.statuses) {
+  Object.keys(jsonData.statuses).forEach((status) => {
     // set currently selected color
     const selectedOption = GetSelectedOptionId(jsonData, status);
     document.getElementById(jsonData.statuses[status].id).value = selectedOption;
@@ -148,9 +152,18 @@ function SetupHtml(data) {
 
     // disable selected color from other menues
     DisableColors(selectedOption, '', jsonData.statuses[status].id);
-  }
+  });
+
   $('.selectpicker').selectpicker('refresh');
 }
+
+$('#ResetColorButton').on('click', () => {
+  ResetColorConfig();
+});
+
+$('#SubmitForm').on('click', () => {
+  SubmitForm();
+});
 
 $(document).ready(() => {
   $('#sidebarlight').addClass('active');
