@@ -951,4 +951,16 @@ When the Java version is updated on the OpenAM server, it is necessary to update
 
 ---
 
+#### Problem 20
+
+How can I add additional agents to OpenAM?
+
+#### Solution 20
+
+1. Add the agents to `/root/iam/config/config.json`
+1. `cd /root/iam/scripts`
+1. `python create_users.py`
+
+---
+
 _Fin._
