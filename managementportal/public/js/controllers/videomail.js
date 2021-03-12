@@ -168,6 +168,10 @@ function ChangePlayButton() {
   document.getElementById('play-video-icon').classList.remove('fa-pause');
 }
 
+$('#play-video').on('click', () => {
+  PlayVideo();
+});
+
 function ConnectSocket() {
   $.ajax({
     url: './token',
@@ -220,11 +224,12 @@ function ConnectSocket() {
           })
           .on('videomail-status', (data) => {
             let showLabel = true;
+            let dataToPlot = data;
             if (data.length === 0) {
-              data = [{ data: 1, label: 'No Messages' }];
+              dataToPlot = [{ data: 1, label: 'No Messages' }];
               showLabel = false;
             }
-            $.plot('#videomailStatusPieChart', data, {
+            $.plot('#videomailStatusPieChart', dataToPlot, {
               series: {
                 pie: {
                   show: true,
@@ -289,6 +294,8 @@ function sortButtonToggle(buttonid) {
     $(buttonid).addClass('fa-sort-down').removeClass('fa-sort-up');
     return ('desc');
   }
+  // Default to 'acs' if none of the ones above.
+  return ('asc');
 }
 
 // Sorting the videomail table
@@ -399,3 +406,7 @@ function enterFullscreen() {
     remoteView.webkitRequestFullscreen(); // Chrome and Safari
   }
 }
+
+$('#enter-fullscreen').on('click', () => {
+  enterFullscreen();
+});
