@@ -51,40 +51,41 @@ exports.getConfigVal = function GetConfigVal(paramName) {
  * @returns {return} the updated json object
  */
 exports.setRgbValues = function SetRgbValues(jsonData, status, color) {
+  const newJsonData = jsonData;
   // jsonData.statuses[status] gets you the fields of each specific status
   if (color === 'red') {
-    jsonData.statuses[status].r = 255;
-    jsonData.statuses[status].g = 0;
-    jsonData.statuses[status].b = 0;
+    newJsonData.statuses[status].r = 255;
+    newJsonData.statuses[status].g = 0;
+    newJsonData.statuses[status].b = 0;
   } else if (color === 'green') {
-    jsonData.statuses[status].r = 0;
-    jsonData.statuses[status].g = 255;
-    jsonData.statuses[status].b = 0;
+    newJsonData.statuses[status].r = 0;
+    newJsonData.statuses[status].g = 255;
+    newJsonData.statuses[status].b = 0;
   } else if (color === 'blue') {
-    jsonData.statuses[status].r = 0;
-    jsonData.statuses[status].g = 0;
-    jsonData.statuses[status].b = 255;
+    newJsonData.statuses[status].r = 0;
+    newJsonData.statuses[status].g = 0;
+    newJsonData.statuses[status].b = 255;
   } else if (color === 'orange') {
-    jsonData.statuses[status].r = 255;
-    jsonData.statuses[status].g = 50;
-    jsonData.statuses[status].b = 0;
+    newJsonData.statuses[status].r = 255;
+    newJsonData.statuses[status].g = 50;
+    newJsonData.statuses[status].b = 0;
   } else if (color === 'yellow') {
-    jsonData.statuses[status].r = 255;
-    jsonData.statuses[status].g = 255;
-    jsonData.statuses[status].b = 0;
+    newJsonData.statuses[status].r = 255;
+    newJsonData.statuses[status].g = 255;
+    newJsonData.statuses[status].b = 0;
   } else if (color === 'pink') {
-    jsonData.statuses[status].r = 255;
-    jsonData.statuses[status].g = 0;
-    jsonData.statuses[status].b = 255;
+    newJsonData.statuses[status].r = 255;
+    newJsonData.statuses[status].g = 0;
+    newJsonData.statuses[status].b = 255;
   } else if (color === 'aqua') {
-    jsonData.statuses[status].r = 0;
-    jsonData.statuses[status].g = 255;
-    jsonData.statuses[status].b = 255;
+    newJsonData.statuses[status].r = 0;
+    newJsonData.statuses[status].g = 255;
+    newJsonData.statuses[status].b = 255;
   } else {
     // color is white
-    jsonData.statuses[status].r = 255;
-    jsonData.statuses[status].g = 255;
-    jsonData.statuses[status].b = 255;
+    newJsonData.statuses[status].r = 255;
+    newJsonData.statuses[status].g = 255;
+    newJsonData.statuses[status].b = 255;
   }
-  return jsonData;
+  return newJsonData;
 };
