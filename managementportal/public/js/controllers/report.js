@@ -19,7 +19,8 @@ function getTimeZoneOffset() {
 
 const timezone = getTimeZoneOffset();
 
-function updateCallStatusLineChart(data) {
+function updateCallStatusLineChart(dataIn) {
+  const data = dataIn;
   $(() => {
     if (data.data.length === 1) {
       start = new Date(data.data[0].date);
