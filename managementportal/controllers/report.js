@@ -145,7 +145,8 @@ function forEachPromise(items, fn) {
   return items.reduce((promise, item) => promise.then(() => fn(item)), Promise.resolve());
 }
 
-function getItemStateCode(item) {
+function getItemStateCode(itemIn) {
+  const item = itemIn;
   return new Promise((resolve, _reject) => {
     process.nextTick(() => {
       areaCodesPromise(item.vrs)
