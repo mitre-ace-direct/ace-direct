@@ -1,0 +1,71 @@
+{
+    "common": {
+        "java": "java-1.8.0-openjdk-devel.x86_64",
+        "tomcat" : "7.0.105"
+    },
+    "apache": {
+        "cert_path": "../ssl/cert.pem",
+        "cert_key_path": "../ssl/key.pem",
+        "p12_out_filename": "../ssl/cert.p12",
+        "p12_export_pass": "root",
+        "alias": "tomcat",
+        "dest_keystore_pass": "changeit",
+        "keystore_path": "../ssl/.keystore",
+        "keystore_dest_path":"/opt/tomcat/.keystore",
+        "tomcat_server_config":"../config/tomcat/server.xml",
+        "tomcat_service_config":"../config/tomcat/tomcat.service"
+    },
+    "oam": {
+        "oam_path" : ".",
+        "ssoadm_file" : "../config/oam/SSOAdminTools-13.0.0/ace/bin/ssoadm",
+        "ssoconfig_file":"../config/oam/SSOConfiguratorTools-13.0.0/openam-configurator-tool-13.0.0.jar",
+        "war_file" : "../config/oam/ace.war",
+        "adminid": "amadmin",
+        "admin_pwd_file": "../config/oam/SSOAdminTools-13.0.0/ace/bin/pwd.txt",
+        "users": [
+            {
+                "username": "dagent1",
+                "password": "Dagent1#",
+                "realm": "/",
+                "type": "User"
+            },
+            {
+                "username": "dagent2",
+                "password": "Dagent2#",
+                "realm": "/",
+                "type": "User"
+            },
+            {
+                "username": "dagent3",
+                "password": "Dagent3#",
+                "realm": "/",
+                "type": "User"
+            },
+            {
+                "username": "dagent4",
+                "password": "Dagent4#",
+                "realm": "/",
+                "type": "User"
+            },
+            {
+                "username": "dagent5",
+                "password": "Dagent5#",
+                "realm": "/",
+                "type": "User"
+            },
+            {
+                "username": "manager",
+                "password": "manager1234",
+                "realm": "/",
+                "type": "User"
+            },
+            {
+                "username": "supervisor",
+                "password": "supervisor1234",
+                "realm": "/",
+                "type": "User"
+            }
+        ]
+    }
+
+}
