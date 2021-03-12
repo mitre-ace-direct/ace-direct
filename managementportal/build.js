@@ -137,6 +137,7 @@ JS.map((asset) => {
     console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`);
     process.exit(1);
   }
+  return true;
 });
 
 CSS.map((asset) => {
@@ -149,6 +150,7 @@ CSS.map((asset) => {
     console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`);
     process.exit(1);
   }
+  return true;
 });
 
 FONT.map((asset) => {
@@ -161,6 +163,7 @@ FONT.map((asset) => {
     console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`);
     process.exit(1);
   }
+  return true;
 });
 WEB_FONT.map((asset) => {
   const filename = asset.substring(asset.lastIndexOf('/') + 1);
@@ -172,6 +175,7 @@ WEB_FONT.map((asset) => {
     console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`);
     process.exit(1);
   }
+  return true;
 });
 
 IMAGES.map((asset) => {
@@ -184,4 +188,5 @@ IMAGES.map((asset) => {
     console.log(`${from} does not exist.\nUpdate the build.js script with the correct file paths.`);
     process.exit(1);
   }
+  return true;
 });
