@@ -1,3 +1,5 @@
+const logger = require('./logger');
+
 // These are functions that are not called by code.
 // They look like they are called by a person during an interactive debugging session.
 // Extracted from server-db.js
@@ -8,7 +10,7 @@
  * @param {type} agent
  * @returns {unresolved} Not used
  */
-function findAgentName(Agents, agent) {
+function findAgentName(Agents, agent) { // eslint-disable-line no-unused-vars
   for (let i = 0; i < Agents.length; i += 1) {
     if (Agents[i].agent === agent) return Agents[i].name;
   }
@@ -22,7 +24,8 @@ function findAgentName(Agents, agent) {
  * @param {type} queue
  * @returns {unresolved}
  */
-function findAgentInQueue(Agents, agent, queue) { // find agent by name (extension) and queue
+// find agent by name (extension) and queue
+function findAgentInQueue(Agents, agent, queue) { // eslint-disable-line no-unused-vars
   logger.debug(`findAgentInQueue() Entering:  agent= ${agent}, queue= ${queue}`);
   for (let i = 0; i < Agents.length; i += 1) {
     logger.debug(Agents[i]);
@@ -42,7 +45,7 @@ function findAgentInQueue(Agents, agent, queue) { // find agent by name (extensi
  * @param {type} Agents
  * @returns {undefined} Not used
  */
-function printAgent(Agents) {
+function printAgent(Agents) { // eslint-disable-line no-unused-vars
   logger.debug('Entering printAgent() ');
   for (let i = 0; i < Agents.length; i += 1) {
     logger.debug(Agents[i]);
@@ -51,13 +54,13 @@ function printAgent(Agents) {
 
 /**
  * Initialize Agent Call map (total calls taken)
- * @param {type} Asterisk_queuenames
+ * @param {type} AsteriskQueuenames
  * @param {type} obj Map
  * @returns {undefined} Not used
  */
-function setCallMap(Asterisk_queuenames, map) {
-  for (let i = 0; i < Asterisk_queuenames.length; i += 1) {
-    map.set(Asterisk_queuenames[i], 0); // set the total call to 0
+function setCallMap(AsteriskQueuenames, map) { // eslint-disable-line no-unused-vars
+  for (let i = 0; i < AsteriskQueuenames.length; i += 1) {
+    map.set(AsteriskQueuenames[i], 0); // set the total call to 0
   }
 }
 
@@ -66,7 +69,7 @@ function setCallMap(Asterisk_queuenames, map) {
  * @param {type} obj Map
  * @returns {undefined} Not used
  */
-function printCallMap(m) {
+function printCallMap(m) { // eslint-disable-line no-unused-vars
   m.forEach((call, queue) => {
     logger.debug(`printCallMap(): ${queue} ${call}`);
   });
@@ -77,7 +80,7 @@ function printCallMap(m) {
  * @param {type} evt Event to display
  * @returns {undefined} Not used
  */
-function showEvent(evt) {
+function showEvent(evt) { // eslint-disable-line no-unused-vars
   if (evt) {
     logger.debug(`Event: ${evt.event}`);
   }
