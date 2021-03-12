@@ -58,15 +58,9 @@ function showProperty(msg, obj) {
   console.log(`${msg}========================================`);
   if (!obj) return;
 
-  //Object.keys(obj).forEach((key) => console.log(`${key} = ${obj[key]}`));
-
-  // obj.forEach((key) => {
-  //   console.log(`${key} = ${obj[key]}`);
-  // });
-
-  for (const key in obj) {
+  Object.keys(obj).forEach((key) => {
     console.log(`${key} = ${obj[key]}`);
-  }
+  });
 }
 
 function sendChat(key) {
