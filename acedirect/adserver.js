@@ -816,6 +816,33 @@ io.sockets.on('connection', function (socket) {
 			});
 	});
 
+	socket.on('transferCallInvite', function(data) {
+        //send the original ext through so we know who should terminate the call
+        io.to(Number(data.transferExt)).emit('receiveTransferInvite', {'originalExt':data.originalExt, 'vrs':data.vrs, 'transferExt': data.transferExt});
+    });
+
+	socket.on('denyingTransfer', function(data) {
+        io.to(Number(data.originalExt)).emit('transferDenied');
+	});
+
+	socket.on('transferInviteAccepted', function(data) {
+		io.to(Number(data.originalExt)).emit('beginTransfer');
+	});
+
+	socket.on('joiningTransfer', function(data) {
+		redisClient.hset(rStatusMap, token.username, "INCALL", function (err, res) {
+			sendAgentStatusList(token.username, "INCALL");
+			redisClient.hset(rTokenMap, token.lightcode, "INCALL");
+		});
+        io.to(Number(data.originalExt)).emit('transferJoined');
+    });
+
+	socket.on('transferSuccess', function(data) {
+		//remove the original agent
+        var vrs = data.vrs;
+        socket.leave(Number(vrs));
+    });
+
 	//Handle new multi party invite since we need to manually tell the agent a call is coming.
 	socket.on('multiparty-invite', function (data){
 		io.to(Number(data.extensions)).emit('new-caller-ringing', {
@@ -1119,6 +1146,15 @@ io.sockets.on('connection', function (socket) {
 		redisClient.hset(rStatusMap, token.username, "INCOMINGCALL", function (err, res) {
 			sendAgentStatusList(token.username, "INCOMINGCALL");
 			redisClient.hset(rTokenMap, token.lightcode, "INCOMINGCALL");
+		});
+	});
+
+	//Sets the agent state to TRANSFERRED_CALL
+	socket.on('incomingtransferredcall', function () {
+		logger.info('State: TRANSFERRED_CALL - ' + token.username);
+		redisClient.hset(rStatusMap, token.username, "TRANSFERRED_CALL", function (err, res) {
+			sendAgentStatusList(token.username, "TRANSFERRED_CALL");
+			redisClient.hset(rTokenMap, token.lightcode, "TRANSFERRED_CALL");
 		});
 	});
 
@@ -2532,7 +2568,33 @@ function handle_manager_event(evt) {
             }
           });
 
-        }
+        } else {
+			// transferred consumer portal call hanging up
+			redisClient.hget(rConsumerExtensions, Number(extension[1]), function (err, reply) {
+				if (err) {
+					logger.error("Redis Error" + err);
+				} else if (reply) {
+					var val = JSON.parse(reply);
+					val.inuse = false;
+					redisClient.hset(rConsumerExtensions, Number(extension[1]), JSON.stringify(val));
+				}
+				});
+	
+				redisClient.hget(rExtensionToVrs, Number(extension[1]), function (err, vrsNum) {
+					if (!err && vrsNum) {
+						logger.info('Sending chat-leave for socket id ' + vrsNum);
+						io.to(Number(vrsNum)).emit('chat-leave', {
+						"vrs": vrsNum
+						});
+		
+						// Remove the extension when we're finished
+						redisClient.hdel(rExtensionToVrs, Number(extension[1]));
+						redisClient.hdel(rExtensionToVrs, Number(vrsNum));
+					} else {
+						logger.error("Couldn't find VRS number in extensionToVrs map for extension ");
+					}
+				});
+		}
       } else if (evt.context === 'from-phones') {
         if (evt.channelstatedesc === 'Busy') {
           //This is a hangup from an outbound call that did not connect (i.e., Busy)
@@ -2546,6 +2608,7 @@ function handle_manager_event(evt) {
           //if we get here, it is a hangup that we are ignoring, probably because we don't need it
           logger.info('Not processing hangup.  evt string values... evt.context:' + evt.context + ' , evt.channel:' + evt.channel);
 		  logger.info('HANGUP RECEIVED IGNORING calleridnum: ' + evt.calleridnum);
+		  console.log('ignoring hangup')
       }
 
       break;
@@ -4216,6 +4279,14 @@ app.get('/getagentstatus/:token', function (req, res) {
 						resObj.r = 255;
 						resObj.g = 0;
 						resObj.b = 0;
+						resObj.blink = true;
+						resObj.stop = false;
+						break;
+					case 'TRANSFERRED_CALL':
+						resObj.status = status;
+						resObj.r = 255;
+						resObj.g = 255;
+						resObj.b = 255;
 						resObj.blink = true;
 						resObj.stop = false;
 						break;
