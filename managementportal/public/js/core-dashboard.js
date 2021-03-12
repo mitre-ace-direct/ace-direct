@@ -8,7 +8,7 @@ const acrApp = angular.module('acrcsr-dashboard',
     'ngRoute'
   ]);
 
-acrApp.config(['$routeProvider', function ($routeProvider) {
+acrApp.config(['$routeProvider', function DashBoard($routeProvider) {
   $routeProvider
     .when('/', {
       templateUrl: 'dashboard'
