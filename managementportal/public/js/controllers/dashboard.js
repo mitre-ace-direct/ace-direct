@@ -36,7 +36,8 @@ const dbController = angular.module('dashboardModule', ['csrService', 'angularDu
     }
 
     function updateAgentStatusPieChart(agents) {
-      const temp = agents.reduce((p, c) => {
+      const temp = agents.reduce((pIn, c) => {
+        const p = pIn;
         const defaultValue = {
           status: c.status,
           data: 0
@@ -48,9 +49,11 @@ const dbController = angular.module('dashboardModule', ['csrService', 'angularDu
       }, {});
 
       const agentStatusSummary = [];
-      for (const k in temp) {
-        agentStatusSummary.push(temp[k]);
-      }
+      Object.keys(temp).forEach((k) => agentStatusSummary.push(temp[k]));
+
+      // for (const k in temp) {
+      //   agentStatusSummary.push(temp[k]);
+      // }
 
       agentStatusSummary.forEach((e) => {
         e.label = e.status;
@@ -123,9 +126,11 @@ const dbController = angular.module('dashboardModule', ['csrService', 'angularDu
         for (let i = 0; i < data.agents.length; i += 1) {
           const a = findAgent($scope.Agents, data.agents[i]);
           if (a) {
-            for (const prop in data.agents[i]) {
-              a[prop] = data.agents[i][prop];
-            }
+            Object.keys(data.agents[i]).forEach((prop) => { a[prop] = data.agents[i][prop]; });
+
+            // for (const prop in data.agents[i]) {
+            //   a[prop] = data.agents[i][prop];
+            // }
           } else {
             $scope.Agents.push(data.agents[i]);
           }
