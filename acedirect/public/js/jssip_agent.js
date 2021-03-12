@@ -23,6 +23,7 @@ var recording = false;
 var outbound_timer = null;
 var callParticipants = [];
 var isMuted = false;
+var showTransferModal = false;
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -207,11 +208,21 @@ function register_jssip() {
 			socket.emit('wrapup', null);
 			changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
 			changeStatusLight('WRAP_UP');
-			$('#modalWrapup').modal('show');
-			$('#modalWrapup').modal({
-				backdrop: 'static',
-				keyboard: false
-			});
+
+			if (showTransferModal) {
+				$('#modalWrapupTransfer').modal('show');
+				$('#modalWrapupTransfer').modal({
+					backdrop: 'static',
+					keyboard: false
+				});
+				showTransferModal = false;
+			} else {
+				$('#modalWrapup').modal('show');
+				$('#modalWrapup').modal({
+					backdrop: 'static',
+					keyboard: false
+				});
+			}
 		}
 	};
 
@@ -352,6 +363,15 @@ function accept_call() {
 		setTimeout(() => {
 			if (document.getElementById("muteAudio").checked == true) {
 				mute_audio();
+			}
+
+			if (isTransfer) {
+				socket.emit('joiningTransfer', {'extension' : extensionMe, 'originalExt':originalExt});
+				isTransfer = false;
+				originalExt = null;
+				transferExt = null;
+				transferAccepted = true;
+				isBlindTransfer = null;
 			}
 			calibrateVideo(2000);
 		}, 1000);
@@ -543,6 +563,13 @@ function terminate_call() {
 		//resets the agent and consumer who can share files
 		socket.emit('call-ended');
 	}
+
+	isTransfer = false;
+	originalExt = null;
+	transferExt = null;
+	transferVRS = null;
+	transferAccepted = false;
+	isBlindTransfer = false;
 }
 
 function unregister_jssip() {
@@ -906,10 +933,24 @@ function multipartyinvite(extension) {
 		})
 	}*/
 }
-
-function transferCall(isBlind) {
+/**
+ * @param {string} ext - agent extension to receive the transfer
+ * @param {boolean} isCold 
+ */
+ function sendTransferInvite(ext, isCold) {
 	if (agentStatus == 'IN_CALL') {
-		acekurento.callTransfer(document.getElementById('transferExtension').value, isBlind);
+		transferExt = ext;
+		showAlert('info', 'Call transfer initiated. Waiting for response...');
+
+		if (isCold) {
+			isColdTransfer = true;
+		}
+
+		socket.emit('transferCallInvite', {
+			'transferExt': transferExt, 
+			'originalExt': extensionMe, 
+			'vrs': $('#callerPhone').val()
+		});
 	}
 }
 
