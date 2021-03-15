@@ -24,6 +24,25 @@ Set up your local Node.js environment:
 1. Make sure Git is installed: `git --version`
 1. Install Node.js locally:
 
+    * Amazon Linux 2 example:
+
+      ```bash
+      $  # install NVM
+      $  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+      $
+      $  . ~/.nvm/nvm.sh
+      $  nvm install node
+      ```
+
+    * Add `N_PREFIX` to your  `~/.bash_profile`:
+
+      ```bash
+      N_PREFIX=$HOME/.n
+      PATH=$N_PREFIX/bin:$PATH:$HOME/.local/bin:$HOME/bin
+      export PATH N_PREFIX
+      ```
+
+    * Source your profile: `source ~/.bash_profile`
     * From a terminal, install Node `n` manager and Node.js:
 
       ```bash
@@ -38,16 +57,6 @@ Set up your local Node.js environment:
       $  # for Windows
       $  npm config set script-shell bash
       ```
-
-    * Add `N_PREFIX` to your  `~/.bash_profile`:
-
-      ```bash
-      N_PREFIX=$HOME/.n
-      PATH=$N_PREFIX/bin:$PATH:$HOME/.local/bin:$HOME/bin
-      export PATH N_PREFIX
-      ```
-
-    * Source your profile: `source ~/.bash_profile`
 
 1. Install and configure _Redis_. See [Redis Quick Start](https://redis.io/topics/quickstart).
 
