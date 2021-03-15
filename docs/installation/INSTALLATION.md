@@ -113,7 +113,7 @@ The following instructions assume a local MySQL server:
 * Install and configure Asterisk on _sipace_. See the `asterisk/README.md` file for detailed instructions.
 * Install and connect the _BusyLight_ device (if available) to the agent computer:
   * Connect the USB BusyLight to the agent computer.
-  * See the [obusylight](../../obusylight/) folder for instructions on deploying the BusyLight server program on the agent computer.
+  * See the [obusylight/README.md](../../obusylight/README.md) file for instructions on deploying the BusyLight server program on the agent computer.
 
 ## ACE Direct Reboot Checklist
 
