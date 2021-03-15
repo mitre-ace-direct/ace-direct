@@ -58,7 +58,7 @@ Install the `strongSwan` server. See [STRONGSWAN.md](STRONGSWAN.md).
 This is the NGINX server for ACE Direct. This server acts as a _reverse proxy_, hiding internal Node.js servers from public access.
 
 * Log into the `portal.domain.com` server.
-* See the [nginx](nginx/) folder for installation instructions.
+* See the [nginx/README.md](../../nginx/README.md) for installation instructions.
 
 ### aceopenam
 
@@ -66,11 +66,13 @@ The `aceopenam` server is the _identity and access management_ server, implement
 
 * Log into the `aceopenam.domain.com` server.
 * Clone the `iam` repo.
-* See the `README.md` file in the `iam` repo for detailed installation and configuration instructions.
+* See [iam/README.md](../../iam/README.md) for detailed installation and configuration instructions.
 
 ### acesip
 
-The `acesip.domain.com` server is the Asterisk server. Log into the Asterisk server, clone the `asterisk` repo, and follow the installation instructions. Additionally, you can install the _ACE Quill_ `acequill-service` repo and configure it with `asterisk` to include captioning and language translation.
+* The `acesip.domain.com` server is the Asterisk server. Log into the Asterisk server, clone the `asterisk` repo, and follow the installation instructions.
+* You can install the _ACE Quill_ `acequill-service` server and configure it with `asterisk` to include captioning and language translation.
+* See the `kurento-asterisk-servlet` repo for informatioon on installing the videomail server on `acesip`.
 
 ### aceproxy
 
