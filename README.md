@@ -20,8 +20,8 @@ This document describes how to install, configure, and deploy the core ACE Direc
 Set up your local Node.js environment:
 
 1. Log into the ACE Direct user account on the target server.
-1. Clone _this_ repo on the target server in the home folder of the ACE Direct user.
 1. Make sure Git is installed: `git --version`
+1. Clone _this_ Git repo on the target server in the home folder of the ACE Direct user.
 1. Install Node.js locally:
 
     * Amazon Linux 2 example:
