@@ -12,7 +12,7 @@ The installation, configuration, and deployment procedures in this document are 
 
 1. The OpenAM server is running CentOS Linux. Other Linux versions may work, with or without minor modifications to the installation scripts.
 1. Install OpenAM as `root` in the `/root` home folder of the OpenAM server.
-1. OpenAM will run behind NGINX. See the ACE Direct `nginx` repo for configuration details.
+1. OpenAM will run behind NGINX. See the [nginx/README.md](../nginx/README.md) for configuration details.
 1. OpenAM only has a private IP address. Do **not** assign a public IP address to it.
 1. Certificates are required to secure the OpenAM login process:
 
@@ -28,7 +28,7 @@ The installation, configuration, and deployment procedures in this document are 
 
 ### Files
 
-1. Clone this repo, then copy the `iam` folder to the `/root` folder on the OpenAM server.
+1. Copy this `iam` folder to the `/root` folder on the OpenAM server.
 1. Execute the commands below on the OpenAM server as `root`.
 
 ### Certificates
@@ -127,8 +127,8 @@ Where...
 * `dest_keystore_pass`: the password to access the jks keystore; set 'keystorePass' in `server.xml` to this same value
 * `keystore_path`: the initial file path for generated jks keystore
 * `keystore_dest_path`: the destination keystore path - tomcat_installer will move keystore here
-* `tomcat_server_config`: the location of `server.xml` in this repo
-* `tomcat_service_config`: the location of `tomcat.service` in this repo
+* `tomcat_server_config`: the location of `server.xml` in this folder
+* `tomcat_service_config`: the location of `tomcat.service` in this folder
 
 ### OpenAM Configuration
 
