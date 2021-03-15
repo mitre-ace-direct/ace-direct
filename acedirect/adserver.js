@@ -1991,12 +1991,12 @@ io.sockets.on('connection', function (socket) {
 							if (error) {
 								logger.error("GET translation: " + error);
 								console.error("GET translation error: " + error);
-								socket.emit('caption-translated', {
-									'transcript' : 'Error using translation server: ' + translationUrl,
-									'displayname' : data.transcripts.displayname,
-									'msgid': msgid,
-									'final': final
-								});
+								// socket.emit('caption-translated', {
+								// 	'transcript' : 'Error using translation server: ' + translationUrl,
+								// 	'displayname' : data.transcripts.displayname,
+								// 	'msgid': msgid,
+								// 	'final': final
+								// });
 							} else {
 								console.log('received translation', data);
 								console.log(languageFrom, languageTo, translationUrl);
