@@ -55,7 +55,7 @@ Install the `strongSwan` server. See [STRONGSWAN.md](STRONGSWAN.md).
 
 ### portal
 
-This is the NGINX server for ACE Direct. This server acts as a _reverse proxy_, hiding internal Node.js servers from public access.
+This is the NGINX server for ACE Direct. The server acts as a _reverse proxy_, hiding internal Node.js servers from public access.
 
 * Log into the `portal.domain.com` server.
 * See the [nginx/README.md](../../nginx/README.md) for installation instructions.
@@ -65,7 +65,7 @@ This is the NGINX server for ACE Direct. This server acts as a _reverse proxy_, 
 The `aceopenam` server is the _identity and access management_ server, implemented with OpenAM. To install and configure `aceopenam`:
 
 * Log into the `aceopenam.domain.com` server.
-* Clone the `iam` repo.
+* Copy over the `iam` folder.
 * See [iam/README.md](../../iam/README.md) for detailed installation and configuration instructions.
 
 ### acesip
