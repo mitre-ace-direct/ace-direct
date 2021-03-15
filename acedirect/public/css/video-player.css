@@ -1,3 +1,25 @@
+/* scrollbar items */
+  /* width */
+  div#consumer-captions::-webkit-scrollbar {
+    width: 12px;
+    }
+
+    /* Track */
+    div#consumer-captions::-webkit-scrollbar-track {
+    background: #3f3f3f;
+    }
+
+    /* Handle */
+    div#consumer-captions::-webkit-scrollbar-thumb {
+    background: #a7a7a7; 
+    }
+
+    /* Handle on hover */
+    div#consumer-captions::-webkit-scrollbar-thumb:hover {
+    background: #8f8f8f; 
+    }
+
+
 #fullscreen-element {
 	padding: 0;
 	height: 100%;
