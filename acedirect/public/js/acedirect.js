@@ -68,6 +68,17 @@ var transferVRS;
 var transferAccepted = false;
 var isColdTransfer;
 
+// multiparty hangup variables
+var hostAgent;
+var backupHostAgent;
+var transitionExt;
+var transitionAgent;
+
+var autoAnswer= false;
+var multipartyTransition = false;
+var isMultipartyTransfer = false;
+var allAgentCall = false;
+
 setInterval(function () {
 	busylight.light(this.agentStatus);
 }, 2000);
@@ -308,6 +319,10 @@ function connect_socket() {
 						changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
 						changeStatusLight('WRAP_UP');
 						socket.emit('chat-leave-ack', data);
+					} else {
+						// consumer left multiparty call-- agents still in call together
+						socket.emit('chat-leave-ack', data);
+					  	clearScreen();
 					}
 				}).on('chat-message-new', function (data) {
 					debugtxt('chat-message-new', data);
@@ -528,11 +543,25 @@ function connect_socket() {
 						} else{
 							$('#myRingingModalPhoneNumber').html(data.callerNumber);
 						}
-						$('#myRingingModal').modal({
-						show: true,
-						backdrop: 'static',
-						keyboard: false
-						});
+						if (autoAnswer) {
+							// multiparty transition
+							$('#myRingingModal').modal({
+								show: false,
+								backdrop: 'static',
+								keyboard: false
+								});
+								setTimeout(() => {
+									$('#accept-btn').trigger('click');
+								}, 1000);
+								autoAnswer = false;
+						} else {
+							// standard incoming call
+							$('#myRingingModal').modal({
+							show: true,
+							backdrop: 'static',
+							keyboard: false
+							});
+						}
 						//Did come with null
 						socket.emit('incomingcall', null);
 					}
@@ -904,7 +933,32 @@ function connect_socket() {
 						terminate_call();
 						socket.emit('call-ended'); //stop allowing file share between consumer and original agent
 					}
-                });
+                }).on ('multiparty-transfer', function(data) {
+					// backup host is becoming the new host of the call
+					multipartyCaptionsEnd();
+					
+					isTransfer = true;
+					isMultipartyTransfer = true;
+					hostAgent = extensionMe;
+					transitionAgent = data.transitionAgent;
+					transferVRS = data.vrs;
+
+					$('#multipartyTransitionModal').modal('show');
+					$('#multipartyTransitionModal').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+				}).on('multiparty-reinvite', function(){
+					// transition agent
+					autoAnswer = true;
+					multipartyTransition = true;
+					terminate_call();
+					$('#multipartyTransitionModal').modal('show');
+					$('#multipartyTransitionModal').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+				});
 
 			} else {
 				//we do nothing with bad connections
