@@ -169,7 +169,8 @@ class WebRTCMediaSession extends Events {
     const simplePartList = [];
     this._participants.forEach(p => {
       const { ext, type, onHold } = p;
-      simplePartList.push({ ext, type, onHold });
+      const isAgent = (type == "participant:webrtc") ? p.session._isAgent : false;
+      simplePartList.push({ ext, type, onHold, isAgent });
     });
     this._participants.forEach(p => {
       if (p.type === PARTICIPANT_TYPE_WEBRTC && p.session
