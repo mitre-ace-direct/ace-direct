@@ -4140,47 +4140,72 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 		uploadMetadata.mimetype = req.file.mimetype;
 		uploadMetadata.size = req.file.size;
 
-		ClamScan.then(async clamscan => {
-			try {
-				console.log('scanning', uploadMetadata.filepath, 'as', require("os").userInfo().username, fs.existsSync(uploadMetadata.filepath));
-		 
-				// You can re-use the `clamscan` object as many times as you want
-				// const version = await clamscan.get_version();
-				// console.log(`ClamAV Version: ${version}`);
-				
-				const {is_infected, file, viruses} = await clamscan.is_infected(uploadMetadata.filepath);
-				if (is_infected) {
-					console.log(`${req.file.originalname} is infected with ${viruses}!`);
-					res.status(400).send("Error scanning file i");
+
+		if (getConfigVal('filesharing:virus_scan_enabled') === 'true') {
+			ClamScan.then(async clamscan => {
+				try {
+					console.log('scanning', uploadMetadata.filepath, 'as', require("os").userInfo().username, fs.existsSync(uploadMetadata.filepath));
+			 
+					// You can re-use the `clamscan` object as many times as you want
+					// const version = await clamscan.get_version();
+					// console.log(`ClamAV Version: ${version}`);
+					
+					const {is_infected, file, viruses} = await clamscan.is_infected(uploadMetadata.filepath);
+					if (is_infected) {
+						console.log(`${req.file.originalname} is infected with ${viruses}!`);
+						res.status(400).send("Error scanning file i");
+					}
+					else {
+						console.log(`${req.file.originalname} passed inspection!`);
+						request({
+							method: 'POST',
+							url: 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
+							headers: {
+								'Content-Type': 'application/json'
+							},
+							body: uploadMetadata,
+							json: true
+						}, function (error, response, data) {
+							if (error) {
+								res.status(500).send("Error");
+							} else {
+								res.status(200).send("Success");
+							}
+						});
+					}
+				} catch (err) {
+					// Handle any errors raised by the code in the try block
+					console.log('Error using Clam AV:', err)
+					res.status(400).send("Error scanning file");
 				}
-				else {
-					console.log(`${req.file.originalname} passed inspection!`);
-					request({
-						method: 'POST',
-						url: 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
-						headers: {
-							'Content-Type': 'application/json'
-						},
-						body: uploadMetadata,
-						json: true
-					}, function (error, response, data) {
-						if (error) {
-							res.status(500).send("Error");
-						} else {
-							res.status(200).send("Success");
-						}
-					});
-				}
-			} catch (err) {
-				// Handle any errors raised by the code in the try block
-				console.log('Error using Clam AV:', err)
+			}).catch(err => {
+				// Handle errors that may have occurred during initialization
+				console.log('Error initializing Clam AV:', err)
 				res.status(400).send("Error scanning file");
-			}
-		}).catch(err => {
-			// Handle errors that may have occurred during initialization
-			console.log('Error initializing Clam AV:', err)
-			res.status(400).send("Error scanning file");
-		});
+			});
+		}
+		else {
+			console.log('WARNING: VIRUS SCAN IS DISABLED!');
+			request({
+				method: 'POST',
+				url: 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: uploadMetadata,
+				json: true
+			}, function (error, response, data) {
+				if (error) {
+					res.status(500).send("Error");
+				} else {
+					res.status(200).send("Success");
+				}
+			});
+
+		}
+
+
+		
 		
 	}else{
 		console.log("Not valid agent");
