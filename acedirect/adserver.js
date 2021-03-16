@@ -843,11 +843,23 @@ io.sockets.on('connection', function (socket) {
         socket.leave(Number(vrs));
     });
 
+	socket.on('multiparty-hangup', function(data) {
+		io.to(Number(data.newHost)).emit('multiparty-transfer', {'transitionAgent':data.transitionAgent, 'vrs': data.vrs});
+
+		// reinvite the transitionAgent if it exists
+		if (data.transitionAgent) {
+			io.to(Number(data.transitionAgent)).emit('multiparty-reinvite');
+		}
+		if (data.vrs) {
+			io.to(Number(data.vrs)).emit('consumer-multiparty-hangup');
+		}
+	});
+
 	//Handle new multi party invite since we need to manually tell the agent a call is coming.
 	socket.on('multiparty-invite', function (data){
 		io.to(Number(data.extensions)).emit('new-caller-ringing', {
-			'phoneNumber': data.extensions,
-			'callerNumber' : data.callerNumber
+			'callerNumber': data.extensions,
+			'phoneNumber' : data.callerNumber
 		  });
 	});
 

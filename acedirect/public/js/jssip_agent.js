@@ -21,7 +21,7 @@ var jssip_debug = true; //enables debugging logs from jssip library if true NOTE
 var incomingCall = null;
 var recording = false;
 var outbound_timer = null;
-var callParticipants = [];
+var callParticipantsExt = [];
 var isMuted = false;
 var showTransferModal = false;
 
@@ -61,7 +61,7 @@ function register_jssip() {
 							"language": transcripts.langCd,
 							"displayname": $('#callerFirstName').val() + " " + $('#callerLastName').val(),
 							"agent": false,
-							"participants": callParticipants
+							"participants": callParticipantsExt
 						});
 					} else {
 						// Acedirect will skip translation service if languages are the same
@@ -80,12 +80,71 @@ function register_jssip() {
 		'participantsUpdate': function(e) {
 			console.log('--- WV: Participants Update ---\n');
 			console.log('--- WV: ' + JSON.stringify(e));
-			callParticipants = e.participants.map(function (p) { return p.ext; });
-			if(callParticipants.length > 2){
-				multipartyCaptionsStart();
+			var participants = [];
+			acekurento.activeAgentList = [];
+			participants = e.participants.map(function (p) { return p; });
+			callParticipantsExt = participants.map(function (p) { return p.ext; });
+
+			for (var i = 0; i < participants.length; i++) {
+				if (participants[i].isAgent) {
+					acekurento.activeAgentList.push(participants[i]);
+				}
+			}
+
+			if (acekurento.activeAgentList.length == participants.length) {
+				allAgentCall = true;
+				// disable chat, file share, and screenshare buttons
+				disable_chat_buttons();
+				document.getElementById("fileInput").disabled = true;
+				document.getElementById("sendFileButton").removeAttribute('class');
+				document.getElementById("sendFileButton").disabled = true;
+				document.getElementById("sendFileButton").removeAttribute('style');
+				document.getElementById("screenShareButton").removeAttribute('class');
+				document.getElementById("screenShareButton").disabled = true;
+				document.getElementById("screenShareButton").removeAttribute('style');
+				$('#end-call').attr('onclick', 'terminate_call()');
 			} else {
-				multipartyCaptionsEnd()
-			}                      
+				allAgentCall = false;
+			}
+
+			if(callParticipantsExt.length > 2) {
+				multipartyCaptionsStart();
+
+				// the last agent to join will be the backup host
+				backupHostAgent = participants[participants.length-1].ext; 
+				$('#end-call').attr('onclick', 'multipartyHangup()');
+
+				if (participants.length > 3) {
+					// set the transition agent
+					for (var i = 0; i < participants.length; i++){
+						if (participants[i].ext != hostAgent && participants[i].ext != backupHostAgent && participants[i].isAgent) {
+							transitionExt = participants[i].ext;
+						}
+					}
+				
+				}
+				if (participants.length == 3 && backupHostAgent == transitionExt) {
+					// this should only happen after the host leaves a four person call
+					transitionAgent = null;
+					transitionExt = null;
+				} else if (participants.length == 3 && transitionExt && !isMultipartyTransfer) {
+					// transition agent left the call
+					transitionAgent = null;
+					transitionExt = null;
+				}
+			} else if (participants.length == 2) {
+				multipartyCaptionsEnd();
+
+				if (allAgentCall) {
+					$('#end-call').attr('onclick', 'terminate_call()');
+				} else {
+					// one to one call with consumer
+					hostAgent = extensionMe;
+					backupHostAgent = null; // remove backup host if it existed
+					$('#end-call').attr('onclick', 'terminate_call()');
+				}
+				multipartyTransition = false;
+			}																						
 
 		},
 		'registerResponse': function (error) {
@@ -160,68 +219,74 @@ function register_jssip() {
 		'ended': function (e) {
 			screenShareEnabled = false;
 			acekurento.screenshare(false);
-			if (acekurento.isMultiparty == false) {
-				//Wont enter wrap up
-			}
-			console.log('--- WV: Call ended ---\n');
-			terminate_call();
 
-			duration = $('#duration').html();
-			var currentTime = new Date();
-			callDate = (currentTime.getHours() + ":"
-				+ (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
-				+ (currentTime.getMonth() + 1) + "/"
-				+ (currentTime.getDate()) + "/"
-				+ (currentTime.getFullYear()));
-			socket.emit('callHistory', {
-				"callerName": callerName,
-				"callerNumber": callerNumber,
-				"direction": direction,
-				"duration": duration,
-				"endpoint": endpoint,
-				"callDate": callDate
-			});
-			//console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
-			loadCallHistory();
-
-			console.log("REASON: " + e.reason);
-			clearScreen();
-			if (e.reason != undefined && e.reason.includes("failed")) {
-				//show modal saying why call failed
-				//reason seems to be undefined when agent hangs up or consumer declines call
-				$('#outboundFailedBody').html(e.reason);
-				$('#modalOutboundFailed').modal({
-					backdrop: 'static',
-					keyboard: false,
-				})
-
-			}
-			/*for(var i = 0; i < acekurento.activeAgentList.length; i++){
-				if(acekurento.activeAgentList[i].ext == extensionMe){
-					console.log("Found extension");
-				}
-			}*/
-			$('#duration').timer('pause');
-			$('#user-status').text('Wrap Up');
-			$('#complaintsInCall').hide();
-			$('#geninfoInCall').hide();
-			socket.emit('wrapup', null);
-			changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
-			changeStatusLight('WRAP_UP');
-
-			if (showTransferModal) {
-				$('#modalWrapupTransfer').modal('show');
-				$('#modalWrapupTransfer').modal({
-					backdrop: 'static',
-					keyboard: false
-				});
-				showTransferModal = false;
+			if (multipartyTransition) {
+				terminate_call();
+				unpauseQueues();
 			} else {
-				$('#modalWrapup').modal('show');
-				$('#modalWrapup').modal({
-					backdrop: 'static',
-					keyboard: false
+				if (acekurento.isMultiparty == false) {
+					//Wont enter wrap up
+				}
+				console.log('--- WV: Call ended ---\n');
+				terminate_call();
+
+				duration = $('#duration').html();
+				var currentTime = new Date();
+				callDate = (currentTime.getHours() + ":"
+					+ (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
+					+ (currentTime.getMonth() + 1) + "/"
+					+ (currentTime.getDate()) + "/"
+					+ (currentTime.getFullYear()));
+				socket.emit('callHistory', {
+					"callerName": callerName,
+					"callerNumber": callerNumber,
+					"direction": direction,
+					"duration": duration,
+					"endpoint": endpoint,
+					"callDate": callDate
 				});
+				//console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
+				loadCallHistory();
+
+				console.log("REASON: " + e.reason);
+				clearScreen();
+				if (e.reason != undefined && e.reason.includes("failed")) {
+					//show modal saying why call failed
+					//reason seems to be undefined when agent hangs up or consumer declines call
+					$('#outboundFailedBody').html(e.reason);
+					$('#modalOutboundFailed').modal({
+						backdrop: 'static',
+						keyboard: false,
+					})
+
+				}
+				/*for(var i = 0; i < acekurento.activeAgentList.length; i++){
+					if(acekurento.activeAgentList[i].ext == extensionMe){
+						console.log("Found extension");
+					}
+				}*/
+				$('#duration').timer('pause');
+				$('#user-status').text('Wrap Up');
+				$('#complaintsInCall').hide();
+				$('#geninfoInCall').hide();
+				socket.emit('wrapup', null);
+				changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
+				changeStatusLight('WRAP_UP');
+
+				if (showTransferModal) {
+					$('#modalWrapupTransfer').modal('show');
+					$('#modalWrapupTransfer').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					showTransferModal = false;
+				} else {
+					$('#modalWrapup').modal('show');
+					$('#modalWrapup').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+				}
 			}
 		}
 	};
@@ -365,6 +430,11 @@ function accept_call() {
 				mute_audio();
 			}
 
+			if (transitionAgent && transitionAgent != extensionMe){
+				// invite the transition agent back to the call
+				multipartyinvite(transitionAgent);
+			}
+
 			if (isTransfer) {
 				socket.emit('joiningTransfer', {'extension' : extensionMe, 'originalExt':originalExt});
 				isTransfer = false;
@@ -374,8 +444,13 @@ function accept_call() {
 				isBlindTransfer = null;
 			}
 			calibrateVideo(2000);
+			$('#multipartyTransitionModal').modal('hide');
 		}, 1000);
 	}
+
+	multipartyTransition = false;
+	isMultipartyTransfer = false;
+	autoAnswer = false;
 }
 
 //Functions for enabling and disabling persist view
@@ -558,8 +633,8 @@ function terminate_call() {
 	document.getElementById("screenShareButton").disabled = true;
 	document.getElementById("screenShareButton").removeAttribute('style');
 
-	// doesn't reset the agent and consumer who can share files if an agent leaves a multiparty call
-	if (!(acekurento.isMultiparty)) {
+	// only reset if host leaves the call
+	if (hostAgent == extensionMe) {
 		//resets the agent and consumer who can share files
 		socket.emit('call-ended');
 	}
@@ -570,6 +645,9 @@ function terminate_call() {
 	transferVRS = null;
 	transferAccepted = false;
 	isBlindTransfer = false;
+
+	hostAgent = null;
+	allAgentCall = false;
 }
 
 function unregister_jssip() {
@@ -933,6 +1011,36 @@ function multipartyinvite(extension) {
 		})
 	}*/
 }
+
+function multipartyHangup() {
+	if (acekurento.isMultiparty && hostAgent == extensionMe) {
+		// host agent is leaving call
+		// refer the session to the other agent in the call
+		multipartyCaptionsEnd();
+
+		socket.emit('multiparty-hangup', {'newHost' :backupHostAgent, 'transitionAgent':transitionExt, 'vrs': $('#callerPhone').val()});
+
+		setTimeout(() => {
+			acekurento.callTransfer(backupHostAgent.toString(), false);
+			socket.emit('transferSuccess',{'vrs':$('#callerPhone').val()});
+			terminate_call();
+			
+			hostAgent = null;
+			backupHostAgent = null;
+			transitionAgent = null;
+			transitionExt = null;
+		}, 500);
+	
+	} else {
+		// non-host leaving multiparty call
+		hostAgent = null;
+		backupHostAgent = null;
+		transitionAgent = null;
+		transitionExt = null;
+		terminate_call();
+	}
+}
+
 /**
  * @param {string} ext - agent extension to receive the transfer
  * @param {boolean} isCold 
@@ -1167,13 +1275,13 @@ function multipartyCaptionsStart() {
 				"displayname": $('#agentname-sidebar').html().trim(),
 				"extension": extensionMe,
 				"agent": true,
-				"participants": callParticipants
+				"participants": callParticipantsExt
 			});
 		}
 	};
 
 	recognition.onend = function (event) {
-		if(acekurento.isMultiparty && (callParticipants.length > 2))
+		if(acekurento.isMultiparty && (callParticipantsExt.length > 2))
 			multipartyCaptionsStart();	
 	}
 	recognition.start();
@@ -1183,5 +1291,5 @@ function multipartyCaptionsEnd() {
 	if(recognition)
 		recognition.abort();
 	recognition = null;
-	callParticipants = [];
+	callParticipantsExt = [];
 }
