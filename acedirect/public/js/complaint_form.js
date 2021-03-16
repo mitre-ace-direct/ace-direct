@@ -510,6 +510,16 @@ function connect_socket() {
 					$("#languageSelectModal").modal('show');
 					// Align flags and labels to left
 					$('#language-select_msdd').css('text-align', 'left')
+				}).on('consumer-multiparty-hangup', function() {
+					// show "One Moment Please"
+					$('#multipartyTransitionModal').modal('show');
+					$('#multipartyTransitionModal').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					setTimeout(function () {
+						$('#multipartyTransitionModal').modal('hide');
+					}, 3000);
 				});
 
 			} else {
