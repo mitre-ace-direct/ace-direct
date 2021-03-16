@@ -256,5 +256,8 @@
       "/tmp/videomail/instructions/final.jpg"
     ],
     "media_profile": "MP4"
-  }  
+  },
+  "filesharing": {
+    "virus_scan_enabled": "Virus scan will be enabled if set to 'true' but clamdscan must be set up on the machine for it to work."
+  }
 }
