@@ -262,5 +262,8 @@
       "/tmp/videomail/instructions/final.jpg"
     ],
     "media_profile": "MP4"
+  },
+  "filesharing": {
+    "virus_scan_enabled": "true"
   }
 }
