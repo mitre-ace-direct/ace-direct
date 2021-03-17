@@ -502,11 +502,11 @@ $  # set up OpenAM tools and add users...
 $
 ```
 
-Now repeat [Set up OpenAM admin tools](#Set-up-OpenAM-admin-tools).
+Now repeat [Set up OpenAM admin tools](#set-up-openam-admin-tools).
 
 ### Tomcat upgrade
 
-Need to update Tomcat? Just update the `common:tomcat` value in `/root/iam/config/config.json` and [Reinstall OpenAM](#Reinstall-OpenAM).
+Need to update Tomcat? Just update the `common:tomcat` value in `/root/iam/config/config.json` and [Reinstall OpenAM](#reinstall-openam).
 
 ### Reinstall with custom base name
 
@@ -533,7 +533,7 @@ You may need a custom OpenAM base name if you have a specific NGINX route for Op
 
 1. Now source the new environment: `source /root/.bashrc`
 
-2. After unzipping `OpenAM-13.0.0.zip` in the [OpenAM Configuration](#OpenAM-Configuration) step, copy the `.war` file to the new base name: `cp /root/openam/OpenAM-13.0.0.war /root/iam/config/oam/ace2.war`
+2. After unzipping `OpenAM-13.0.0.zip` in the [OpenAM Configuration](#openam-configuration) step, copy the `.war` file to the new base name: `cp /root/openam/OpenAM-13.0.0.war /root/iam/config/oam/ace2.war`
 
 3. Update two variables in `/root/iam/config/oam/config.properties`:
 
@@ -567,14 +567,14 @@ You may need a custom OpenAM base name if you have a specific NGINX route for Op
   $  python oam_installer.py -silent
   ```
 
-1. Continue with [Set up OpenAM admin tools](#Set-up-OpenAM-admin-tools), but when executing commands, use the new working folders in commands and folder references:
+1. Continue with [Set up OpenAM admin tools](#set-up-openam-admin-tools), but when executing commands, use the new working folders in commands and folder references:
 
   ```bash
   /opt/tomcat/webapps/ace2
   /root/iam/config/oam/SSOAdminTools-13.0.0/ace2
   ```
 
-1. See [NGINX Configuration](#NGINX-Configuration). Note that `/ace` should now be `/ace2`. Each OpenAM instance in NGINX must have a unique route, and this unique route name must be the base name of the OpenAM installation (e.g., `/ace2`).
+1. See [NGINX Configuration](#nginx-configuration). Note that `/ace` should now be `/ace2`. Each OpenAM instance in NGINX must have a unique route, and this unique route name must be the base name of the OpenAM installation (e.g., `/ace2`).
 
 ## System Administration
 
@@ -714,7 +714,7 @@ Running the `oam_installer.py` script results in an error that says:
 
 ##### Previous OpenAM exists
 
-This error could be caused if OpenAM was previously installed. Look in the home folder of a user that installed OpenAM previously. If you find a directory named `.openamcfg`, delete it and its contents. Then follow the [Reinstallation of OpenAM (optional)](#Reinstallation-of-OpenAM-(optional)) instructions above. Also see the installation log file `/opt/tomcat/webapps/ace/install.log` and the tomcat log files in  `/opt/tomcat/logs` for errors.
+This error could be caused if OpenAM was previously installed. Look in the home folder of a user that installed OpenAM previously. If you find a directory named `.openamcfg`, delete it and its contents. Then follow the [Reinstall OpenAM](#reinstall-openam) instructions above. Also see the installation log file `/opt/tomcat/webapps/ace/install.log` and the tomcat log files in  `/opt/tomcat/logs` for errors.
 
 Also verify that all fields in `/root/iam/config/tomcat/server.xml` are correct. An incorrect field here can cause a `500` error.
 
