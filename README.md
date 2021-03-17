@@ -46,13 +46,12 @@ Set up your local Node.js environment:
       export PATH N_PREFIX
       ```
 
-    * Source your profile: `source ~/.bash_profile`
     * From a terminal, install Node `n` manager and Node.js:
 
       ```bash
       $  cd
       $
-      $  . .bash_profile
+      $  source ~/.bash_profile
       $  mkdir .n
       $  npm install -g n
       $  n 12.18.2  # install Node.js v12.18.2
