@@ -32,6 +32,9 @@ Set up your local Node.js environment:
       $
       $  . ~/.nvm/nvm.sh
       $  nvm install node
+      $
+      $  # if prompted, run...
+      $  npm config delete prefix
       ```
 
     * Add `N_PREFIX` to your  `~/.bash_profile`:
