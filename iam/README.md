@@ -88,7 +88,7 @@ export PATH JAVA_HOME JRE_HOME OPENAM_BASE_NAME JAVA_OPTS
 Here are the OpenAM configuration files:
 
 * Global configuration file: `/root/iam/config/config.json`
-* Tomcat configuration files: `/root/iam/config/tomcat/server.xml`, `/root/iam/config/tomcat/tomcat.service`
+* Tomcat configuration files: `/root/iam/config/tomcat/server.xml, /root/iam/config/tomcat/tomcat.service`
 * OpenAM configuration file: `/root/iam/config/oam/config.properties`
 
 ### General configuration
