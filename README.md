@@ -37,11 +37,12 @@ Set up your local Node.js environment:
       $  npm config delete prefix
       ```
 
-    * Add `N_PREFIX` to your  `~/.bash_profile`:
+    * Add the following lines to the _end_ of your  `~/.bash_profile`:
 
       ```bash
+      # for local Node with n manager
       N_PREFIX=$HOME/.n
-      PATH=$N_PREFIX/bin:$PATH:$HOME/.local/bin:$HOME/bin
+      PATH=$N_PREFIX/bin:$PATH
       export PATH N_PREFIX
       ```
 
