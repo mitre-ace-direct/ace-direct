@@ -336,7 +336,7 @@ $
 $   curl -k https://OPENAM_PRIVATE_IP:8443  # also try with the Private IP
 ```
 
-### Install OpenAM admin tools
+### Set up OpenAM admin tools
 
 With OpenAM/Tomcat up and running, set up the OpenAM admin tools:
 
@@ -502,7 +502,7 @@ $  # set up OpenAM tools and add users...
 $
 ```
 
-Now repeat [Install OpenAM admin tools](#Install-OpenAM-admin-tools).
+Now repeat [Set up OpenAM admin tools](#Set-up-OpenAM-admin-tools).
 
 ### Tomcat upgrade
 
@@ -567,7 +567,7 @@ You may need a custom OpenAM base name if you have a specific NGINX route for Op
   $  python oam_installer.py -silent
   ```
 
-1. Continue with [Install OpenAM admin tools](#Install-OpenAM-admin-tools), but when executing commands, use the new working folders in commands and folder references:
+1. Continue with [Set up OpenAM admin tools](#Set-up-OpenAM-admin-tools), but when executing commands, use the new working folders in commands and folder references:
 
   ```bash
   /opt/tomcat/webapps/ace2
