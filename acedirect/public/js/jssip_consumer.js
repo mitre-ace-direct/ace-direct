@@ -552,7 +552,7 @@
 		console.log('consumer uc: ', transcripts)
 
 		var tDiv = document.getElementById(transcripts.msgid);
-		let caption = 'CSR ' + $('#agent-name').text() + ': ' + transcripts.transcript;
+		let caption = '<strong>CSR ' + $('#agent-name').text() + ':</strong> ' + transcripts.transcript;
 		if(!tDiv) {
 			var temp = document.createElement("div");
 			temp.id = transcripts.msgid;
