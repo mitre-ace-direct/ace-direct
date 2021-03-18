@@ -2001,6 +2001,7 @@ io.sockets.on('connection', function (socket) {
 							} else {
 								console.log('received translation', data);
 								console.log(languageFrom, languageTo, translationUrl);
+								console.log(response)
 								// fixme will this be wrong if multiple clients/agents?
 								socket.emit('caption-translated', {
 									'transcript' : data.translation,
