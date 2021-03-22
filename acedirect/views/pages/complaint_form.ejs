@@ -29,6 +29,9 @@
 		var turnPort = '<%= turnPort %>';
 		var turnUser = '<%= turnUser %>';
 		var turnCred = '<%= turnCred %>';
+
+                var logWebRTCStats = false; //not instrumenting complaint web page
+                var logWebRTCStatsFreq = 60000;
 	</script>
 	<style>
 		.blink {
@@ -781,6 +784,8 @@
 	<script type="text/javascript" src="/js/jssip_consumer.js"></script>
 	<!-- Custom Javascript for ACEDirect complaint_form.html page -->
 	<script type="text/javascript" src="/js/complaint_form.js"></script>
+
+        <script src="/assets/js/getStats.js"></script>
 
 	<!-- Copy this from acedirect-kurento repo to acedirect/public/js -->
 	<script src="/js/ACEKurento-1.0.0.js"></script>
