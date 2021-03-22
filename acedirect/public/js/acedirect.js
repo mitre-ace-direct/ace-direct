@@ -2639,6 +2639,8 @@ $("#accept-btn").click(function () {
 $("#decline-btn").click(function () {
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
+	unpauseQueues();
+	$('#callerPhone').val('');
 });
 
 //Dialpad functionality
