@@ -221,28 +221,7 @@
       if (logWebRTCStats == 'true') {
         var repeatInterval = logWebRTCStatsFreq; //milliseconds
         getStats(pc, function(result) {
-          result.connectionType.remote.ipAddress
-          result.connectionType.remote.candidateType
-          result.connectionType.transport
-    
-          result.bandwidth.speed // bandwidth download speed (bytes per second)
-    
-          // to access native "results" array
-          result.results.forEach(function(item) {
-            //sample stats
-            if (item.type === 'ssrc' ) {
-              var transportId = item.transportId;
-              var packetsLost = item.packetsLost;
-              var packetsSent = item.packetsSent;
-              var audioInputLevel = item.audioInputLevel;
-              var trackId = item.googTrackId; // media stream track id
-              var isAudio = item.mediaType === 'audio'; // audio or video
-              var isSending = item.id.indexOf('_send') !== -1; // sender or receiver
-
-              var obj = { epochms: Date.now(), transportId, packetsLost, packetsSent, audioInputLevel, trackId, isAudio, isSending };
-              socket.emit('logWebRTCEvt', { obj });
-            }
-          });
+          socket.emit('logWebRTCEvt', { result });
         }, repeatInterval);
       }
 
