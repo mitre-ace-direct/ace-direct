@@ -621,14 +621,15 @@ io.sockets.on('connection', function (socket) {
 
 	socket.on('logWebRTCEvt', function (data) {
           //log to MongoDB
-          var collName = `${token.username}_webRTCStats`;
+          data['username'] = token.username;
+          var collName = `webRTCStats`;
           var agentWebRTCStats = mongodb.collection(collName);
           agentWebRTCStats.insertOne(data, function(err, result) {
             if (err) {
-              logger.error(`Insert a record into ${collName} collection of MongoDB, error: ${err}`);
+              logger.error(`Insert into ${collName} collection of MongoDB FAILED. error: ${err}`);
               throw err;
             }
-            logger.debug(`Logged a WebRTC stat to ${collName}.`);
+            logger.debug(`Logged a WebRTC stat to ${collName}...`);
           });
         });
 
