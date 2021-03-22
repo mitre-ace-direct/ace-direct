@@ -216,6 +216,18 @@
           dataChannel.onerror = dataChannelConfig.onerror || noop;
         }
       }
+
+      // getstats WebRTC logging; param in config.json
+      if (logWebRTCStats == 'true') {
+        var repeatInterval = logWebRTCStatsFreq; //milliseconds
+        getStats(pc, function(result) {
+          socket.emit('logWebRTCEvt', { result });
+          if (result.ended && result.ended == true) {
+            result.nomore();
+          }
+        }, repeatInterval);
+      }
+
     }
     pc.addEventListener('icecandidate', function (event) {
       var candidate = event.candidate;
