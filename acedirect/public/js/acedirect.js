@@ -937,7 +937,7 @@ function connect_socket() {
 					if (isColdTransfer) {
 						//we terminate the call for the original agent
 						terminate_call();
-						socket.emit('call-ended'); //stop allowing file share between consumer and original agent
+						socket.emit('call-ended', {'agentExt': extensionMe}); //stop allowing file share between consumer and original agent
 					}
                 }).on ('multiparty-transfer', function(data) {
 					// backup host is becoming the new host of the call
@@ -1275,7 +1275,7 @@ function inCallADComplaints(endpoint_type) {
 		$('#remoteView').css('object-fit', ' contain');
 
 		//allow file sharing
-		socket.emit('begin-file-share', {'vrs': vrs});
+		socket.emit('begin-file-share', {'vrs': vrs, 'agentExt': extensionMe});
 	}
 
 
@@ -1309,7 +1309,7 @@ function inCallADGeneral(endpoint_type) {
 		$('#remoteView').css('object-fit', ' contain');
 
 		//allow file sharing
-		socket.emit('begin-file-share', {'vrs': vrs});
+		socket.emit('begin-file-share', {'vrs': vrs, 'agentExt': extensionMe});
 	}
 }
 
