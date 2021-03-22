@@ -88,6 +88,9 @@ function register_jssip() {
 			for (var i = 0; i < participants.length; i++) {
 				if (participants[i].isAgent) {
 					acekurento.activeAgentList.push(participants[i]);
+				} else if(participants[i].type == 'participant:webrtc'){
+					// webrtc consumer. enable chat
+					enable_chat_buttons();
 				}
 			}
 
@@ -639,6 +642,11 @@ function terminate_call() {
 		socket.emit('call-ended');
 	}
 
+	if($('#callerPhone').val()) {
+		socket.emit('call-ended');
+		socket.emit('chat-leave-ack', {'vrs': $('#callerPhone').val()})
+	}
+
 	isTransfer = false;
 	originalExt = null;
 	transferExt = null;
@@ -1000,7 +1008,8 @@ function multipartyinvite(extension) {
 	acekurento.invitePeer(extension.toString());
 	socket.emit('multiparty-invite', {
 		"extensions": extension.toString(),
-		"callerNumber": extensionMe
+		"callerNumber": extensionMe,
+		'vrs':$('#callerPhone').val()
 	});
 
 	/*if(agentStatus == 'IN_CALL'){
