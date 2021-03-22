@@ -106,9 +106,11 @@
       "caption_database_name": "database to log captions to",
       "caption_collection_name": "collection to log captions to",
       "logAMIevents": "true/false boolean - log AMI events",
-	    "logCallData": "true/false boolean - log Call Data",
+      "logCallData": "true/false boolean - log Call Data",
       "logStats": "true/false boolean - log stats",
-      "logStatsFreq": "frequency(milliseconds) to log stats"
+      "logStatsFreq": "frequency(milliseconds) to log stats",
+      "logWebRTCStats": "true/false boolean - log WebRTC stats",
+      "logWebRTCStatsFreq": "frequency(milliseconds) to log WebRTC stats"
     }
   },
   "complaint_redirect": {
