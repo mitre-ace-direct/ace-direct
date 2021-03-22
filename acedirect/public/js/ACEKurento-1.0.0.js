@@ -222,6 +222,9 @@
         var repeatInterval = logWebRTCStatsFreq; //milliseconds
         getStats(pc, function(result) {
           socket.emit('logWebRTCEvt', { result });
+          if (result.ended && result.ended == true) {
+            result.nomore();
+          }
         }, repeatInterval);
       }
 
