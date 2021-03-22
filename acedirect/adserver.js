@@ -859,7 +859,8 @@ io.sockets.on('connection', function (socket) {
 	socket.on('multiparty-invite', function (data){
 		io.to(Number(data.extensions)).emit('new-caller-ringing', {
 			'callerNumber': data.extensions,
-			'phoneNumber' : data.callerNumber
+			'phoneNumber' : data.callerNumber,
+			'vrs': data.vrs
 		  });
 	});
 
