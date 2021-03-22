@@ -18,6 +18,7 @@
     "ejs": "^3.1.6",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "getstats": "^1.2.0",
     "gridstack": "^1.2.1",
     "handlebars": "^4.7.6",
     "jquery": "^3.5.1",
