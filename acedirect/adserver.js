@@ -270,6 +270,25 @@ if (!turnCred) {
   process.exit(0);
 }
 
+// log WebWebRTC stats parameters
+var logWebRTCStats = getConfigVal('database_servers:mongodb:logWebRTCStats');
+var logWebRTCStatsFreq = 60000;
+if (!logWebRTCStats) {
+  logWebRTCStats = false;
+} else {
+  logWebRTCStats = (logWebRTCStats == 'true');
+}
+logger.debug('logWebRTCStats: ' + logWebRTCStats);
+if (logWebRTCStats) {
+  logWebRTCStatsFreqVal = getConfigVal('database_servers:mongodb:logWebRTCStatsFreq'); 
+  if (!logWebRTCStatsFreqVal) {
+    logWebRTCStatsFreq = 0;
+  } else {
+    logWebRTCStatsFreq = parseInt(logWebRTCStatsFreqVal,10);
+  }
+  logger.debug('logWebRTCStatsFreq: ' + logWebRTCStatsFreq);
+}
+
 //busylight parameter
 var busyLightEnabled = getConfigVal('busylight:enabled');
 if (busyLightEnabled.length === 0) {
@@ -600,7 +619,20 @@ io.sockets.on('connection', function (socket) {
 	logger.info('NEW CONNECTION');
 	logger.info(socket.request.connection._peername);
 
-    //emit AD version and year to clients
+	socket.on('logWebRTCEvt', function (data) {
+          //log to MongoDB
+          var collName = `${token.username}_webRTCStats`;
+          var agentWebRTCStats = mongodb.collection(collName);
+          agentWebRTCStats.insertOne(data, function(err, result) {
+            if (err) {
+              logger.error(`Insert a record into ${collName} collection of MongoDB, error: ${err}`);
+              throw err;
+            }
+            logger.debug(`Logged a WebRTC stat to ${collName}.`);
+          });
+        });
+
+        //emit AD version and year to clients
 	socket.emit('adversion', {"version":version,"year":year});
 
 	// emit
@@ -3724,7 +3756,9 @@ app.use(function (req, res, next) {
                 "turnFQDN":turnFQDN,
                 "turnPort":turnPort,
                 "turnUser":turnUser,
-                "turnCred":turnCred
+                "turnCred":turnCred,
+                "logWebRTCStats": logWebRTCStats,
+                "logWebRTCStatsFreq": logWebRTCStatsFreq
         };
         next();
 });
