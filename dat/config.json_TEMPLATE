@@ -107,7 +107,9 @@
       "logAMIevents": false,
       "logCallData": false,
       "logStats": false,
-      "logStatsFreq": "60000"
+      "logStatsFreq": "60000",
+      "logWebRTCStats": false,
+      "logWebRTCStatsFreq": "60000"
     }
   },
   "complaint_redirect": {
