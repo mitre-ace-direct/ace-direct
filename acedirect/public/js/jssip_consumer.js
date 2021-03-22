@@ -294,7 +294,7 @@
 		mute_audio_icon.classList.remove("fa-microphone-slash");
 
 		//remove file sharing
-		socket.emit('call-ended');
+		socket.emit('call-ended', {'agentExt': ''});
 
 		stopRecordProgress();
 	}
