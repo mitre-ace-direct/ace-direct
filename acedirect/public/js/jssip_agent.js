@@ -89,9 +89,17 @@ function register_jssip() {
 				if (participants[i].isAgent) {
 					acekurento.activeAgentList.push(participants[i]);
 				} else if(participants[i].type == 'participant:webrtc'){
-					// webrtc consumer. enable chat
+					// webrtc consumer. enable chat and file share
 					enable_chat_buttons();
-				}
+					socket.emit('begin-file-share', {'vrs': $('#callerPhone').val(), 'agentExt': extensionMe});
+				}  else {
+                    // provider consumer. disable chat and file share
+                    disable_chat_buttons();
+                    document.getElementById("fileInput").disabled = true;
+                    document.getElementById("sendFileButton").removeAttribute('class');
+                    document.getElementById("sendFileButton").disabled = true;
+                    document.getElementById("sendFileButton").removeAttribute('style');
+                }
 			}
 
 			if (acekurento.activeAgentList.length == participants.length) {
@@ -636,14 +644,8 @@ function terminate_call() {
 	document.getElementById("screenShareButton").disabled = true;
 	document.getElementById("screenShareButton").removeAttribute('style');
 
-	// only reset if host leaves the call
-	if (hostAgent == extensionMe) {
-		//resets the agent and consumer who can share files
-		socket.emit('call-ended');
-	}
-
 	if($('#callerPhone').val()) {
-		socket.emit('call-ended');
+		socket.emit('call-ended', {'agentExt': extensionMe});
 		socket.emit('chat-leave-ack', {'vrs': $('#callerPhone').val()})
 	}
 

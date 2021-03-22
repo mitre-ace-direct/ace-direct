@@ -623,6 +623,10 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('begin-file-share', function(data) {
+		if (sharingAgent.includes(data.agentExt)) {
+            // participants can already share files
+            return;
+        }
 
 		if (sharingAgent.length == 0) {
 			//first element
@@ -662,7 +666,7 @@ io.sockets.on('connection', function (socket) {
 		console.log('call ended');
 
 		for (let i = 0; i < sharingAgent.length; i++) {
-			if (token.extension == sharingAgent[i] || token.vrs == sharingConsumer[i]) {
+			if (data.agentExt == sharingAgent[i] || token.vrs == sharingConsumer[i]) {
 				//empty
 				sharingAgent[i] = '';
 				sharingConsumer[i] = '';
@@ -790,7 +794,6 @@ io.sockets.on('connection', function (socket) {
 									console.log(sharingConsumer[i]+ ' shared file');
 									console.log('with id: ');
 									console.log(fileToken[i]);
-									break;
 								}
 							}
 							console.log('agents: ' +sharingAgent);
@@ -4267,7 +4270,6 @@ app.get('/downloadFile',/*agent.shield(cookieShield) ,*/function(req, res) {
 						break;
 					} else{
 						console.log('Not authorized to download this file');
-						break;
 					}
 				} else {
 					console.log('Not authorized to download');
