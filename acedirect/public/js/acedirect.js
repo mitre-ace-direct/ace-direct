@@ -561,6 +561,12 @@ function connect_socket() {
 							backdrop: 'static',
 							keyboard: false
 							});
+
+							if (data.vrs) {
+								console.log('webrtc call');
+								//get the consumer vrs
+								$('#callerPhone').val(data.vrs);
+							}
 						}
 						//Did come with null
 						socket.emit('incomingcall', null);
