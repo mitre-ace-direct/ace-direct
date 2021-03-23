@@ -107,10 +107,11 @@
       "caption_collection_name": "collection to log captions to",
       "logAMIevents": "true/false boolean - log AMI events",
       "logCallData": "true/false boolean - log Call Data",
-      "logStats": "true/false boolean - log stats",
+      "logStats": "true/false boolean - log stats and update the real-time strength meter",
       "logStatsFreq": "frequency(milliseconds) to log stats",
       "logWebRTCStats": "true/false boolean - log WebRTC stats",
-      "logWebRTCStatsFreq": "frequency(milliseconds) to log WebRTC stats"
+      "logWebRTCStatsFreq": "frequency(milliseconds) to log WebRTC stats",
+      "logWebRTCStatsDbEnabled": "enable DB logging of WebRTC log stats"
     }
   },
   "complaint_redirect": {
