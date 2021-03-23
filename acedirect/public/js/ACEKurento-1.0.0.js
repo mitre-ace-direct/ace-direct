@@ -220,9 +220,8 @@
       // getstats WebRTC logging; param in config.json
       if (logWebRTCStats == 'true') {
         var repeatInterval = logWebRTCStatsFreq; //milliseconds
+
         getStats(pc, function(result) {
-
-
           if (logWebRTCStatsDbEnabled == 'true') {
             socket.emit('logWebRTCEvt', { result });
           }
@@ -233,15 +232,13 @@
             let x = (parseFloat(result.video.send.availableBandwidth, 10) * 1000.00);
             if (z > 0) {
               let pct = x/z;
-              strengthMeter = pct;
+              meterelem.value = pct;
             }
           }
 
           if (result.ended && result.ended == true) {
             result.nomore();
-            clearInterval(strengthMeterID); // stop the meter
             meterelem.value = 0.0; 
-            strengthMeter = 0.0;
           }
         }, repeatInterval);
       }
