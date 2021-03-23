@@ -221,9 +221,27 @@
       if (logWebRTCStats == 'true') {
         var repeatInterval = logWebRTCStatsFreq; //milliseconds
         getStats(pc, function(result) {
-          socket.emit('logWebRTCEvt', { result });
+
+
+          if (logWebRTCStatsDbEnabled == 'true') {
+            socket.emit('logWebRTCEvt', { result });
+          }
+
+          // sample strength metric for the strength meter
+          if (result.bandwidth.speed && result.video.send.availableBandwidth) {
+            let z = parseFloat(result.bandwidth.speed, 10);
+            let x = (parseFloat(result.video.send.availableBandwidth, 10) * 1000.00);
+            if (z > 0) {
+              let pct = x/z;
+              strengthMeter = pct;
+            }
+          }
+
           if (result.ended && result.ended == true) {
             result.nomore();
+            clearInterval(strengthMeterID); // stop the meter
+            meterelem.value = 0.0; 
+            strengthMeter = 0.0;
           }
         }, repeatInterval);
       }
