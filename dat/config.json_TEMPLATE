@@ -109,7 +109,8 @@
       "logStats": false,
       "logStatsFreq": "60000",
       "logWebRTCStats": false,
-      "logWebRTCStatsFreq": "60000"
+      "logWebRTCStatsFreq": "60000",
+      "logWebRTCStatsDbEnabled": false
     }
   },
   "complaint_redirect": {
