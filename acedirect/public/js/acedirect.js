@@ -44,6 +44,9 @@ var direction;
 var duration;
 var callDate;
 var endpoint;
+var strengthMeter = 0.0;
+var strengthMeterID = null;
+var meterelem = null;
 
 //shortcut table variables
 var originalShortcuts = [];
@@ -84,6 +87,9 @@ setInterval(function () {
 }, 2000);
 
 $(document).ready(function () {
+        
+        meterelem = document.getElementById('speedMeter');
+
 	connect_socket();
 	$("#debugtab").hide();
 	$('#scriptstab').hide();
