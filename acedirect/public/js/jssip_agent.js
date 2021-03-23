@@ -175,6 +175,10 @@ function register_jssip() {
 		},
 		'incomingCall': function (call) {
 			console.log('--- WV: Incoming call ---\n');
+
+                        // start the strength meter interval
+                        strengthMeterID = setInterval(function(){  meterelem.value = strengthMeter; }, 1000);
+
 			incomingCall = call;
 			direction = 'incoming';
 			//accept_call()
