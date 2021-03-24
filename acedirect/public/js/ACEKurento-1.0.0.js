@@ -240,7 +240,7 @@
           if (result.ended && result.ended == true) {
             result.nomore();
             meterelem.value = 0.0; 
-            meterelemval.value = '';
+            meterelemval.textContent = '';
           }
         }, repeatInterval);
       }
