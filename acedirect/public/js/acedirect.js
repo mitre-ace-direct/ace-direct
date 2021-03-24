@@ -45,6 +45,7 @@ var duration;
 var callDate;
 var endpoint;
 var meterelem = null;
+var meterelemval = null;
 
 //shortcut table variables
 var originalShortcuts = [];
@@ -87,6 +88,7 @@ setInterval(function () {
 $(document).ready(function () {
         
         meterelem = document.getElementById('speedMeter');
+        meterelemval = document.getElementById('speedval');
 
 	connect_socket();
 	$("#debugtab").hide();
