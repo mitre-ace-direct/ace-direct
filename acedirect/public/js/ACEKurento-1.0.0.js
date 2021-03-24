@@ -233,12 +233,14 @@
             if (z > 0) {
               let pct = x/z;
               meterelem.value = pct;
+              meterelemval.textContent = Math.floor(pct*100);
             }
           }
 
           if (result.ended && result.ended == true) {
             result.nomore();
             meterelem.value = 0.0; 
+            meterelemval.value = '';
           }
         }, repeatInterval);
       }
