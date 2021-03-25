@@ -485,7 +485,8 @@ function connect_socket() {
 					console.log(JSON.stringify(transcripts))
 					socket.emit('translate-caption', {
 						"transcripts": transcripts,
-						"callerNumber": exten
+						"callerNumber": exten,
+						"displayname": transcripts.displayname
 					});
 				}).on('caption-translated', function (transcripts) {
 					console.log('consumer received translation', transcripts);
