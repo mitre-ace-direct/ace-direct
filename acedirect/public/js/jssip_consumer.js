@@ -548,7 +548,6 @@
 	});
 	var tempDivTimeout = null;
 	function updateConsumerCaptions(transcripts) {
-		$('#consumer-captions').show();
 		console.log('--- WV: transcripts.transcript ---\n');
 		console.log('consumer uc: ', transcripts)
 
