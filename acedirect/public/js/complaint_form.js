@@ -482,7 +482,7 @@ function connect_socket() {
 						$("#requestAck").html("Permission has been denied.");
 					}
 				}).on('multiparty-caption', function (transcripts) {
-					console.log(JSON.stringify(transcripts))
+					console.log('multiparty caption:', JSON.stringify(transcripts))
 					socket.emit('translate-caption', {
 						"transcripts": transcripts,
 						"callerNumber": exten,
