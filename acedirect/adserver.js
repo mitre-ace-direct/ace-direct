@@ -273,10 +273,16 @@ if (!turnCred) {
 // log WebWebRTC stats parameters
 var logWebRTCStats = getConfigVal('database_servers:mongodb:logWebRTCStats');
 var logWebRTCStatsFreq = 60000;
+var logWebRTCStatsDbEnabled = getConfigVal('database_servers:mongodb:logWebRTCStatsDbEnabled');
 if (!logWebRTCStats) {
   logWebRTCStats = false;
 } else {
   logWebRTCStats = (logWebRTCStats == 'true');
+}
+if (!logWebRTCStatsDbEnabled) {
+  logWebRTCStatsDbEnabled = false;
+} else {
+  logWebRTCStatsDbEnabled = (logWebRTCStatsDbEnabled == 'true');
 }
 logger.debug('logWebRTCStats: ' + logWebRTCStats);
 if (logWebRTCStats) {
@@ -3759,7 +3765,8 @@ app.use(function (req, res, next) {
                 "turnUser":turnUser,
                 "turnCred":turnCred,
                 "logWebRTCStats": logWebRTCStats,
-                "logWebRTCStatsFreq": logWebRTCStatsFreq
+                "logWebRTCStatsFreq": logWebRTCStatsFreq,
+                "logWebRTCStatsDbEnabled": logWebRTCStatsDbEnabled
         };
         next();
 });
