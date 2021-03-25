@@ -44,6 +44,10 @@ var direction;
 var duration;
 var callDate;
 var endpoint;
+var meterelem = null;
+var meterelemval = null;
+var packetsLostElem = null;
+var packetsLostValElem = null;
 
 //shortcut table variables
 var originalShortcuts = [];
@@ -84,6 +88,13 @@ setInterval(function () {
 }, 2000);
 
 $(document).ready(function () {
+        
+        // connection elements
+        meterelem = document.getElementById('speedMeter');
+        meterelemval = document.getElementById('speedval');
+        packetsLostElem = document.getElementById('packets-lost-a');
+        packetsLostValElem = document.getElementById('connection-packets-lost');
+
 	connect_socket();
 	$("#debugtab").hide();
 	$('#scriptstab').hide();

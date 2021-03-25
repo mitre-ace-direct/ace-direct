@@ -220,10 +220,40 @@
       // getstats WebRTC logging; param in config.json
       if (logWebRTCStats == 'true') {
         var repeatInterval = logWebRTCStatsFreq; //milliseconds
+
         getStats(pc, function(result) {
-          socket.emit('logWebRTCEvt', { result });
+          if (logWebRTCStatsDbEnabled == 'true') {
+            socket.emit('logWebRTCEvt', { result });
+          }
+
+          // sample strength metric for the strength meter
+          if (result.bandwidth.speed && result.video.send.availableBandwidth) {
+            let z = parseFloat(result.bandwidth.speed, 10);
+            let x = (parseFloat(result.video.send.availableBandwidth, 10) * 1000.00);
+            if (z > 0) {
+              let pct = x/z;
+              meterelem.value = pct;
+              meterelemval.textContent = Math.floor(pct*100);
+
+              // packets lost meter
+              if (result.video && result.video.packetsLost) {
+                let packetsLost = parseInt(result.video.packetsLost, 10);
+
+                // if we lose any packet, display the meter
+                if (packetsLost > 0) {
+                  packetsLostElem.style.display = 'block';     
+                } 
+                packetsLostValElem.textContent = packetsLost;
+              }
+            }
+          }
+
           if (result.ended && result.ended == true) {
             result.nomore();
+            meterelem.value = 0.0; 
+            meterelemval.textContent = '';
+            packetsLostElem.style.display = 'none'; 
+            packetsLostValElem.value = 0;
           }
         }, repeatInterval);
       }
