@@ -18,6 +18,7 @@ const url = require('url');
 const mysql = require('mysql');
 const Json2csvParser = require('json2csv').Parser;
 const redis = require('redis');
+const socketIO = require('socket.io');
 
 // additional helpers/utility functions
 const { getConfigVal } = require('./helpers/utility');
@@ -331,7 +332,7 @@ port = parseInt(getConfigVal('management_portal:https_listen_port'), 10);
 
 const httpsServer = https.createServer(credentials, app);
 
-const io = require('socket.io')(httpsServer, {
+const io = socketIO(httpsServer, {
   cookie: false,
   origins: fqdnUrl
 });
@@ -1890,7 +1891,7 @@ setImmediate(initialize);
 app.use((err, req, res, next) => {
   if (err.code !== 'EBADCSRFTOKEN') return next(err);
   // handle CSRF token errors here
-  res.status(200).json({
+  return res.status(200).json({
     message: 'Form has been tampered'
   });
 });
@@ -1931,9 +1932,11 @@ function getUserInfo(username, callback) {
 app.use((req, res, next) => {
   if (req.path === nginxPath || req.path === '/agentassist') {
     return next();
-  } if (req.path === '/logout') {
+  }
+  if (req.path === '/logout') {
     return next();
-  } if (req.session !== null && req.session.data) {
+  }
+  if (req.session !== null && req.session.data) {
     if (req.session.data !== null && req.session.data.uid) {
       if (req.session.role) { return next(); } // user is logged in go to next()
 
@@ -1945,11 +1948,11 @@ app.use((req, res, next) => {
           req.session.username = user.data[0].username;
           return next();
         }
-        res.redirect('./');
+        return res.redirect('./');
       });
     }
   } else {
-    res.redirect(`.${nginxPath}`);
+    return res.redirect(`.${nginxPath}`);
   }
 });
 
