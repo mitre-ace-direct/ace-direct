@@ -217,6 +217,7 @@
 	function start_call(other_sip_uri, myExtension) {
           console.log("start_call: " + other_sip_uri);
 		  selfStream.removeAttribute("hidden");
+		  $('#consumer-captions').show();
 		
 		$("#screenshareButton").removeAttr('disabled');
 		  $("#fileInput").removeAttr('disabled');
@@ -547,7 +548,6 @@
 	});
 	var tempDivTimeout = null;
 	function updateConsumerCaptions(transcripts) {
-		$('#consumer-captions').show();
 		console.log('--- WV: transcripts.transcript ---\n');
 		console.log('consumer uc: ', transcripts)
 
