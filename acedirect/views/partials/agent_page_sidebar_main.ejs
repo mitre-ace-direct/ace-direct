@@ -44,8 +44,17 @@
                 <span id="dial-in-number"></span>
             </a>
         </li>
-        <li id="sidebar-queues" class="header">
-        <span>Connection speed:&nbsp;<meter id="speedMeter" value="0.00"></meter>&nbsp;<span id="speedval"></span></span>
+
+        <li class="header">CONNECTION</li>
+        <li>
+            <a>
+                <div style="display:inline">Bandwidth:&nbsp;</div>
+                <span id="connection-bandwidth"><meter id="speedMeter" value="0.00"></meter>&nbsp;<span id="speedval"></span></span>
+            </a>
+            <a id="packets-lost-a" style="display:none">
+                <div style="display:inline">Packets lost:&nbsp;</div>
+                <span id="connection-packets-lost">0</span>
+            </a>
         </li>
 
         <li id="sidebar-queues" class="header">
