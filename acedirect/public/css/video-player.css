@@ -1,21 +1,21 @@
 /* scrollbar items */
   /* width */
-  div#consumer-captions::-webkit-scrollbar {
+  div.captions-box::-webkit-scrollbar {
     width: 12px;
     }
 
     /* Track */
-    div#consumer-captions::-webkit-scrollbar-track {
+    div.captions-box::-webkit-scrollbar-track {
     background: #3f3f3f;
     }
 
     /* Handle */
-    div#consumer-captions::-webkit-scrollbar-thumb {
+    div.captions-box::-webkit-scrollbar-thumb {
     background: #a7a7a7; 
     }
 
     /* Handle on hover */
-    div#consumer-captions::-webkit-scrollbar-thumb:hover {
+    div.captions-box::-webkit-scrollbar-thumb:hover {
     background: #8f8f8f; 
     }
 
@@ -26,7 +26,7 @@
 	/* overflow: auto; */
 }
 #webcam {
-	height: 100%;
+	height: 70%;
 	position: relative;
 }
 
@@ -35,13 +35,16 @@
 	position: relative;
 }
 
-#consumer-captions {
+.captions-box {
   background-color:black;
   margin-top: -3px;
   height:200px;
   position:relative;
   overflow-y:scroll;
-   /* max-height: fit-content; */
+}
+
+#agent-captions {
+  margin-top: 3px;
 }
 
 #selfView { 
