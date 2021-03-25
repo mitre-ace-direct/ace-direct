@@ -55,7 +55,8 @@ function register_jssip() {
 				var transcripts = JSON.parse(e.msg);
 				if (transcripts.transcript) {
 					if (acekurento.isMultiparty) {
-                        			socket.emit('multiparty-caption-agent', {
+						console.log('sending multiparty caption:', transcripts.transcript, extensionMe);
+                        socket.emit('multiparty-caption-agent', {
 							"transcript": transcripts.transcript,
 							"final": transcripts.final,
 							"language": transcripts.langCd,
@@ -396,6 +397,7 @@ function calibrateVideo(duration) {
 
 //answers an incoming call
 function accept_call() {
+	$('#agent-captions').show();
 	stopVideomail();
 	disable_persist_view();
 	document.getElementById("sidebar-dialpad").removeAttribute("onclick");
@@ -595,6 +597,7 @@ function toggle_incall_buttons(make_visible) {
 }
 
 function terminate_call() {
+	$('#agent-captions').hide();
 	clearTimeout(outbound_timer);
 	$('#outboundCallAlert').hide();
 	mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
@@ -1268,6 +1271,7 @@ function multipartyCaptionsStart() {
 	recognition.onresult = function (event) {
 		if(!isMuted && event && event.results && (event.results.length > 0)){
 			var lastResult = event.results.length - 1;
+			console.log('sending multiparty-caption-agent caption:', event.results[lastResult][0].transcript, extensionMe);
 			socket.emit('multiparty-caption-agent', {
 				"transcript":event.results[lastResult][0].transcript,
 				"final": event.results[lastResult].isFinal, 
