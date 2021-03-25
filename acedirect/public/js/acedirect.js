@@ -84,6 +84,7 @@ setInterval(function () {
 }, 2000);
 
 $(document).ready(function () {
+	console.log('connecting socket')
 	connect_socket();
 	$("#debugtab").hide();
 	$('#scriptstab').hide();
