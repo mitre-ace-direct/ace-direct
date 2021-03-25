@@ -175,6 +175,7 @@ function register_jssip() {
 		},
 		'incomingCall': function (call) {
 			console.log('--- WV: Incoming call ---\n');
+
 			incomingCall = call;
 			direction = 'incoming';
 			//accept_call()

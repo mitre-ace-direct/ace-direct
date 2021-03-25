@@ -109,8 +109,9 @@
       "logCallData": "true/false boolean - log Call Data",
       "logStats": "true/false boolean - log stats",
       "logStatsFreq": "frequency(milliseconds) to log stats",
-      "logWebRTCStats": "true/false boolean - log WebRTC stats",
-      "logWebRTCStatsFreq": "frequency(milliseconds) to log WebRTC stats"
+      "logWebRTCStats": "true/false boolean - log WebRTC stats; required to enable the real-time connection speed meter",
+      "logWebRTCStatsFreq": "frequency(milliseconds) to log WebRTC stats and update the real-time connection speed meter",
+      "logWebRTCStatsDbEnabled": "enable logging of WebRTC call stats to database"
     }
   },
   "complaint_redirect": {
