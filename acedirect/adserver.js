@@ -1997,7 +1997,7 @@ io.sockets.on('connection', function (socket) {
 								// fixme will this be wrong if multiple clients/agents?
 								socket.emit('caption-translated', {
 									'transcript' : data.translation,
-									'displayname' : data.transcripts.displayname,
+									'displayname' : "test",//data.transcripts.displayname,
 									'msgid': msgid,
 									'final': final
 									});
