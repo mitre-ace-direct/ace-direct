@@ -68,7 +68,8 @@ function register_jssip() {
 						console.log('sending caption:', transcripts.transcript, extensionMe);
 						socket.emit('translate-caption', {
 							"transcripts": transcripts,
-							"callerNumber": extensionMe
+							"callerNumber": extensionMe,
+							"displayname": $('#callerFirstName').val() + " " + $('#callerLastName').val()
 						});
 					}
 				}
@@ -1200,6 +1201,7 @@ function updateCaptions(transcripts) {
 	} else {
 		clearTimeout(tempDivTimeout);
 		tDiv.innerHTML = transcripts.transcript;
+		tempDivTimeout = setTimeout(function () { tDiv.remove() }, 5000);
 		if (transcripts.final) {
 			setTimeout(function () { tDiv.remove() }, 5000);
 
