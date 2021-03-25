@@ -1896,6 +1896,7 @@ io.sockets.on('connection', function (socket) {
 		let callerNumber = data.callerNumber.toString();
 		let msgid = data.transcripts.msgid;
 		let final = data.transcripts.final;
+		let displayname = data.displayname || "Caller";
 
 		console.log('translating', data);
 
@@ -1967,7 +1968,7 @@ io.sockets.on('connection', function (socket) {
 						console.log('same language!');
 						socket.emit('caption-translated', {
 							'transcript' : data.transcripts.transcript.trim(),
-							'displayname' : data.transcripts.displayname,
+							'displayname' : displayname,
 							'msgid': msgid,
 							'final': final
 						});
@@ -1987,7 +1988,7 @@ io.sockets.on('connection', function (socket) {
 								console.error("GET translation error: " + error);
 								socket.emit('caption-translated', {
 									'transcript' : 'Error using translation server: ' + translationUrl,
-									'displayname' : data.transcripts.displayname,
+									'displayname' : displayname,
 									'msgid': msgid,
 									'final': final
 								});
@@ -1997,7 +1998,7 @@ io.sockets.on('connection', function (socket) {
 								// fixme will this be wrong if multiple clients/agents?
 								socket.emit('caption-translated', {
 									'transcript' : data.translation,
-									'displayname' : "test",//data.transcripts.displayname,
+									'displayname' : displayname,
 									'msgid': msgid,
 									'final': final
 									});
