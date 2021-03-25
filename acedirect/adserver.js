@@ -1997,10 +1997,12 @@ io.sockets.on('connection', function (socket) {
 								// 	'msgid': msgid,
 								// 	'final': final
 								// });
+							} else if (!data.translation) {
+								console.error("No translation was received from translation server");
 							} else {
 								console.log('received translation', data);
 								console.log(languageFrom, languageTo, translationUrl);
-								console.log(response)
+								// console.log(response)
 								// fixme will this be wrong if multiple clients/agents?
 								socket.emit('caption-translated', {
 									'transcript' : data.translation,
