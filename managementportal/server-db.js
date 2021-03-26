@@ -578,27 +578,27 @@ io.sockets.on('connection', (socket) => {
     year
   });
 
-  socket.on('config', (message) => {
-    logger.debug(`Got config message request: ${message}`);
-    const confobj = {
-      host: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
-      realm: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
-      stun: `${getConfigVal('asterisk:sip:stun')}:${getConfigVal('asterisk:sip:stun_port')}`,
-      wsport: parseInt(getConfigVal('asterisk:sip:ws_port'), 10),
-      channel: getConfigVal('asterisk:sip:channel'),
-      websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('asterisk:sip:ws_port')}/ws`
-    };
+  // socket.on('config', (message) => {
+  //   logger.debug(`Got config message request: ${message}`);
+  //   const confobj = {
+  //     host: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
+  //     realm: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
+  //     stun: `${getConfigVal('asterisk:sip:stun')}:${getConfigVal('asterisk:sip:stun_port')}`,
+  //     wsport: parseInt(getConfigVal('asterisk:sip:ws_port'), 10),
+  //     channel: getConfigVal('asterisk:sip:channel'),
+  //     websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('asterisk:sip:ws_port')}/ws`
+  //   };
 
-    socket.emit('sipconf', confobj);
+  //   socket.emit('sipconf', confobj);
 
-    if (message === 'webuser') {
-      const qobj = {
-        queues: getConfigVal('management_portal:queues')
-      };
-      socket.emit('queueconf', qobj);
-      logger.debug('Message is webuser type');
-    }
-  });
+  //   if (message === 'webuser') {
+  //     const qobj = {
+  //       queues: getConfigVal('management_portal:queues')
+  //     };
+  //     socket.emit('queueconf', qobj);
+  //     logger.debug('Message is webuser type');
+  //   }
+  // });
 
   // Handle incoming Socket.IO registration requests - add to the room
   socket.on('register-manager', () => {
@@ -1938,7 +1938,9 @@ app.use((req, res, next) => {
   }
   if (req.session !== null && req.session.data) {
     if (req.session.data !== null && req.session.data.uid) {
-      if (req.session.role) { return next(); } // user is logged in go to next()
+      if (req.session.role) {
+        return next(); // user is logged in go to next()
+      }
 
       const username = req.session.data.uid;
       getUserInfo(username, (user) => {
@@ -1952,8 +1954,9 @@ app.use((req, res, next) => {
       });
     }
   } else {
-    return res.redirect(`.${nginxPath}`);
+    return res.redirect(`.${nginxPath}`); // '/{user}/ManagementPortal' or default is '/ManagementPortal'
   }
+  // return something here ???
 });
 
 /**
