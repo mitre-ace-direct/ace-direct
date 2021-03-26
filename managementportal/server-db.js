@@ -1929,37 +1929,6 @@ function getUserInfo(username, callback) {
  * determines if user can procede or
  * before openam cookie shield is enforced
  */
-// app.use((req, res, next) => {
-//   if (req.path === nginxPath || req.path === '/agentassist') {
-//     return next();
-//   }
-//   if (req.path === '/logout') {
-//     return next();
-//   }
-//   if (req.session !== null && req.session.data) {
-//     if (req.session.data !== null && req.session.data.uid) {
-//       if (req.session.role) {
-//         return next(); // user is logged in go to next()
-//       }
-
-//       const username = req.session.data.uid;
-//       getUserInfo(username, (user) => {
-//         if (user.message === 'success') {
-//           req.session.agent_id = user.data[0].agent_id;
-//           req.session.role = user.data[0].role;
-//           req.session.username = user.data[0].username;
-//           return next();
-//         }
-//         return res.redirect('./');
-//       });
-//     }
-//   } else {
-//     return res.redirect(`.${nginxPath}`);
-// '/{user}/ManagementPortal' or default is '/ManagementPortal'
-//   }
-//   // return something here ???
-// });
-
 app.use((req, res, next) => {
   if (req.path === nginxPath || req.path === '/agentassist') {
     next();
