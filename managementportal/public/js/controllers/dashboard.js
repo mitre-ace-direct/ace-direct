@@ -145,13 +145,14 @@ const dbController = angular.module('dashboardModule', ['csrService', 'angularDu
       CalculateSummary();
     });
 
-    socket.on('sipconf', (data) => {
-      // so the data can be accessed by non-angular javascript under the window element
-      $window.sipconf = data;
-    });
-    socket.on('queueconf', (data) => {
-      $window.queueconf = data;
-    });
+    // socket.on('sipconf', (data) => {
+    //   // so the data can be accessed by non-angular javascript under the window element
+    //   $window.sipconf = data;
+    // });
+
+    // socket.on('queueconf', (_data) => {
+    //   $window.queueconf = data;
+    // });
 
     socket.on('agent-request', (data) => {
       console.log(`Received agent-request help data...${JSON.stringify(data, null, 2, true)}`);
@@ -165,8 +166,8 @@ const dbController = angular.module('dashboardModule', ['csrService', 'angularDu
     });
 
     $scope.initData = function InitData() {
-      socket.emit('config', 'agent');
-      socket.emit('config', 'webuser');
+      // socket.emit('config', 'agent');
+      // socket.emit('config', 'webuser');
       socket.emit('ami-req', 'agent');
       socket.emit('ami-req', 'queue');
     };
