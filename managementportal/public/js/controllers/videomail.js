@@ -104,13 +104,19 @@ function VideomailReadOnclick(id) {
   console.log('Emitted a socket videomail-read-onclick');
 }
 
+function ChangePlayButton() {
+  console.log('Video ended');
+  document.getElementById('play-video-icon').classList.add('fa-play');
+  document.getElementById('play-video-icon').classList.remove('fa-pause');
+}
+
 // More videomail functionality//Play the selected videomail
 function playVideomail(id, duration, vidStatus) {
   console.log(`Playing video mail with id ${id}`);
   $('#videoBox').removeAttr('hidden');
   remoteView.removeAttribute('poster');
   remoteView.setAttribute('src', `./getVideomail?id=${id}&agent=${socket.id}`);
-  remoteView.setAttribute('onended', 'ChangePlayButton()');
+  remoteView.onended = ChangePlayButton();
   if (document.getElementById('play-video-icon').classList.contains('fa-pause')) {
     document.getElementById('play-video-icon').classList.add('fa-play');
     document.getElementById('play-video-icon').classList.remove('fa-pause');
@@ -144,7 +150,8 @@ function getVideomailRecs() {
 }
 
 // Socket emit for changing status of a videomail
-function VideomailStatusChange(id, videoStatus) {
+function VideomailStatusChange(videoStatus) {
+  const id = document.getElementById('videomailId').getAttribute('name');
   socket.emit('videomail-status-change', {
     id,
     status: videoStatus
@@ -152,8 +159,16 @@ function VideomailStatusChange(id, videoStatus) {
   console.log('Emitted a socket videomail-status-change');
 }
 
+$('#ChangeVideomailStatus').on('click', 'li', function Selected() {
+  const videoStatus = $(this).attr('value');
+
+  VideomailStatusChange(videoStatus);
+});
+
 // Socket emit for deleting a videomail
-function VideomailDeleted(id) {
+// function VideomailDeleted(id) {
+function VideomailDeleted() {
+  const id = document.getElementById('videomailId').getAttribute('name');
   socket.emit('videomail-deleted', {
     id,
     extension: extensionMe
@@ -162,11 +177,9 @@ function VideomailDeleted(id) {
   stopVideomail();
 }
 
-function ChangePlayButton() {
-  console.log('Video ended');
-  document.getElementById('play-video-icon').classList.add('fa-play');
-  document.getElementById('play-video-icon').classList.remove('fa-pause');
-}
+$('#VideomailDelete').on('click', () => {
+  VideomailDeleted();
+});
 
 $('#play-video').on('click', () => {
   PlayVideo();
@@ -372,6 +385,11 @@ function filterVideomail(mailFilter) {
     filter
   });
 }
+
+$('#videomailFilter').on('click', 'a', function Selected() {
+  const mailFilter = $(this).attr('value');
+  filterVideomail(mailFilter);
+});
 
 // Seekbar functionality
 const seekBar = document.getElementById('seek-bar');
