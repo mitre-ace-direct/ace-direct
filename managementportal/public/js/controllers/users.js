@@ -110,9 +110,10 @@ $(document).ready(() => {
     const pass = $('#inputPassword').val();
     const pass2 = $('#inputPassword2').val();
     if (pass !== pass2) {
-      alert('Re-entered password does not match!');
+      $('#passwordMatchError').attr('hidden', false);
       return;
     }
+    $('#passwordMatchError').attr('hidden', true);
 
     $.post('./AddAgent', {
       username: $('#inputUsername').val(),
@@ -128,11 +129,13 @@ $(document).ready(() => {
     },
     (data, _status) => {
       if (data.result === 'success') {
-        console.log('Saved!!!!');
+        // console.log('Saved!!!!');
+        $('#actionError').attr('hidden', true);
         window.location.reload();
       } else {
-        console.log(`POST failed: ${JSON.stringify(data)}`);
-        alert(data.message);
+        // console.log(`POST failed: ${JSON.stringify(data)}`);
+        $('#errorMessage').text(' Add agent');
+        $('#actionError').attr('hidden', false);
       }
     });
   });
@@ -160,11 +163,13 @@ $(document).ready(() => {
     },
     (data, _status) => {
       if (data.result === 'success') {
-        console.log(`POST succ: ${JSON.stringify(data)}`);
+        // console.log(`POST succ: ${JSON.stringify(data)}`);
+        $('#actionError').attr('hidden', true);
         window.location.reload();
       } else {
-        console.log(`POST failed: ${JSON.stringify(data)}`);
-        alert(data.message);
+        // console.log(`POST failed: ${JSON.stringify(data)}`);
+        $('#errorMessage').text(' Update agent');
+        $('#actionError').attr('hidden', false);
       }
     });
   });
@@ -208,9 +213,14 @@ $(document).ready(() => {
           username: value.username
         },
         (data, _status) => {
-          if (data.result !== 'success') {
-            console.log(`DeleteAgent ${value.username} failed: ${JSON.stringify(data)}`);
-            alert(data.message);
+          if (data.result === 'success') {
+            // console.log(`POST succ: ${JSON.stringify(data)}`);
+            $('#actionError').attr('hidden', true);
+            window.location.reload();
+          } else {
+            // console.log(`DeleteAgent ${value.username} failed: ${JSON.stringify(data)}`);
+            $('#errorMessage').text(' Delete agent');
+            $('#actionError').attr('hidden', false);
           }
         });
       }
