@@ -549,6 +549,7 @@ class WebRTCMediaSession extends Events {
     if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0) {
       debug(`${ext} Re-invite`, offer);
       await this.leave(ext, true);
+      return;
     }
 
     const rtp = await this._createRtpEndpoint();
