@@ -671,11 +671,20 @@
 	}
 
 
+function getAgentColor(displayName) {
+	console.log('returning cyan for', displayName)
+	return 'cyan'; // fixme
+}
+
 function updateCaptionsMultiparty(transcripts) {
 	var temp = document.createElement("div");
 	temp.id = transcripts.msgid;
-	temp.innerHTML = transcripts.displayname + ": " + transcripts.transcript;
+	temp.innerHTML = '<strong>CSR ' + transcripts.displayname + ": " + transcripts.transcript;
 	temp.classList.add("transcripttext");
+	if (transcripts.agent) {
+
+		temp.classList.add("agent-color-" + getAgentColor(transcripts.displayname) ); //fixme
+	}
 	document.getElementById("transcriptoverlay").appendChild(temp);
-	setTimeout(function () { temp.remove() }, 5000);
+	// setTimeout(function () { temp.remove() }, 5000);
 }
