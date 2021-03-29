@@ -691,7 +691,8 @@ function connect_socket() {
 					console.log(JSON.stringify(transcripts))
 					socket.emit('translate-caption', {
 						"transcripts": transcripts,
-						"callerNumber": extensionMe
+						"callerNumber": extensionMe,
+						"displayname": transcripts.displayname
 					});
 				}).on('new-agent-chat', function(data) {
 					var count = 0;
