@@ -1970,11 +1970,13 @@ io.sockets.on('connection', function (socket) {
 					console.log('translating', data.transcripts.transcript, 'from', languageFrom, 'to', languageTo);
 					let encodedText = encodeURI(data.transcripts.transcript.trim());
 					let translationUrl = translationServerUrl + '/translate?languageFrom=' + languageFrom + '&text=' + encodedText + '&languageTo=' + languageTo;
+					console.log('is agent here? if so use color', data);
 					if (languageTo === languageFrom) {
 						console.log('same language!');
 						socket.emit('caption-translated', {
-							'transcript' : data.transcripts.transcript.trim(),
-							'displayname' : displayname,
+							'transcript': data.transcripts.transcript.trim(),
+							'displayname': data.transcripts.displayname,
+							'agent': data.transcripts.agent,
 							'msgid': msgid,
 							'final': final
 						});
@@ -2003,11 +2005,12 @@ io.sockets.on('connection', function (socket) {
 							} else {
 								console.log('received translation', data);
 								console.log(languageFrom, languageTo, translationUrl);
-								// console.log(response)
+								
 								// fixme will this be wrong if multiple clients/agents?
 								socket.emit('caption-translated', {
 									'transcript' : data.translation,
-									'displayname' : displayname,
+									'displayname' : data.transcripts.displayname,
+									'agent': data.transcripts.agent,
 									'msgid': msgid,
 									'final': final
 									});
