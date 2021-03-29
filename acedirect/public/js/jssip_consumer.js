@@ -559,9 +559,9 @@
 			tempDivTimeout = setTimeout(function () { temp.remove() }, 5000);
 		} else {
 			clearTimeout(tempDivTimeout);
+			tempDivTimeout = setTimeout(function(){tDiv.remove();},5000);
 			tDiv.innerHTML = transcripts.transcript;
 			if(transcripts.final || call_terminated) {
-				setTimeout(function(){tDiv.remove();},5000);
 
 				//var captionBubble = '<div><b>' +transcripts.timestamp + ':</b>&nbsp;'+transcripts.transcript+'<br/><div>';
 				//$(captionBubble).appendTo($("#caption-messages"));
