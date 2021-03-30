@@ -1,23 +1,23 @@
 /* scrollbar items */
   /* width */
-  /* div.captions-box::-webkit-scrollbar {
-    width: 12px;
+   div.captions-box::-webkit-scrollbar {
+    /* width: 12px; */
     }
 
     /* Track */
     div.captions-box::-webkit-scrollbar-track {
-    background: #3f3f3f;
+    /* background: #3f3f3f; */
     }
 
     /* Handle */
     div.captions-box::-webkit-scrollbar-thumb {
-    background: #a7a7a7; 
+    /* background: #a7a7a7;  */
     }
 
     /* Handle on hover */
     div.captions-box::-webkit-scrollbar-thumb:hover {
-    background: #8f8f8f; 
-    } */
+    /* background: #8f8f8f;  */
+    } 
 
 
 #fullscreen-element {
