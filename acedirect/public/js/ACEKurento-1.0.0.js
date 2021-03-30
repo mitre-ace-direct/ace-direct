@@ -222,7 +222,9 @@
         var repeatInterval = logWebRTCStatsFreq; //milliseconds
 
         getStats(pc, function(result) {
-          if (logWebRTCStatsDbEnabled == 'true') {
+
+          // log to Mongo?
+          if (logWebRTCMongo.length > 0) {
             socket.emit('logWebRTCEvt', { result });
           }
 
