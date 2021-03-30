@@ -3,250 +3,254 @@
 <html>
 
 <head>
-	<%- include("../partials/head") %>
+  <%- include("../partials/head") %>
 </head>
 
 <body class="hold-transition skin-purple sidebar-mini layout-fixed">
-	<div class="wrapper">
-		<!-- Main Header -->
-		<%- include("../partials/header") %>
-		<%- include("../partials/sidebar") %>
-		<!-- Content Wrapper. Contains page content -->
-		<div class="content-wrapper">
-			<!-- Content Header (Page header) -->
-			<div class="content-header">
-				<div class="container-fluid">
-					<div class="row mb-2">
-						<div class="col-lg-12">
-							<h1 class="m-0 text-dark">Report</h1>
-							<div id="reportrange">
-								<div data-toggle="tooltip" data-placement="left"
-									title="Select Date Range – The user can select a date range for the report. Predefined values are Today, Yesterday, Last 7 days, Last 30 days, This Month, Last Month, All Time (March 1st 2020 to Today), and Custom Range. Default selection is 'Last 7 days'">
-									<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
-									<span></span>
-									<b class="caret"></b>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- Main content -->
-			<div class="content">
-				<div class="container-fluid">
-					<div class="row">
-						<div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
-							<div class="small-box" data-toggle="tooltip" title="Calls Handled - Number of calls completed in all queues in the date range of this report.">
-								<div class="inner">
-									<h5 id="handled"></h5>
-									<h5>Calls Handled</h5>
-								</div>
-							</div>
-						</div><!-- ./col -->
-						<div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
-							<div class="small-box" data-toggle="tooltip" title="Calls Abandoned – Number of calls not answered in all queues in the date range of this report.">
-								<div class="inner">
-									<h5 id="abandoned"></h5>
-									<h5>Calls Abandoned</h5>
-								</div>
-							</div>
-						</div><!-- ./col -->
-						<div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
-							<div class="small-box" data-toggle="tooltip" title="Videomails - Number of videomails in the date range of this report.">
-								<div class="inner">
-									<h5 id="videomails"></h5>
-									<h5>Videomails</h5>
-								</div>
-							</div>
-						</div><!-- ./col -->
-						<div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
-							<div class="small-box" data-toggle="tooltip" title="Web Calls - Number of web calls in the date range of this report.">
-								<div class="inner">
-									<h5 id="webcalls"></h5>
-									<h5>Web Calls</h5>
-								</div>
-							</div>
-						</div><!-- ./col -->
-					</div><!-- /.row -->
-					<!-- Call Summary Report Table -->
-					<div class="row">
-						<div class="col-lg-12">
-							<div class="card">
-								<div class="card-header">
-									<h3 class="card-title">Call Summary Records</h3>
+  <div class="wrapper">
+    <!-- Main Header -->
+    <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+          <!-- Content Header (Page header) -->
+          <div class="content-header">
+            <div class="container-fluid">
+              <div class="row mb-2">
+                <div class="col-lg-12">
+                  <h1 class="m-0 text-dark">Report</h1>
+                  <div id="reportrange">
+                    <div data-toggle="tooltip" data-placement="left"
+                      title="Select Date Range – The user can select a date range for the report. Predefined values are Today, Yesterday, Last 7 days, Last 30 days, This Month, Last Month, All Time (March 1st 2020 to Today), and Custom Range. Default selection is 'Last 7 days'">
+                      <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+                      <span></span>
+                      <b class="caret"></b>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Main content -->
+          <div class="content">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
+                  <div class="small-box" data-toggle="tooltip"
+                    title="Calls Handled - Number of calls completed in all queues in the date range of this report.">
+                    <div class="inner">
+                      <h5 id="handled"></h5>
+                      <h5>Calls Handled</h5>
+                    </div>
+                  </div>
+                </div><!-- ./col -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
+                  <div class="small-box" data-toggle="tooltip"
+                    title="Calls Abandoned – Number of calls not answered in all queues in the date range of this report.">
+                    <div class="inner">
+                      <h5 id="abandoned"></h5>
+                      <h5>Calls Abandoned</h5>
+                    </div>
+                  </div>
+                </div><!-- ./col -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
+                  <div class="small-box" data-toggle="tooltip"
+                    title="Videomails - Number of videomails in the date range of this report.">
+                    <div class="inner">
+                      <h5 id="videomails"></h5>
+                      <h5>Videomails</h5>
+                    </div>
+                  </div>
+                </div><!-- ./col -->
+                <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
+                  <div class="small-box" data-toggle="tooltip"
+                    title="Web Calls - Number of web calls in the date range of this report.">
+                    <div class="inner">
+                      <h5 id="webcalls"></h5>
+                      <h5>Web Calls</h5>
+                    </div>
+                  </div>
+                </div><!-- ./col -->
+              </div><!-- /.row -->
+              <!-- Call Summary Report Table -->
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Call Summary Records</h3>
 
-									<div class="card-tools pull-right">
-										<button class="btn btn-tool" id="reportdownloadbtn">
-											<i class="fa fa-download" style="font-size: 1.75em"></i>
-										</button>
-										<i style="padding-right: 15px" class="fa fa-question-circle"
-											data-toggle="tooltip" data-placement="bottom"
-											title="Download CSV File – This action downloads the table as a Comma Separated Values (CSV) file. The CSV file contains only data within the date range."></i>
-									</div>
-								</div>
+                      <div class="card-tools pull-right">
+                        <button class="btn btn-tool" id="reportdownloadbtn">
+                          <i class="fa fa-download" style="font-size: 1.75em"></i>
+                        </button>
+                        <i style="padding-right: 15px" class="fa fa-question-circle" data-toggle="tooltip"
+                          data-placement="bottom"
+                          title="Download CSV File – This action downloads the table as a Comma Separated Values (CSV) file. The CSV file contains only data within the date range."></i>
+                      </div>
+                    </div>
 
-								<div id="reporttablediv" class="card-body table-responsive" style="overflow-x: scroll">
-									<table id="reporttable" class="display table-bordered" cellspacing="0"
-										width="100%">
-										<thead>
-											<tr>
-												<th class="text-center" data-toggle="tooltip" data-container="body"
-													title="Date">Date</th>
-												<th class="text-center" data-toggle="tooltip" data-container="body"
-													title="Calls Handled">Calls Handled</th>
-												<th class="text-center" data-toggle="tooltip" data-container="body"
-													title="Calls Abandoned">Calls Abandoned</th>
-												<th class="text-center" data-toggle="tooltip" data-container="body"
-													title="Videomails">Videomails</th>
-												<th class="text-center" data-toggle="tooltip" data-container="body"
-													title="Web Calls">Web Calls</th>
-											</tr>
-										</thead>
-									</table>
-								</div>
+                    <div id="reporttablediv" class="card-body table-responsive" style="overflow-x: scroll">
+                      <table id="reporttable" class="display table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                          <tr>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="Date">Date</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="Calls Handled">
+                              Calls Handled</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="Calls Abandoned">
+                              Calls Abandoned</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="Videomails">
+                              Videomails</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="Web Calls">Web
+                              Calls</th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
 
-							</div>
-						</div>
-					</div>
-					<!-- ./Call Summary Report Table -->
-					<div id="report"></div>
-					<div class="row" >
-						<div class="col-lg-12">
-							<!-- Call Summary Line Chart -->
-							<div class="card">
-								<div class="card-header">
-									<h3 class="card-title">Call Summary Chart</h3>
-									<div class="card-tools">
-										<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fa fa-minus"></i>
-										</button>
-									</div>
-								</div>
-								<div class="card-body">
-									<div id="callSummaryLineChart" style="height:450px"></div>
-        							<div id="legendContainer" class="legend"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- VRS Number Report Table -->
-					<div class="row">
-						<div class="col-lg-12">
-							<div class="card">
-								<div class="card-header">
-									<h3 class="card-title">VRS Number Records</h3>
-									<div class="card-tools pull-right">
-										<button class="btn btn-tool" id="vrsreportdownloadbtn">
-											<i class="fa fa-download" style="font-size: 1.75em"></i>
-										</button>
-										<i style="padding-right: 15px" class="fa fa-question-circle"
-											data-toggle="tooltip" data-placement="bottom"
-											title="Download CSV File – This action downloads the table as a Comma Separated Values (CSV) file. The CSV file contains only data within the date range."></i>
-									</div>
-								</div>
-								<div id="vrsreporttablediv" class="card-body table-responsive" style="overflow-x: scroll">
-									<table id="vrsreporttable" class="display table-bordered" cellspacing="0"
-										width="100%">
-										<thead>
-											<tr>
-												<th class="text-center" data-toggle="tooltip" data-container="body"
-													title="VRS Number">VRS Number</th>
-												<th class="text-center" data-toggle="tooltip" data-container="body"
-													title="Date">Date</th>
-												<th class="text-center" data-toggle="tooltip" data-container="body"
-													title="Status">Status</th>
-												<th class="text-center" data-toggle="tooltip" data-container="body"
-													title="State">State</th>
-											</tr>
-										</thead>
-									</table>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- ./VRS Number Report Table -->
-					<div class="row">
-						<div class="col-lg-4 col-md-6 col-sm-6 col-xs-6">
-							<div class="small-box" data-toggle="tooltip" title="Top 10 States, based on area code, in the date range of this report.">
-								<div class="inner">
-									<h5>Top 10 States</h5>
-									<div id="topTenStates"></div>
-								</div>
-							</div>
-						</div><!-- ./col -->
-						<div class="col-lg-4 col-md-6 col-sm-6 col-xs-6">
-							<div class="small-box" data-toggle="tooltip" title="Top 10 Area Codes in the date range of this report.">
-								<div class="inner">
-									<h5>Top 10 Area Codes</h5>
-									<div id="topTenAreaCodes"></div>
+                  </div>
+                </div>
+              </div>
+              <!-- ./Call Summary Report Table -->
+              <div id="report"></div>
+              <div class="row">
+                <div class="col-lg-12">
+                  <!-- Call Summary Line Chart -->
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Call Summary Chart</h3>
+                      <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                            class="fa fa-minus"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <div id="callSummaryLineChart" style="height:450px"></div>
+                      <div id="legendContainer" class="legend"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- VRS Number Report Table -->
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">VRS Number Records</h3>
+                      <div class="card-tools pull-right">
+                        <button class="btn btn-tool" id="vrsreportdownloadbtn">
+                          <i class="fa fa-download" style="font-size: 1.75em"></i>
+                        </button>
+                        <i style="padding-right: 15px" class="fa fa-question-circle" data-toggle="tooltip"
+                          data-placement="bottom"
+                          title="Download CSV File – This action downloads the table as a Comma Separated Values (CSV) file. The CSV file contains only data within the date range."></i>
+                      </div>
+                    </div>
+                    <div id="vrsreporttablediv" class="card-body table-responsive" style="overflow-x: scroll">
+                      <table id="vrsreporttable" class="display table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                          <tr>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="VRS Number">VRS
+                              Number</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="Date">Date</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="Status">Status
+                            </th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="State">State</th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- ./VRS Number Report Table -->
+              <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6">
+                  <div class="small-box" data-toggle="tooltip"
+                    title="Top 10 States, based on area code, in the date range of this report.">
+                    <div class="inner">
+                      <h5>Top 10 States</h5>
+                      <div id="topTenStates"></div>
+                    </div>
+                  </div>
+                </div><!-- ./col -->
+                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6">
+                  <div class="small-box" data-toggle="tooltip"
+                    title="Top 10 Area Codes in the date range of this report.">
+                    <div class="inner">
+                      <h5>Top 10 Area Codes</h5>
+                      <div id="topTenAreaCodes"></div>
 
-								</div>
-							</div>
-						</div><!-- ./col -->
-						<div class="col-lg-4 col-md-6 col-sm-6 col-xs-6">
-							<div class="small-box" data-toggle="tooltip" title="Top 10 VRS Numbers in the date range of this report.">
-								<div class="inner">
-									<h5>Top 10 VRS Numbers</h5>
-									<div id="topTenVrsNumbers"></div>
+                    </div>
+                  </div>
+                </div><!-- ./col -->
+                <div class="col-lg-4 col-md-6 col-sm-6 col-xs-6">
+                  <div class="small-box" data-toggle="tooltip"
+                    title="Top 10 VRS Numbers in the date range of this report.">
+                    <div class="inner">
+                      <h5>Top 10 VRS Numbers</h5>
+                      <div id="topTenVrsNumbers"></div>
 
-								</div>
-							</div>
-						</div><!-- ./col -->
-					</div><!-- /.row -->
-				</div>
-			</div>
-			<!-- /.content -->
-		</div>
-		<!-- /.content - wrapper -->
-		<%- include("../partials/footer") %>
-	</div>
-	<!-- ./wrapper -->
-<style>
-.legend {
-		display: block;
-		-webkit-padding-start: 2px;
-		-webkit-padding-end: 2px;
-		border-width: initial;
-		border-style: none;
-		border-color: initial;
-		border-image: initial;
-		padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-}
-.legendLayer .background {
-    fill: rgba(255, 255, 255, 0.85);
-    stroke: rgba(0, 0, 0, 0.85);
-    stroke-width: 1;
-}
+                    </div>
+                  </div>
+                </div><!-- ./col -->
+              </div><!-- /.row -->
+            </div>
+          </div>
+          <!-- /.content -->
+        </div>
+        <!-- /.content - wrapper -->
+        <%- include("../partials/footer") %>
+  </div>
+  <!-- ./wrapper -->
+  <style>
+    .legend {
+      display: block;
+      -webkit-padding-start: 2px;
+      -webkit-padding-end: 2px;
+      border-width: initial;
+      border-style: none;
+      border-color: initial;
+      border-image: initial;
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
 
-.legendContainer {
-    background-color: #fff;
-    padding: 2px;
-    margin-bottom: 8px;
-    border-radius: 3px 3px 3px 3px;
-    border: 1px solid #E6E6E6;
-    display: inline-block;
-    margin: 0 auto;
-}
-</style>
+    .legendLayer .background {
+      fill: rgba(255, 255, 255, 0.85);
+      stroke: rgba(0, 0, 0, 0.85);
+      stroke-width: 1;
+    }
 
-	<!-- REQUIRED JS SCRIPTS -->
-	<!-- flot -->
-	<script language="javascript" type="text/javascript" src="./assets/js/globalize.js"></script>
-	<script language="javascript" type="text/javascript" src="./assets/js/jquery.canvaswrapper.js"></script>
-	<script language="javascript" type="text/javascript" src="./assets/js/jquery.colorhelpers.js"></script>
-	<script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.js"></script>
-	<script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.saturated.js"></script>
-	<script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.browser.js"></script>
-	<script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.drawSeries.js"></script>
-	<script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.uiConstants.js"></script>
-	<script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.time.js"></script>
-	<script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.legend.js"></script>
+    .legendContainer {
+      background-color: #fff;
+      padding: 2px;
+      margin-bottom: 8px;
+      border-radius: 3px 3px 3px 3px;
+      border: 1px solid #E6E6E6;
+      display: inline-block;
+      margin: 0 auto;
+    }
+  </style>
 
-	<!-- DateRangePicker -->
-	<script type="text/javascript" src="./assets/js/daterangepicker.js"></script>
-	<script type="text/javascript" src="./js/controllers/report.js"></script>
+  <!-- REQUIRED JS SCRIPTS -->
+  <!-- flot -->
+  <script language="javascript" type="text/javascript" src="./assets/js/globalize.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.canvaswrapper.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.colorhelpers.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.saturated.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.browser.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.drawSeries.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.uiConstants.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.time.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.legend.js"></script>
+
+  <!-- DateRangePicker -->
+  <script type="text/javascript" src="./assets/js/daterangepicker.js"></script>
+  <script type="text/javascript" src="./js/controllers/report.js"></script>
 </body>
 
 </html>
