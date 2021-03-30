@@ -411,6 +411,7 @@ function calibrateVideo(duration) {
 //answers an incoming call
 function accept_call() {
 	$('#agent-captions').show();
+	$('#agent-divider').show();
 	stopVideomail();
 	disable_persist_view();
 	document.getElementById("sidebar-dialpad").removeAttribute("onclick");
@@ -611,6 +612,7 @@ function toggle_incall_buttons(make_visible) {
 
 function terminate_call() {
 	$('#agent-captions').hide();
+	$('#agent-divider').hide();
 	clearTimeout(outbound_timer);
 	$('#outboundCallAlert').hide();
 	mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
