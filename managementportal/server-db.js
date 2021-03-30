@@ -18,6 +18,7 @@ const url = require('url');
 const mysql = require('mysql');
 const Json2csvParser = require('json2csv').Parser;
 const redis = require('redis');
+const socketIO = require('socket.io');
 
 // additional helpers/utility functions
 const { getConfigVal } = require('./helpers/utility');
@@ -331,7 +332,7 @@ port = parseInt(getConfigVal('management_portal:https_listen_port'), 10);
 
 const httpsServer = https.createServer(credentials, app);
 
-const io = require('socket.io')(httpsServer, {
+const io = socketIO(httpsServer, {
   cookie: false,
   origins: fqdnUrl
 });
@@ -577,27 +578,27 @@ io.sockets.on('connection', (socket) => {
     year
   });
 
-  socket.on('config', (message) => {
-    logger.debug(`Got config message request: ${message}`);
-    const confobj = {
-      host: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
-      realm: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
-      stun: `${getConfigVal('asterisk:sip:stun')}:${getConfigVal('asterisk:sip:stun_port')}`,
-      wsport: parseInt(getConfigVal('asterisk:sip:ws_port'), 10),
-      channel: getConfigVal('asterisk:sip:channel'),
-      websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('asterisk:sip:ws_port')}/ws`
-    };
+  // socket.on('config', (message) => {
+  //   logger.debug(`Got config message request: ${message}`);
+  //   const confobj = {
+  //     host: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
+  //     realm: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
+  //     stun: `${getConfigVal('asterisk:sip:stun')}:${getConfigVal('asterisk:sip:stun_port')}`,
+  //     wsport: parseInt(getConfigVal('asterisk:sip:ws_port'), 10),
+  //     channel: getConfigVal('asterisk:sip:channel'),
+  //     websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('asterisk:sip:ws_port')}/ws`
+  //   };
 
-    socket.emit('sipconf', confobj);
+  //   socket.emit('sipconf', confobj);
 
-    if (message === 'webuser') {
-      const qobj = {
-        queues: getConfigVal('management_portal:queues')
-      };
-      socket.emit('queueconf', qobj);
-      logger.debug('Message is webuser type');
-    }
-  });
+  //   if (message === 'webuser') {
+  //     const qobj = {
+  //       queues: getConfigVal('management_portal:queues')
+  //     };
+  //     socket.emit('queueconf', qobj);
+  //     logger.debug('Message is webuser type');
+  //   }
+  // });
 
   // Handle incoming Socket.IO registration requests - add to the room
   socket.on('register-manager', () => {
@@ -1890,7 +1891,7 @@ setImmediate(initialize);
 app.use((err, req, res, next) => {
   if (err.code !== 'EBADCSRFTOKEN') return next(err);
   // handle CSRF token errors here
-  res.status(200).json({
+  return res.status(200).json({
     message: 'Form has been tampered'
   });
 });
@@ -1930,12 +1931,14 @@ function getUserInfo(username, callback) {
  */
 app.use((req, res, next) => {
   if (req.path === nginxPath || req.path === '/agentassist') {
-    return next();
-  } if (req.path === '/logout') {
-    return next();
-  } if (req.session !== null && req.session.data) {
+    next();
+  } else if (req.path === '/logout') {
+    next();
+  } else if (req.session !== null && req.session.data) {
     if (req.session.data !== null && req.session.data.uid) {
-      if (req.session.role) { return next(); } // user is logged in go to next()
+      if (req.session.role) {
+        return next(); // user is logged in go to next()
+      }
 
       const username = req.session.data.uid;
       getUserInfo(username, (user) => {
@@ -1945,12 +1948,13 @@ app.use((req, res, next) => {
           req.session.username = user.data[0].username;
           return next();
         }
-        res.redirect('./');
+        return res.redirect('./');
       });
     }
   } else {
-    res.redirect(`.${nginxPath}`);
+    return res.redirect(`.${nginxPath}`);
   }
+  return null;
 });
 
 /**
