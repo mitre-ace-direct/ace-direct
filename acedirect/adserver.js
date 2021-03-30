@@ -271,22 +271,16 @@ if (!turnCred) {
 }
 
 // log WebWebRTC stats parameters
-var logWebRTCStats = getConfigVal('database_servers:mongodb:logWebRTCStats');
+var logWebRTCStats = getConfigVal('webrtcstats:logWebRTCStats');
 var logWebRTCStatsFreq = 60000;
-var logWebRTCStatsDbEnabled = getConfigVal('database_servers:mongodb:logWebRTCStatsDbEnabled');
 if (!logWebRTCStats) {
   logWebRTCStats = false;
 } else {
   logWebRTCStats = (logWebRTCStats == 'true');
 }
-if (!logWebRTCStatsDbEnabled) {
-  logWebRTCStatsDbEnabled = false;
-} else {
-  logWebRTCStatsDbEnabled = (logWebRTCStatsDbEnabled == 'true');
-}
 logger.debug('logWebRTCStats: ' + logWebRTCStats);
 if (logWebRTCStats) {
-  logWebRTCStatsFreqVal = getConfigVal('database_servers:mongodb:logWebRTCStatsFreq'); 
+  logWebRTCStatsFreqVal = getConfigVal('webrtcstats:logWebRTCStatsFreq'); 
   if (!logWebRTCStatsFreqVal) {
     logWebRTCStatsFreq = 0;
   } else {
@@ -294,6 +288,9 @@ if (logWebRTCStats) {
   }
   logger.debug('logWebRTCStatsFreq: ' + logWebRTCStatsFreq);
 }
+var logWebRTCMongo = getConfigVal('webrtcstats:logWebRTCMongo');
+logWebRTCMongo = logWebRTCMongo.trim();
+logger.debug(`logWebRTCMongo: ${logWebRTCMongo}`);
 
 //busylight parameter
 var busyLightEnabled = getConfigVal('busylight:enabled');
@@ -3767,7 +3764,7 @@ app.use(function (req, res, next) {
                 "turnCred":turnCred,
                 "logWebRTCStats": logWebRTCStats,
                 "logWebRTCStatsFreq": logWebRTCStatsFreq,
-                "logWebRTCStatsDbEnabled": logWebRTCStatsDbEnabled
+								"logWebRTCMongo": logWebRTCMongo
         };
         next();
 });
