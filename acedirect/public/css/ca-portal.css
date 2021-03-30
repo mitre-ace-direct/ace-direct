@@ -1,6 +1,6 @@
 :root {
-  --caption-bg-color: black;
-  --caption-font-color: white;
+  --caption-bg-color: #f2f2f2;
+  --caption-font-color: black;
   --caption-font-size: 1.75rem;
 }
 body{
