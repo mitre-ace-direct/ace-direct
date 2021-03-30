@@ -218,6 +218,7 @@
           console.log("start_call: " + other_sip_uri);
 		  selfStream.removeAttribute("hidden");
 		  $('#consumer-captions').show();
+		  $('#consumer-divider').show();
 		
 		$("#screenshareButton").removeAttr('disabled');
 		  $("#fileInput").removeAttr('disabled');
@@ -289,6 +290,7 @@
 		exitFullscreen();
 		$('#transcriptoverlay').html('');
 		$('#consumer-captions').hide();
+		$('#consumer-divider').hide();
 
 		//reset the incall mute button
 		mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
