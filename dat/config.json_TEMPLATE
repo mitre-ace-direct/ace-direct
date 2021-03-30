@@ -107,12 +107,14 @@
       "logAMIevents": false,
       "logCallData": false,
       "logStats": false,
-      "logStatsFreq": "60000",
-      "logWebRTCStats": false,
-      "logWebRTCStatsFreq": "60000",
-      "logWebRTCStatsDbEnabled": false
+      "logStatsFreq": "60000"
     }
   },
+  "webrtcstats": {
+    "logWebRTCStats": false,
+    "logWebRTCStatsFreq": "1000",
+    "logWebRTCMongo": ""
+  },  
   "complaint_redirect": {
     "active": "true",
     "desc": "FCC.gov",
