@@ -53,14 +53,15 @@
 													<span id="user-status" >Mark as...</span>
 													<span class="caret"></span>
 													</button>
-													<ul class="dropdown-menu">
-													<li onclick="VideomailStatusChange(document.getElementById('videomailId').getAttribute('name'),'UNREAD')"><a href="#"><span>Unread</span></a></li>
-													<li onclick="VideomailStatusChange(document.getElementById('videomailId').getAttribute('name'),'READ')"><a href="#"><span>Read</span></a></li>
-													<li onclick="VideomailStatusChange(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS')"><a href="#"><span>In Progress</span></a></li>
-													<li onclick="VideomailStatusChange(document.getElementById('videomailId').getAttribute('name'),'CLOSED')"><a href="#"><span>Closed</span></a></li>
+													<ul class="dropdown-menu" id="ChangeVideomailStatus">
+													<li value = 'UNREAD'><a href="#"><span>Unread</span></a></li>
+													<li value = 'READ'><a href="#"><span>Read</span></a></li>
+													<li value = 'IN PROGRESS'><a href="#"><span>In Progress</span></a></li>
+													<li value = 'CLOSED'><a href="#"><span>Closed</span></a></li>
 													</ul>
 												</span>
-												<button class="btn btn-danger" type="button" onclick="VideomailDeleted(document.getElementById('videomailId').getAttribute('name'))">Permanently Delete</button>
+												<!-- <button class="btn btn-danger" type="button" onclick="VideomailDeleted(document.getElementById('videomailId').getAttribute('name'))">Permanently Delete</button>-->
+                        <button id="VideomailDelete" class="btn btn-danger" type="button">Permanently Delete</button>
 												<button id="exit-btn" class="btn btn-primary" type="button" onclick="stopVideomail()">Close Video</button>
 											</div>
 										</div>
@@ -109,13 +110,13 @@
 																Filter Messages
 																<span class="caret"></span>
 															</button>
-															<div class="dropdown-menu" aria-labelledby="videomailDropdownMenuButton">
-																<a class="dropdown-item" href="#" onclick="filterVideomail('ALL');">All</a>
-																<a class="dropdown-item" href="#" onclick="filterVideomail('UNREAD');">Unread</a>
-																<a class="dropdown-item" href="#" onclick="filterVideomail('READ');">Read</a>
-																<a class="dropdown-item" href="#" onclick="filterVideomail('IN PROGRESS');">In Progress</a>
-																<a class="dropdown-item" href="#" onclick="filterVideomail('CLOSED');">Closed</a>
-																<a class="dropdown-item" href="#" onclick="filterVideomail('MARKED FOR DELETION');">Marked for Deletion</a>
+															<div id = "videomailFilter" class="dropdown-menu" aria-labelledby="videomailDropdownMenuButton">
+																<a class="dropdown-item" href="#" value='ALL'>All</a>
+																<a class="dropdown-item" href="#" value='UNREAD'>Unread</a>
+																<a class="dropdown-item" href="#" value='READ'>Read</a>
+																<a class="dropdown-item" href="#" value='IN PROGRESS'>In Progress</a>
+																<a class="dropdown-item" href="#" value='CLOSED'>Closed</a>
+																<a class="dropdown-item" href="#" value='MARKED FOR DELETION'>Marked for Deletion</a>
 															</div>
 														</div>
 													</div>
