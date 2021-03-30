@@ -1,6 +1,6 @@
 /* scrollbar items */
   /* width */
-  div.captions-box::-webkit-scrollbar {
+  /* div.captions-box::-webkit-scrollbar {
     width: 12px;
     }
 
@@ -17,7 +17,7 @@
     /* Handle on hover */
     div.captions-box::-webkit-scrollbar-thumb:hover {
     background: #8f8f8f; 
-    }
+    } */
 
 
 #fullscreen-element {
@@ -36,11 +36,17 @@
 }
 
 .captions-box {
-  background-color:black;
+  background-color:#f2f2f2;
   margin-top: -3px;
   height:200px;
   position:relative;
   overflow-y:scroll;
+}
+
+.caption-box-divider {
+  border-top: 2px solid #555;
+  margin-top: 0px;
+  margin-bottom: 0px;
 }
 
 #agent-captions {
