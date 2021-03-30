@@ -22,16 +22,14 @@ angular.module('csrService', []).factory('socket', ['$rootScope', '$http', '$tim
   });
   return {
     on(eventName, callback) {
-      socket.on(eventName, function OnSocketApply() {
-        const args = arguments;
+      socket.on(eventName, (...args) => {
         $rootScope.$apply(() => {
           callback.apply(socket, args);
         });
       });
     },
     emit(eventName, data, callback) {
-      socket.emit(eventName, data, function EmitSocketApply() {
-        const args = arguments;
+      socket.emit(eventName, data, (...args) => {
         $rootScope.$apply(() => {
           if (callback) {
             callback.apply(socket, args);
