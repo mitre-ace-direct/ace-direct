@@ -108,12 +108,14 @@
       "logAMIevents": "true/false boolean - log AMI events",
       "logCallData": "true/false boolean - log Call Data",
       "logStats": "true/false boolean - log stats",
-      "logStatsFreq": "frequency(milliseconds) to log stats",
-      "logWebRTCStats": "true/false boolean - log WebRTC stats; required to enable the real-time connection speed meter",
-      "logWebRTCStatsFreq": "frequency(milliseconds) to log WebRTC stats and update the real-time connection speed meter",
-      "logWebRTCStatsDbEnabled": "enable logging of WebRTC call stats to database"
+      "logStatsFreq": "frequency(milliseconds) to log stats"
     }
   },
+  "webrtcstats": {
+    "logWebRTCStats": "true/false boolean; turn on webrtc in-call stats",
+    "logWebRTCStatsFreq": "string; webrtc stats polling frequency (milliseconds)",
+    "logWebRTCMongo": "mongodb connection URI; leave empty to disable MongoDB logging"
+  },  
   "complaint_redirect": {
     "active": "Complaint portal redirect? true or false",
     "desc": "Description of redirect website",
