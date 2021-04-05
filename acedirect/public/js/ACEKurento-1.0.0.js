@@ -5154,7 +5154,7 @@ function ACEKurento(config) {
         
         // console.log('ats', mediaStream.getAudioTracks())
         mediaStream.getAudioTracks()[0].enabled = isActive;
-        mediaStream.getAudioTracks()[0].muted = true; //fixme
+        mediaStream.getAudioTracks()[0].muted = true; //fixme ?should this be !isActive?
         console.log('enabled?', mediaStream.getAudioTracks()[0].enabled)
         console.log('muted?', mediaStream.getAudioTracks()[0].muted)
         console.log('ats', mediaStream.getAudioTracks())
