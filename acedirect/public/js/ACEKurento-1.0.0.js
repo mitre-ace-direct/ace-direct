@@ -5153,14 +5153,14 @@ function ACEKurento(config) {
         // mediaStream.audioEnabled = false; // fixme
         
         // console.log('ats', mediaStream.getAudioTracks())
-        mediaStream.getAudioTracks()[0].enabled = !(mediaStream.getAudioTracks()[0].enabled);
+        mediaStream.getAudioTracks()[0].enabled = isActive;
         mediaStream.getAudioTracks()[0].muted = true; //fixme
         console.log('enabled?', mediaStream.getAudioTracks()[0].enabled)
         console.log('muted?', mediaStream.getAudioTracks()[0].muted)
         console.log('ats', mediaStream.getAudioTracks())
         console.log(this.mediaStream())
       } else {
-        mediaStream.getVideoTracks()[0].enabled = !(mediaStream.getVideoTracks()[0].enabled);
+        mediaStream.getVideoTracks()[0].enabled = isActive;
       }
 
       console.log((isAudio ? "AUDIO" : "VIDEO") + " is " + (isActive ? "ON" : "OFF"));
