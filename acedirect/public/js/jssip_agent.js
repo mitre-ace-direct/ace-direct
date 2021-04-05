@@ -751,7 +751,7 @@ function removeElement(elementId) {
 function mute_audio() {
 	if (acekurento !== null) {
 		console.log('MUTING AUDIO');
-		acekurento.enableDisableTrack(true, true); //mute audio
+		acekurento.enableDisableTrack(false, true); //mute audio
 		mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
 		mute_audio_icon.classList.add("fa-microphone-slash");
 		mute_audio_icon.classList.remove("fa-microphone");
@@ -784,7 +784,7 @@ function mute_captions() {
 //hides self video so remote cannot see you
 function hide_video() {
 	if (acekurento !== null) {
-		acekurento.enableDisableTrack(true, false); //mute video
+		acekurento.enableDisableTrack(false, false); //mute video
 		console.log("Hide video reached");
 		selfStream.setAttribute("hidden", true);
 	}
@@ -793,7 +793,7 @@ function hide_video() {
 //unhides self video so remote can see you
 function unhide_video() {
 	if (acekurento !== null) {
-		acekurento.enableDisableTrack(false, false); //unmute video
+		acekurento.enableDisableTrack(true, false); //unmute video
 		console.log("Unhide video reached");
 		selfStream.removeAttribute("hidden");
 	}
@@ -802,7 +802,7 @@ function unhide_video() {
 function enable_video_privacy() {
 	if (acekurento !== null) {
 		console.log('Enabling video privacy');
-		acekurento.enableDisableTrack(true, false); //mute video
+		acekurento.enableDisableTrack(false, false); //mute video
 		hide_video_icon.style.display = "block";
 		hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
 		acekurento.privateMode(true, privacy_video_url);
@@ -813,7 +813,7 @@ function disable_video_privacy() {
 	if (acekurento !== null) {
 		console.log('Disabling video privacy');
 		mirrorMode("selfView", true);
-		acekurento.enableDisableTrack(false, false); //unmute video
+		acekurento.enableDisableTrack(true, false); //unmute video
 		hide_video_icon.style.display = "none";
 		hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
 		acekurento.privateMode(false);
@@ -824,7 +824,7 @@ function disable_video_privacy() {
 function start_video_calibration() {
 	if (acekurento !== null) {
 		console.log('Start video calibration');
-		acekurento.enableDisableTrack(true, false); //mute video
+		acekurento.enableDisableTrack(false, false); //mute video
 		acekurento.calibrateMode(true, privacy_video_url);
 	}
 }
@@ -833,7 +833,7 @@ function end_video_calibration() {
 	if (acekurento !== null) {
 		console.log('End video calibration');
 		mirrorMode("selfView", true);
-		acekurento.enableDisableTrack(false, false); //unmute video
+		acekurento.enableDisableTrack(true, false); //unmute video
 		acekurento.calibrateMode(false);
 	}
 }
