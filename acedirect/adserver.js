@@ -903,7 +903,7 @@ io.sockets.on('connection', function (socket) {
 		  });
 	});
 
-	socket.on('multiparty-caption-agent', function(data){
+	socket.on('caption-text', function(data){
 		if(data.final){ //only send finals during a multiparty call, browser caption engine fragments sentences
 			let d = new Date();
 			data.timestamp = d.getTime();
@@ -913,13 +913,14 @@ io.sockets.on('connection', function (socket) {
 					redisClient.hget(rExtensionToVrs, Number(p), function (err, vrsNum) {
             					if (!err){ 
 							p = (vrsNum) ? vrsNum : p;
-							io.to(Number(p)).emit('multiparty-caption', data);
+							io.to(Number(p)).emit('caption', data);
 						}
 					});
 				});
 			}
 		}
 	});
+
 
 	socket.on('requestScreenshare', function(data){
 		console.log("Receiving screenshare request to " + data.agentNumber);
