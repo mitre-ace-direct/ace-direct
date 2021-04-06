@@ -228,29 +228,35 @@
             socket.emit('logWebRTCEvt', { result });
           }
 
-          // sample strength metric for the strength meter
-          if (result.bandwidth.speed && result.video.send.availableBandwidth) {
-            let z = parseFloat(result.bandwidth.speed, 10);
-            let x = (parseFloat(result.video.send.availableBandwidth, 10) * 1000.00);
-            if (z > 0) {
-              let pct = x/z;
-              if (pct < 0 || pct > 1.0) {
-                pct = 0.0;
-              }
-              meterelem.value = pct;
-              meterelemval.textContent = Math.floor(pct*100);
-
-              // packets lost meter
-              if (result.video && result.video.packetsLost) {
-                let packetsLost = parseInt(result.video.packetsLost, 10);
-
-                // if we lose any packet, display the meter
-                if (packetsLost > 0) {
-                  packetsLostElem.style.display = 'block';     
-                } 
-                packetsLostValElem.textContent = packetsLost;
-              }
+          // get frame rate value
+          let results = result.results;  
+          let findex = results.length - 2;
+          let fpsObj = results[findex];
+          let fps = 0;
+          if (fpsObj.googFrameRateReceived) {
+            fps = fpsObj.googFrameRateReceived;
+            meterelem.value = fps;
+            meterelemval.textContent = fps;
+          } else {
+            // try last element of the array
+            findex += 1;
+            fpsObj = results[findex];
+            if (fpsObj.googFrameRateReceived) {
+              fps = fpsObj.googFrameRateReceived;
+              meterelem.value = fps;
+              meterelemval.textContent = fps;
             }
+          }
+
+          // packets lost meter
+          if (result.video && result.video.packetsLost) {
+            let packetsLost = parseInt(result.video.packetsLost, 10);
+
+            // if we lose any packet, display the meter
+            if (packetsLost > 0) {
+              packetsLostElem.style.display = 'block';     
+            } 
+            packetsLostValElem.textContent = packetsLost;
           }
 
           if (result.ended && result.ended == true) {
