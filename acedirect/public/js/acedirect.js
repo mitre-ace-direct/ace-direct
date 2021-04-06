@@ -687,8 +687,7 @@ function connect_socket() {
 					}else{
 						updateCaptions(transcripts); // in jssip_agent.js
 					}
-				}).on('multiparty-caption', function (transcripts) {
-					console.log(JSON.stringify(transcripts))
+				}).on('caption', function (transcripts) {
 					socket.emit('translate-caption', {
 						"transcripts": transcripts,
 						"callerNumber": extensionMe,
