@@ -55,7 +55,7 @@ function register_jssip() {
 				var transcripts = JSON.parse(e.msg);
 				if (transcripts.transcript) {
 					if (acekurento.isMultiparty) {
-                        			socket.emit('multiparty-caption-agent', {
+                        socket.emit('multiparty-caption-agent', {
 							"transcript": transcripts.transcript,
 							"final": transcripts.final,
 							"language": transcripts.langCd,
@@ -120,7 +120,7 @@ function register_jssip() {
 			}
 
 			if(callParticipantsExt.length > 2) {
-				multipartyCaptionsStart();
+				
 
 				// the last agent to join will be the backup host
 				backupHostAgent = participants[participants.length-1].ext; 
@@ -145,7 +145,7 @@ function register_jssip() {
 					transitionExt = null;
 				}
 			} else if (participants.length == 2) {
-				multipartyCaptionsEnd();
+				
 
 				if (allAgentCall) {
 					$('#end-call').attr('onclick', 'terminate_call()');
@@ -363,7 +363,7 @@ function start_call(other_sip_uri) {
 			}]
 		}
 	};
-
+	captionsStart();
 	selfStream.removeAttribute("hidden");
 	toggle_incall_buttons(true);
 	start_self_video();
@@ -436,6 +436,7 @@ function accept_call() {
 		toggle_incall_buttons(true);
 		start_self_video();
 		incomingCall.accept();
+		captionsStart();
 		$("#start-call-buttons").hide();
 		$('#outboundCallAlert').hide();// Does Not Exist - ybao: recover this to remove the Calling screen
 		setTimeout(() => {
@@ -618,7 +619,7 @@ function terminate_call() {
 	mute_captions();
 	disable_chat_buttons();
 	enable_initial_buttons();
-	multipartyCaptionsEnd();
+	captionsEnd();
 	$("#start-call-buttons").show();
 	exitFullscreen();
 	$("#sidebar-dialpad").on('click', showDialpad);
@@ -806,6 +807,7 @@ function enable_video_privacy() {
 		hide_video_icon.style.display = "block";
 		hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
 		acekurento.privateMode(true, privacy_video_url);
+		isMuted = true;
 	}
 }
 
@@ -817,6 +819,7 @@ function disable_video_privacy() {
 		hide_video_icon.style.display = "none";
 		hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
 		acekurento.privateMode(false);
+		isMuted = false;
 	}
 }
 
@@ -1029,8 +1032,6 @@ function multipartyHangup() {
 	if (acekurento.isMultiparty && hostAgent == extensionMe) {
 		// host agent is leaving call
 		// refer the session to the other agent in the call
-		multipartyCaptionsEnd();
-
 		socket.emit('multiparty-hangup', {'newHost' :backupHostAgent, 'transitionAgent':transitionExt, 'vrs': $('#callerPhone').val()});
 
 		setTimeout(() => {
@@ -1235,7 +1236,7 @@ $('#language-select').on('change', function () {
 });
 
 var recognition = null;
-function multipartyCaptionsStart() {
+function captionsStart() {
 	var language = $('#language-select').val();
 	switch (language) {
         case 'en': // English US
@@ -1282,7 +1283,8 @@ function multipartyCaptionsStart() {
 	recognition.onresult = function (event) {
 		if(!isMuted && event && event.results && (event.results.length > 0)){
 			var lastResult = event.results.length - 1;
-			socket.emit('multiparty-caption-agent', {
+			//if(acekurento.isMultiparty && (callParticipantsExt.length > 2)){
+			socket.emit('caption-text', {
 				"transcript":event.results[lastResult][0].transcript,
 				"final": event.results[lastResult].isFinal, 
 				"language": language,
@@ -1295,13 +1297,13 @@ function multipartyCaptionsStart() {
 	};
 
 	recognition.onend = function (event) {
-		if(acekurento.isMultiparty && (callParticipantsExt.length > 2))
-			multipartyCaptionsStart();	
+		if(callParticipantsExt.length > 1)
+			captionsStart();	
 	}
 	recognition.start();
 }
 
-function multipartyCaptionsEnd() {
+function captionsEnd() {
 	if(recognition)
 		recognition.abort();
 	recognition = null;
