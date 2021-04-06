@@ -234,6 +234,9 @@
             let x = (parseFloat(result.video.send.availableBandwidth, 10) * 1000.00);
             if (z > 0) {
               let pct = x/z;
+              if (pct < 0 || pct > 1.0) {
+                pct = 0.0;
+              }
               meterelem.value = pct;
               meterelemval.textContent = Math.floor(pct*100);
 
