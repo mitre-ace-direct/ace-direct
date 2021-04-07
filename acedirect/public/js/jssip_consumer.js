@@ -18,8 +18,6 @@
 	var debug = true; //console logs event info if true
 	var jssip_debug = false; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
 	var maxRecordingSeconds = 90;
-	var callParticipantsExt = [];
-	var isMuted = false;
 	var call_terminated = false;
 
 	//VIDEOMAIL recording progress bar
@@ -186,7 +184,6 @@
 				$("#start-call-buttons").show();
 				$("#agent-name-box").hide();
 				$("#agent-name").text("");
-				captionsEnd()
 
 			},
 			'participantsUpdate': function(e) {
@@ -194,8 +191,6 @@
 				console.log('--- WV: ' + JSON.stringify(e));
 				console.log('--- WV: e.participants.length: ' + e.participants.length);
 				var partCount = e.participants.filter(t=>t.type == "participant:webrtc").length;
-				var participants = e.participants.map(function (p) { return p; });
-				callParticipantsExt = participants.map(function (p) { return p.ext; });
 
 				console.log("--- WV: partCount: " + partCount);
 
@@ -227,8 +222,7 @@
 		  $("#fileInput").removeAttr('disabled');
 		  $("#shareFileConsumer").removeAttr('disabled');
           //acekurento.call(globalData.queues_complaint_number, false);
-		  acekurento.call(other_sip_uri, false);
-		  captionsStart();
+          acekurento.call(other_sip_uri, false);
 	}
 
 	function toggleSelfview() {
@@ -408,7 +402,6 @@
                   mute_audio_icon.classList.add("fa-microphone-slash");
 				  mute_audio_icon.classList.remove("fa-microphone");
 				  console.log('here mute2')
-				  isMuted = true;
                 }
 	}
 
@@ -418,8 +411,7 @@
                   acekurento.enableDisableTrack(true, true); //unmute audio
                   mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
                   mute_audio_icon.classList.add("fa-microphone");
-				  mute_audio_icon.classList.remove("fa-microphone-slash");
-				  isMuted = false;
+                  mute_audio_icon.classList.remove("fa-microphone-slash");
                 }
 	}
 
@@ -456,8 +448,7 @@
                   acekurento.enableDisableTrack(true, false); //mute video
                   hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
                   hide_video_icon.style.display = "block";
-				  acekurento.privateMode(true, globalData.privacy_video_url);
-				  isMuted = true;
+                  acekurento.privateMode(true, globalData.privacy_video_url);
                 }
 	}
 
@@ -469,8 +460,7 @@
                   hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
                   hide_video_icon.style.display = "none";
                   acekurento.privateMode(false);
-				  hide_video_icon.style.display = "none";
-				  isMuted = false;
+                  hide_video_icon.style.display = "none";
                 }
 	}
 	// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout".
@@ -685,81 +675,4 @@ function updateCaptionsMultiparty(transcripts) {
 	temp.classList.add("transcripttext");
 	document.getElementById("transcriptoverlay").appendChild(temp);
 	setTimeout(function () { temp.remove() }, 5000);
-}
-
-
-
-var recognition = null;
-function captionsStart() {
-	var language = $('#language-select').val();
-	switch (language) {
-        case 'en': // English US
-			language = "en-US";
-            break;
-        case 'es': // Spanish (Mexican)
-			language = "es-US";
-            break;
-        case 'ar': // Arabic (Modern Standard)
-			language  = "ar-EG";
-            break;
-        case 'pt': // Brazilian Portuguese
-			language = "pt-PT";
-            break;
-        case 'zh': // Chinese (Mandarin)
-			language = "zh";
-            break;
-        case 'nl': // Dutch
-			language = "nl-NL";
-            break;
-        case 'fr': // French
-			language = "fr-FR";
-            break;
-        case 'de': // German
-			language = "de-DE";
-            break;
-        case 'it': // Italian
-			language = "it-IT";
-            break;
-        case 'ja': // Japanese
-			language = "ja-JP";
-            break;
-        case 'ko': // Korean
-			language = "ko-KR";
-			break;
-		default:
-			language = "en-US";
-    }
-	recognition = new webkitSpeechRecognition();
-	recognition.continuous = true;
-	recognition.lang = language;
-	recognition.interimResults = false;
-	recognition.maxAlternatives = 1;
-	recognition.onresult = function (event) {
-		if(!isMuted && event && event.results && (event.results.length > 0)){
-			var lastResult = event.results.length - 1;
-			//if(acekurento.isMultiparty && (callParticipantsExt.length > 2)){
-			socket.emit('caption-text', {
-				"transcript":event.results[lastResult][0].transcript,
-				"final": event.results[lastResult].isFinal, 
-				"language": language,
-				"displayname": $('#displayname').val().trim(),
-				"extension": extensionMe,
-				"agent": true,
-				"participants": callParticipantsExt
-			});
-		}
-	};
-
-	recognition.onend = function (event) {
-		if(callParticipantsExt.length > 1)
-			captionsStart();	
-	}
-	recognition.start();
-}
-
-function captionsEnd() {
-	if(recognition)
-		recognition.abort();
-	recognition = null;
-	callParticipantsExt = [];
 }
