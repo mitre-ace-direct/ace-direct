@@ -11,7 +11,6 @@ var skinny = false;
 var acekurento = null;
 var globalData;
 var agentExtension;
-var extensionMe;
 //Used for DTMFpad toggle
 var DTMFpad = false;
 
@@ -257,8 +256,7 @@ function connect_socket() {
                                                     'connected': function (e) {
                                                        console.log('--- WV: Connected ---\n');
                                                        register_jssip(data.extension, data.password); //register with the given extension
-													   extensionMe = data.extension;
-													   start_call(asterisk_sip_uri); //calling asterisk to get into the queue
+                                                       start_call(asterisk_sip_uri); //calling asterisk to get into the queue
                                                      },
                                                     'registerResponse': function (error) {
                                                        console.log('--- WV: Register response:', error || 'Success ---');
@@ -483,7 +481,8 @@ function connect_socket() {
 						console.log("No permission");
 						$("#requestAck").html("Permission has been denied.");
 					}
-				}).on('caption', function (transcripts) {
+				}).on('multiparty-caption', function (transcripts) {
+					console.log(JSON.stringify(transcripts))
 					socket.emit('translate-caption', {
 						"transcripts": transcripts,
 						"callerNumber": exten,
