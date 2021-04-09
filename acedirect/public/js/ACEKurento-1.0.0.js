@@ -5179,6 +5179,11 @@ function ACEKurento(config) {
      * @param {Boolean} enable - If "true" will enable screenshare. Otherwise will stop and use camera.
      */
     screenshare: function (enable) {
+      if (webRtcPeer) {
+        // dispose current webrtcPeer before making a new one
+        webRtcPeer.dispose();
+        webRtcPeer = null;
+      }
       var options = {
         localVideo: this.selfStream,
         remoteVideo: this.remoteStream,
