@@ -24,6 +24,16 @@ var MongoClient = require('mongodb').MongoClient;
 var dbConnection = null;
 var dbconn = null;
 
+//Credentials needed for Call Recordings
+var AWS = require('aws-sdk');
+AWS.config.update({region: 'us-east-1'});
+
+s3 = new AWS.S3({apiVersion: '2006-03-01'});
+
+var bucketParams = {
+	Bucket : 'task3acrdemo-recordings',
+};
+
 // Clam AV
 const NodeClam = require('clamscan');
 const ClamScan = new NodeClam().init({
@@ -1758,6 +1768,19 @@ io.sockets.on('connection', function (socket) {
 			} else {
 				logger.debug(result);
 				io.to(token.extension).emit('changed-status', result);
+			}
+		});
+	});
+
+	//Retrieval of videomail records from the database
+	socket.on("get-recordings", function (data) {
+		// Call S3 to obtain a list of the objects in the bucket
+		console.log("Checking the S3 bucket " + JSON.stringify(bucketParams));
+		s3.listObjects(bucketParams, function(err, data) {
+			if (err) {
+				console.log("Error", err);
+			} else {
+				console.log("Success: " + JSON.stringify(data));
 			}
 		});
 	});
@@ -3515,7 +3538,7 @@ function getConfigVal(param_name) {
     //found value for param_name
     if (clearText) {
       decodedString = val;
-    } else {
+    } else {``
       decodedString = Buffer.alloc(val.length, val, 'base64');
     }
   } else {
