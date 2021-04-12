@@ -194,26 +194,26 @@ ACE Direct uses a _MongoDB_ database for call statistics. Follow the instruction
 
 1. Create a `/etc/yum.repos.d/mongodb-org-4.4.repo` file with the following contents:
 
-  ```bash
-  [mongodb-org-4.4]
-  name=MongoDB Repository
-  baseurl=https://repo.mongodb.org/yum/amazon/2/mongodb-org/4.4/x86_64/
-  gpgcheck=1
-  enabled=1
-  gpgkey=https://www.mongodb.org/static/pgp/server-4.4.asc
-  ```
+    ```bash
+    [mongodb-org-4.4]
+    name=MongoDB Repository
+    baseurl=https://repo.mongodb.org/yum/amazon/2/mongodb-org/4.4/x86_64/
+    gpgcheck=1
+    enabled=1
+    gpgkey=https://www.mongodb.org/static/pgp/server-4.4.asc
+    ```
 
 1. Install MongoDB and make it start on reboot:
 
-  ```bash
-  $  sudo yum install -y mongodb-org
-  $
-  $  sudo systemctl start mongod  # if it fails: sudo systemctl daemon-reload
-  $  sudo systemctl status mongod  # check status
-  $  sudo systemctl enable mongod  # start at boot time
-  $
-  $  sudo systemctl stop mongod  # in case you need to stop MongoDB
-  ```
+    ```bash
+    $  sudo yum install -y mongodb-org
+    $
+    $  sudo systemctl start mongod  # if it fails: sudo systemctl daemon-reload
+    $  sudo systemctl status mongod  # check status
+    $  sudo systemctl enable mongod  # start at boot time
+    $
+    $  sudo systemctl stop mongod  # in case you need to stop MongoDB
+    ```
 
 1. MongoDB uses port `27017` by default.
 
@@ -225,40 +225,40 @@ The instructions below describe how to install MySQL locally on `acenode.domain.
 
 1. Install MySQL Server Version `5.6.37` or a similar version and note the database root user and password:
 
-  ```bash
-  $  wget http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-5.6.37-1.el7.x86_64.rpm-bundle.tar
-  $
-  $  tar -xvf MySQL-5.6.37-1.el7.x86_64.rpm-bundle.tar
-  $  sudo yum -y install MySQL-client-5.6.37-1.el7.x86_64.rpm
-  $  sudo yum install MySQL-shared-compat-5.6.37-1.el7.x86_64.rpm
-  $  sudo yum install MySQL-server-5.6.37-1.el7.x86_64.rpm
-  $  rm MySQL*.rpm MySQL*.tar
-  ```
+    ```bash
+    $  wget http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-5.6.37-1.el7.x86_64.rpm-bundle.tar
+    $
+    $  tar -xvf MySQL-5.6.37-1.el7.x86_64.rpm-bundle.tar
+    $  sudo yum -y install MySQL-client-5.6.37-1.el7.x86_64.rpm
+    $  sudo yum install MySQL-shared-compat-5.6.37-1.el7.x86_64.rpm
+    $  sudo yum install MySQL-server-5.6.37-1.el7.x86_64.rpm
+    $  rm MySQL*.rpm MySQL*.tar
+    ```
 
 1. Enable MySQL as a service and start it on reboot:
 
-  ```bash
-  $
-  $  sudo systemctl start mysqld.service  # if it fails: sudo systemctl daemon-reload
-  $  sudo systemctl status mysqld.service  # check status
-  $  sudo systemctl enable mysqld.service  # start at boot time
-  $
-  $  sudo systemctl stop mysqld.service  # in case you need to stop MySQL
-  ```
+    ```bash
+    $
+    $  sudo systemctl start mysqld.service  # if it fails: sudo systemctl daemon-reload
+    $  sudo systemctl status mysqld.service  # check status
+    $  sudo systemctl enable mysqld.service  # start at boot time
+    $
+    $  sudo systemctl stop mysqld.service  # in case you need to stop MySQL
+    ```
 
 1. On `acenode.domain.com`, modify the `~/ace-direct/dat/acedirectdefault.sql` script:
 
-* Globally replace `_EXTENSION_PASSWORD_` with the _actual extension password_ from Asterisk. See the `password=` field in `/etc/asterisk/pjsip.conf` on `acesip.domain.com`.
-* Change `_ACEDIRECT_PASSWORD_` to the desired password for the `acedirect` database user.
-* Change `_ASTERISK_PASSWORD_` to the desired password for the `asterisk` database user.
-* Change `_MEDIASERVER_PASSWORD_` to the desired password for the `media_server` database user.
+   * Globally replace `_EXTENSION_PASSWORD_` with the _actual extension password_ from Asterisk. See the `password=` field in `/etc/asterisk/pjsip.conf` on `acesip.domain.com`.
+   * Change `_ACEDIRECT_PASSWORD_` to the desired password for the `acedirect` database user.
+   * Change `_ASTERISK_PASSWORD_` to the desired password for the `asterisk` database user.
+   * Change `_MEDIASERVER_PASSWORD_` to the desired password for the `media_server` database user.
 
 1. Execute the `~/ace-direct/dat/acedirectdefault.sql` script to create the ACE Direct databases and user accounts. You will need your MySQL root user and password. Here is an example, assuming a root user `admin`:
 
-  ```bash
-  $  mysql -u admin -p -h localhost < acedirectdefault.sql  # you will be prompted for the password
-  $
-  ```
+    ```bash
+    $  mysql -u admin -p -h localhost < acedirectdefault.sql  # you will be prompted for the password
+    $
+    ```
 
 1. MySQL uses port `3306` by default.
 1. The ACE Direct database users are: `acedirect`, `asterisk`, and `media_server`.
@@ -272,66 +272,66 @@ The ACE Direct application servers are Node.js servers.
 1. Log into `acenode.domain.com`.
 1. For a new ACE Direct deployment, create the initial global configuration:
 
-  ```bash
-  $  cp ~/ace-direct/dat/config.json_TEMPLATE ~/ace-direct/dat/config.json
-  $
-  ```
+    ```bash
+    $  cp ~/ace-direct/dat/config.json_TEMPLATE ~/ace-direct/dat/config.json
+    $
+    ```
 
 1. Edit all values in `~/ace-direct/dat/config.json` to match your environment. Many of the default values will work as is for a default ACE Direct installation. View `~/ace-direct/dat/parameter_desc.json` for a description of each configuration variable.
 1. Build the application servers:
 
-  ```bash
-  $  cd ~/ace-direct
-  $
-  $  npm install
-  $  npm run build  # build
-  $  npm run config
-  $
-  $  # other commands
-  $  npm run test  # automated tests
-  $  npm run lint  # run linting tests
-  $  npm run clean  # remove all external libs
-  $  npm run clean:logs  # remove log files
-  ```
+    ```bash
+    $  cd ~/ace-direct
+    $
+    $  npm install
+    $  npm run build  # build
+    $  npm run config
+    $
+    $  # other commands
+    $  npm run test  # automated tests
+    $  npm run lint  # run linting tests
+    $  npm run clean  # remove all external libs
+    $  npm run clean:logs  # remove log files
+    ```
 
 1. Deploy the application servers - ACE Direct services use [pm2](https://pm2.keymetrics.io/) for process management:
 
-  ```bash
-  $  cd ~/ace-direct
-  $
-  $  # starting
-  $  pm2 start dat/process.json   # first time
-  $  pm2 status  # check status of app servers
-  $
-  $  # other commands
-  $
-  $  pm2 start all  # ongoing
-  $  pm2 restart all  # ongoing
-  $  pm2 restart 0  # restart just ID 0, for example
-  $
-  $  # stopping
-  $  pm2 stop all
-  $  pm2 stop 0  # stop one, ACE Direct server
-  $
-  $  # reset counters
-  $  pm2 reset all  # reset all
-  $  pm2 reset 0  # reset just ID 0
-  $
-  $  # deleting services
-  $  pm2 stop all
-  $  pm2 delete all
-  ```
+    ```bash
+    $  cd ~/ace-direct
+    $
+    $  # starting
+    $  pm2 start dat/process.json   # first time
+    $  pm2 status  # check status of app servers
+    $
+    $  # other commands
+    $
+    $  pm2 start all  # ongoing
+    $  pm2 restart all  # ongoing
+    $  pm2 restart 0  # restart just ID 0, for example
+    $
+    $  # stopping
+    $  pm2 stop all
+    $  pm2 stop 0  # stop one, ACE Direct server
+    $
+    $  # reset counters
+    $  pm2 reset all  # reset all
+    $  pm2 reset 0  # reset just ID 0
+    $
+    $  # deleting services
+    $  pm2 stop all
+    $  pm2 delete all
+    ```
 
 1. Make app servers start on reboot:
 
-```bash
-$  cd  ~/ace-direct
-$
-$  pm2 start dat/process.json  # start all node servers
-$  pm2 save
-$  pm2 startup
-$  # now node.js servers will start on boot
-```
+    ```bash
+    $  cd  ~/ace-direct
+    $
+    $  pm2 start dat/process.json  # start all node servers
+    $  pm2 save
+    $  pm2 startup
+    $  # now node.js servers will start on boot
+    ```
 
 ### Busylight
 
