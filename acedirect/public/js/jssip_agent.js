@@ -1192,25 +1192,32 @@ function testCaptions() {
 	} else { console.log('demo running'); }
 }
 
-var tempDivTimeout = null;
+
+function createCaptionHtml(displayName, transcripts) {
+	console.log(displayName, transcripts)
+	let caption = transcripts.transcript;
+	if (!transcripts.final) {
+		caption += '...';
+	}
+	let timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+	return '<span class="timestamp">' + timestamp + '</span><strong>' + displayName + ':</strong> ' + caption;
+}
+
 function updateCaptions(transcripts) {
+	
 	console.log('transcripts in UC are ', transcripts)
 	var tDiv = document.getElementById(transcripts.msgid);
-	console.log(tDiv)
+	
 	if (!tDiv) {
 		var temp = document.createElement("div");
 		temp.id = transcripts.msgid;
-		temp.innerHTML = transcripts.transcript;
+		temp.innerHTML = 
+		
 		temp.classList.add("transcripttext");
-		document.getElementById("transcriptoverlay").appendChild(temp);
-		tempDivTimeout = setTimeout(function () { temp.remove() }, 5000);
+		document.getElementById("transcriptoverlay").prepend(temp);
 	} else {
-		clearTimeout(tempDivTimeout);
-		tDiv.innerHTML = transcripts.transcript;
-		tempDivTimeout = setTimeout(function () { tDiv.remove() }, 5000);
+		tDiv.innerHTML = createCaptionHtml('Consumer', transcripts); 
 		if (transcripts.final) {
-			setTimeout(function () { tDiv.remove() }, 5000);
-
 			$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
 			$("#caption-messages").scrollTop($("#caption-messages")[0].scrollHeight);
 
@@ -1223,10 +1230,10 @@ function updateCaptionsMultiparty(transcripts) {
 	if(!tDiv){//prevents duplicate captions
 		var temp = document.createElement("div");
 		temp.id = transcripts.msgid;
-		temp.innerHTML = transcripts.displayname + ": " + transcripts.transcript;
+		temp.innerHTML = createCaptionHtml(transcripts.displayname, transcripts);
 		temp.classList.add("transcripttext");
-		document.getElementById("transcriptoverlay").appendChild(temp);
-		setTimeout(function () { temp.remove() }, 5000);
+		document.getElementById("transcriptoverlay").prepend(temp);
+		// setTimeout(function () { temp.remove() }, 5000);
 	}
 }
 

@@ -922,7 +922,7 @@ div#call-controls button#button-hangup {
   display: block;
   width: 100%;
   text-align: left;
-  position: absolute;
+  /* position: absolute; */
   bottom: 10px;
   left: 0px;
   z-index: 2147483647;
@@ -940,6 +940,11 @@ div#call-controls button#button-hangup {
   display: table;
   padding: 0px 15px 0px 15px;
 }
+
+.timestamp {
+  margin-right: 15px;
+}
+
 /* Caption setting interface */
 .cap-setting span {
   color: #ccc;
