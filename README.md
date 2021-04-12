@@ -4,6 +4,8 @@
 
 This document describes how to install, configure, and deploy ACE Direct.
 
+---
+
 ## Prerequisites and assumptions
 
 * *Acquire domain names for the servers*. Domain names must be *three-level domain names* with *no special characters*: `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
@@ -23,13 +25,19 @@ This document describes how to install, configure, and deploy ACE Direct.
 
 * *Internet access*. An Internet connection is required to install and update the ACE Direct software. This allows the build processes to download external software and other dependencies.
 
+---
+
 ## acestun
 
 Install the STUN server on `acestun.domain.com`. See [./docs/installation/STUN.md](./docs/installation/STUN.md).
 
+---
+
 ## aceturn
 
 Install the TURN server on `aceturn.domain.com`. See [./docs/installation/TURN.md](./docs/installation/TURN.md).
+
+---
 
 ## portal
 
@@ -39,11 +47,15 @@ Install NGINX on `portal.domain.com`.
 
 See [./nginx/README.md](./nginx/README.md) for installation instructions.
 
+---
+
 ## aceopenam
 
 The `aceopenam` server is the _identity and access management_ server, implemented with _OpenAM_. To install and configure `aceopenam`:
 
 Log into the `aceopenam.domain.com` server and follow the instructions in [./iam/README.md](./iam/README.md) for detailed installation and configuration instructions.
+
+---
 
 ## acesip
 
@@ -56,17 +68,25 @@ There are several components to install on `acesip.domain.com`:
 * Clone the `kurento-asterisk-servlet` repo and follow the instructions to deploy the videomail server.
 * Clone the `acequill-service` repo and follow the instructions to enable captioning and language translation.
 
+---
+
 ## aceproxy
 
 `aceproxy` is the SIP proxy server. Log into `aceproxy.domain.com`, clone the `kamailio` repo, and follow the installation instructions.
+
+---
 
 ## acekms
 
 `acekms` is the Kurento media server. Log into `acekms.domain.com`, clone the `kurento` repo, and follow the installation instructions.
 
+---
+
 ## strongSwan
 
 Install a `strongSwan` server. See [STRONGSWAN.md](STRONGSWAN.md).
+
+---
 
 ## acenode
 
@@ -333,13 +353,17 @@ The ACE Direct application servers are Node.js servers.
     $  # now node.js servers will start on boot
     ```
 
-### Busylight
+---
+
+## Busylight
 
 The BusyLight is an optional visual ring indicator that you can install on the Agent laptop.
 
 See the [./obusylight/README.md](./obusylight/README.md) for instructions on how to install the BusyLight server and device on the Agent laptop.
 
 :checkered_flag: **This completes ACE Direct installation, configuration, and deployment**.
+
+---
 
 ## Accessing the websites
 
@@ -355,13 +379,19 @@ The default ACE Direct URLs are:
 * Consumer portal: `https://portal.domain.com/ACEDirect/call`
 * Management portal: `https://portal.domain.com/ManagementPortal`
 
+---
+
 ## Documentation
 
 See the [docs](docs/) folder for the official ACE Direct user guide, installation manual, and other useful documentation.
 
+---
+
 ## Release Notes
 
 See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
+
+---
 
 ## ACE Direct troubleshooting
 
@@ -388,7 +418,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 * Consumer portal cannot reach Asterisk (`acesip.domain.com`); ERR_CONNECTION_REFUSED - make sure Asterisk is configured to use valid certificates.
 * Cannot connect to portals - possibly remap the elastic IPs or try running `nslookup` on the NGINX FQDN and verify its public FQDN and public IP.
 * NGINX errors when trying to connect to portals, but all servers are up and running - make sure all servers have the **correct time, synced with each other**.
-* Rebooting servers - the reboot order is: 
+* Rebooting servers - the reboot order is:
 
   * `aceturn` - TURN
   * `acestun` - STUN
@@ -415,5 +445,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   $
   $  pm2 restart all  # restart all application servers
   ```
+
+---
 
 fin.
