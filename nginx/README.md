@@ -2,63 +2,71 @@
 
 ![AD](images/adsmall.png)
 
-NGINX is an open-source web-server, reverse-proxy, load-balancer and HTTP cache. For the ACE Direct project, NGINX is only used as a reverse proxy.
+NGINX is an open-source web server, reverse proxy, load balancer, and HTTP cache. For the ACE Direct project, NGINX is only used as a reverse proxy.
 
-A reverse-proxy allow ACE Direct to hide internally-used port numbers and script names from the public-facing interface.
+A reverse proxy allows ACE Direct to hide internally-used port numbers and script names from the public-facing interface.
 
-Full documentation and screenshots are here: [NGINX](https://www.nginx.com).
+Full documentation for NGINX is here: [NGINX](https://www.nginx.com).
 
-## NGINX Installation
+## Prerequisites
 
-1. Add the CentOS 7 EPEL repository
+* ***NGINX requires a public FQDN and IP address.**
+* This installation assumes the following servers:
 
-    ```bash
-    sudo yum install epel-release
-    ```
+  * NGINX: `portal.domain.com`
+  * OpenAM: `aceopenam.domain.com`
+  * Application servers: `acenode.domain.com`
 
-1. Install NGINX
+* The default `ace-direct` installation is assumed.
+* Valid certificates must be on `portal.domain.com`:
 
-    ```bash
-    sudo yum install nginx
-    ```
+  * `/etc/ssl/cert.pem`
+  * `/etc/ssl/key.pem`
 
-1. Configure and Start the NGINX Service
+## Installation
 
-    ```bash
-    sudo systemctl start nginx
-    ```
+1. On the `portal.domain.com` server, execute the following:
 
-1. Verify that the service is running (you should see two PIDs)
+  ```bash
+  $  sudo yum install epel-release
+  $  sudo yum install nginx
+  $
+  $  sudo systemctl start nginx  # start
+  $  pidof nginx  # make sure it is running
+  $
+  $  sudo systemctl enable nginx  # start on reboot
+  $
+  $  sudo mkdir -p /etc/nginx/html
+  $  sudo mkdir -p /etc/nginx/images
+  ```
 
-    ```bash
-    pidof nginx
-    ```
+## Configuration
 
-1. To enable NGINX to start on boot
+1. Copy [nginx.conf](nginx.conf) from this repo to `/etc/nginx/nginx.conf` on the NGINX server.
+1. Edit the configuration file `sudo vi /etc/nginx/nginx.conf`:
 
-    ```bash
-    sudo systemctl enable nginx
-    ```
+* Globally replace `<OPENAM_FQDN>` with your OpenAM FQDN: `aceopenam.domain.com`
+* Globally replace `<ACE_DIRECT_FQDN>` with your application server FQDN: `acenode.domain.com`
+* Globally replace `SOMEUSER` with the ACE Direct user account name, e.g. `ec2-user`.
 
-1. HTML files - create the `/etc/nginx/html` folder if it does _not_ exist. Copy files from the `html` folder in this repo to the folder you just created.
+1. Copy files from the `html` folder in this repo to `/etc/nginx/html`.
+1. Copy files from the `images` folder in this repo to `/etc/nginx/images`.
+1. Port numbers in `nginx.conf` must match port numbers as specified in `~/ace-direct/dat/config.json` on `acenode.domain.com`.
 
-1. Image files - create the `/etc/nginx/images` folder if it does _not_ exist. Copy files from the `images` folder in this repo to the folder you just created.
-
-At this point the service can be started or stopped with the following commands:
+## Restart
 
 ```bash
-sudo service nginx start
-sudo service nginx stop
+$  sudo service nginx stop
+$
+$  sudo service nginx start
+$  sudo service nginx restart  # another way
+$
+$  # make sure it is running
+$  sudo service nginx status
+$  pidof nginx
 ```
 
-## NGINX Configuration
-
-1. Update the NGINX configuration (/etc/nginx/nginx.conf). See the [nginx.conf](nginx.conf) file. **Note**: port numbers in nginx.conf must match port numbers of other ACE Direct components. These port numbers are currently set to the defaults. Replace/set parameters in capital letters, surrounded by < and > (e.g., `<OPENAM FQDN>`).
-1. Verify that both the SSH key and certificate are properly configured
-1. Restart the `nginx` service: `sudo service nginx restart`
-1. Verify that the service is running (see pidof command above)
-
-## NGINX Configuration Documentation
+## NGINX configuration info
 
 Configuration information can be found here: [NGINX Config](http://nginx.org/en/docs/http/ngx_http_proxy_module.html).
 
