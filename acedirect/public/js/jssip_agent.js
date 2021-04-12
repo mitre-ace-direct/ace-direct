@@ -225,14 +225,11 @@ function register_jssip() {
 			if (remoteStream.srcObject) {
 				remoteStream.srcObject.getVideoTracks()[0].onended = function () {
 					screenShareEnabled = false;
-					acekurento.screenshare(false);
 				};
 			}
 		},
 		'ended': function (e) {
 			screenShareEnabled = false;
-			acekurento.screenshare(false);
-
 			if (multipartyTransition) {
 				terminate_call();
 				unpauseQueues();
@@ -299,6 +296,10 @@ function register_jssip() {
 						backdrop: 'static',
 						keyboard: false
 					});
+				}
+
+				if (document.getElementById("persistCameraCheck").checked == true) {
+					enable_persist_view();
 				}
 			}
 		}
@@ -627,9 +628,10 @@ function terminate_call() {
 	$('#dtmfpad').hide();
 	//RemoteView is not currently set to value so line gives an error
 	//remoteView.srcObject.getTracks().forEach(track => track.stop());
-	if (document.getElementById("persistCameraCheck").checked == true) {
+	/*if (document.getElementById("persistCameraCheck").checked == true) {
+		// this causes the webcam to stay active when the agent disables self-view after a call
 		enable_persist_view();
-	}
+	}*/
 	document.getElementById("muteAudio").disabled = false;
 	// document.getElementById("language-select").disabled = false;
 	if ($('#language-select') && $('#language-select').data('dd')) {
@@ -693,6 +695,11 @@ function remove_video() {
 		if (window.self_stream.getVideoTracks()) {
 			if (window.self_stream.getVideoTracks()[0]) {
 				window.self_stream.getVideoTracks()[0].stop();
+			}
+		}
+		if (window.self_stream.getAudioTracks()) {
+			if (window.self_stream.getAudioTracks()[0]) {
+				window.self_stream.getAudioTracks()[0].stop();
 			}
 		}
 	}
@@ -991,8 +998,8 @@ function shareScreen() {
 				acekurento.selfStream = document.getElementById('selfView');
 			}
 		}
-		acekurento.screenshare(false);
 		acekurento.screenshare(true);
+		screenShareEnabled = true;
 	}
 }
 
