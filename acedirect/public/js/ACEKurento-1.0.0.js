@@ -230,22 +230,19 @@
 
           // get frame rate value
           let results = result.results;  
-          let findex = results.length - 2;
-          let fpsObj = results[findex];
+          let fpsObj = null;
           let fps = 0;
-          if (fpsObj.googFrameRateReceived) {
-            fps = fpsObj.googFrameRateReceived;
-            meterelem.value = fps;
-            meterelemval.textContent = fps;
-          } else {
-            // try last element of the array
-            findex += 1;
-            fpsObj = results[findex];
-            if (fpsObj.googFrameRateReceived) {
-              fps = fpsObj.googFrameRateReceived;
-              meterelem.value = fps;
-              meterelemval.textContent = fps;
-            }
+          meterelem.value = fps;
+          meterelemval.textContent = fps;
+          for (let i = 0; i < results.length; i += 1) {
+              fpsObj = results[i];
+              if (fpsObj.googFrameRateReceived) {
+                  fps = fpsObj.googFrameRateReceived;
+                  meterelem.value = fps;
+                  meterelemval.textContent = fps;
+                  break;
+              }
+              fpsObj = null;
           }
 
           // packets lost meter
