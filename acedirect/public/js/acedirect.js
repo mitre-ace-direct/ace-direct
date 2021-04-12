@@ -219,6 +219,9 @@ function connect_socket() {
 							"filter": filter
 						});
 					}, 5000);
+					socket.emit('get-recordings', {
+						"extension": extensionMe
+					})
 					toggle_videomail_buttons(false);
 					console.log('Sent a get-videomail event');
 
@@ -1564,6 +1567,36 @@ function updateVideomailTable(data) {
 	}
 }
 
+function callRecordingTable(data){
+	$("#callRecordingTbody").html("");
+	var table;
+	var row;
+
+	var usernameCell;
+	var consumerNumberCell;
+	var timeStampCell;
+	var lengthCell;
+	var filenameCell;
+	for (var i = 0; i < data.length; i++) {
+		var recordConsumer = data[i].agentConsumer;
+		var recordTimestamp = data[i].timestamp;
+		var recordLength = data[i].recordLength;
+		var recordFilename = data[i].recordFilename;
+		table = document.getElementById("callRecordingTbody");
+		row = table.insertRow(table.length);
+		consumerNumberCell = row.insertCell(0);
+		timeStampCell = row.insertCell(1);
+		lengthCell = row.insertCell(2);
+		statusCell = row.insertCell(3);
+		fileNameCell = row.insertCell(4);
+		fileNameCell.setAttribute('hidden', true);
+
+		consumerNumberCell.innerHTML = recordConsumer;
+		timeStampCell.innerHTML = recordTimestamp;
+		lengthCell.innerHTML = recordLength;
+	}
+}
+
 //Notification for unread videomail
 function updateVideomailNotification(data) {
 	if(data != storedData){
@@ -1700,6 +1733,17 @@ function showAgentsTab() {
 		});
 	}
 
+}
+
+//Loads the call recordings
+function showCallRecordingTab(){
+	s3.listObjects(bucketParams, function(err, data){
+		if(err){
+			console.log("Error", err);
+		} else {
+			console.log("Success", "Loading recordings " + data); 
+		}
+	})
 }
 
 //Play the selected videomail
