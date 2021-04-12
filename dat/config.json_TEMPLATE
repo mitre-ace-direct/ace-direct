@@ -84,21 +84,21 @@
   },
   "database_servers": {
     "mysql": {
-      "host": "0.0.0.0",
+      "host": "localhost",
       "port": "3306",
-      "user": "username",
-      "password": "password",
-      "ad_database_name": "adDbName",
-      "cdr_database_name": "cdrDbName",
-      "cdr_table_name": "cdrTableName",
-      "ssuser": "signalingServerDbUser",
-      "sspassword": "signalingServerDbPassword",
-      "ssdatabase": "signalingServerDbName"
+      "user": "acedirect",
+      "password": "PASSWORD",
+      "ad_database_name": "acedirect",
+      "cdr_database_name": "asterisk",
+      "cdr_table_name": "cdr",
+      "ssuser": "media_server",
+      "sspassword": "PASSWORD",
+      "ssdatabase": "media_server"
     },
     "redis": {
       "host": "127.0.0.1",
       "port": "6379",
-      "auth": "someAuthPasswordIfEnabled"
+      "auth": "REDISPASSWORD"
     },
     "mongodb": {
       "connection_uri": "mongodb://localhost:27017/test",
@@ -155,10 +155,10 @@
     "https_listen_port": "9002",
     "queues": "GeneralQuestionsQueue,ComplaintsQueue,MailQueue",
     "poll_interval": "1000",
-    "force_logout_password": "secureForceLogoutPassword"
+    "force_logout_password": "securexForcexLogoutxPassword"
   },
   "zendesk": {
-    "private_ip": "<private IP address of acenode.domain.com>",
+    "private_ip": "localhost",
     "port": "9003",
     "protocol": "https",
     "user_id": "user@email.com",
@@ -269,6 +269,6 @@
     "media_profile": "MP4"
   },
   "filesharing": {
-    "virus_scan_enabled": "true"
+    "virus_scan_enabled": "false"
   }
 }
