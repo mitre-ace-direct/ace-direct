@@ -165,20 +165,16 @@
                                   remoteStream.srcObject.getVideoTracks()[0].onended = function () {
                                     console.log('screensharing ended remote');
 				    $("#startScreenshare").hide();
-                                    if (acekurento) acekurento.screenshare(false);
                                   };
                                 }
                         },
 			'ended': function(e) {
 				console.log('--- WV: Call ended ---\n');
 
-                                //stop screen sharing at end
 				$("#startScreenshare").hide();
-                                if (acekurento)
-                                  acekurento.screenshare(false);
 
-                                terminate_call();
-                                clearScreen();
+				terminate_call();
+				clearScreen();
 				disable_chat_buttons();
 				enable_initial_buttons();
 				$("#start-call-buttons").show();
