@@ -127,66 +127,66 @@ Install and configure _Redis_. For an overview, read [Redis Quick Start](https:/
 
 1. Download and install Redis:
 
-  ```bash
-  $  cd
-  $
-  $  wget http://download.redis.io/redis-stable.tar.gz
-  $  tar xvzf redis-stable.tar.gz
-  $  cd redis-stable
-  $  sudo make distclean
-  $  sudo make
-  $  sudo make install
-  $  ls /usr/local/bin/redis-server /usr/local/bin/redis-cli  # both folders should exist
-  $  sudo yum install -y tcl
-  $  
-  $  # LOG FILE for REDIS
-  $  sudo cp redis.conf /etc/redis/redis.conf  
-  $  sudo mkdir /var/lib/redis
-  $  sudo mkdir /etc/redis
-  ```
+    ```bash
+    $  cd
+    $
+    $  wget http://download.redis.io/redis-stable.tar.gz
+    $  tar xvzf redis-stable.tar.gz
+    $  cd redis-stable
+    $  sudo make distclean
+    $  sudo make
+    $  sudo make install
+    $  ls /usr/local/bin/redis-server /usr/local/bin/redis-cli  # both folders should exist
+    $  sudo yum install -y tcl
+    $  
+    $  # LOG FILE for REDIS
+    $  sudo cp redis.conf /etc/redis/redis.conf  
+    $  sudo mkdir /var/lib/redis
+    $  sudo mkdir /etc/redis
+    ```
 
 1. Configure Redis by editing `/etc/redis/redis.conf`. Enable and set the fields below, selecting your own value for the secret Redis password: `myRedisPassword`:
 
-  ```bash
-  supervised systemd
-  logfile "/var/log/redis.log"
-  requirepass myRedisPassword
-  ```
+    ```bash
+    supervised systemd
+    logfile "/var/log/redis.log"
+    requirepass myRedisPassword
+    ```
 
 1. Enable Redis as a service by creating `/etc/systemd/system/redis.service`:
 
-  ```bash
-  [Unit]
-  Description=Redis In-Memory Data Store
-  After=network.target
+    ```bash
+    [Unit]
+    Description=Redis In-Memory Data Store
+    After=network.target
 
-  [Service]
-  User=root
-  Group=root
-  ExecStart=/usr/local/bin/redis-server /etc/redis/redis.conf
-  ExecStop=/usr/local/bin/redis-cli shutdown
-  Restart=always
+    [Service]
+    User=root
+    Group=root
+    ExecStart=/usr/local/bin/redis-server /etc/redis/redis.conf
+    ExecStop=/usr/local/bin/redis-cli shutdown
+    Restart=always
 
-  [Install]
-  WantedBy=multi-user.target
-  ```
+    [Install]
+    WantedBy=multi-user.target
+    ```
 
 1. Reload the Redis service and make it start on reboot:
 
-  ```bash
-  $  sudo systemctl daemon-reload
-  $
-  $  sudo systemctl enable redis.service
-  ```
+    ```bash
+    $  sudo systemctl daemon-reload
+    $
+    $  sudo systemctl enable redis.service
+    ```
 
 1. Managing the Redis service:
 
-  ```bash
-  $  sudo service redis start
-  $
-  $  sudo service redis status
-  $  sudo service redis stop
-  ```
+    ```bash
+    $  sudo service redis start
+    $
+    $  sudo service redis status
+    $  sudo service redis stop
+    ```
 
 ### MongoDB
 
