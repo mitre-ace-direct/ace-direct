@@ -448,4 +448,4 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 
 ---
 
-fin.
+_fin._
