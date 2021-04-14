@@ -15,8 +15,8 @@
   <script src="bower_components/adapter.js/release/adapter.js"></script>
   <script src="bower_components/demo-console/index.js"></script>
   <script src="bower_components/draggabilly/dist/draggabilly.pkgd.min.js"></script>
-  <script src="js/ACEKurento-1.0.0.js"></script>
   <script src="js/index.js"></script>
+  <script src="js/ACEKurento-1.0.0.js"></script>
   <title>WebRTC - SIP Kurento Call</title>
 </head>
 <body>
@@ -36,6 +36,19 @@
     <h1>WebRTC - SIP Kurento Call</h1>
   </div>
   <div class="row">
+    <div class="col-md-12">
+      <div id="prompt" style="background-color: #dedede; padding: 5px; display: flex; justify-content: space-between; visibility: hidden; margin: 10px 0">
+        <h3 style="margin: 0; padding: 0; line-height: 1.5">
+          Incoming call from <span id="from"></span>
+        </h3>
+        <div class="pull-right">
+          <button id="accept" class="btn btn-success ">Accept</button>
+          <button id="reject" class="btn btn-danger " style="margin-left: 5px">Reject</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
     <div class="col-md-5">
       <div class="row">
         <div class="col-md-12">
@@ -50,6 +63,36 @@
                 <span class="fa fa-info-circle" title="As an agent you will be assigned as a queue member to receive calls from consumers"></span>
               </label>
             </div>
+
+            <label class="control-label" for="stun-server-fqdn">STUN server : port</label>
+            <form class="form-inline">
+              <div class="form-group">
+                <input id="stun-server-fqdn" name="stun-server-fqdn" class="form-control" type="text" value="stun.domain.com"/>&nbsp;:&nbsp;
+              </div>
+              <div class="form-group">
+                <input id="stun-server-port" name="stun-server-port" class="form-control" type="text" value="0000"/>
+              </div>
+            </form>
+
+            <label class="control-label" for="turn-server-fqdn">TURN server : port</label>
+            <form class="form-inline">
+              <div class="form-group">
+                <input id="turn-server-fqdn" name="turn-server-fqdn" class="form-control" type="text" value="turn.domain.com"/>&nbsp;:&nbsp;
+              </div>
+              <div class="form-group">
+                <input id="turn-server-port" name="turn-server-port" class="form-control" type="text" value="0000"/>
+              </div>
+            </form>
+
+            <label class="control-label" for="turn-server-username">TURN username / password</label>
+            <form class="form-inline">
+              <div class="form-group">
+                <input id="turn-server-username" name="turn-server-username" class="form-control" type="text" value="turnusername"/>&nbsp;&#47;&nbsp;
+              </div>
+              <div class="form-group">
+                <input id="turn-server-password" name="turn-server-password" class="form-control" type="password" value=""/>
+              </div>
+            </form>
           </div>
         </div>
         <div class="col-md-12 text-right">
@@ -162,19 +205,6 @@
       </div>
       <ul id="participants" style="padding-top: 10px">
       </ul>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
-      <div id="prompt" style="background-color: #dedede; padding: 5px; display: flex; justify-content: space-between; visibility: hidden; margin: 10px 0">
-        <h3 style="margin: 0; padding: 0; line-height: 1.5">
-          Incoming call from <span id="from"></span>
-        </h3>
-        <div class="pull-right">
-          <button id="accept" class="btn btn-success ">Accept</button>
-          <button id="reject" class="btn btn-danger " style="margin-left: 5px">Reject</button>
-        </div>
-      </div>
     </div>
   </div>
   <div class="row">
