@@ -992,11 +992,15 @@
   module.exports = freeice;
 },{"./stun.json":6,"./turn.json":7,"normalice":12}],6:[function(require,module,exports){
   module.exports=[
-    "stun.***REMOVED***:3478"
+    `${stunServerFqdn}:${stunServerPort}`
   ]
 
 },{}],7:[function(require,module,exports){
-  module.exports=[{"url":"turn:coturn.***REMOVED***","username":"turn","credential":"turn123"}]
+  let turnPort = ''; 
+  if (turnServerPort && turnServerPort.trim().length > 0) {
+    turnPort = `:${turnServerPort.trim()}`;
+  }
+  module.exports=[{"url":`${turnServerUser}:${turnServerFqdn}${turnPort}`,"username":`${turnServerUser}`,"credential":`${turnServerPass}`}]
 
 },{}],8:[function(require,module,exports){
   var WildEmitter = require('wildemitter');
