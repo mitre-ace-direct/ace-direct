@@ -542,18 +542,14 @@ class WebRTCMediaSession extends Events {
     if (!p) {
       throw new Error(`No participant registered for ${ext}`);
     }
-
-    // disconnect asterisk queue finding extension
-    // and return to use webrtc directly
-    // REMOVED: return to fix ace quill audio issues
-    if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0) {
-      debug(`${ext} Re-invite`, offer);
-      await this.leave(ext, true);
-      return;
-    }
-
     const rtp = await this._createRtpEndpoint();
-    if (this.isMultiparty) {
+    if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0){
+      // disconnect asterisk queue finding extension
+      await this.leave(ext, true);
+      const other = this.oneToOnePeer(ext);
+      await other.endpoint.connect(rtp);
+      await rtp.connect(other.endpoint);
+    } else if (this.isMultiparty) {
       await replaceMediaEl(p.port, p.endpoint, rtp);
     } else {
       const other = this.oneToOnePeer(ext);
