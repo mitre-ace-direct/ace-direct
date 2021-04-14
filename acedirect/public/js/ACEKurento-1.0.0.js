@@ -5148,28 +5148,28 @@ function ACEKurento(config) {
     },
     /**
      * Enable/Disable video or audio tracks
-     * @param {Boolean} isActive - If "true" will disable/pause media type. Otherwise will resume a specified media type.
+     * @param {Boolean} enableTrack - If "true" will enable/play media type. Otherwise will pause a specified media type.
      * @param {Boolean} isAudio - If "true" will act on the audio media stream type. Otherwise it will act on the video type.
      */
-    enableDisableTrack: function (isActive, isAudio) {
+    enableDisableTrack: function (enableTrack, isAudio) {
       var mediaStream = this.mediaStream();
-      console.log("Set " + (isAudio ? "AUDIO" : "VIDEO") + " " + (isActive ? "ON" : "OFF"));
+      console.log("Set " + (isAudio ? "AUDIO" : "VIDEO") + " " + (enableTrack ? "ON" : "OFF"));
 
       if(isAudio) {
         // mediaStream.audioEnabled = false; // fixme
         
         // console.log('ats', mediaStream.getAudioTracks())
-        mediaStream.getAudioTracks()[0].enabled = !(mediaStream.getAudioTracks()[0].enabled);
-        mediaStream.getAudioTracks()[0].muted = true; //fixme
+        mediaStream.getAudioTracks()[0].enabled = enableTrack;
+        mediaStream.getAudioTracks()[0].muted = true; //fixme ?should this be !isActive?
         console.log('enabled?', mediaStream.getAudioTracks()[0].enabled)
         console.log('muted?', mediaStream.getAudioTracks()[0].muted)
         console.log('ats', mediaStream.getAudioTracks())
         console.log(this.mediaStream())
       } else {
-        mediaStream.getVideoTracks()[0].enabled = !(mediaStream.getVideoTracks()[0].enabled);
+        mediaStream.getVideoTracks()[0].enabled = enableTrack;
       }
 
-      console.log((isAudio ? "AUDIO" : "VIDEO") + " is " + (isActive ? "ON" : "OFF"));
+      console.log((isAudio ? "AUDIO" : "VIDEO") + " is " + (enableTrack ? "ON" : "OFF"));
     },
     /**
      * Screenshare to Kurento
