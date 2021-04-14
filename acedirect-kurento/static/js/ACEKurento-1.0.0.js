@@ -1000,7 +1000,6 @@
   if (turnServerPort && turnServerPort.trim().length > 0) {
     turnPort = `:${turnServerPort.trim()}`;
   }
-  console.log(`***turnPort: >${turnPort}<`);
   module.exports=[{"url":`${turnServerUser}:${turnServerFqdn}${turnPort}`,"username":`${turnServerUser}`,"credential":`${turnServerPass}`}]
 
 },{}],8:[function(require,module,exports){
