@@ -539,6 +539,11 @@ function connect_socket() {
 							keyboard: false
 						});
 
+						if (data.vrs) {
+							//get the consumer vrs
+							$('#callerPhone').val(data.vrs);
+						}
+
 						setTimeout(() => {
 							$('#accept-btn').trigger('click');
 						}, 1000);
@@ -555,6 +560,7 @@ function connect_socket() {
 							$('#myRingingModalPhoneNumber').html(data.callerNumber);
 						}
 						if (autoAnswer) {
+							console.log('autoAnswer')
 							// multiparty transition
 							$('#myRingingModal').modal({
 								show: false,
@@ -926,6 +932,7 @@ function connect_socket() {
                     }
                     showAlert('info', 'Transfer Denied. Please try again.');
                     //reset transfer variables
+					$('#transferExtension').val('');
                     isTransfer = false;
 					originalExt = null;
 					transferVRS = null;
@@ -935,10 +942,11 @@ function connect_socket() {
 					// initiate the call transfer in the signaling server
 					if (isColdTransfer) {
 						acekurento.callTransfer(transferExt.toString(), true);
+					} else {
+						// warm transfers are multiparty calls
+						multipartyinvite(transferExt);
 					}
 				}).on('transferJoined', function() {
-					var vrs = $('#callerPhone').val();
-                    socket.emit('transferSuccess',{'vrs':vrs})
 
                     //close the sidebar if it's open
                     if ($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#shortcuts-tab').hasClass('active')) {
@@ -950,6 +958,8 @@ function connect_socket() {
 						//we terminate the call for the original agent
 						terminate_call();
 						socket.emit('call-ended', {'agentExt': extensionMe}); //stop allowing file share between consumer and original agent
+					} else {
+						console.log('warm transfer success!')
 					}
                 }).on ('multiparty-transfer', function(data) {
 					// backup host is becoming the new host of the call
@@ -1027,7 +1037,7 @@ function alignDataTableHeaders() {
 
 function transferAvailability(status, name, ext) {
 	return (status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != name) 
-  	? '<Button class=\"demo-btn\" onClick="sendTransferInvite(\'' + ext + '\',\'' + true + '\')"><i class=\"fa fa-share-square\"></i></Button>' 
+  	? '<Button class=\"demo-btn\" onClick="getTransferType(' + ext + ')"><i class=\"fa fa-share-square\"></i></Button>' 
 	: "<Button class=\"secondary\" disabled><i class=\"fa fa-share-square\"></i></Button>"
 }
 
@@ -1397,6 +1407,8 @@ function clearScreen() {
 	$('#fileInput').val('');
 	$('#fileSent').hide();
 	$('#fileSentError').hide();
+
+	$('#transferExtension').val('');
 }
 
 function changeStatusLight(state) {
