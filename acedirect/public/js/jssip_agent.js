@@ -1042,7 +1042,6 @@ function multipartyHangup() {
 
 		setTimeout(() => {
 			acekurento.callTransfer(backupHostAgent.toString(), false);
-			socket.emit('transferSuccess',{'vrs':$('#callerPhone').val()});
 			terminate_call();
 			
 			hostAgent = null;
@@ -1061,17 +1060,27 @@ function multipartyHangup() {
 	}
 }
 
+function getTransferType(ext) {
+    $('#modalCallTransfer').modal({
+        show: true,
+        backdrop: 'static',
+        keyboard: false
+    });
+	$('#transferExtension').val(ext);
+}
+
 /**
- * @param {string} ext - agent extension to receive the transfer
  * @param {boolean} isCold 
  */
- function sendTransferInvite(ext, isCold) {
+ function sendTransferInvite(isCold) {
 	if (agentStatus == 'IN_CALL') {
-		transferExt = ext;
+		transferExt = $('#transferExtension').val();
 		showAlert('info', 'Call transfer initiated. Waiting for response...');
 
 		if (isCold) {
 			isColdTransfer = true;
+		} else {
+			isColdTransfer = false;
 		}
 
 		socket.emit('transferCallInvite', {
