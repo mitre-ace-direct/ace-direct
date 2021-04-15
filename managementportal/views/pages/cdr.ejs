@@ -1,101 +1,108 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<%- include("../partials/head") %>
+  <%- include("../partials/head") %>
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
-	<div class="wrapper">
-		<!-- Main Header -->
-		<%- include("../partials/header") %>
-		<%- include("../partials/sidebar") %>
-			<!-- Content Wrapper. Contains page content -->
-			<div class="content-wrapper">
-				<!-- Content Header (Page header) -->
-				<div class="content-header">
-					<div class="container-fluid">
-						<div class="row">
-							<div class="col-lg-12">
-								<h1 class="m-0 text-dark">CDR Dashboard</h1>
-								<div id="reportrange" class="dropdown-menu-left">
-									<div data-toggle="tooltip" data-placement="left" title="Select Date Range – The user can select a date range for the report. Predefined values are Today, Yesterday, Last 7 days, Last 30 days, This Month, Last Month, All Time (January 1st 2016 to Today), and Custom Range. Default selection is 'Last 7 days'">
-										<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
-										<span></span>
-										<b class="caret"></b>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- Main content -->
-				<div class="content">
-					<div class="container-fluid">
-						<!-- CDR Table -->
-						<div class="row">
-							<div class="col-lg-12">
-								<div class="card">
-									<div class="card-header">
-										<h3 class="card-title">Call Detail Records</h3>
-										<div class="card-tools">
-											<button class="btn btn-tool" id="toggle">
-												<i class="fa fa-toggle-off" style="font-size: 1.75em"></i>
-											</button>
-											<i style="padding-right: 25px" class="fa fa-question-circle" data-toggle="tooltip" data-placement="bottom" title="Show/Hide Columns – This action expands the table to include the following columns: Caller ID Text, Destination Channel, Disposition, AMA Flags, Account Code, User Field, Unique ID, Linked ID, Sequence, and Peer Account."></i>
-											<button class="btn btn-tool" id="cdrdownloadbtn">
-												<i class="fa fa-download" style="font-size: 1.75em"></i>
-											</button>
-											<i style="padding-right: 15px" class="fa fa-question-circle" data-toggle="tooltip" data-placement="bottom" title="Download CSV File – This action downloads the table as a Comma Separated Values (CSV) file. The CSV file contains only data within the date range."></i>
-										</div>
-									</div>
-									<!-- /.box-header -->
-									<div id="cdrtablediv" class="card-body table-responsive" style="overflow-x: scroll">
-										<table id="cdrtable" class="table table-bordered table-hover" cellspacing="0" width="100%">
-											<thead>
-												<tr>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The start datetime of the call. Default format: 2016-09-07T09:35:41Z dashboard formats the date to 2016/09/07 09:35:41 pm (adjusted for timezone).">Call Date</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The full caller ID, including the name, of the calling party. This field is set automatically and is read-only.">Caller ID Text</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The calling party’s caller ID number. It is set automatically and is read-only.">Source</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The destination extension for the call. This field is set automatically and is read-only.">Destination</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The destination context for the call. This field is set automatically and is read-only.">Destination Context</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The calling party’s channel. This field is set automatically and is read-only.">Channel</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The called party’s channel. This field is set automatically and is read-only.">Destination Channel</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The last dialplan application that was executed. This field is set automatically and is read-only.">Last Application</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The arguments passed to the lastapp. This field is set automatically and is read-only.">Last Data</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The number of seconds between the start and end times for the call. This field is set automatically and is read-only.">Duration Seconds</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The number of seconds between the answer and end times for the call. This field is set automatically and is read-only.">Billable Seconds</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="An indication of what happened to the call. This may be NO ANSWER, FAILED, BUSY, ANSWERED, or UNKNOWN.">Disposition</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The Automatic Message Accounting (AMA) flag associated with this call. This may be one of the following: OMIT, BILLING, DOCUMENTATION, or Unknown.">AMA Flags</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="An account ID. This field is user defined and is empty by default.">Account Code</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="A general-purpose user field. This field is empty by default and can be set to a user-defined string.">User Field</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The unique ID for the src channel. This field is set automatically and is read-only.">Unique ID</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="A unique identifier that unites multiple CDR records.">Linked ID</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="A numeric value that, combined with uniqueid and linkedid, can be used to uniquely identify a single CDR record.">Sequence</th>
-													<th class="text-center" data-toggle="tooltip" data-container="body" title="The account code of the called party’s channel.">Peer Account</th>
-												</tr>
-											</thead>
-										</table>
-									</div>
-									<!-- /.box-body -->
-								</div>
-								<!-- /.box -->
-							</div>
-						</div>
-						<!-- ./CDR Table -->
-						<div id="csv"></div>
-					</div>
-				</div>
-				<!-- /.content -->
-			</div>
-			<!-- /.content - wrapper -->
-			<%- include("../partials/footer") %>
-	</div>
-	<!-- ./wrapper -->
+  <div class="wrapper">
+    <!-- Main Header -->
+    <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+          <!-- Content Header (Page header) -->
+          <div class="content-header">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-lg-12">
+                  <h1 class="m-0 text-dark">CDR Dashboard</h1>
+                  <div id="reportrange" class="dropdown-menu-left">
+                    <div data-toggle="tooltip" data-placement="left"
+                      title="Select Date Range – The user can select a date range for the report. Predefined values are Today, Yesterday, Last 7 days, Last 30 days, This Month, Last Month, All Time (January 1st 2016 to Today), and Custom Range. Default selection is 'Last 7 days'">
+                      <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+                      <span></span>
+                      <b class="caret"></b>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Main content -->
+          <div class="content">
+            <div class="container-fluid">
+              <!-- CDR Table -->
+              <div class="row">
+                <div class="col-lg-12">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Call Detail Records</h3>
+                      <div class="card-tools">
+                        <button class="btn btn-tool" id="toggle">
+                          <i class="fa fa-toggle-off" style="font-size: 1.75em"></i>
+                        </button>
+                        <i style="padding-right: 25px" class="fa fa-question-circle" data-toggle="tooltip"
+                          data-placement="bottom"
+                          title="Show/Hide Columns – This action expands the table to include the following columns: Caller ID Text, Destination Channel, Disposition, AMA Flags, Account Code, User Field, Unique ID, Linked ID, Sequence, and Peer Account."></i>
+                        <button class="btn btn-tool" id="cdrdownloadbtn">
+                          <i class="fa fa-download" style="font-size: 1.75em"></i>
+                        </button>
+                        <i style="padding-right: 15px" class="fa fa-question-circle" data-toggle="tooltip"
+                          data-placement="bottom"
+                          title="Download CSV File – This action downloads the table as a Comma Separated Values (CSV) file. The CSV file contains only data within the date range."></i>
+                      </div>
+                    </div>
+                    <!-- /.box-header -->
+                    <div id="cdrtablediv" class="card-body table-responsive" style="overflow-x: scroll">
+                      <table id="cdrtable" class="table table-bordered table-hover" cellspacing="0" width="100%">
+                        <thead>
+                          <tr>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The start datetime of the call. Default format: 2016-09-07T09:35:41Z dashboard formats the date to 2016/09/07 09:35:41 pm (adjusted for timezone).">Call Date</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The full caller ID, including the name, of the calling party. This field is set automatically and is read-only.">Caller ID Text</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The calling party’s caller ID number. It is set automatically and is read-only.">Source</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The destination extension for the call. This field is set automatically and is read-only.">Destination</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The destination context for the call. This field is set automatically and is read-only.">Destination Context</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The calling party’s channel. This field is set automatically and is read-only.">Channel</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The called party’s channel. This field is set automatically and is read-only.">Destination Channel</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The last dialplan application that was executed. This field is set automatically and is read-only.">Last Application</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The arguments passed to the lastapp. This field is set automatically and is read-only.">Last Data</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The number of seconds between the start and end times for the call. This field is set automatically and is read-only.">Duration Seconds</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The number of seconds between the answer and end times for the call. This field is set automatically and is read-only.">Billable Seconds</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="An indication of what happened to the call. This may be NO ANSWER, FAILED, BUSY, ANSWERED, or UNKNOWN.">Disposition</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The Automatic Message Accounting (AMA) flag associated with this call. This may be one of the following: OMIT, BILLING, DOCUMENTATION, or Unknown.">AMA Flags</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="An account ID. This field is user defined and is empty by default.">Account Code</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="A general-purpose user field. This field is empty by default and can be set to a user-defined string.">User Field</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The unique ID for the src channel. This field is set automatically and is read-only.">Unique ID</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="A unique identifier that unites multiple CDR records.">Linked ID</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="A numeric value that, combined with uniqueid and linkedid, can be used to uniquely identify a single CDR record.">Sequence</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body" title="The account code of the called party’s channel.">Peer Account</th>
+                          </tr>
+                        </thead>
+                      </table>
+                    </div>
+                    <!-- /.box-body -->
+                  </div>
+                  <!-- /.box -->
+                </div>
+              </div>
+              <!-- ./CDR Table -->
+              <div id="csv"></div>
+            </div>
+          </div>
+          <!-- /.content -->
+        </div>
+        <!-- /.content - wrapper -->
+        <%- include("../partials/footer") %>
+  </div>
+  <!-- ./wrapper -->
 
-	<!-- REQUIRED JS SCRIPTS -->
-	<!-- DateRangePicker -->
-	<script type="text/javascript" src="./assets/js/daterangepicker.js"></script>
+  <!-- REQUIRED JS SCRIPTS -->
+  <!-- DateRangePicker -->
+  <script type="text/javascript" src="./assets/js/daterangepicker.js"></script>
 
-	<script type="text/javascript" src="./js/controllers/cdr.js"></script>
+  <script type="text/javascript" src="./js/controllers/cdr.js"></script>
 </body>
 
 </html>
