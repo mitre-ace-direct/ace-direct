@@ -337,9 +337,6 @@ const io = socketIO(httpsServer, {
   origins: fqdnUrl
 });
 
-// io.set removed in socket.io 3.0. Origins now set in options during socket.io module inclusion.
-// io.set('origins', fqdnUrl);
-
 // Pull MySQL configuration from config.json file
 const dbHost = getConfigVal('database_servers:mysql:host');
 const dbUser = getConfigVal('database_servers:mysql:user');
