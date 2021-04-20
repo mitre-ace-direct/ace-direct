@@ -544,21 +544,33 @@
 		var color = current.substring(0,current.lastIndexOf(',')+1) + alpha + ')';
 		document.documentElement.style.setProperty('--caption-bg-color', color);
 	});
-	var tempDivTimeout = null;
+
+
+	function createCaptionHtml(displayName, transcripts) {
+		console.log(displayName, transcripts)
+		let caption = transcripts.transcript;
+		if (!transcripts.final) {
+			caption += '...';
+		}
+		let timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+		return '<span class="timestamp">' + timestamp + '</span><strong>' + displayName + ':</strong> ' + caption;
+	}
+
 	function updateConsumerCaptions(transcripts) {
 		console.log('--- WV: transcripts.transcript ---\n');
 		console.log('consumer uc: ', transcripts)
 
 		var tDiv = document.getElementById(transcripts.msgid);
-		let caption = '<strong>CSR ' + $('#agent-name').text() + ':</strong> ' + transcripts.transcript;
+		let displayName = 'CSR ' +  $('#agent-name').text();
+		let caption = createCaptionHtml(displayName, transcripts);
 		if(!tDiv) {
 			var temp = document.createElement("div");
 			temp.id = transcripts.msgid;
 			temp.innerHTML = caption;
 			temp.classList.add("transcripttext");
-			document.getElementById("transcriptoverlay").appendChild(temp);
+			document.getElementById("transcriptoverlay").prepend(temp);
 			let elem = $('#consumer-captions')
-			elem.scrollTop(elem.prop("scrollHeight")); // Scroll to bottom
+			// elem.scrollTop(elem.prop("scrollHeight")); // Scroll to bottom
 		} else {
 			tDiv.innerHTML = caption;
 			if(transcripts.final || call_terminated) {
@@ -573,45 +585,46 @@
 	}
 
 	// Run caption demo
-	var demo_running = false;
-	function testCaptions() {
+	// This doesn't work anymore -- jkorb
+	// var demo_running = false;
+	// function testCaptions() {
 
-		if(!demo_running) {
-			demo_running = true;
+	// 	if(!demo_running) {
+	// 		demo_running = true;
 
-			var temp = document.createElement("div");
-			temp.classList.add("transcripttext");
+	// 		var temp = document.createElement("div");
+	// 		temp.classList.add("transcripttext");
 
-			document.getElementById("transcriptoverlay").appendChild(temp);
-			temp.innerHTML = 'Hello, how can I help you today?';
-			var count = 0;
-			var intervalId = window.setInterval(function() {
-				switch (count) {
-					case 0:
-						temp.innerHTML = "No problem, I'll just need your account number";
-						break;
-					case 1:
-						temp.innerHTML = 'You are all set. Thank you for your patience';
-						break;
-					case 2:
-						temp.innerHTML = 'Is there anything else I can help you with today?';
-						break;
-					case 3:
-						temp.innerHTML = 'Have a nice day.';
-						break;
-				}
-				count++;
+	// 		document.getElementById("transcriptoverlay").appendChild(temp);
+	// 		temp.innerHTML = 'Hello, how can I help you today?';
+	// 		var count = 0;
+	// 		var intervalId = window.setInterval(function() {
+	// 			switch (count) {
+	// 				case 0:
+	// 					temp.innerHTML = "No problem, I'll just need your account number";
+	// 					break;
+	// 				case 1:
+	// 					temp.innerHTML = 'You are all set. Thank you for your patience';
+	// 					break;
+	// 				case 2:
+	// 					temp.innerHTML = 'Is there anything else I can help you with today?';
+	// 					break;
+	// 				case 3:
+	// 					temp.innerHTML = 'Have a nice day.';
+	// 					break;
+	// 			}
+	// 			count++;
 
-				if(count > 4) {
-					window.clearInterval(intervalId);
-					temp.innerHTML = '';
-					demo_running = false;
-				}
-			}, 6000);
-		} else { console.log('demo running'); }
+	// 			if(count > 4) {
+	// 				window.clearInterval(intervalId);
+	// 				temp.innerHTML = '';
+	// 				demo_running = false;
+	// 			}
+	// 		}, 6000);
+	// 	} else { console.log('demo running'); }
 
 
-	}
+	// }
 
 	
 	// Default to English
@@ -677,12 +690,14 @@ function getAgentColor(displayName) {
 function updateCaptionsMultiparty(transcripts) {
 	var temp = document.createElement("div");
 	temp.id = transcripts.msgid;
-	temp.innerHTML = '<strong>CSR ' + transcripts.displayname + ": " + transcripts.transcript;
+	let displayName = 'CSR ' +  $('#agent-name').text();
+	temp.innerHTML = createCaptionHtml(displayName, transcripts);
+	
 	temp.classList.add("transcripttext");
 	if (transcripts.agent) {
 
 		temp.classList.add("agent-color-" + getAgentColor(transcripts.displayname) ); //fixme
 	}
-	document.getElementById("transcriptoverlay").appendChild(temp);
+	document.getElementById("transcriptoverlay").prepend(temp);
 	// setTimeout(function () { temp.remove() }, 5000);
 }
