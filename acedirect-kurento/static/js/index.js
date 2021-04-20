@@ -1,4 +1,10 @@
 var acekurento;
+var stunServerFqdn;
+var stunServerPort;
+var turnServerFqdn;
+var turnServerPort;
+var turnServerUser;
+var turnServerPass;
 window.onload = function() {
   console = new Console();
   // setRegisterState(NOT_REGISTERED);
@@ -19,9 +25,21 @@ window.onload = function() {
   document.getElementById('ext').focus();
 
   document.getElementById('register').addEventListener('click', function() {
+    stunServerFqdn = document.getElementById("stun-server-fqdn").value;
+    stunServerPort = document.getElementById("stun-server-port").value;
+    turnServerFqdn = document.getElementById("turn-server-fqdn").value;
+    turnServerPort = document.getElementById("turn-server-port").value;
+    turnServerUser = document.getElementById("turn-server-username").value;
+    turnServerPass = document.getElementById("turn-server-password").value;
     acekurento.register(document.getElementById('ext').value, document.getElementById('password').value, document.getElementById('isAgent').checked);
   });
   document.getElementById('loopback').addEventListener('click', function() {
+    stunServerFqdn = document.getElementById("stun-server-fqdn").value;
+    stunServerPort = document.getElementById("stun-server-port").value;
+    turnServerFqdn = document.getElementById("turn-server-fqdn").value;
+    turnServerPort = document.getElementById("turn-server-port").value;
+    turnServerUser = document.getElementById("turn-server-username").value;
+    turnServerPass = document.getElementById("turn-server-password").value;
     // generate a loopback call with random extension
     acekurento.loopback(Math.floor(Math.random() * Math.floor(1000)));
   });

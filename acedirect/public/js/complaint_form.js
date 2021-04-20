@@ -800,7 +800,6 @@ $('#screenshareButton').prop("disabled", true).click(function () {
 });
 
 $('#startScreenshare').prop("disabled", true).click(function(){
-	acekurento.screenshare(false);
 	acekurento.screenshare(true);
 });
 
