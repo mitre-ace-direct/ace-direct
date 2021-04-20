@@ -1211,7 +1211,7 @@ function updateCaptions(transcripts) {
 	if (!tDiv) {
 		var temp = document.createElement("div");
 		temp.id = transcripts.msgid;
-		temp.innerHTML = 
+		temp.innerHTML = createCaptionHtml('Consumer', transcripts); 
 		
 		temp.classList.add("transcripttext");
 		document.getElementById("transcriptoverlay").prepend(temp);
