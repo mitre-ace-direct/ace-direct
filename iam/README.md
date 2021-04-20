@@ -446,7 +446,7 @@ With OpenAM/Tomcat up and running, set up the OpenAM admin tools:
     * Click _Subjects_.
     * Click an agent _User_ (e.g., `dagent1`, `dagent2`).
     * Scroll down to _Success URL_.
-    * Add a success URL for an agent: [https://portal.domain.com/ACEDirect/agent](https://portal.domain.com/ACEDirect/agent))
+    * Add a success URL for an agent: [https://portal.domain.com/ACEDirect/agent](https://portal.domain.com/ACEDirect/agent)
     * Click _Add_.
     * Scroll to the top and click _Save_ and _Back to Subjects_.
     * Repeat above for all agent usernames.
@@ -477,6 +477,19 @@ After updating the NGINX configuration and restarting NGINX. Assuming the public
 `https://portal.domain.com/ace`
 
 If successful, the OpenAM home page will open.
+
+### Managing OpenAM services
+
+```bash
+$  sudo service tomcat stop
+$
+$  sudo service tomcat start
+$  sudo systemctl enable tomcat.service  # to make OpenAM start on reboot
+$
+$  sudo service tomcat status
+$
+$  sudo service tomcat restart
+```
 
 **This completes the OpenAM installation and configuration.** :checkered_flag: :trophy:
 
