@@ -24,6 +24,7 @@ var outbound_timer = null;
 var callParticipantsExt = [];
 var isMuted = false;
 var showTransferModal = false;
+var isMultipartyCall = false;
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -120,7 +121,11 @@ function register_jssip() {
 			}
 
 			if(callParticipantsExt.length > 2) {
-				multipartyCaptionsStart();
+				if (!isMultipartyCall) {
+					// new multiparty call
+					multipartyCaptionsStart();
+				}
+				isMultipartyCall = true;
 
 				// the last agent to join will be the backup host
 				backupHostAgent = participants[participants.length-1].ext; 
@@ -145,6 +150,7 @@ function register_jssip() {
 					transitionExt = null;
 				}
 			} else if (participants.length == 2) {
+				isMultipartyCall = false;
 				multipartyCaptionsEnd();
 
 				if (allAgentCall) {
@@ -662,6 +668,7 @@ function terminate_call() {
 
 	hostAgent = null;
 	allAgentCall = false;
+	isMultipartyCall = false;
 }
 
 function unregister_jssip() {
@@ -1042,7 +1049,6 @@ function multipartyHangup() {
 
 		setTimeout(() => {
 			acekurento.callTransfer(backupHostAgent.toString(), false);
-			socket.emit('transferSuccess',{'vrs':$('#callerPhone').val()});
 			terminate_call();
 			
 			hostAgent = null;
@@ -1061,17 +1067,27 @@ function multipartyHangup() {
 	}
 }
 
+function getTransferType(ext) {
+    $('#modalCallTransfer').modal({
+        show: true,
+        backdrop: 'static',
+        keyboard: false
+    });
+	$('#transferExtension').val(ext);
+}
+
 /**
- * @param {string} ext - agent extension to receive the transfer
  * @param {boolean} isCold 
  */
- function sendTransferInvite(ext, isCold) {
+ function sendTransferInvite(isCold) {
 	if (agentStatus == 'IN_CALL') {
-		transferExt = ext;
+		transferExt = $('#transferExtension').val();
 		showAlert('info', 'Call transfer initiated. Waiting for response...');
 
 		if (isCold) {
 			isColdTransfer = true;
+		} else {
+			isColdTransfer = false;
 		}
 
 		socket.emit('transferCallInvite', {

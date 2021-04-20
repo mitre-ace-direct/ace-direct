@@ -4865,6 +4865,12 @@ function ACEKurento(config) {
     acceptCall: function (message) {
       
       setCallState(PROCESSING_CALL);
+      if (webRtcPeer) {
+        // dispose current webrtcPeer before making a new one
+        // this stops the camera from staying active after a multiparty transfer
+        webRtcPeer.dispose();
+        webRtcPeer = null;
+      }
 
       var options = {
         localVideo: this.selfStream,
