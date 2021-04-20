@@ -876,11 +876,6 @@ io.sockets.on('connection', function (socket) {
         io.to(Number(data.originalExt)).emit('transferJoined');
     });
 
-	socket.on('transferSuccess', function(data) {
-		//remove the original agent
-        var vrs = data.vrs;
-        socket.leave(Number(vrs));
-    });
 
 	socket.on('multiparty-hangup', function(data) {
 		io.to(Number(data.newHost)).emit('multiparty-transfer', {'transitionAgent':data.transitionAgent, 'vrs': data.vrs});
