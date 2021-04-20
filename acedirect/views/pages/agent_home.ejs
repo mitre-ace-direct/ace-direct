@@ -436,15 +436,15 @@
 
         <!--Call Transfer Modal-->
         <div class="modal fade" id="modalCallTransfer">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-sm">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4 class="modal-title">Call Transfer</h4>
                     </div>
                     <div class="modal-body">
-                        <input id="transferExtension" class="form-control input-lg" placeholder="Enter the extension you want to transfer to" autofocus>
-                        <button class="btn btn-default" onclick=transferCall(true)>Blind Transfer</button>
-                        <button class="btn btn-default" onclick=transferCall(false)>Warm Transfer</button>
+                        <p id="transferExtension" hidden></p>
+                        <button class="btn btn-default" onclick=sendTransferInvite(true) data-dismiss="modal">Cold Transfer</button>
+                        <button class="btn btn-default" onclick=sendTransferInvite(false) data-dismiss="modal">Warm Transfer</button>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
