@@ -45,8 +45,8 @@
 
 .caption-box-divider {
   border-top: 2px solid #555;
-  margin-top: 0px;
-  margin-bottom: 0px;
+  margin-top: -5px;
+  margin-bottom: 3px;
 }
 
 #agent-captions {
