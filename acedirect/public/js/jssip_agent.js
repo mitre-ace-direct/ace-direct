@@ -24,6 +24,7 @@ var outbound_timer = null;
 var callParticipantsExt = [];
 var isMuted = false;
 var showTransferModal = false;
+var isMultipartyCall = false;
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -121,7 +122,11 @@ function register_jssip() {
 			}
 
 			if(callParticipantsExt.length > 2) {
-				multipartyCaptionsStart();
+				if (!isMultipartyCall) {
+					// new multiparty call
+					multipartyCaptionsStart();
+				}
+				isMultipartyCall = true;
 
 				// the last agent to join will be the backup host
 				backupHostAgent = participants[participants.length-1].ext; 
@@ -146,6 +151,7 @@ function register_jssip() {
 					transitionExt = null;
 				}
 			} else if (participants.length == 2) {
+				isMultipartyCall = false;
 				multipartyCaptionsEnd();
 
 				if (allAgentCall) {
@@ -226,14 +232,11 @@ function register_jssip() {
 			if (remoteStream.srcObject) {
 				remoteStream.srcObject.getVideoTracks()[0].onended = function () {
 					screenShareEnabled = false;
-					acekurento.screenshare(false);
 				};
 			}
 		},
 		'ended': function (e) {
 			screenShareEnabled = false;
-			acekurento.screenshare(false);
-
 			if (multipartyTransition) {
 				terminate_call();
 				unpauseQueues();
@@ -300,6 +303,10 @@ function register_jssip() {
 						backdrop: 'static',
 						keyboard: false
 					});
+				}
+
+				if (document.getElementById("persistCameraCheck").checked == true) {
+					enable_persist_view();
 				}
 			}
 		}
@@ -632,9 +639,10 @@ function terminate_call() {
 	$('#dtmfpad').hide();
 	//RemoteView is not currently set to value so line gives an error
 	//remoteView.srcObject.getTracks().forEach(track => track.stop());
-	if (document.getElementById("persistCameraCheck").checked == true) {
+	/*if (document.getElementById("persistCameraCheck").checked == true) {
+		// this causes the webcam to stay active when the agent disables self-view after a call
 		enable_persist_view();
-	}
+	}*/
 	document.getElementById("muteAudio").disabled = false;
 	// document.getElementById("language-select").disabled = false;
 	if ($('#language-select') && $('#language-select').data('dd')) {
@@ -665,6 +673,7 @@ function terminate_call() {
 
 	hostAgent = null;
 	allAgentCall = false;
+	isMultipartyCall = false;
 }
 
 function unregister_jssip() {
@@ -698,6 +707,11 @@ function remove_video() {
 		if (window.self_stream.getVideoTracks()) {
 			if (window.self_stream.getVideoTracks()[0]) {
 				window.self_stream.getVideoTracks()[0].stop();
+			}
+		}
+		if (window.self_stream.getAudioTracks()) {
+			if (window.self_stream.getAudioTracks()[0]) {
+				window.self_stream.getAudioTracks()[0].stop();
 			}
 		}
 	}
@@ -756,7 +770,7 @@ function removeElement(elementId) {
 function mute_audio() {
 	if (acekurento !== null) {
 		console.log('MUTING AUDIO');
-		acekurento.enableDisableTrack(true, true); //mute audio
+		acekurento.enableDisableTrack(false, true); //mute audio
 		mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
 		mute_audio_icon.classList.add("fa-microphone-slash");
 		mute_audio_icon.classList.remove("fa-microphone");
@@ -789,7 +803,7 @@ function mute_captions() {
 //hides self video so remote cannot see you
 function hide_video() {
 	if (acekurento !== null) {
-		acekurento.enableDisableTrack(true, false); //mute video
+		acekurento.enableDisableTrack(false, false); //mute video
 		console.log("Hide video reached");
 		selfStream.setAttribute("hidden", true);
 	}
@@ -798,7 +812,7 @@ function hide_video() {
 //unhides self video so remote can see you
 function unhide_video() {
 	if (acekurento !== null) {
-		acekurento.enableDisableTrack(false, false); //unmute video
+		acekurento.enableDisableTrack(true, false); //unmute video
 		console.log("Unhide video reached");
 		selfStream.removeAttribute("hidden");
 	}
@@ -807,7 +821,7 @@ function unhide_video() {
 function enable_video_privacy() {
 	if (acekurento !== null) {
 		console.log('Enabling video privacy');
-		acekurento.enableDisableTrack(true, false); //mute video
+		acekurento.enableDisableTrack(false, false); //mute video
 		hide_video_icon.style.display = "block";
 		hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
 		acekurento.privateMode(true, privacy_video_url);
@@ -818,7 +832,7 @@ function disable_video_privacy() {
 	if (acekurento !== null) {
 		console.log('Disabling video privacy');
 		mirrorMode("selfView", true);
-		acekurento.enableDisableTrack(false, false); //unmute video
+		acekurento.enableDisableTrack(true, false); //unmute video
 		hide_video_icon.style.display = "none";
 		hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
 		acekurento.privateMode(false);
@@ -829,7 +843,7 @@ function disable_video_privacy() {
 function start_video_calibration() {
 	if (acekurento !== null) {
 		console.log('Start video calibration');
-		acekurento.enableDisableTrack(true, false); //mute video
+		acekurento.enableDisableTrack(false, false); //mute video
 		acekurento.calibrateMode(true, privacy_video_url);
 	}
 }
@@ -838,7 +852,7 @@ function end_video_calibration() {
 	if (acekurento !== null) {
 		console.log('End video calibration');
 		mirrorMode("selfView", true);
-		acekurento.enableDisableTrack(false, false); //unmute video
+		acekurento.enableDisableTrack(true, false); //unmute video
 		acekurento.calibrateMode(false);
 	}
 }
@@ -996,8 +1010,8 @@ function shareScreen() {
 				acekurento.selfStream = document.getElementById('selfView');
 			}
 		}
-		acekurento.screenshare(false);
 		acekurento.screenshare(true);
+		screenShareEnabled = true;
 	}
 }
 
@@ -1040,7 +1054,6 @@ function multipartyHangup() {
 
 		setTimeout(() => {
 			acekurento.callTransfer(backupHostAgent.toString(), false);
-			socket.emit('transferSuccess',{'vrs':$('#callerPhone').val()});
 			terminate_call();
 			
 			hostAgent = null;
@@ -1059,17 +1072,27 @@ function multipartyHangup() {
 	}
 }
 
+function getTransferType(ext) {
+    $('#modalCallTransfer').modal({
+        show: true,
+        backdrop: 'static',
+        keyboard: false
+    });
+	$('#transferExtension').val(ext);
+}
+
 /**
- * @param {string} ext - agent extension to receive the transfer
  * @param {boolean} isCold 
  */
- function sendTransferInvite(ext, isCold) {
+ function sendTransferInvite(isCold) {
 	if (agentStatus == 'IN_CALL') {
-		transferExt = ext;
+		transferExt = $('#transferExtension').val();
 		showAlert('info', 'Call transfer initiated. Waiting for response...');
 
 		if (isCold) {
 			isColdTransfer = true;
+		} else {
+			isColdTransfer = false;
 		}
 
 		socket.emit('transferCallInvite', {

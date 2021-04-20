@@ -165,20 +165,16 @@
                                   remoteStream.srcObject.getVideoTracks()[0].onended = function () {
                                     console.log('screensharing ended remote');
 				    $("#startScreenshare").hide();
-                                    if (acekurento) acekurento.screenshare(false);
                                   };
                                 }
                         },
 			'ended': function(e) {
 				console.log('--- WV: Call ended ---\n');
 
-                                //stop screen sharing at end
 				$("#startScreenshare").hide();
-                                if (acekurento)
-                                  acekurento.screenshare(false);
 
-                                terminate_call();
-                                clearScreen();
+				terminate_call();
+				clearScreen();
 				disable_chat_buttons();
 				enable_initial_buttons();
 				$("#start-call-buttons").show();
@@ -401,7 +397,7 @@
 	function mute_audio() {
 		console.log('here mute')
                 if (acekurento !== null) {
-                  acekurento.enableDisableTrack(true, true); //mute audio
+                  acekurento.enableDisableTrack(false, true); //mute audio
 				  mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
                   mute_audio_icon.classList.add("fa-microphone-slash");
 				  mute_audio_icon.classList.remove("fa-microphone");
@@ -433,7 +429,7 @@
 	//hides self video so remote cannot see you
 	function hide_video() {
                 if (acekurento !== null) {
-                  acekurento.enableDisableTrack(true, false); //mute video
+                  acekurento.enableDisableTrack(false, false); //mute video
                   selfStream.setAttribute("hidden", true);
                 }
 	}
@@ -441,7 +437,7 @@
 	//unhides self video so remote can see you
 	function unhide_video() {
                 if (acekurento !== null) {
-                  acekurento.enableDisableTrack(false, false); //unmute video
+                  acekurento.enableDisableTrack(true, false); //unmute video
                   selfStream.removeAttribute("hidden");
                 }
 	}
@@ -449,7 +445,7 @@
 	function enable_video_privacy() {
                 if (acekurento !== null) {
 				  selfStream.classList.remove("mirror-mode");
-                  acekurento.enableDisableTrack(true, false); //mute video
+                  acekurento.enableDisableTrack(false, false); //mute video
                   hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
                   hide_video_icon.style.display = "block";
                   acekurento.privateMode(true, globalData.privacy_video_url);
@@ -460,7 +456,7 @@
                 if (acekurento !== null) {
 
 				  selfStream.classList.add("mirror-mode");
-                  acekurento.enableDisableTrack(false, false); //unmute video
+                  acekurento.enableDisableTrack(true, false); //unmute video
                   hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
                   hide_video_icon.style.display = "none";
                   acekurento.privateMode(false);
