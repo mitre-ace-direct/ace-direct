@@ -68,7 +68,7 @@ class ConfManager extends Events {
     });
   }
 
-  async invitePeer(caller, session, ext) {
+  async invitePeer(caller, session, ext, isMonitor) {
     if (session.atMaxCapacity) {
       return false;
     }
@@ -76,6 +76,13 @@ class ConfManager extends Events {
     if (!peer) return false;
     const webrtcOffer = await peer.askJoinSession(caller._ext, session);
     if (!webrtcOffer) return false;
+
+    if (isMonitor && peer._isAgent) {
+      // adding a monitor to the call
+      peer._isMonitoring = true;
+      session._hasMonitor = true;
+    }
+ 
     await session.addWebrtcPeer(peer, webrtcOffer);
     return true;
   }
