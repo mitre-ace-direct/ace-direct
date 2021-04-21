@@ -84,7 +84,7 @@ class ClientSession extends Events {
           this.handlePrivateMode(message.enabled, message.url);
           break;
         case 'invitePeer':
-          this.invitePeer(message.ext);
+          this.invitePeer(message.ext, message.isMonitor);
           break;
         case 'callTransfer':
           this.callTransfer(message.ext, message.isBlind);
@@ -144,10 +144,10 @@ class ClientSession extends Events {
     });
   }
   
-  async invitePeer(ext) {
+  async invitePeer(ext, isMonitor) {
     let success = false;
     if (this._session) {
-      success = await this._confm.invitePeer(this, this._session, ext);
+      success = await this._confm.invitePeer(this, this._session, ext, isMonitor);
     }
     this._send({
       id: 'inviteResponse',
@@ -266,6 +266,10 @@ class ClientSession extends Events {
           if (amires)
             this._isMemberQueue = false
         });
+      }
+      if(this._isMonitoring) {
+        this._session._hasMonitor = false;
+        this._isMonitoring = false;
       }
       this._status = CL_STATUS_REGISTERED;
       let sid = this._session.id;
