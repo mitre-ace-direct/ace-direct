@@ -83,6 +83,12 @@ var multipartyTransition = false;
 var isMultipartyTransfer = false;
 var allAgentCall = false;
 
+// call monitoring 
+var isMonitoring = false;
+var beingMonitored = false;
+var monitorExt;
+var extensionBeingMonitored;
+
 setInterval(function () {
 	busylight.light(this.agentStatus);
 }, 2000);
@@ -410,6 +416,7 @@ function connect_socket() {
 							"<tr><td>Name</td>" +
 							"<td>Extension</td>" +
 							"<td>Status</td>" +
+							"<td>Monitor Call</td>" + 
 							"<td>Transfer Call</td>" + 
 							"<td>Multi-Party Invite</td>"+
 							"<td>Chat</td></tr>"
@@ -492,6 +499,7 @@ function connect_socket() {
 								"name": data.agents[i].name,
 								"extension": data.agents[i].extension,
 								"queues": queues,
+								"monitorCall": monitorAvailability(data.agents[i].status, data.agents[i].name, data.agents[i].extension),
 								"transferCall": transferAvailability(data.agents[i].status, data.agents[i].name, data.agents[i].extension),
 								"multipartyInvite" : (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != data.agents[i].name)
 								? "<Button class=\"demo-btn\" onClick=multipartyinvite(" + data.agents[i].extension + ")><i class=\"fa fa-users\"></i></Button>"
@@ -986,6 +994,34 @@ function connect_socket() {
 						backdrop: 'static',
 						keyboard: false
 					});
+				}).on('initiateMonitor', function(data) {
+                    console.log('inviting ' +data.monitorExt.toString()+' to monitor this call');
+                    acekurento.invitePeer(data.monitorExt.toString(), true);
+                    socket.emit('monitor-invite', {'monitorExt': data.monitorExt, 'vrs': $('#callerPhone').val()});
+					if ($('#callerPhone').val()) {
+						// tell web consumer there's a monitor
+						socket.emit('start-monitoring-consumer', {'vrs': $('#callerPhone').val()});
+					}
+                    beingMonitored = true;
+                    showAlert('info', 'Your call is currently being monitored');
+                }).on('monitor-join-session', function(data) {
+                    //accept the call to monitor the session
+					if (data.vrs) {
+						console.log('webrtc call');
+						$('#callerPhone').val(data.vrs);
+					}
+                    $('#myRingingModal').modal({
+                        show: false,
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    setTimeout(() => {
+                        $('#accept-btn').trigger('click');
+                    }, 1000);
+                }).on('monitor-left', function() {
+					acekurento.isMonitoring = false;
+					beingMonitored = false;
+					showAlert('info', 'Your call is no longer being monitored');
 				});
 
 			} else {
@@ -1015,6 +1051,9 @@ $('#agenttable').DataTable({
 			"mDataProp": "queues"
 		},
 		{
+            "mDataProp": "monitorCall"
+        },
+		{
             "mDataProp": "transferCall"
         },
 		{
@@ -1033,6 +1072,12 @@ $('#agenttable').DataTable({
 
 function alignDataTableHeaders() {
 	$($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+}
+
+function monitorAvailability(status, name, ext) {
+	return (($('#user-status').text() == 'Ready' || $('#user-status').text() == 'Away') && status == 'INCALL' && $("#agentname-sidebar").text() != name) 
+	? "<Button class=\"demo-btn\" onClick=startMonitoringCall(" + ext + ")><i class=\"fa fa-eye\"></i></Button>"
+	: "<Button class=\"secondary\" disabled><i class=\"fa fa-eye\"></i></Button>"
 }
 
 function transferAvailability(status, name, ext) {
@@ -1067,6 +1112,19 @@ $('#submitvrs').on('click', function (event) {
 	}
 });
 
+function startMonitoringCall(ext) {
+    isMonitoring = true;
+	extensionBeingMonitored = ext;
+    socket.emit('askMonitor', {'monitorExt': extensionMe, 'originalExt': ext})
+}
+
+function stopMonitoringCall(ext) {
+    terminate_call();
+	acekurento.isMonitoring = false;
+	extensionBeingMonitored = null;
+
+    socket.emit('stopMonitoringCall', {'originalExt':ext, 'vrs': $('#callerPhone').val()});
+}
 
 $("#newchatmessage").on('change keydown paste input', function () {
 	var value = $("#newchatmessage").val();
