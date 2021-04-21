@@ -521,6 +521,11 @@ function connect_socket() {
 					setTimeout(function () {
 						$('#multipartyTransitionModal').modal('hide');
 					}, 3000);
+				}).on('consumer-being-monitored', function() {
+					// keep self-view and don't enable multiparty captions during a monitored one-to-one call
+					acekurento.isMonitoring = true;
+				}).on('consumer-stop-monitor', function() {
+					acekurento.isMonitoring = false;
 				});
 
 			} else {
