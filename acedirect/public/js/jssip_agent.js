@@ -25,6 +25,7 @@ var callParticipantsExt = [];
 var isMuted = false;
 var showTransferModal = false;
 var isMultipartyCall = false;
+var activeParticipantCount;
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -83,12 +84,21 @@ function register_jssip() {
 			console.log('--- WV: Participants Update ---\n');
 			console.log('--- WV: ' + JSON.stringify(e));
 			var participants = [];
+			activeParticipantCount = 0;
 			acekurento.activeAgentList = [];
 			participants = e.participants.map(function (p) { return p; });
 			callParticipantsExt = participants.map(function (p) { return p.ext; });
 
+			activeParticipantCount = participants.length;
+			beingMonitored = false;
+
 			for (var i = 0; i < participants.length; i++) {
-				if (participants[i].isAgent) {
+				if (participants[i].isMonitor) {
+					// a monitor is in the call. ignore them
+					activeParticipantCount = activeParticipantCount -1;
+					monitorExt = participants[i].ext;
+					beingMonitored = true;
+				} else if (participants[i].isAgent) {
 					acekurento.activeAgentList.push(participants[i]);
 				} else if(participants[i].type == 'participant:webrtc'){
 					// webrtc consumer. enable chat and file share
@@ -119,8 +129,10 @@ function register_jssip() {
 			} else {
 				allAgentCall = false;
 			}
-
-			if(callParticipantsExt.length > 2) {
+			if (isMonitoring && activeParticipantCount == 2) {
+				disable_chat_buttons();
+				$('#end-call').attr('onclick', 'stopMonitoringCall('+extensionBeingMonitored+')');
+			} else if(activeParticipantCount > 2) {
 				if (!isMultipartyCall) {
 					// new multiparty call
 					multipartyCaptionsStart();
@@ -128,28 +140,28 @@ function register_jssip() {
 				isMultipartyCall = true;
 
 				// the last agent to join will be the backup host
-				backupHostAgent = participants[participants.length-1].ext; 
+				backupHostAgent = participants[participants.length-1].ext; // TODO make sure this isn't the monitor
 				$('#end-call').attr('onclick', 'multipartyHangup()');
 
-				if (participants.length > 3) {
+				if (activeParticipantCount > 3) {
 					// set the transition agent
 					for (var i = 0; i < participants.length; i++){
-						if (participants[i].ext != hostAgent && participants[i].ext != backupHostAgent && participants[i].isAgent) {
+						if (participants[i].ext != hostAgent && participants[i].ext != backupHostAgent && participants[i].isAgent && !participants[i].isMonitor) {
 							transitionExt = participants[i].ext;
 						}
 					}
 				
 				}
-				if (participants.length == 3 && backupHostAgent == transitionExt) {
+				if (activeParticipantCount == 3 && backupHostAgent == transitionExt) {
 					// this should only happen after the host leaves a four person call
 					transitionAgent = null;
 					transitionExt = null;
-				} else if (participants.length == 3 && transitionExt && !isMultipartyTransfer) {
+				} else if (activeParticipantCount == 3 && transitionExt && !isMultipartyTransfer) {
 					// transition agent left the call
 					transitionAgent = null;
 					transitionExt = null;
 				}
-			} else if (participants.length == 2) {
+			} else if (activeParticipantCount == 2) {
 				isMultipartyCall = false;
 				multipartyCaptionsEnd();
 
@@ -245,25 +257,28 @@ function register_jssip() {
 				}
 				console.log('--- WV: Call ended ---\n');
 				terminate_call();
-
-				duration = $('#duration').html();
-				var currentTime = new Date();
-				callDate = (currentTime.getHours() + ":"
-					+ (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
-					+ (currentTime.getMonth() + 1) + "/"
-					+ (currentTime.getDate()) + "/"
-					+ (currentTime.getFullYear()));
-				socket.emit('callHistory', {
-					"callerName": callerName,
-					"callerNumber": callerNumber,
-					"direction": direction,
-					"duration": duration,
-					"endpoint": endpoint,
-					"callDate": callDate
-				});
-				//console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
-				loadCallHistory();
-
+				if (isMonitoring) {
+					//dont add to call history
+					isMonitoring = false;
+				} else {
+					duration = $('#duration').html();
+					var currentTime = new Date();
+					callDate = (currentTime.getHours() + ":"
+						+ (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
+						+ (currentTime.getMonth() + 1) + "/"
+						+ (currentTime.getDate()) + "/"
+						+ (currentTime.getFullYear()));
+					socket.emit('callHistory', {
+						"callerName": callerName,
+						"callerNumber": callerNumber,
+						"direction": direction,
+						"duration": duration,
+						"endpoint": endpoint,
+						"callDate": callDate
+					});
+					//console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
+					loadCallHistory();
+				}
 				console.log("REASON: " + e.reason);
 				clearScreen();
 				if (e.reason != undefined && e.reason.includes("failed")) {
@@ -427,14 +442,16 @@ function accept_call() {
 	if ($('#language-select') && $('#language-select').data('dd')) {
 		$('#language-select').data('dd').set('disabled', true); // Disable the msdropdown
 	}
-	//Enable in call buttons
-	document.getElementById("fileInput").disabled = false;
-	document.getElementById("sendFileButton").className = "demo-btn"
-	document.getElementById("sendFileButton").disabled = false;
-	document.getElementById("sendFileButton").style = 'cursor: pointer';
-	document.getElementById("screenShareButton").className = "demo-btn"
-	document.getElementById("screenShareButton").disabled = false;
-	document.getElementById("screenShareButton").style = 'cursor: pointer';
+	if (!isMonitoring){
+		//Enable in call buttons
+		document.getElementById("fileInput").disabled = false;
+		document.getElementById("sendFileButton").className = "demo-btn"
+		document.getElementById("sendFileButton").disabled = false;
+		document.getElementById("sendFileButton").style = 'cursor: pointer';
+		document.getElementById("screenShareButton").className = "demo-btn"
+		document.getElementById("screenShareButton").disabled = false;
+		document.getElementById("screenShareButton").style = 'cursor: pointer';
+	}
 	if (incomingCall) {
 		console.log("Accepting a call");
 		selfStream.removeAttribute("hidden");
@@ -442,7 +459,11 @@ function accept_call() {
 		//remoteView.srcObject = pc.getRemoteStreams()[0];
 		toggle_incall_buttons(true);
 		start_self_video();
-		incomingCall.accept();
+		if (isMonitoring) {
+            incomingCall.monitor();
+        } else {
+            incomingCall.accept();
+        }
 		$("#start-call-buttons").hide();
 		$('#outboundCallAlert').hide();// Does Not Exist - ybao: recover this to remove the Calling screen
 		setTimeout(() => {
@@ -463,9 +484,22 @@ function accept_call() {
 				transferAccepted = true;
 				isBlindTransfer = null;
 			}
-			calibrateVideo(2000);
+			try {
+				calibrateVideo(2000);
+			} catch(e) {}
+
 			$('#multipartyTransitionModal').modal('hide');
 		}, 1000);
+
+		if (isMonitoring) {
+            $('#selfView').hide();
+			$('#end-call').attr('onclick', 'stopMonitoring('+extensionBeingMonitored+')');
+			// not needed because monitor has no audio or video 
+			$('#hide-video').hide();
+			$('#mute-audio').hide();
+        } else {
+			$('#end-call').attr('onclick', 'termiante_call()');
+		}
 	}
 
 	multipartyTransition = false;
@@ -540,6 +574,10 @@ function disable_persist_view() {
 
 //starts the local streaming video. Works with some older browsers, if it is incompatible it logs an error message, and the selfStream html box stays hidden
 function start_self_video() {
+	if (isMonitoring) {
+		// dont start self video
+		return;
+	}
 	//if (selfStream.hasAttribute("hidden")) //then the video wasn't already started
 	//{
 	// Older browsers might not implement mediaDevices at all, so we set an empty object first
@@ -1023,7 +1061,7 @@ if (remoteStream.srcObject) {
 }
 
 function multipartyinvite(extension) {
-	acekurento.invitePeer(extension.toString());
+    acekurento.invitePeer(extension.toString(), false);
 	socket.emit('multiparty-invite', {
 		"extensions": extension.toString(),
 		"callerNumber": extensionMe,
@@ -1318,7 +1356,7 @@ function multipartyCaptionsStart() {
 	};
 
 	recognition.onend = function (event) {
-		if(acekurento.isMultiparty && (callParticipantsExt.length > 2))
+		if(acekurento.isMultiparty && (activeParticipantCount > 2))
 			multipartyCaptionsStart();	
 	}
 	recognition.start();
