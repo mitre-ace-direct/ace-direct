@@ -930,6 +930,28 @@ io.sockets.on('connection', function (socket) {
 		});
 	});
 
+	socket.on('askMonitor', function(data) {
+        io.to(Number(data.originalExt)).emit('initiateMonitor', {'monitorExt':data.monitorExt});
+    });
+
+    //invite the monitoring agent to the call
+    socket.on('monitor-invite', function(data){
+        console.log('at monitor invite')
+        io.to(Number(data.monitorExt)).emit('monitor-join-session', {'vrs': data.vrs});
+    });
+
+	socket.on('stopMonitoringCall', function(data) {
+		io.to(Number(data.originalExt)).emit('monitor-left');
+		if (data.vrs) {
+			io.to(Number(data.vrs)).emit('consumer-stop-monitor');
+			socket.leave(Number(data.vrs));
+		}
+	});
+
+	socket.on('start-monitoring-consumer', function(data) {
+		io.to(Number(data.vrs)).emit('consumer-being-monitored');
+	});
+
 	//Fired at end of call when new call history is added
 	socket.on('callHistory', function(data){
 		console.log('callhistory for ' + token.username);
