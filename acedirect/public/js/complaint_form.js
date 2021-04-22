@@ -524,8 +524,10 @@ function connect_socket() {
 				}).on('consumer-being-monitored', function() {
 					// keep self-view and don't enable multiparty captions during a monitored one-to-one call
 					acekurento.isMonitoring = true;
+					$('#end-call').attr('onclick', 'monitorHangup()');
 				}).on('consumer-stop-monitor', function() {
 					acekurento.isMonitoring = false;
+					$('#end-call').attr('onclick', 'terminate_call()');
 				});
 
 			} else {
