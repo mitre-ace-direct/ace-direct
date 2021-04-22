@@ -88,6 +88,7 @@ var isMonitoring = false;
 var beingMonitored = false;
 var monitorExt;
 var extensionBeingMonitored;
+var monitorTransition = false;
 
 setInterval(function () {
 	busylight.light(this.agentStatus);
@@ -1023,13 +1024,24 @@ function connect_socket() {
                     setTimeout(() => {
                         $('#accept-btn').trigger('click');
                     }, 1000);
+					$('#multipartyTransitionModal').modal('hide');
                 }).on('monitor-left', function() {
 					acekurento.isMonitoring = false;
 					beingMonitored = false;
 					showAlert('info', 'Your call is no longer being monitored');
 				}).on('monitor-leave-session', function(data) {
 					terminate_call();
-				});
+					if (data.reinvite) {
+						monitorTransition = true;
+                        $('#multipartyTransitionModal').modal('show');
+                        $('#multipartyTransitionModal').modal({
+                            backdrop: 'static',
+                            keyboard: false
+                        });
+                    }
+				}).on('monitor-rejoin-session', function(data) {
+                    startMonitoringCall(data.ext);
+                });
 
 			} else {
 				//we do nothing with bad connections
@@ -1126,6 +1138,7 @@ function startMonitoringCall(ext) {
 }
 
 function stopMonitoringCall(ext) {
+	monitorTransition = false;
     terminate_call();
 	acekurento.isMonitoring = false;
 	extensionBeingMonitored = null;
