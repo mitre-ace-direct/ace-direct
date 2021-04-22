@@ -292,6 +292,18 @@ var logWebRTCMongo = getConfigVal('webrtcstats:logWebRTCMongo');
 logWebRTCMongo = logWebRTCMongo.trim();
 logger.debug(`logWebRTCMongo: ${logWebRTCMongo}`);
 
+// FPS meter values
+var fpsHigh = getConfigVal('webrtcstats:fpsHigh');
+if (!fpsHigh) fpsHigh = "25.0";
+var fpsLow = getConfigVal('webrtcstats:fpsLow');
+if (!fpsLow) fpsLow = "14.9";
+var fpsMax = getConfigVal('webrtcstats:fpsMax');
+if (!fpsMax) fpsMax = "30.0";
+var fpsMin = getConfigVal('webrtcstats:fpsMin');
+if (!fpsMin) fpsMin = "0.0";
+var fpsOptimum = getConfigVal('webrtcstats:fpsOptimum');
+if (!fpsOptimum) fpsOptimum = "40.0";
+
 //busylight parameter
 var busyLightEnabled = getConfigVal('busylight:enabled');
 if (busyLightEnabled.length === 0) {
@@ -3759,7 +3771,12 @@ app.use(function (req, res, next) {
                 "turnCred":turnCred,
                 "logWebRTCStats": logWebRTCStats,
                 "logWebRTCStatsFreq": logWebRTCStatsFreq,
-								"logWebRTCMongo": logWebRTCMongo
+		"logWebRTCMongo": logWebRTCMongo,
+                "fpsHigh": fpsHigh,
+                "fpsLow": fpsLow,
+                "fpsMax": fpsMax,
+                "fpsMin": fpsMin,
+                "fpsOptimum": fpsOptimum
         };
         next();
 });
