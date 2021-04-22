@@ -9,4 +9,5 @@ bower_components/
 
 # config files
 acedirect-kurento/confs/kurento/WebRtcEndpoint.conf.ini
+acedirect-kurento/src/config/development.json
 dat/config.json
