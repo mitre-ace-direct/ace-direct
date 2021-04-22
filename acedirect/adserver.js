@@ -955,6 +955,14 @@ io.sockets.on('connection', function (socket) {
 		io.to(Number(data.vrs)).emit('consumer-being-monitored');
 	});
 
+	socket.on('force-monitor-leave', function(data) {
+		io.to(Number(data.monitorExt)).emit('monitor-leave-session', {'reinvite': data.reinvite});
+	});
+
+	socket.on('reinvite-monitor', function(data) {
+		io.to(Number(data.monitorExt)).emit('monitor-rejoin-session', {'ext': data.ext});
+	});
+
 	//Fired at end of call when new call history is added
 	socket.on('callHistory', function(data){
 		console.log('callhistory for ' + token.username);
