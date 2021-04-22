@@ -1026,6 +1026,8 @@ function connect_socket() {
 					acekurento.isMonitoring = false;
 					beingMonitored = false;
 					showAlert('info', 'Your call is no longer being monitored');
+				}).on('monitor-leave-session', function(data) {
+					terminate_call();
 				});
 
 			} else {
