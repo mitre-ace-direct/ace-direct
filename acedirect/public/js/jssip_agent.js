@@ -90,7 +90,6 @@ function register_jssip() {
 			callParticipantsExt = participants.map(function (p) { return p.ext; });
 
 			activeParticipantCount = participants.length;
-			beingMonitored = false;
 
 			for (var i = 0; i < participants.length; i++) {
 				if (participants[i].isMonitor) {
@@ -240,8 +239,18 @@ function register_jssip() {
 			console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e));
 			if (selfStream.srcObject) {
 				selfStream.srcObject.getVideoTracks()[0].onended = function () {
-					screenShareEnabled = false;
-					acekurento.screenshare(false);
+					if (beingMonitored){
+						// force monitor to leave the session first
+						socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
+
+						setTimeout(() => {
+							screenShareEnabled = false;
+							acekurento.screenshare(false);
+						}, 500);
+					} else {
+						screenShareEnabled = false;
+						acekurento.screenshare(false);
+					}
 				};
 			}
 			if (remoteStream.srcObject) {
@@ -249,12 +258,20 @@ function register_jssip() {
 					screenShareEnabled = false;
 				};
 			}
+
+			if (beingMonitored) {
+				// bring the monitor back to the session
+				socket.emit('reinvite-monitor', {'monitorExt': monitorExt, 'ext': extensionMe});
+			}
 		},
 		'ended': function (e) {
 			screenShareEnabled = false;
 			if (multipartyTransition) {
 				terminate_call();
 				unpauseQueues();
+			} else if (monitorTransition) {
+				terminate_call();
+				monitorTransition = false;
 			} else {
 				if (acekurento.isMultiparty == false) {
 					//Wont enter wrap up
@@ -1041,6 +1058,10 @@ function exitFullscreen() {
 //New 4.0 feature functions
 function shareScreen() {
 	if (agentStatus == 'IN_CALL') {
+		if (beingMonitored) {
+			// kick the monitor from the session before screensharing
+			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
+		}
 		if (screenShareEnabled == true) {
 			if (acekurento !== null) {
 				acekurento.remoteStream = document.getElementById('remoteView');
