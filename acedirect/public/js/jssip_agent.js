@@ -171,7 +171,11 @@ function register_jssip() {
 					// one to one call with consumer
 					hostAgent = extensionMe;
 					backupHostAgent = null; // remove backup host if it existed
-					$('#end-call').attr('onclick', 'terminate_call()');
+					if (beingMonitored) {
+						$('#end-call').attr('onclick', 'monitorHangup()');
+					} else {
+						$('#end-call').attr('onclick', 'terminate_call()');
+					}
 				}
 				multipartyTransition = false;
 			}																						
@@ -1058,6 +1062,16 @@ if (selfStream.srcObject) {
 }
 if (remoteStream.srcObject) {
 	remoteStream.srcObject.getVideoTracks()[0].addEventListener('ended', () => console.log('screensharing has ended'));
+}
+
+function monitorHangup() {
+	if (beingMonitored) {
+		// kick the monitor from the session first
+		socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite': false});
+	}
+	setTimeout(() => {
+		terminate_call();
+	}, 500);
 }
 
 function multipartyinvite(extension) {
