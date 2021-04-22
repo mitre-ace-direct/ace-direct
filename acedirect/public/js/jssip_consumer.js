@@ -19,7 +19,11 @@
 	var jssip_debug = false; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
 	var maxRecordingSeconds = 90;
 	var call_terminated = false;
+<<<<<<< HEAD
 	var privacy_video_url = window.location.origin + "/" + nginxPath + "/media/videoPrivacy.webm";
+=======
+	var monitorExt;
+>>>>>>> Fix hangups while monitoring
 
 	//VIDEOMAIL recording progress bar
 	var recordId = null;
@@ -181,6 +185,7 @@
 				$("#start-call-buttons").show();
 				$("#agent-name-box").hide();
 				$("#agent-name").text("");
+				$('#end-call').attr('onclick', 'terminate_call()');
 
 			},
 			'participantsUpdate': function(e) {
@@ -190,6 +195,12 @@
 				var partCount = e.participants.filter(t=>t.type == "participant:webrtc").length;
 
 				console.log("--- WV: partCount: " + partCount);
+
+				for (var i = 0; i < e.participants.length; i++) {
+					if (e.participants[i].isMonitor) {
+						monitorExt = e.participants[i].ext;
+					}
+				}
 
 				if (partCount >=2 || videomailflag) {
 					console.log("--- WV: CONNECTED");
@@ -263,6 +274,14 @@
 		}
 	}
 
+	function monitorHangup() {
+		socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite': false});
+		
+		setTimeout(() => {
+			terminate_call();
+		}, 500);
+	}
+
 	//handles cleanup from jssip call. removes the session if it is active and removes video.
 	function terminate_call() {
 		if (acekurento !== null) {
@@ -270,6 +289,7 @@
 			acekurento = null;
 		}
 		call_terminated = true;
+		monitorExt = null;
 
 		
 		document.getElementById("screenshareButton").disabled = true;
