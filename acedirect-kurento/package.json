@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "DEBUG=ace:*,JsSIP:* nodemon --watch src --exec node src/index",
+    "start": "node src/index.js",
     "build": "node ./build.js",
     "build2": "node ./build2.js",
     "clean": "rm -rf node_modules vendor/kurento-client-js/node_modules vendor/kurento-jsonrpc/node_modules vendor/reconnect-ws/node_modules call-metrics/node_modules ACEKurento-js/node_modules static/bower_components >/dev/null 2>&1 || true ",
