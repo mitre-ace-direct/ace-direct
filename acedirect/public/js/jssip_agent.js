@@ -262,7 +262,7 @@ function register_jssip() {
 
 			if (beingMonitored) {
 				// bring the monitor back to the session
-				socket.emit('reinvite-monitor', {'monitorExt': monitorExt, 'ext': extensionMe});
+				socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
 			}
 		},
 		'ended': function (e) {
