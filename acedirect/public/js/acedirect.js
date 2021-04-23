@@ -94,6 +94,11 @@ $(document).ready(function () {
         meterelemval = document.getElementById('speedval');
         packetsLostElem = document.getElementById('packets-lost-a');
         packetsLostValElem = document.getElementById('connection-packets-lost');
+        meterelem.high = fpsHigh;
+        meterelem.low = fpsLow; 
+        meterelem.max = fpsMax; 
+        meterelem.min = fpsMin
+        meterelem.optimum = fpsOptimum;
 
 	connect_socket();
 	$("#debugtab").hide();
