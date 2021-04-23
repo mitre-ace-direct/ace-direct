@@ -690,11 +690,13 @@ function connect_socket() {
 					$('#fileInput').val('');
 				}).on('screenshareRequest', function(data){
 					//$('#screenshareButtons').show()
-					$('#screenshareRequest').modal({
-						show: true,
-						backdrop: 'static',
-						keyboard: false
-					});
+					if (!isMonitoring) {
+						$('#screenshareRequest').modal({
+							show: true,
+							backdrop: 'static',
+							keyboard: false
+						});
+					}
 				}).on('caption-translated', function (transcripts) {
 						console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
 					if(acekurento.isMultiparty){
@@ -1034,8 +1036,8 @@ function connect_socket() {
                             keyboard: false
                         });
                     }
-				}).on('monitor-rejoin-session', function(data) {
-                    startMonitoringCall(data.ext);
+				}).on('monitor-rejoin-session', function() {
+					startMonitoringCall(extensionBeingMonitored);
                 });
 
 			} else {
