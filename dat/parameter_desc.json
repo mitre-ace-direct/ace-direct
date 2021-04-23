@@ -113,7 +113,12 @@
   "webrtcstats": {
     "logWebRTCStats": "true/false boolean; turn on webrtc in-call stats for the agent portal (FPS and dropped packets indicators)",
     "logWebRTCStatsFreq": "string; webrtc stats polling frequency (milliseconds); set to >= 1000, since the call stats object is quite large",
-    "logWebRTCMongo": "mongodb connection URI; leave empty to disable MongoDB logging"
+    "logWebRTCMongo": "mongodb connection URI; leave empty to disable MongoDB logging",
+    "fpsLow": "float; FPS meter low boundary",
+    "fpsHigh": "float; FPS meter high boundary",
+    "fpsMin": "float; FPS meter min value",
+    "fpsMax": "float; FPS meter max value",
+    "fpsOptimum": "float; FPS meter optimum value"
   },  
   "complaint_redirect": {
     "active": "Complaint portal redirect? true or false",
