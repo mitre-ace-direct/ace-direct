@@ -113,7 +113,12 @@
   "webrtcstats": {
     "logWebRTCStats": false,
     "logWebRTCStatsFreq": "1000",
-    "logWebRTCMongo": ""
+    "logWebRTCMongo": "",
+    "fpsLow": "14.9", 
+    "fpsHigh": "25.0", 
+    "fpsMin": "0.0", 
+    "fpsMax": "30.0", 
+    "fpsOptimum": "40.0"
   },  
   "complaint_redirect": {
     "active": "true",
