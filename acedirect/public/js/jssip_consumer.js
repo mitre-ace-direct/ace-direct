@@ -682,22 +682,28 @@
 	}
 
 
-function getAgentColor(displayName) {
-	console.log('returning cyan for', displayName)
-	return 'cyan'; // fixme
-}
+// function getAgentColor(displayName) {
+// 	console.log('returning cyan for', displayName)
+// 	return 'cyan'; // fixme
+// }
 
 function updateCaptionsMultiparty(transcripts) {
 	var temp = document.createElement("div");
 	temp.id = transcripts.msgid;
-	let displayName = 'CSR ' +  $('#agent-name').text();
+	
+	// fixme how do i know if this is consumer
+	let displayName = '';
+	if (transcripts.agent) {
+		displayName = 'CSR ';
+	}
+	displayName = displayName +  transcripts.displayname;
 	temp.innerHTML = createCaptionHtml(displayName, transcripts);
 	
 	temp.classList.add("transcripttext");
-	if (transcripts.agent) {
+	// if (transcripts.agent) {
 
-		temp.classList.add("agent-color-" + getAgentColor(transcripts.displayname) ); //fixme
-	}
+	// 	temp.classList.add("agent-color-" + getAgentColor(transcripts.displayname) ); //fixme
+	// }
 	document.getElementById("transcriptoverlay").prepend(temp);
 	// setTimeout(function () { temp.remove() }, 5000);
 }
