@@ -969,7 +969,7 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('reinvite-monitor', function(data) {
-		io.to(Number(data.monitorExt)).emit('monitor-rejoin-session', {'ext': data.ext});
+		io.to(Number(data.monitorExt)).emit('monitor-rejoin-session');
 	});
 
 	//Fired at end of call when new call history is added
