@@ -23,9 +23,6 @@
     "port": 1234,
     "dev_url": "wss://portal.domain.com/SOMEUSER/acedirect-kurento/signaling"
   },
-  "media_server": {
-    "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
-  },
   "asterisk": {
     "sip": {
       "public": "acesip.domain.com",
