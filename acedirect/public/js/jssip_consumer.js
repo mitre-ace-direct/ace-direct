@@ -153,22 +153,38 @@
 			'failed': function(e) {
 				console.log('--- WV: Failed ---\n' + e);
 			},
-                        'restartCallResponse': function (e) {
-                                console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e) );
-                                if (selfStream && selfStream.srcObject) {
-                                  selfStream.srcObject.getVideoTracks()[0].onended = function () {
-                                    console.log('screensharing ended self');
-				    $("#startScreenshare").hide();
-                                    if (acekurento) acekurento.screenshare(false);
-                                  };
-                                }
-                                if (remoteStream && remoteStream.srcObject) {
-                                  remoteStream.srcObject.getVideoTracks()[0].onended = function () {
-                                    console.log('screensharing ended remote');
-				    $("#startScreenshare").hide();
-                                  };
-                                }
-                        },
+			'restartCallResponse': function (e) {
+				console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e));
+				if (selfStream && selfStream.srcObject) {
+					selfStream.srcObject.getVideoTracks()[0].onended = function () {
+						console.log('screensharing ended self');
+						$("#startScreenshare").hide();
+
+						if (monitorExt) {
+							// force monitor to leave the session first
+							socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
+
+							setTimeout(() => {
+								screenShareEnabled = false;
+								if (acekurento) acekurento.screenshare(false);
+							}, 500);
+						} else {
+							if (acekurento) acekurento.screenshare(false);
+						}
+					};
+				}
+				if (remoteStream && remoteStream.srcObject) {
+					remoteStream.srcObject.getVideoTracks()[0].onended = function () {
+						console.log('screensharing ended remote');
+						$("#startScreenshare").hide();
+					};
+				}
+
+				if (monitorExt) {
+					// bring the monitor back to the session
+					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+				}
+			},
 			'ended': function(e) {
 				console.log('--- WV: Call ended ---\n');
 
