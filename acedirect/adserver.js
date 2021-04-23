@@ -142,8 +142,8 @@ log4js.configure({
 		filename: 'logs/' + logname + '.log',
 		pattern: '-yyyy-MM-dd',
 		alwaysIncludePattern: false,
-		maxLogSize: 20480,
-		backups: 10
+		maxLogSize: 20971520,
+		backups: 0
 	  }
 	},
 	categories: {
