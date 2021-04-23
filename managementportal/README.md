@@ -4,24 +4,9 @@
 
 The ACE Management Portal consists of two components, the Management and Call Detail Record (CDR) dashboards. These dashboards present the manager with information about the operations of the call center and information about incoming calls.  
 
-## SSL Configuration
+## Deployment
 
-1. ACE software uses SSL which requires a valid key and certificate.
-1. The location of the SSL key and certificate is specified in the `dat/config.json` by using the `common:https:certificate` and `common:https:private_key` parameters in the form of folder/file (e.g., `/home/centos/ssl/mycert.pem` and `/home/centos/ssl/mykey.pem`).
-1. Additional information can be found in the ACE Direct Platform Release documentation.
-
-## Getting Started
-
-To install the management portal, follow the README.md file in the autoinstall folder. The instructions for manual install are also provided below for reference.
-
-1. Clone this repository
-1. Download and install or update [Node.js](https://nodejs.org/en/)
-1. Run the required build script: cd into the managementportal directory, run `npm run build`
-1. To start the ACE Management Portal node server manually, run `node server-db.js`
-
-## Accessing the Portal
-
-1. ACE Management Portal: `http://host/ManagementPortal`
+Configuraiton and deployment of this server is part of the overall `ace-direct` installation process. See [../README.md](../README.md) for full details.
 
 ## Management Dashboard
 
@@ -95,4 +80,3 @@ The data can be one of two types:
 
 1. **System** - A list of services required for ACE Direct to properly operate
 2. **Status** - The current status of each service (Running or Unavailable)
-
