@@ -586,15 +586,6 @@ var fqdnUrl = 'https://' + fqdnTrimmed + ':*';
 
 logger.info('FQDN URL: ' + fqdnUrl);
 
-//Note: privacy video file must be configured and served by media server
-var privacy_video_url = '';
-if (nconf.get('media_server:privacy_video_url')) {
-  privacy_video_url = getConfigVal('media_server:privacy_video_url');
-} else {
-  privacy_video_url = 'file:///tmp/media/videoPrivacy.webm'; //default to this if not in config.json
-}
-// Remove the newline
-var privacy_video_url = privacy_video_url.trim();
 
 var httpsServer = https.createServer(credentials, app);
 
@@ -3343,7 +3334,6 @@ function processExtension(data) {
 						"signaling_server_port": signalingServerPort,
 						"signaling_server_proto": signalingServerProto,
 						"signaling_server_dev_url": signalingServerDevUrl,
-					        "privacy_video_url": privacy_video_url,
 						"queues_complaint_number": queuesComplaintNumber,
 						"queues_videomail_number": queuesVideomailNumber,
 						"queues_videomail_maxrecordsecs": queuesVideomailMaxrecordsecs,
@@ -3917,7 +3907,6 @@ app.get('/token', function (req, res) {
 		payload.signalingServerPort = req.session.signalingServerPort;
 		payload.signalingServerProto= req.session.signalingServerProto;
 		payload.signalingServerDevUrl = req.session.signalingServerDevUrl;
-                payload.privacy_video_url = privacy_video_url;
 		payload.queuesComplaintNumber = req.session.queuesComplaintNumber;
 		payload.extensionPassword = req.session.extensionPassword;
 		payload.complaint_queue_count = complaint_queue_count;
@@ -4099,7 +4088,6 @@ app.get('/login', agent.shield(cookieShield), function (req, res) {
 						req.session.signalingServerPort = signalingServerPort;
 						req.session.signalingServerProto= signalingServerProto;
 						req.session.signalingServerDevUrl= signalingServerDevUrl;
-						req.session.privacy_video_url = privacy_video_url;
 						req.session.queuesComplaintNumber = queuesComplaintNumber;
 						req.session.extensionPassword = extensionPassword;
 						req.session.complaint_queue_count = complaint_queue_count;
