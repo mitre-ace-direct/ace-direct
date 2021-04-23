@@ -839,7 +839,7 @@ function start_video_calibration() {
 	if (acekurento !== null) {
 		console.log('Start video calibration');
 		acekurento.enableDisableTrack(false, false); //mute video
-		acekurento.calibrateMode(true, privacy_video_url);
+		acekurento.privateMode(true, calibrate_video_url);
 	}
 }
 
@@ -848,7 +848,7 @@ function end_video_calibration() {
 		console.log('End video calibration');
 		mirrorMode("selfView", true);
 		acekurento.enableDisableTrack(true, false); //unmute video
-		acekurento.calibrateMode(false);
+		acekurento.privateMode(false);
 	}
 }
 
