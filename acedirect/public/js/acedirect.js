@@ -31,7 +31,8 @@ var filter = "ALL";
 var telNumber;
 var playingVideomail = false;
 var acekurento;
-var privacy_video_url = null;
+var privacy_video_url = window.location.origin + "/" + nginxPath + "/media/videoPrivacy.webm";
+var calibrate_video_url = window.location.origin + "/" + nginxPath + "/media/calibrate.webm";
 var recipientNumber;
 //Used for tracking new videomail
 var storedData = document.getElementById("unread-mail-count").innerHTML;
@@ -215,8 +216,6 @@ function connect_socket() {
 					$("#pc_config").attr("name", "stun:" + payload.stunServer);
 					$("#complaints-queue-num").text(payload.complaint_queue_count);
 					$("#general-queue-num").text(payload.general_queue_count);
-
-                                        privacy_video_url = payload.privacy_video_url;
 					signalingServerPublic = document.getElementById("signaling_server_public");
 					signalingServerPort = document.getElementById("signaling_server_port");
 
