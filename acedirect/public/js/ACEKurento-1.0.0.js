@@ -4969,14 +4969,6 @@ function ACEKurento(config) {
       sendMessage({ id: 'privacy', enabled: enabled, url: enabled ? url : undefined });
     },
     /**
-     * Sends calibration video image to peer instead of local video stream
-     * @param {Boolean} enabled - If "true" enables video calibrate mode
-     * @param {String} url - The video calibrate mode url
-     */
-    calibrateMode: function (enabled, url) {
-      sendMessage({ id: 'privacy', enabled: enabled, url: enabled ? "file://tmp/media/calibrate5.webm" : undefined });
-    },
-    /**
      * @param {Number} number - Number value for DTMF input
      */
     sendDTMF: function (number) {
