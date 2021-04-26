@@ -19,6 +19,7 @@
 	var jssip_debug = false; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
 	var maxRecordingSeconds = 90;
 	var call_terminated = false;
+	var privacy_video_url = window.location.origin + "/" + nginxPath + "/media/videoPrivacy.webm";
 
 	//VIDEOMAIL recording progress bar
 	var recordId = null;
@@ -444,7 +445,7 @@
                   acekurento.enableDisableTrack(false, false); //mute video
                   hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
                   hide_video_icon.style.display = "block";
-                  acekurento.privateMode(true, globalData.privacy_video_url);
+                  acekurento.privateMode(true, privacy_video_url);
                 }
 	}
 
