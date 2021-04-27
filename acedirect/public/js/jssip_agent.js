@@ -56,7 +56,8 @@ function register_jssip() {
 				var transcripts = JSON.parse(e.msg);
 				if (transcripts.transcript) {
 					if (acekurento.isMultiparty) {
-                        			socket.emit('multiparty-caption-agent', {
+						console.log('sending multiparty caption:', transcripts.transcript, extensionMe);
+                        socket.emit('multiparty-caption-agent', {
 							"transcript": transcripts.transcript,
 							"final": transcripts.final,
 							"language": transcripts.langCd,
@@ -416,6 +417,8 @@ function calibrateVideo(duration) {
 
 //answers an incoming call
 function accept_call() {
+	$('#agent-captions').show();
+	$('#agent-divider').show();
 	stopVideomail();
 	disable_persist_view();
 	document.getElementById("sidebar-dialpad").removeAttribute("onclick");
@@ -615,6 +618,8 @@ function toggle_incall_buttons(make_visible) {
 }
 
 function terminate_call() {
+	$('#agent-captions').hide();
+	$('#agent-divider').hide();
 	clearTimeout(outbound_timer);
 	$('#outboundCallAlert').hide();
 	mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
@@ -1210,25 +1215,32 @@ function testCaptions() {
 	} else { console.log('demo running'); }
 }
 
-var tempDivTimeout = null;
+
+function createCaptionHtml(displayName, transcripts) {
+	console.log(displayName, transcripts)
+	let caption = transcripts.transcript;
+	if (!transcripts.final) {
+		caption += '...';
+	}
+	let timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+	return '<span class="timestamp">' + timestamp + '</span><strong>' + displayName + ':</strong> ' + caption;
+}
+
 function updateCaptions(transcripts) {
+	
 	console.log('transcripts in UC are ', transcripts)
 	var tDiv = document.getElementById(transcripts.msgid);
-	console.log(tDiv)
+	
 	if (!tDiv) {
 		var temp = document.createElement("div");
 		temp.id = transcripts.msgid;
-		temp.innerHTML = transcripts.transcript;
+		temp.innerHTML = createCaptionHtml('Consumer', transcripts); 
+		
 		temp.classList.add("transcripttext");
-		document.getElementById("transcriptoverlay").appendChild(temp);
-		tempDivTimeout = setTimeout(function () { temp.remove() }, 5000);
+		document.getElementById("transcriptoverlay").prepend(temp);
 	} else {
-		clearTimeout(tempDivTimeout);
-		tDiv.innerHTML = transcripts.transcript;
-		tempDivTimeout = setTimeout(function () { tDiv.remove() }, 5000);
+		tDiv.innerHTML = createCaptionHtml('Consumer', transcripts); 
 		if (transcripts.final) {
-			setTimeout(function () { tDiv.remove() }, 5000);
-
 			$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
 			$("#caption-messages").scrollTop($("#caption-messages")[0].scrollHeight);
 
@@ -1241,10 +1253,10 @@ function updateCaptionsMultiparty(transcripts) {
 	if(!tDiv){//prevents duplicate captions
 		var temp = document.createElement("div");
 		temp.id = transcripts.msgid;
-		temp.innerHTML = transcripts.displayname + ": " + transcripts.transcript;
+		temp.innerHTML = createCaptionHtml(transcripts.displayname, transcripts);
 		temp.classList.add("transcripttext");
-		document.getElementById("transcriptoverlay").appendChild(temp);
-		setTimeout(function () { temp.remove() }, 5000);
+		document.getElementById("transcriptoverlay").prepend(temp);
+		// setTimeout(function () { temp.remove() }, 5000);
 	}
 }
 
@@ -1305,6 +1317,7 @@ function multipartyCaptionsStart() {
 	recognition.onresult = function (event) {
 		if(!isMuted && event && event.results && (event.results.length > 0)){
 			var lastResult = event.results.length - 1;
+			console.log('sending multiparty-caption-agent caption:', event.results[lastResult][0].transcript, extensionMe);
 			socket.emit('multiparty-caption-agent', {
 				"transcript":event.results[lastResult][0].transcript,
 				"final": event.results[lastResult].isFinal, 
