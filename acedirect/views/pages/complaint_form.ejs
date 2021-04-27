@@ -170,7 +170,7 @@
 						</div>
 					</section>
 					<!-- Middle Col -->
-					<section class="col-lg-7" id="video-section">
+					<section class="col-lg-6" id="video-section">
 						<div class="box">
 							<div class="box-header with-border">
 								<i class="fa fa-video-camera"></i>
@@ -183,12 +183,11 @@
 							</div>
 
 							<div class="box-body" id="fullscreen-element">
-								<div id="webcam" hidden>
+								<div id="consumer-webcam" hidden>
 
 
 									<video id="remoteView" autoplay poster="images/acedirect-logo.png"></video>
 									<video id="selfView" autoplay muted="true" class="mirror-mode" hidden></video>
-									<div id="transcriptoverlay" class="transcriptoverlay"></div> <!-- Caption code -->
 
 									<div id="call-option-buttons">
 										<div id="inner">
@@ -234,8 +233,12 @@
 
 									</div>
 								</div>
+								<hr id="consumer-divider" class="caption-box-divider"  style="display:none" />
+								<div id="consumer-captions" class="captions-box" style="display:none">
+									<div id="transcriptoverlay" class=""></div> 
+								</div>
 
-								<div class="row">
+								<div>
 									<div class="col-xs-12 text-center" id="start-call-buttons"
 										style="margin-top: 10px; margin-bottom: 10px;">
 										<button class="btn btn-primary" id="callbutton" style="width: 80px;"
@@ -247,6 +250,7 @@
 										</button>
 									</div>
 								</div>
+								
 								<div class="col-xs-12 text-center" id="agent-name-box"
 									style="margin-bottom: 5px; margin-top: 5px;" hidden>
 									<p> You are talking to CSR <strong id="agent-name"> </strong>.</p>
