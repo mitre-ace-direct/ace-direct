@@ -1965,11 +1965,13 @@ io.sockets.on('connection', function (socket) {
 					console.log('translating', data.transcripts.transcript, 'from', languageFrom, 'to', languageTo);
 					let encodedText = encodeURI(data.transcripts.transcript.trim());
 					let translationUrl = translationServerUrl + '/translate?languageFrom=' + languageFrom + '&text=' + encodedText + '&languageTo=' + languageTo;
+					console.log('is agent here? if so use color', data);
 					if (languageTo === languageFrom) {
 						console.log('same language!');
 						socket.emit('caption-translated', {
-							'transcript' : data.transcripts.transcript.trim(),
-							'displayname' : displayname,
+							'transcript': data.transcripts.transcript.trim(),
+							'displayname': data.transcripts.displayname,
+							'agent': data.transcripts.agent,
 							'msgid': msgid,
 							'final': final
 						});
@@ -1987,19 +1989,23 @@ io.sockets.on('connection', function (socket) {
 							if (error) {
 								logger.error("GET translation: " + error);
 								console.error("GET translation error: " + error);
-								socket.emit('caption-translated', {
-									'transcript' : 'Error using translation server: ' + translationUrl,
-									'displayname' : displayname,
-									'msgid': msgid,
-									'final': final
-								});
+								// socket.emit('caption-translated', {
+								// 	'transcript' : 'Error using translation server: ' + translationUrl,
+								// 	'displayname' : data.transcripts.displayname,
+								// 	'msgid': msgid,
+								// 	'final': final
+								// });
+							} else if (!data.translation) {
+								console.error("No translation was received from translation server");
 							} else {
 								console.log('received translation', data);
 								console.log(languageFrom, languageTo, translationUrl);
+								
 								// fixme will this be wrong if multiple clients/agents?
 								socket.emit('caption-translated', {
 									'transcript' : data.translation,
-									'displayname' : displayname,
+									'displayname' : data.transcripts.displayname,
+									'agent': data.transcripts.agent,
 									'msgid': msgid,
 									'final': final
 									});
