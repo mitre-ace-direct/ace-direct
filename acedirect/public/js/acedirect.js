@@ -1010,7 +1010,7 @@ function connect_socket() {
 						socket.emit('start-monitoring-consumer', {'vrs': $('#callerPhone').val()});
 					}
                     beingMonitored = true;
-                    showAlert('info', 'Your call is currently being monitored');
+					monitorExt = data.monitorExt;
                 }).on('monitor-join-session', function(data) {
                     //accept the call to monitor the session
 					if (data.vrs) {
@@ -1029,7 +1029,7 @@ function connect_socket() {
                 }).on('monitor-left', function() {
 					acekurento.isMonitoring = false;
 					beingMonitored = false;
-					showAlert('info', 'Your call is no longer being monitored');
+					monitorExt = null;
 				}).on('monitor-leave-session', function(data) {
 					terminate_call();
 					if (data.reinvite) {
@@ -1039,7 +1039,19 @@ function connect_socket() {
                             backdrop: 'static',
                             keyboard: false
                         });
-                    }
+
+						if (data.multipartyHangup) {
+							setTimeout(() => {
+								startMonitoringCall(extensionBeingMonitored);
+							}, 5000);
+						}
+                    } else {
+						// remove monitor variables
+						extensionBeingMonitored = null;
+						isMonitoring = false;
+						monitorTransition = false;
+						socket.emit('stopMonitoringCall', {'originalExt':extensionBeingMonitored, 'vrs': $('#callerPhone').val()});
+					}
 				}).on('monitor-rejoin-session', function() {
 					startMonitoringCall(extensionBeingMonitored);
                 });
@@ -1488,6 +1500,7 @@ function clearScreen() {
 	$('#fileSentError').hide();
 
 	$('#transferExtension').val('');
+	monitorExt = null;
 }
 
 function changeStatusLight(state) {
