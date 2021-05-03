@@ -121,6 +121,12 @@ function register_jssip() {
                     document.getElementById("sendFileButton").removeAttribute('style');
                 }
 			}
+			if (beingMonitored && acekurento.activeAgentList.length == participants.length-1) {
+				allAgentCall = true;
+				socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':false});
+				beingMonitored = false;
+				acekurento.isMonitoring = false;
+			}
 
 			if (acekurento.activeAgentList.length == participants.length) {
 				allAgentCall = true;
@@ -183,6 +189,11 @@ function register_jssip() {
 
 				if (allAgentCall) {
 					$('#end-call').attr('onclick', 'terminate_call()');
+					if (beingMonitored) {
+						socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':false});
+						beingMonitored = false;
+						acekurento.isMonitoring = false;
+					}
 				} else {
 					// one to one call with consumer
 					hostAgent = extensionMe;
