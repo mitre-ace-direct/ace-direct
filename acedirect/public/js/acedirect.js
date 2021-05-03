@@ -956,7 +956,15 @@ function connect_socket() {
                 }).on('beginTransfer', function() {
 					// initiate the call transfer in the signaling server
 					if (isColdTransfer) {
+						if (beingMonitored) {
+							// remove monitor first
+							socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':false});
+							setTimeout(() => {
+								acekurento.callTransfer(transferExt.toString(), true);
+							}, 500);
+						} else {
 						acekurento.callTransfer(transferExt.toString(), true);
+						}
 					} else {
 						// warm transfers are multiparty calls
 						multipartyinvite(transferExt);
