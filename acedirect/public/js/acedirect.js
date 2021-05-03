@@ -1039,11 +1039,12 @@ function connect_socket() {
                             backdrop: 'static',
                             keyboard: false
                         });
-
-						if (data.multipartyHangup) {
+						if (data.multipartyTransition) {
+							// do nothing
+						} else if (data.multipartyHangup) {
 							setTimeout(() => {
 								startMonitoringCall(extensionBeingMonitored);
-							}, 5000);
+							}, 1000);
 						}
                     } else {
 						// remove monitor variables
@@ -1500,7 +1501,6 @@ function clearScreen() {
 	$('#fileSentError').hide();
 
 	$('#transferExtension').val('');
-	monitorExt = null;
 }
 
 function changeStatusLight(state) {
