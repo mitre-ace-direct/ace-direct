@@ -956,7 +956,7 @@ io.sockets.on('connection', function (socket) {
 	});
 
 	socket.on('force-monitor-leave', function(data) {
-		io.to(Number(data.monitorExt)).emit('monitor-leave-session', {'reinvite': data.reinvite, 'multipartyHangup': data.multipartyHangup});
+		io.to(Number(data.monitorExt)).emit('monitor-leave-session', {'reinvite': data.reinvite, 'multipartyHangup': data.multipartyHangup, 'multipartyTransition':data.multipartyTransition});
 	});
 
 	socket.on('reinvite-monitor', function(data) {
