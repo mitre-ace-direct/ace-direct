@@ -27,6 +27,9 @@ var showTransferModal = false;
 var isMultipartyCall = false;
 var activeParticipantCount;
 var activeParticipants = [];
+var isMonitorInSession = false;
+var reinviteMonitorMultipartyInvite = false;
+var reinviteMonitorMultipartyTransition = false;
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -89,6 +92,7 @@ function register_jssip() {
 			activeParticipantCount = 0;
 			acekurento.activeAgentList = [];
 			activeParticipants = [];
+			isMonitorInSession = false;
 			participants = e.participants.map(function (p) { return p; });
 			callParticipantsExt = participants.map(function (p) { return p.ext; });
 
@@ -101,6 +105,7 @@ function register_jssip() {
 					// a monitor is in the call. ignore them
 					activeParticipantCount = activeParticipantCount -1;
 					monitorExt = participants[i].ext;
+					isMonitorInSession = true;
 				} else if (participants[i].isAgent) {
 					acekurento.activeAgentList.push(participants[i]);
 				} else if(participants[i].type == 'participant:webrtc'){
@@ -119,6 +124,7 @@ function register_jssip() {
 
 			if (acekurento.activeAgentList.length == participants.length) {
 				allAgentCall = true;
+				beingMonitored = false;
 				// disable chat, file share, and screenshare buttons
 				disable_chat_buttons();
 				document.getElementById("fileInput").disabled = true;
@@ -354,15 +360,25 @@ function register_jssip() {
 				if (document.getElementById("persistCameraCheck").checked == true) {
 					enable_persist_view();
 				}
+
+				// reset monitor variables
+				monitorExt = null;
+				beingMonitored = false;
+				if (acekurento) {
+					acekurento.isMonitoring = false;
+				}
 			}
 		},
 		'inviteResponse': function(e) {
 			console.log('--- WV: inviteResponse ---\n' + JSON.stringify(e));
-			if (e.success && beingMonitored && e.ext != monitorExt){
+			if ((e.success && beingMonitored && e.ext != monitorExt && !reinviteMonitorMultipartyTransition) || (reinviteMonitorMultipartyInvite && e.ext != monitorExt)){
 				// reinvite the monitor back after the new agent joins
 				setTimeout(() => {
 					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+					reinviteMonitorMultipartyInvite = false;
 				}, 1000);
+			} else if (e.ext == monitorExt && reinviteMonitorMultipartyTransition) {
+				reinviteMonitorMultipartyTransition = false;
 			}
 		}
 	};
@@ -526,6 +542,13 @@ function accept_call() {
 				transferExt = null;
 				transferAccepted = true;
 				isBlindTransfer = null;
+			}
+
+			if (beingMonitored) {
+				reinviteMonitorMultipartyTransition = true;
+				setTimeout(() => {
+					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+				}, 1000);
 			}
 			try {
 				calibrateVideo(2000);
@@ -1125,7 +1148,8 @@ function monitorHangup() {
 }
 
 function multipartyinvite(extension) {
-	if (beingMonitored) { 
+	if (isMonitorInSession) { 
+		reinviteMonitorMultipartyInvite = true;
 		socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
 
 		setTimeout(() => {
@@ -1160,10 +1184,14 @@ function multipartyHangup() {
 		monitorExt = null;
 		beingMonitored = false;
 		acekurento.isMonitoring = false;
-	} else if (monitorExt && !beingMonitored) {
+	} else if (isMonitorInSession && !beingMonitored) {
 		// a monitor is in the session
 		// but not monitoring the agent hanging up
-		socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true, 'multipartyHangup': true});
+		if (hostAgent == extensionMe) {
+			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true, 'multipartyHangup': true, 'multipartyTransition':true});
+		} else {
+			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true, 'multipartyHangup': true, 'multipartyTransition': false});
+		}
 		
 		monitorExt = null;
 		acekurento.isMonitoring = false;
