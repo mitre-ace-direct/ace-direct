@@ -121,7 +121,7 @@ function register_jssip() {
                     document.getElementById("sendFileButton").removeAttribute('style');
                 }
 			}
-			if (beingMonitored && acekurento.activeAgentList.length == participants.length-1) {
+			if (beingMonitored && acekurento.activeAgentList.length == participants.length-1 && acekurento.activeAgentList.length > 1) {
 				allAgentCall = true;
 				socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':false});
 				beingMonitored = false;
@@ -378,6 +378,8 @@ function register_jssip() {
 				if (acekurento) {
 					acekurento.isMonitoring = false;
 				}
+				$('#hide-video').show();
+				$('#mute-audio').show();
 			}
 		},
 		'inviteResponse': function(e) {
@@ -1117,7 +1119,7 @@ function exitFullscreen() {
 
 //New 4.0 feature functions
 function shareScreen() {
-	if (agentStatus == 'IN_CALL') {
+	if (agentStatus == 'IN_CALL' && !isMonitoring) {
 		if (beingMonitored) {
 			// kick the monitor from the session before screensharing
 			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
