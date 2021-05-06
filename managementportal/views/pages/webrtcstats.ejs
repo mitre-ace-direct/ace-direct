@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <%- include("../partials/head") %>
+</head>
+
+<body class="hold-transition skin-purple sidebar-mini layout-fixed">
+  <div class="wrapper">
+    <!-- Main Header -->
+    <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+          <!-- Content Header (Page header) -->
+          <div class="content-header">
+            <div class="container-fluid">
+              <div class="row mb-2">
+                <div class="col-lg-12">
+                  <h1 class="m-0 text-dark">WebRTC Stats</h1>
+                  <div id="reportrange">
+                    <div data-toggle="tooltip" data-placement="left"
+                      title="Select Date Range – The user can select a date range for the report. Predefined values are Today, Yesterday, Last 7 days, Last 30 days, This Month, Last Month, All Time (March 1st 2020 to Today), and Custom Range. Default selection is 'Last 7 days'">
+                      <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+                      <span></span>
+                      <b class="caret"></b>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Main content -->
+          <div class="content">
+            <div class="container-fluid">
+              <!-- Line Chart -->
+              <div class="row">
+                <div class="col-lg-12">
+                  <!-- Line Chart -->
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Call Summary Chart</h3>
+                      <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse"><i
+                            class="fa fa-minus"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <div id="callSummaryLineChart" style="height:450px"></div>
+                      <div id="legendContainer" class="legend"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /.content -->
+        </div>
+        <!-- /.content - wrapper -->
+        <%- include("../partials/footer") %>
+  </div>
+  <!-- ./wrapper -->
+  <style>
+    .legend {
+      display: block;
+      -webkit-padding-start: 2px;
+      -webkit-padding-end: 2px;
+      border-width: initial;
+      border-style: none;
+      border-color: initial;
+      border-image: initial;
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .legendLayer .background {
+      fill: rgba(255, 255, 255, 0.85);
+      stroke: rgba(0, 0, 0, 0.85);
+      stroke-width: 1;
+    }
+
+    .legendContainer {
+      background-color: #fff;
+      padding: 2px;
+      margin-bottom: 8px;
+      border-radius: 3px 3px 3px 3px;
+      border: 1px solid #E6E6E6;
+      display: inline-block;
+      margin: 0 auto;
+    }
+  </style>
+
+  <!-- REQUIRED JS SCRIPTS -->
+  <!-- flot -->
+  <script language="javascript" type="text/javascript" src="./assets/js/globalize.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.canvaswrapper.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.colorhelpers.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.saturated.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.browser.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.drawSeries.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.uiConstants.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.time.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.legend.js"></script>
+
+  <!-- DateRangePicker -->
+  <script type="text/javascript" src="./assets/js/daterangepicker.js"></script>
+  <script type="text/javascript" src="./js/controllers/report.js"></script>
+</body>
+
+</html>
