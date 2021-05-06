@@ -936,22 +936,47 @@ function unhide_video() {
 
 function enable_video_privacy() {
 	if (acekurento !== null) {
-		console.log('Enabling video privacy');
-		acekurento.enableDisableTrack(false, false); //mute video
-		hide_video_icon.style.display = "block";
-		hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
-		acekurento.privateMode(true, privacy_video_url);
+		if (isMonitorInSession) {
+			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite': true});
+			setTimeout(() => {
+				console.log('Enabling video privacy with monitor in session');
+				acekurento.enableDisableTrack(false, false); //mute video
+				hide_video_icon.style.display = "block";
+				hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
+				acekurento.privateMode(true, privacy_video_url);
+				socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+			}, 500);
+		} else {
+			console.log('Enabling video privacy');
+			acekurento.enableDisableTrack(false, false); //mute video
+			hide_video_icon.style.display = "block";
+			hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
+			acekurento.privateMode(true, privacy_video_url);
+		}
 	}
 }
 
 function disable_video_privacy() {
 	if (acekurento !== null) {
-		console.log('Disabling video privacy');
-		mirrorMode("selfView", true);
-		acekurento.enableDisableTrack(true, false); //unmute video
-		hide_video_icon.style.display = "none";
-		hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
-		acekurento.privateMode(false);
+		if (isMonitorInSession) {
+			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite': true});
+			setTimeout(() => {
+				console.log('Disabling video privacy with monitor in session');
+				mirrorMode("selfView", true);
+				acekurento.enableDisableTrack(true, false); //unmute video
+				hide_video_icon.style.display = "none";
+				hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+				acekurento.privateMode(false);
+				socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+			}, 500);
+		} else {
+			console.log('Disabling video privacy');
+			mirrorMode("selfView", true);
+			acekurento.enableDisableTrack(true, false); //unmute video
+			hide_video_icon.style.display = "none";
+			hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+			acekurento.privateMode(false);
+		}
 	}
 }
 
