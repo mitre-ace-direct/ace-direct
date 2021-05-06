@@ -477,25 +477,49 @@
 	}
 
 	function enable_video_privacy() {
-                if (acekurento !== null) {
-				  selfStream.classList.remove("mirror-mode");
-                  acekurento.enableDisableTrack(false, false); //mute video
-                  hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
-                  hide_video_icon.style.display = "block";
-                  acekurento.privateMode(true, privacy_video_url);
-                }
+		if (acekurento !== null) {
+			if (acekurento.isMonitoring) {
+				socket.emit('force-monitor-leave', { 'monitorExt': monitorExt, 'reinvite': true });
+				setTimeout(() => {
+					selfStream.classList.remove("mirror-mode");
+					acekurento.enableDisableTrack(false, false); //mute video
+					hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
+					hide_video_icon.style.display = "block";
+					acekurento.privateMode(true, privacy_video_url);
+					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+				}, 500);
+			} else {
+				selfStream.classList.remove("mirror-mode");
+				acekurento.enableDisableTrack(false, false); //mute video
+				hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
+				hide_video_icon.style.display = "block";
+				acekurento.privateMode(true, privacy_video_url);
+			}
+		}
 	}
 
 	function disable_video_privacy() {
-                if (acekurento !== null) {
-
-				  selfStream.classList.add("mirror-mode");
-                  acekurento.enableDisableTrack(true, false); //unmute video
-                  hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
-                  hide_video_icon.style.display = "none";
-                  acekurento.privateMode(false);
-                  hide_video_icon.style.display = "none";
-                }
+		if (acekurento !== null) {
+			if (acekurento.isMonitoring) {
+				socket.emit('force-monitor-leave', { 'monitorExt': monitorExt, 'reinvite': true });
+				setTimeout(() => {
+					selfStream.classList.add("mirror-mode");
+					acekurento.enableDisableTrack(true, false); //unmute video
+					hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+					hide_video_icon.style.display = "none";
+					acekurento.privateMode(false);
+					hide_video_icon.style.display = "none";
+					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+				}, 500);
+			} else {
+			selfStream.classList.add("mirror-mode");
+			acekurento.enableDisableTrack(true, false); //unmute video
+			hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+			hide_video_icon.style.display = "none";
+			acekurento.privateMode(false);
+			hide_video_icon.style.display = "none";
+			}
+		}
 	}
 	// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout".
 	// puts session on hold
