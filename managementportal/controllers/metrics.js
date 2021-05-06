@@ -79,7 +79,7 @@ exports.createMetrics = function CreateMetrics(db, metricsStartDate, metricsEndD
           metrics.averageCallsInQueueTarget = targetData;
         } else {
           // clear chart data
-          logger.debug('No metrics query results');
+          // logger.debug('No metrics query results');
           metrics.averageCallsInQueue = [];
           metrics.averageCallsInQueueTarget = [];
         }
