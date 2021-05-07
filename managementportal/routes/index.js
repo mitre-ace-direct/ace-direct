@@ -108,6 +108,22 @@ router.get('/report', agent.shield(cookieShield), (req, res) => {
 });
 
 /**
+ * Handles a GET request for /webrtcstats. Checks user has
+ * a valid session and displays report page.
+ *
+ * @param {string} '/webrtcstats'
+ * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} function(req, res)
+ */
+router.get('/webrtcstats', agent.shield(cookieShield), (req, res) => {
+  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
+    res.render('pages/webrtcstats');
+  } else {
+    res.redirect('./');
+  }
+});
+
+/**
  * Handles a GET request for /videomail. Checks user has
  * a valid session and displays videomail page.
  *
