@@ -148,54 +148,9 @@ $.ajax({
         updateCallStatusLineChart(data);
       });
 
-      // Receives the VRS Report Table data.
-      socket.on('vrsreporttable-data', (data) => {
-        let i = 0;
-        if (data.message === 'Success') {
-          let content = '<table style="width:100%"">';
-          for (i = 0; i < data.topTenStates.length; i += 1) {
-            content += `<tr><td>${data.topTenStates[i][0]}</td><td>${data.topTenStates[i][1]}</td></tr>`;
-          }
-          content += '</table>';
-          $('#topTenStates').empty().append(content);
-
-          content = '<table style="width:100%"">';
-          for (i = 0; i < data.topTenAreaCodes.length; i += 1) {
-            content += `<tr><td>${data.topTenAreaCodes[i][0]}</td><td>${data.topTenAreaCodes[i][1]}</td></tr>`;
-          }
-          content += '</table>';
-          $('#topTenAreaCodes').empty().append(content);
-
-          content = '<table style="width:100%"">';
-          for (i = 0; i < data.topTenVrsNumbers.length; i += 1) {
-            const vrsNumber = data.topTenVrsNumbers[i][0];
-            const vrsNumerFormatted = `${vrsNumber.substring(0, 3)}-${vrsNumber.substring(3, 6)}-${vrsNumber.substring(6, vrsNumber.length)}`;
-            content += `<tr><td>${vrsNumerFormatted}</td><td>${data.topTenVrsNumbers[i][1]}</td></tr>`;
-          }
-          content += '</table>';
-          $('#topTenVrsNumbers').empty().append(content);
-
-          $('#vrsreporttable').dataTable().fnClearTable();
-          $('#vrsreporttable').dataTable().fnAddData(data.data);
-          $('#vrsreporttable').resize();
-        } else {
-          $('#topTenStates').empty().append('Data does not exist');
-          $('#topTenAreaCodes').empty().append('Data does not exist');
-          $('#topTenVrsNumbers').empty().append('Data does not exist');
-
-          $('#vrsreporttable').dataTable().fnClearTable();
-          $('#vrsreporttable').resize();
-        }
-      });
-
       // Receives the report data in CSV format
       socket.on('reporttable-csv', (data) => {
         downloadFile(data, 'report_info.csv');
-      });
-
-      // Receives the vrs report data in CSV format
-      socket.on('vrsreporttable-csv', (data) => {
-        downloadFile(data, 'vrs_report_info.csv');
       });
 
       // Handles Error conditions from Report calls.
@@ -246,40 +201,6 @@ $('#reporttable').DataTable({
   }
 });
 
-$('#vrsreporttable').DataTable({
-  columns: [{
-    data: 'vrs',
-    render(data, type, _full, _meta) {
-      if (type === 'display') {
-        return `${data.substring(0, 3)}-${data.substring(3, 6)}-${data.substring(6, data.length)}`;
-      }
-      return data;
-    }
-  },
-  {
-    data: 'date',
-    render(data, type, _full, _meta) {
-      if (type === 'display') {
-        return moment(data).local().format('YYYY/MM/DD');
-      }
-      return data;
-    }
-  },
-  {
-    data: 'status'
-  },
-  {
-    data: 'stateCode'
-  }
-  ],
-  // "order": [
-  //  [0, "desc"]
-  // ],
-  language: {
-    emptyTable: 'Data does not exist.'
-  }
-});
-
 function DateRangePickerSetup() {
   // Call back funtion for setting report range <div> value
   function cb(startDRPSetup, endDRPSetup) {
@@ -325,7 +246,7 @@ function DateRangePickerSetup() {
 }
 
 $(document).ready(() => {
-  $('#sidebarreport').addClass('active');
+  $('#sidebarwebrtcstats').addClass('active');
 
   // click event for downloading CSV file
   // Summary report is for start and end based on local time start and end of day.
@@ -334,17 +255,6 @@ $(document).ready(() => {
     const startdate = moment(picker.startDate.format('YYYY-MM-DD')).format();
     const enddate = moment(picker.endDate.format('YYYY-MM-DD')).endOf('day').format();
     socket.emit('reporttable-get-data', {
-      format: 'csv',
-      start: startdate,
-      end: enddate,
-      timezone
-    });
-  });
-  $('#vrsreportdownloadbtn').on('click', () => {
-    const picker = $('#reportrange').data('daterangepicker');
-    const startdate = moment(picker.startDate.format('YYYY-MM-DD')).format();
-    const enddate = moment(picker.endDate.format('YYYY-MM-DD')).endOf('day').format();
-    socket.emit('vrsreporttable-get-data', {
       format: 'csv',
       start: startdate,
       end: enddate,
