@@ -280,7 +280,7 @@ if (!logWebRTCStats) {
 }
 logger.debug('logWebRTCStats: ' + logWebRTCStats);
 if (logWebRTCStats) {
-  logWebRTCStatsFreqVal = getConfigVal('webrtcstats:logWebRTCStatsFreq'); 
+  logWebRTCStatsFreqVal = getConfigVal('webrtcstats:logWebRTCStatsFreq');
   if (!logWebRTCStatsFreqVal) {
     logWebRTCStatsFreq = 0;
   } else {
@@ -909,7 +909,7 @@ io.sockets.on('connection', function (socket) {
 			if(data.participants && data.participants.length > 0){
 				data.participants.forEach(p => {
 					redisClient.hget(rExtensionToVrs, Number(p), function (err, vrsNum) {
-            					if (!err){ 
+            					if (!err){
 							p = (vrsNum) ? vrsNum : p;
 							io.to(Number(p)).emit('multiparty-caption', data);
 						}
@@ -2143,11 +2143,11 @@ function popZendesk(callId,ani,agentid,agentphonenum,skillgrpnum,skillgrpnam,cal
  *
  * @param {string} eventType One of these event types: "Handled", "Web", "Videomail", "Abandoned"
  */
-function insertCallDataRecord (eventType, vrs) {
+function insertCallDataRecord (eventType, vrs, uniqueId, origin) {
 	if (logCallData) {
 		colCallData = mongodb.collection('calldata');
 
-		var data = {"Timestamp": new Date(), "Event": eventType};
+		var data = {"Timestamp": new Date(), "Event": eventType, "UniqueId": uniqueId, "Origin": origin};
 		if (vrs != null) {
 			data.vrs = vrs;
 
@@ -2255,8 +2255,8 @@ function handle_manager_event(evt) {
 			  logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
 			//   console.log("HAVE VRS NUMBER " + vrsNum);
 			//   console.log("INSERTING WEB CALL HANDLED");
-			  insertCallDataRecord("Handled", vrsNum);
-			  insertCallDataRecord("Web", vrsNum);
+			  insertCallDataRecord("Handled", vrsNum, evt.uniqueid, "D1");
+			  insertCallDataRecord("Web", vrsNum, evt.uniqueid, "D1");
 
               //mapped consumer extension to a vrs num. so now we can finally pop
               popZendesk(evt.destuniqueid,vrsNum,destExtension[1],destExtension[1],"","","","");
@@ -2291,7 +2291,7 @@ function handle_manager_event(evt) {
            */
 
 		  //console.log("INSERTING HARDWARE OR SOFTPHONE CALL HANDLED");
-		  insertCallDataRecord("Handled", evt.calleridnum);
+		  insertCallDataRecord("Handled", evt.calleridnum, evt.uniqueid, "D2");
 
           if (JSON.stringify(evt.channel).indexOf(PROVIDER_STR) !== -1) {
             // This is a Zphone or Sorenson call
@@ -2366,7 +2366,7 @@ function handle_manager_event(evt) {
               popZendesk(evt.destuniqueid, evt.calleridnum, agentExtension[1], agentExtension[1],"","","","");
 
 			  // Save handled call??? What is in calleridnum ?
-			  //insertCallDataRecord("Handled", evt.calleridnum);
+			  //insertCallDataRecord("Handled", evt.calleridnum, evt.uniqueid);
             }
             /** HOT FIX NOT IN GITHUB; MUST CARRY FORWARD */
 
@@ -2406,7 +2406,7 @@ function handle_manager_event(evt) {
               // Call new function
               logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
 
-			  insertCallDataRecord("Handled", vrsNum);
+			  insertCallDataRecord("Handled", vrsNum, evt.uniqueid, "D3");
 
               //mapped consumer extension to a vrs num. so now we can finally pop
               popZendesk(evt.destuniqueid,vrsNum,destExtension[1],destExtension[1],"","","","");
@@ -2438,7 +2438,7 @@ function handle_manager_event(evt) {
 
 	  if (evt.context === 'Provider_Videomail') {
 		console.log("VIDOEMAIL evt: " +  JSON.stringify(evt, null, 2));
-		insertCallDataRecord("Videomail", evt.calleridnum);
+		insertCallDataRecord("Videomail", evt.calleridnum, evt.uniqueid, "D4");
 	  }
       else if ( evt.connectedlinenum == queuesComplaintNumber || evt.exten === queuesComplaintNumber ) {
         // Consumer portal ONLY! Zphone Complaint queue calls will go to the next if clause
@@ -2581,7 +2581,7 @@ function handle_manager_event(evt) {
           if (!err && vrsNum) {
 
 			console.log("VIDOEMAIL WebRTC evt: " +  JSON.stringify(evt, null, 2));
-			insertCallDataRecord("Videomail", vrsNum);
+			insertCallDataRecord("Videomail", vrsNum, evt.uniqueid, "D5");
 
             // Remove the extension when we're finished
             redisClient.hdel(rExtensionToVrs, Number(evt.calleridnum));
@@ -2611,7 +2611,7 @@ function handle_manager_event(evt) {
 
 		  // calleridnum is for agent, connectedlinenum is for caller
 		  logger.info('HANGUP RECEIVED ABANDONED CALL calleridnum & : connectedlinenum' + evt.calleridnum + " connectedlinenum " + evt.connectedlinenum);
-		  insertCallDataRecord('Abandoned', evt.connectedlinenum);
+		  insertCallDataRecord('Abandoned', evt.connectedlinenum, evt.uniqueid, "D6");
 
           //this agent(agentExtension) must now go to away status
           io.to(Number(agentExtension)).emit('new-missed-call', {"max_missed":getConfigVal('missed_calls:max_missed_calls')}); //should send missed call number
@@ -2636,14 +2636,14 @@ function handle_manager_event(evt) {
 					redisClient.hset(rConsumerExtensions, Number(extension[1]), JSON.stringify(val));
 				}
 				});
-	
+
 				redisClient.hget(rExtensionToVrs, Number(extension[1]), function (err, vrsNum) {
 					if (!err && vrsNum) {
 						logger.info('Sending chat-leave for socket id ' + vrsNum);
 						io.to(Number(vrsNum)).emit('chat-leave', {
 						"vrs": vrsNum
 						});
-		
+
 						// Remove the extension when we're finished
 						redisClient.hdel(rExtensionToVrs, Number(extension[1]));
 						redisClient.hdel(rExtensionToVrs, Number(vrsNum));
@@ -2854,7 +2854,7 @@ function handle_manager_event(evt) {
 				logger.info('ABANDONED WebRTC VRS NUMBER ' + vrsNum);
 				vrs = vrsNum;
 
-				insertCallDataRecord('Abandoned', vrs);
+				insertCallDataRecord('Abandoned', vrs, evt.uniqueid, "D7");
 			}
 		});
 
@@ -4172,8 +4172,8 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 	console.log("SESSION " + JSON.stringify(req.session));
 
 
-	
-	
+
+
 	if(uploadedBy){
 		console.log("Valid agent " + uploadedBy);
 		let uploadMetadata = {};
@@ -4207,11 +4207,11 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 			ClamScan.then(async clamscan => {
 				try {
 					console.log('scanning', uploadMetadata.filepath, 'as', require("os").userInfo().username, fs.existsSync(uploadMetadata.filepath));
-			 
+
 					// You can re-use the `clamscan` object as many times as you want
 					// const version = await clamscan.get_version();
 					// console.log(`ClamAV Version: ${version}`);
-					
+
 					const {is_infected, file, viruses} = await clamscan.is_infected(uploadMetadata.filepath);
 					if (is_infected) {
 						console.log(`${req.file.originalname} is infected with ${viruses}!`);
@@ -4267,8 +4267,8 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 		}
 
 
-		
-		
+
+
 	}else{
 		console.log("Not valid agent");
 		res.status(403).send("Unauthorized");
