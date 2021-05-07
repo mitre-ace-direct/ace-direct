@@ -703,7 +703,7 @@ function connect_socket() {
 					}
 				}).on('caption-translated', function (transcripts) {
 						console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
-					if(acekurento.isMultiparty){
+					if(acekurento.isMultiparty || isMonitoring){
 						updateCaptionsMultiparty(transcripts);
 					}else{
 						updateCaptions(transcripts); // in jssip_agent.js
@@ -1019,6 +1019,10 @@ function connect_socket() {
 					}
                     beingMonitored = true;
 					monitorExt = data.monitorExt;
+					if (!isMultipartyCall && !monitorCaptions) {
+						multipartyCaptionsStart();
+						monitorCaptions = true;
+					}
                 }).on('monitor-join-session', function(data) {
                     //accept the call to monitor the session
 					if (data.vrs) {
@@ -1038,6 +1042,9 @@ function connect_socket() {
 					acekurento.isMonitoring = false;
 					beingMonitored = false;
 					monitorExt = null;
+					if(!acekurento.isMultiparty) {
+						multipartyCaptionsEnd();
+					}
 				}).on('monitor-leave-session', function(data) {
 					terminate_call();
 					if (data.reinvite) {
