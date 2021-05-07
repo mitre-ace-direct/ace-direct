@@ -152,11 +152,19 @@ function getItemStateCode(itemIn) {
       areaCodesPromise(item.vrs)
         .then((data) => {
           item.stateCode = data.stateCode;
+          item.city = data.city;
+          if (item.stateCode == null) {
+            // Happens with area code 888
+            // Area code 888 not assigned to a geographical area. Make state code Unknown
+            logger.debug(`State code null for ${item.vrs}`);
+            item.stateCode = 'Unknown';
+          }
           resolve();
         })
         .catch((_err) => {
-          // None found.
-          logger.debug(`State code not found for ${item.vrs}`);
+          // None found. This opten happens with testing numbers such as 111-111-1111
+          // where the first three numbers are not area codes.
+          // logger.debug(`State code not found for ${item.vrs}`);
           item.stateCode = 'Unknown';
           resolve();
         });
