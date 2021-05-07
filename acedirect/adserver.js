@@ -906,7 +906,10 @@ io.sockets.on('connection', function (socket) {
 			let d = new Date();
 			data.timestamp = d.getTime();
 			data.msgid = d.getTime();
-			if(data.participants && data.participants.length > 0){
+			if (data.hasMonitor) {
+				// send multiparty captions to the monitor
+				io.to(Number(data.monitorExt)).emit('multiparty-caption', data);
+			} else if(data.participants && data.participants.length > 0){
 				data.participants.forEach(p => {
 					redisClient.hget(rExtensionToVrs, Number(p), function (err, vrsNum) {
             					if (!err){
