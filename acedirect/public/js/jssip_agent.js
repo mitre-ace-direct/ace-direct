@@ -30,6 +30,7 @@ var activeParticipants = [];
 var isMonitorInSession = false;
 var reinviteMonitorMultipartyInvite = false;
 var reinviteMonitorMultipartyTransition = false;
+var monitorCaptions = false;
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -71,6 +72,18 @@ function register_jssip() {
 							"participants": callParticipantsExt
 						});
 					} else {
+						if (beingMonitored) {
+							socket.emit('multiparty-caption-agent', {
+								"transcript": transcripts.transcript,
+								"final": transcripts.final,
+								"language": transcripts.langCd,
+								"displayname": $('#callerFirstName').val() + " " + $('#callerLastName').val(),
+								"agent": false,
+								"participants": callParticipantsExt,
+								"hasMonitor": true,
+								"monitorExt": monitorExt
+							});
+						}
 						// Acedirect will skip translation service if languages are the same
 						console.log('sending caption:', transcripts.transcript, extensionMe);
 						socket.emit('translate-caption', {
@@ -93,6 +106,7 @@ function register_jssip() {
 			acekurento.activeAgentList = [];
 			activeParticipants = [];
 			isMonitorInSession = false;
+			var isConsumerInSession = false;
 			participants = e.participants.map(function (p) { return p; });
 			callParticipantsExt = participants.map(function (p) { return p.ext; });
 
@@ -110,10 +124,12 @@ function register_jssip() {
 					acekurento.activeAgentList.push(participants[i]);
 				} else if(participants[i].type == 'participant:webrtc'){
 					// webrtc consumer. enable chat and file share
+					isConsumerInSession = true;
 					enable_chat_buttons();
 					socket.emit('begin-file-share', {'vrs': $('#callerPhone').val(), 'agentExt': extensionMe});
-				}  else {
+				}  else if (participants[i].type == 'participant:rtp'){
                     // provider consumer. disable chat and file share
+					isConsumerInSession = true;
                     disable_chat_buttons();
                     document.getElementById("fileInput").disabled = true;
                     document.getElementById("sendFileButton").removeAttribute('class');
@@ -121,11 +137,12 @@ function register_jssip() {
                     document.getElementById("sendFileButton").removeAttribute('style');
                 }
 			}
-			if (beingMonitored && acekurento.activeAgentList.length == participants.length-1 && acekurento.activeAgentList.length > 1) {
-				allAgentCall = true;
-				socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':false});
-				beingMonitored = false;
-				acekurento.isMonitoring = false;
+
+			if (!isConsumerInSession && isMonitoring) {
+				// catch provider hangups
+				setTimeout(() => {
+					stopMonitoringCall()
+				}, 500);
 			}
 
 			if (acekurento.activeAgentList.length == participants.length) {
@@ -155,9 +172,10 @@ function register_jssip() {
 				document.getElementById("screenShareButton").removeAttribute('style');
 				$('#end-call').attr('onclick', 'stopMonitoringCall('+extensionBeingMonitored+')');
 			} else if(activeParticipantCount > 2) {
-				if (!isMultipartyCall) {
+				if (!isMultipartyCall && !monitorCaptions) {
 					// new multiparty call
 					multipartyCaptionsStart();
+					monitorCaptions = true;
 				}
 				isMultipartyCall = true;
 
@@ -269,6 +287,9 @@ function register_jssip() {
 				selfStream.srcObject.getVideoTracks()[0].onended = function () {
 					if (beingMonitored){
 						// force monitor to leave the session first
+						if(!acekurento.isMultiparty) {
+							multipartyCaptionsEnd();
+						}
 						socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
 
 						setTimeout(() => {
@@ -937,6 +958,9 @@ function unhide_video() {
 function enable_video_privacy() {
 	if (acekurento !== null) {
 		if (isMonitorInSession) {
+			if(!acekurento.isMultiparty) {
+				multipartyCaptionsEnd();
+			}
 			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite': true});
 			setTimeout(() => {
 				console.log('Enabling video privacy with monitor in session');
@@ -959,6 +983,9 @@ function enable_video_privacy() {
 function disable_video_privacy() {
 	if (acekurento !== null) {
 		if (isMonitorInSession) {
+			if(!acekurento.isMultiparty) {
+				multipartyCaptionsEnd();
+			}
 			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite': true});
 			setTimeout(() => {
 				console.log('Disabling video privacy with monitor in session');
@@ -1147,6 +1174,9 @@ function shareScreen() {
 	if (agentStatus == 'IN_CALL' && !isMonitoring) {
 		if (beingMonitored) {
 			// kick the monitor from the session before screensharing
+			if(!acekurento.isMultiparty) {
+				multipartyCaptionsEnd();
+			}
 			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
 		}
 		if (screenShareEnabled == true) {
@@ -1188,6 +1218,9 @@ function monitorHangup() {
 function multipartyinvite(extension) {
 	if (isMonitorInSession) { 
 		reinviteMonitorMultipartyInvite = true;
+		if(!acekurento.isMultiparty) {
+			multipartyCaptionsEnd();
+		}
 		socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
 
 		setTimeout(() => {
@@ -1226,8 +1259,14 @@ function multipartyHangup() {
 		// a monitor is in the session
 		// but not monitoring the agent hanging up
 		if (hostAgent == extensionMe) {
+			if(!acekurento.isMultiparty) {
+				multipartyCaptionsEnd();
+			}
 			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true, 'multipartyHangup': true, 'multipartyTransition':true});
 		} else {
+			if(!acekurento.isMultiparty) {
+				multipartyCaptionsEnd();
+			}
 			socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true, 'multipartyHangup': true, 'multipartyTransition': false});
 		}
 		
@@ -1515,13 +1554,15 @@ function multipartyCaptionsStart() {
 				"displayname": $('#agentname-sidebar').html().trim(),
 				"extension": extensionMe,
 				"agent": true,
-				"participants": callParticipantsExt
+				"participants": callParticipantsExt,
+				"hasMonitor": beingMonitored,
+				"monitorExt": monitorExt
 			});
 		}
 	};
 
 	recognition.onend = function (event) {
-		if(acekurento.isMultiparty && (activeParticipantCount > 2))
+		if((acekurento.isMultiparty && (activeParticipantCount > 2)) || (beingMonitored && isMonitorInSession))
 			multipartyCaptionsStart();	
 	}
 	recognition.start();
@@ -1532,4 +1573,5 @@ function multipartyCaptionsEnd() {
 		recognition.abort();
 	recognition = null;
 	callParticipantsExt = [];
+	monitorCaptions = false;
 }
