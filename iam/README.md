@@ -76,8 +76,8 @@ Set the environment variables in `/root/.bashrc` , for example:
 
 ```bash
 OPENAM_BASE_NAME=ace
-JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.282.b08-1.el7_9.x86_64
-JRE_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.282.b08-1.el7_9.x86_64
+JAVA_HOME=`echo $(dirname $(dirname $(readlink -f $(which javac))))`
+JRE_HOME=${JAVA_HOME}
 JAVA_OPTS="-server  -Xmx2048m -Xms128m  -XX:+UseConcMarkSweepGC -XX:+UseSerialGC"
 PATH=$PATH:$JAVA_HOME/bin
 export PATH JAVA_HOME JRE_HOME OPENAM_BASE_NAME JAVA_OPTS
@@ -966,15 +966,10 @@ OpenAM won't start. Agent cannot reach portal (no access, double url in address 
 
 #### Solution 19
 
-When the Java version is updated on the OpenAM server, it is necessary to update configs and environment variables:
+When the Java version is updated on the OpenAM server, follow these steps to configure your existing OpenAM installation to use the new Java version:
 
-1. Find the new java version: `echo $(dirname $(dirname $(readlink -f $(which javac))))`
-1. Update the `JAVA_HOME` and `JRE_HOME` values in these files to the new version:
-
-    * `/etc/systemd/system/tomcat.service`
-    * `/root/.bashrc`
-    * `/root/iam/config/tomcat/tomcat.service`
-
+1. Find the full path to the new java version: `echo $(dirname $(dirname $(readlink -f $(which javac))))`
+1. Update the `JAVA_HOME` and `JRE_HOME` values in this file to the new Java path: `/etc/systemd/system/tomcat.service`
 1. Reload _systemctl_: `systemctl daemon-reload`
 1. Start OpenAM: `sudo service tomcat start`
 
