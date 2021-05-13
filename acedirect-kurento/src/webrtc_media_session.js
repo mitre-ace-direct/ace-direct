@@ -590,7 +590,8 @@ class WebRTCMediaSession extends Events {
   async enablePrivateMode(ext, file) {
     const p = this._participants.get(ext);
     if (!p) {
-      throw new Error(`No participant registered for ${ext}`);
+      console.log(`No participant registered for ${ext}`);
+      return;
     }
     if (p.player) {
       debug(`${ext} Private mode already enabled`);
@@ -610,8 +611,10 @@ class WebRTCMediaSession extends Events {
     player.play();
 
     if (this.isMultiparty) {
+      if (p.port) {
       await p.endpoint.disconnect(p.port);
       await player.connect(p.port);
+      }
     } else {
       const other = this.oneToOnePeer(ext);
       if (other) {
@@ -624,15 +627,18 @@ class WebRTCMediaSession extends Events {
   async disablePrivateMode(ext) {
     const p = this._participants.get(ext);
     if (!p) {
-      throw new Error(`No participant registered for ${ext}`);
+      console.log(`No participant registered for ${ext}`);
+      return;
     }
     if (!p.player) return; // Not in private mode
     const player = p.player;
     p.player = null;
 
     if (this.isMultiparty) {
+      if (p.port) {
       await player.disconnect(p.port);
       await p.endpoint.connect(p.port);
+      }
     } else {
       const other = this.oneToOnePeer(ext);
       if (other) {
