@@ -125,11 +125,13 @@ function register_jssip() {
 				} else if(participants[i].type == 'participant:webrtc'){
 					// webrtc consumer. enable chat and file share
 					isConsumerInSession = true;
+					consumerType = 'webrtc';
 					enable_chat_buttons();
 					socket.emit('begin-file-share', {'vrs': $('#callerPhone').val(), 'agentExt': extensionMe});
 				}  else if (participants[i].type == 'participant:rtp'){
                     // provider consumer. disable chat and file share
 					isConsumerInSession = true;
+					consumerType = 'provider';
                     disable_chat_buttons();
                     document.getElementById("fileInput").disabled = true;
                     document.getElementById("sendFileButton").removeAttribute('class');
@@ -321,6 +323,8 @@ function register_jssip() {
 			} else if (monitorTransition) {
 				terminate_call();
 				monitorTransition = false;
+			} else if (isMultipartyTransfer) {
+				// do nothing
 			} else {
 				if (acekurento.isMultiparty == false) {
 					//Wont enter wrap up
@@ -598,7 +602,7 @@ function accept_call() {
 			$('#hide-video').hide();
 			$('#mute-audio').hide();
         } else {
-			$('#end-call').attr('onclick', 'termiante_call()');
+			$('#end-call').attr('onclick', 'terminate_call()');
 		}
 	}
 
@@ -1277,12 +1281,13 @@ function multipartyHangup() {
 	if (acekurento.isMultiparty && hostAgent == extensionMe) {
 		// host agent is leaving call
 		// refer the session to the other agent in the call
+		var tempAgent = backupHostAgent;
 		multipartyCaptionsEnd();
 
 		socket.emit('multiparty-hangup', {'newHost' :backupHostAgent, 'transitionAgent':transitionExt, 'vrs': $('#callerPhone').val()});
 
 		setTimeout(() => {
-			acekurento.callTransfer(backupHostAgent.toString(), false);
+			acekurento.callTransfer(tempAgent.toString(), false);
 			terminate_call();
 			
 			hostAgent = null;
