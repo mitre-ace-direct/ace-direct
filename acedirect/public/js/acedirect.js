@@ -83,6 +83,7 @@ var autoAnswer= false;
 var multipartyTransition = false;
 var isMultipartyTransfer = false;
 var allAgentCall = false;
+var consumerType;
 
 // call monitoring 
 var isMonitoring = false;
@@ -987,6 +988,11 @@ function connect_socket() {
                 }).on ('multiparty-transfer', function(data) {
 					// backup host is becoming the new host of the call
 					multipartyCaptionsEnd();
+					if (consumerType == 'provider') {
+						terminate_call();
+						unpauseQueues();
+						autoAnswer = true;
+					}
 					
 					isTransfer = true;
 					isMultipartyTransfer = true;
@@ -1516,6 +1522,7 @@ function clearScreen() {
 	$('#fileSentError').hide();
 
 	$('#transferExtension').val('');
+	consumerType = '';
 }
 
 function changeStatusLight(state) {
