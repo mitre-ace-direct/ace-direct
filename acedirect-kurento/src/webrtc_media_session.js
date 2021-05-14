@@ -10,7 +10,7 @@ const IceCandidate = Kurento.getComplexType('IceCandidate');
 const crypto = require('crypto');
 const util = require('./util');
 const RecMan = require('./rec_manager');
-var mysql = require('mysql');
+var mysql = require('mysql2/promise');
 
 const PARTICIPANT_TYPE_WEBRTC = 'participant:webrtc';
 const PARTICIPANT_TYPE_RTP = 'participant:rtp';
@@ -31,65 +31,15 @@ const ASTERISK_QUEUE_EXT = param('asteriskss.ami.queue_extensions');
  * Custom logic for mysql connection
  */
 
-//CLEAN UP function; must be at the top!
-//for exits, abnormal ends, signals, uncaught exceptions
-/*var cleanup = require('./cleanup').Cleanup(myCleanup);
-function myCleanup() {
-  //clean up code on exit, exception, SIGINT, etc.
-  console.log('');
-  console.log('***Exiting***');
-
-  //MySQL DB cleanup
-  if (dbConnection) {
-    console.log('Cleaning up MySQL DB connection...');
-    dbConnection.destroy();
-  }
-  console.log('byeee.');
-  console.log('');
-}*/
-
 var dbHost = param('database_servers.mysql.host');
 var dbUser = param('database_servers.mysql.user');
 var dbPassword = param('database_servers.mysql.password');
 var dbName = param('database_servers.mysql.ad_database_name');
 var dbPort = parseInt(param('database_servers.mysql.port'));
-console.log("Credential host is " + dbHost);
-console.log("Credential user is " + dbUser);
-console.log("Credential password is " + dbPassword);
-console.log("Credential name is " + dbName);
-console.log("Credential port is " + dbPort);
-
-// Create MySQL connection and connect to the database
-dbConnection = mysql.createConnection({
-	host: dbHost,
-	user: dbUser,
-	password: dbPassword,
-	database: dbName,
-	port: dbPort
-});
-
-//better error checking for MySQL connection
-dbConnection.connect(function(err) {
-  if (err !== null) {
-    //MySQL connection ERROR
-    console.error('');
-    console.error('*************************************');
-    console.error('ERROR connecting to MySQL. Exiting...');
-    console.error('*************************************');
-    console.error('');
-    console.error(err);
-    logger.error('');
-    logger.error('*************************************');
-    logger.error('ERROR connecting to MySQL. Exiting...');
-    logger.error('*************************************');
-    logger.error('');
-    logger.error(err);
-    log4js.shutdown(function() { process.exit(-1); });
-  } else {
-    //SUCCESSFUL connection
-    console.log("Successful database connection");
-  }
-});
+console.log("Using host: " + dbHost);
+console.log("Using username: " + dbUser);
+console.log("Using name: " + dbName);
+console.log("Using port: " + dbPort);
 
 /**
  * Function to verify the config parameter name and
@@ -562,6 +512,8 @@ class WebRTCMediaSession extends Events {
 
   async toggleRecording(ext, record) {
     const participant = this._participants.get(ext);
+    //Moved out of if since we need this globally
+    var fileName;
     if (record && participant.recorder) return true; // Already recording
     if (!record && !participant.recorder) return true; // Already not recording
     try {
@@ -569,7 +521,7 @@ class WebRTCMediaSession extends Events {
         debug(`${ext} Start recording`);
         const date = this.getTimestampString();
         const profile = param('kurento.recording_media_profile');
-        const fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
+        fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
         //const filePath = `file:///tmp/${fileName}`;
         const filePath = `file://home/ubuntu/kms-share/media/${fileName}`;
         //const filePath = `file://home/mwoodman/kurento-asterisk-servlet/recordings/${fileName}`;
@@ -600,34 +552,48 @@ class WebRTCMediaSession extends Events {
         await recorder.record();
         participant.recorder = recorder;
         participant.recorderFile = fileName;
-        //await RecMan.createRecording(fileName, ext, this._id);
+        await RecMan.createRecording(fileName, ext, this._id);
       } else {
-        console.log("Recording has ended");
-        await participant.recorder.stopAndWait()
-        .then(function(err){
-          console.log('Stop and wait is done');
-        });
-        await participant.recorder.release()
-        .then(function(err){
-          //RecMan.upload(participant.recorderFile);
-          if(dbConnection){
-            console.log("The database does exist.");
-            const query = 'INSERT INTO call_recordings (fileName, username, agentNumber, consumerNumber, timestamp, length) VALUES (?,?,?,?,?)';
-            // inserts new user_data record into database
-            return connection.query(query, [fileName, username, agentNumber, consumerNumber, timestamp, length], (err) => {
-              if (err) {
-                console.log(err);
-                return res.status(500).send({ message: 'MySQL error' });
-              }
-              console.log("Success in creating recording");
-              return res.status(200).send({ message: 'Success!' });
-            });
+        var otherCallers = "";
+        for (const p of this._participants.values()) {
+          if(p.ext != ext){
+            otherCallers += p.ext + ",";
           }
+        }
+        if(otherCallers.length > 0){
+          otherCallers = otherCallers.slice(0,-1);
+        }
+        var agentNumber = ext;
+
+        const date = this.getTimestampString();
+        const profile = param('kurento.recording_media_profile');
+        fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
+
+        const dbConnection = await mysql.createConnection({
+          host: dbHost,
+          user: dbUser,
+          password: dbPassword,
+          database: dbName,
+          port: dbPort
         });
+
+        let sqlQuery = 'INSERT INTO call_recordings (fileName, agentNumber, participants, timestamp, status) VALUES (?,?,?,NOW(),?);';
+        let params = [fileName, agentNumber, otherCallers, 'UNREAD'];
+        console.log("QUERY is " + sqlQuery);
+
+        //var [rows,fields] = await dbConnection.execute(sqlQuery, params);
+        await dbConnection.execute(sqlQuery, params);
+
+        await dbConnection.end();
+
+        await participant.recorder.stopAndWait();
+
+        await participant.recorder.release();
+
         participant.recorder = null;
         debug(`${ext} Stopped recording`);
       }
-      return true;
+      //return true; //??? Eric check this
     } catch (ex) {
       debug(`${ext} Recording error: ${ex.message}`);
     }
@@ -655,6 +621,7 @@ class WebRTCMediaSession extends Events {
     if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0) {
       debug(`${ext} Re-invite`, offer);
       await this.leave(ext, true);
+      return; //Eric delete this return and get the latest from develop. this was fixed in the latest code. do not merge this into git.
     }
 
     const rtp = await this._createRtpEndpoint();
