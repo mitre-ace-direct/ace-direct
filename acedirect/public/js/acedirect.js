@@ -26,6 +26,7 @@ var need_assistance_blinking;
 var missed_call_blinking;
 //var videomail_status_buttons = document.getElementById("videomail-status-buttons");
 var videomail_status_buttons = document.getElementById("videomail-status-buttons-footer");
+var record_status_buttons = document.getElementById("record-status-buttons-footer");
 var sortFlag = "id desc";
 var filter = "ALL";
 var telNumber;
@@ -223,6 +224,7 @@ function connect_socket() {
 						"extension": extensionMe
 					})
 					toggle_videomail_buttons(false);
+					toggle_recording_buttons(false);
 					console.log('Sent a get-videomail event');
 
 					// Initialize agent language to English
@@ -553,6 +555,8 @@ function connect_socket() {
 					updateVideomailTable(data);
 				}).on('got-unread-count', function (data) {
 					updateVideomailNotification(data);
+				}).on('got-call-recordings', function (data) {
+					updateCallRecordingTable(data);
 				}).on('changed-status', function () {
 					getVideomailRecs();
 				}).on('videomail-retrieval-error', function (data) {
@@ -812,6 +816,13 @@ function connect_socket() {
 					$('.language-select-li').show();
 					$("#language-select").msDropDown();
 
+				}).on('gotRecordingURL', function(data) {
+					console.log("Assigning file " + data.file);
+					const blob = new Blob([data.file]);
+					const url = URL.createObjectURL( blob);
+					//remoteView.setAttribute("content", "media-src 'self' blob: data:;");
+					remoteView.setAttribute("src", url);
+					//remoteView.setAttribute("src", './getVideomail?fileName=rec_33003_20210331_200114.mp4');
 				});
 
 			} else {
@@ -1567,35 +1578,125 @@ function updateVideomailTable(data) {
 	}
 }
 
-function callRecordingTable(data){
+/**
+ * Call Recording Logic 
+ */
+
+function updateCallRecordingTable(data){
 	$("#callRecordingTbody").html("");
+	console.log("GOT RECORDING DATA " + JSON.stringify(data));
 	var table;
 	var row;
 
-	var usernameCell;
+	var fileNameCell;
 	var consumerNumberCell;
 	var timeStampCell;
 	var lengthCell;
-	var filenameCell;
+	
 	for (var i = 0; i < data.length; i++) {
-		var recordConsumer = data[i].agentConsumer;
+		var recordFilename = data[i].fileName;
+		var recordConsumer = data[i].participants;
 		var recordTimestamp = data[i].timestamp;
-		var recordLength = data[i].recordLength;
-		var recordFilename = data[i].recordFilename;
+		var recordLength = 0; //Need logic from s# here
+		var recordStatus = "UNREAD";
 		table = document.getElementById("callRecordingTbody");
 		row = table.insertRow(table.length);
-		consumerNumberCell = row.insertCell(0);
-		timeStampCell = row.insertCell(1);
-		lengthCell = row.insertCell(2);
-		statusCell = row.insertCell(3);
-		fileNameCell = row.insertCell(4);
-		fileNameCell.setAttribute('hidden', true);
+		fileNameCell = row.insertCell(0);
+		consumerNumberCell = row.insertCell(1);
+		timeStampCell = row.insertCell(2);
+		lengthCell = row.insertCell(3);
+		statusCell = row.insertCell(4);
 
+		fileNameCell.innerHTML = recordFilename;
 		consumerNumberCell.innerHTML = recordConsumer;
 		timeStampCell.innerHTML = recordTimestamp;
 		lengthCell.innerHTML = recordLength;
+		statusCell.innerHTML = recordStatus;
 	}
 }
+
+//Play selected videomail when a row of the table is clicked
+$('#callRecordingTbody').on('click', 'tr', function () {
+	var tableData = $(this).children("td").map(function () {
+		return $(this).text();
+	}).get();
+
+	if(agentStatus != 'IN_CALL'){
+		playCallRecording(tableData[0]);
+	}
+});
+
+function playCallRecording(filename){
+	//Start by removing the persist camera and sending agent to away
+	disable_persist_view();
+	document.getElementById("persistCameraCheck").disabled = true;
+	pauseQueues();
+
+	remoteView.removeAttribute("poster");
+	console.log("Assigning file");
+	remoteView.setAttribute("src", './getRecording?fileName=' + filename);
+	//New attribute for control
+	remoteView.setAttribute("controls","controls");
+	/*remoteView.setAttribute("onended", "change_play_button()");
+	if (document.getElementById("play-video-icon").classList.contains("fa-pause")) {
+		document.getElementById("play-video-icon").classList.add("fa-play");
+		document.getElementById("play-video-icon").classList.remove("fa-pause");
+	}*/
+	toggle_incall_buttons(false);
+	//toggle_videomail_buttons(true);
+	recording_status_change(filename,'IN PROGRESS');
+	seekBar.value = 0;
+	remoteView.currentTime = 0;
+	
+	//Add the event listener for when the videomail finishes playing
+	document.getElementById('remoteView').addEventListener('ended', (event) => {
+		console.log("Finished playing recording");
+		recording_status_change(filename,'READ');
+	});
+}
+
+//Socket emit for changing status of a videomail
+function recording_status_change(fileName, recordStatus) {
+	socket.emit('recording-status-change', {
+		"fileName": fileName,
+		"status": recordStatus
+	});
+}
+
+//Exit videomail view and return to call view
+function exitRecording() {
+	stopRecording();
+	document.getElementById("persistCameraCheck").disabled = false;
+	if (document.getElementById("persistCameraCheck").checked == true) {
+		enable_persist_view();
+	}
+	//close right sidebar if it's open
+	if ($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#shortcuts-tab').hasClass('active')) {
+		$('#mail-btn').trigger('click');
+	}
+}
+
+function stopRecording() {
+	console.log("Videomail view has been stopped, back to call view");
+	remoteView.setAttribute("src", "");
+	remoteView.removeAttribute("src");
+	remoteView.removeAttribute("onended");
+	remoteView.removeAttribute("controls");
+	remoteView.setAttribute("autoplay", "autoplay");
+	remoteView.setAttribute("poster", "images/acedirect-logo.png");
+	toggle_recording_buttons(false);
+	//playingVideomail = false;
+}
+
+//Display the videomail control buttons
+function toggle_recording_buttons(make_visible) {
+	if (make_visible) record_status_buttons.style.display = "block";
+	else record_status_buttons.style.display = "none";
+}
+
+/**
+ * End recording section
+ */
 
 //Notification for unread videomail
 function updateVideomailNotification(data) {
@@ -1631,10 +1732,11 @@ function processFilter(filter) {
 
 //Show videomail sidebar tab
 function showVideoMailTab() {
-	if ($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') ) {
+	if ($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#recordings-tab').hasClass('active')) {
 		// if the sidebar is closing, remove the shortcuts of the tabs
 		$('#videomail-tab').attr("accesskey", '');
 		$('#agents-tab').attr("accesskey", '');
+		$('#recordings-tab').attr("accesskey", '');
 		$('#shortcuts-tab').attr("accesskey", '');
 		$('#clear-shortcuts').attr("accesskey", '');
 		$('#reset-shortcuts').attr("accesskey", '');
@@ -1642,6 +1744,7 @@ function showVideoMailTab() {
 
 		$('#agents-tab').removeClass('active');
 		$('#videomail-tab').removeClass('active');
+		$('#recordings-tab').removeClass('active');
 
 	} else {
 		// sidebar is opening, re-add the tab shortcuts
@@ -1684,10 +1787,11 @@ function showVideoMailTab() {
 
 //Show agent info sidebar tab
 function showAgentsTab() {
-	if ( $('#agents-tab').hasClass('active') || $('#videomail-tab').hasClass('active') ) {
+	if ( $('#agents-tab').hasClass('active') || $('#videomail-tab').hasClass('active') || $('#recordings-tab').hasClass('active')) {
 		// if the sidebar is closing, remove the tab shortcuts
 		$('#videomail-tab').attr("accesskey", '');
 		$('#agents-tab').attr("accesskey", '');
+		$('#recordings-tab').attr("accesskey", '');
 		$('#shortcuts-tab').attr("accesskey", '');
 		$('#clear-shortcuts').attr("accesskey", '');
 		$('#reset-shortcuts').attr("accesskey", '');
@@ -1695,6 +1799,7 @@ function showAgentsTab() {
 
 		$('#agents-tab').removeClass('active');
 		$('#videomail-tab').removeClass('active');
+		$('#recordings-tab').removeClass('active');
 
 	} else {
 		// sidebar is opening, re-add the tab shortcuts
@@ -1737,13 +1842,70 @@ function showAgentsTab() {
 
 //Loads the call recordings
 function showCallRecordingTab(){
-	s3.listObjects(bucketParams, function(err, data){
+	// was agents tab
+	if ( $('#agents-tab').hasClass('active') || $('#videomail-tab').hasClass('active') || $('#recordings-tab').hasClass('active')) {
+		// if the sidebar is closing, remove the tab shortcuts
+		$('#videomail-tab').attr("accesskey", '');
+		$('#agents-tab').attr("accesskey", '');
+		$('#recordings-tab').attr("accesskey", '');
+		$('#shortcuts-tab').attr("accesskey", '');
+		$('#clear-shortcuts').attr("accesskey", '');
+		$('#reset-shortcuts').attr("accesskey", '');
+		updateShortcutTable();
+
+		$('#agents-tab').removeClass('active');
+		$('#videomail-tab').removeClass('active');
+		$('#recordings-tab').removeClass('active');
+
+	} else {
+		// sidebar is opening, re-add the tab shortcuts
+		$('#videomail-tab').attr("accesskey", 'm');
+		$('#agents-tab').attr("accesskey", 'a');
+		//$('#recordings-tab').attr("accesskey", '');
+		$('#shortcuts-tab').attr("accesskey", 'k');
+		updateShortcutTable();
+
+		if ($('#videomail-tab').hasClass('active')) {
+			if (document.getElementById("ctrl-sidebar").hasAttribute('control-sidebar-open')) {
+				$('.nav-tabs a[href="#control-sidebar-agents-tab"]').removeClass('active');
+				$('#videomail-tab').removeClass('active');
+
+			}
+		}
+		$('.nav-tabs a[href="#control-sidebar-videomail-tab"]').removeClass('active')
+		$('.nav-tabs a[href="#control-sidebar-recordings-tab"]').tab('show');
+		$('.nav-tabs a[href="#control-sidebar-recordings-tab"]').addClass('active');
+		$('#agents-tab').addClass('active');
+
+		$('#shortcuts-tab').on('click', function() {
+			//give clear and reset buttons their shortcuts
+			$('#clear-shortcuts').attr("accesskey", '`');
+			$('#reset-shortcuts').attr("accesskey", '-');
+			updateShortcutTable();
+		});
+		$('#videomail-tab').on('click', function() {
+			//remove shortcuts
+			$('#clear-shortcuts').attr("accesskey", '');
+			$('#reset-shortcuts').attr("accesskey", '');
+		});
+		$('#agents-tab').on('click', function() {
+			//remove shortcuts
+			$('#clear-shortcuts').attr("accesskey", '');
+			$('#reset-shortcuts').attr("accesskey", '');
+		});
+		$('#recordings-tab').on('click', function() {
+			//remove shortcuts
+			$('#clear-shortcuts').attr("accesskey", '');
+			$('#reset-shortcuts').attr("accesskey", '');
+		});
+	}
+	/*s3.listObjects(bucketParams, function(err, data){
 		if(err){
 			console.log("Error", err);
 		} else {
 			console.log("Success", "Loading recordings " + data); 
 		}
-	})
+	})*/
 }
 
 //Play the selected videomail
@@ -2947,7 +3109,7 @@ $('#shortcutsBody').on('click','tr',function() {
 
 	var clickedID = $("[name="+clickedValue+"]").attr("id");
 
-	if (clickedID == "agents-tab" || clickedID == "videomail-tab" || clickedID == "shortcuts-tab" || clickedID == "clear-shortcuts" || clickedID == "reset-shortcuts") {
+	if (clickedID == "agents-tab" || clickedID == "videomail-tab" || clickedID == "recordings-tab" || clickedID == "shortcuts-tab" || clickedID == "clear-shortcuts" || clickedID == "reset-shortcuts") {
 
 		//error modal
 		console.log("cannot customize tab shortcuts or shortcut buttons")
