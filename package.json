@@ -58,6 +58,7 @@
     "url": "ssh://git@git.codev.mitre.org/acrdemo/ace-direct.git"
   },
   "dependencies": {
-    "aws-sdk": "^2.865.0"
+    "aws-sdk": "^2.865.0",
+    "mysql2": "^2.2.5"
   }
 }
