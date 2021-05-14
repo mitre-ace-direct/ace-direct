@@ -3,16 +3,16 @@ const param    = require('param');
 const Events   = require('events');
 const models   = require('./dal/models');
 const S3Client = require('./s3_client');
+var proxy = require('proxy-agent');
 /**
  * Custom logic for screen recording
  */
 const AWS = require('aws-sdk');
 
-var proxy = require('proxy-agent');
 AWS.config.update({
   region: 'us-east-1',
   httpOptions: {
-    agent: proxy("http://10.202.1.215:3128")
+    agent: proxy('http://10.202.1.215:3128')
   }
 });
 var s3 = new AWS.S3();
@@ -30,7 +30,7 @@ class RecordingManager extends Events {
     });
     //debug('Created recording for %s: %s', peer, id);
     //Custom logic to try uploading the recording to the s3 bucket
-    var uploadParams = {Bucket: 'task3acrdemo-recordings', Key: "rec_33003_20210319_211313.mp4", Body: ""};
+    var uploadParams = {Bucket: 'task3acrdemo-recordings', Key: filename, Body: ""};
     // Configure the file stream and obtain the upload parameters
 /*    var fs = require('fs');
     var fileStream = fs.createReadStream("http://172.21.1.155/MikeTest2.txt");
@@ -41,8 +41,8 @@ class RecordingManager extends Events {
     //var path = require('path');
     //uploadParams.Key = path.basename(file);
 */
-    var request = require('request');
-    /*request.get('http://172.21.1.155:3000/rec_33003_20210319_211313.mp4', function(err, res, body){
+    /*var request = require('request');
+    request.get(filename, function(err, res, body){
     console.log("Running s3 upload");
     uploadParams.Body = body;
     // call S3 to retrieve upload file to specified bucket
@@ -60,25 +60,24 @@ class RecordingManager extends Events {
     var uploadParams = {Bucket: 'task3acrdemo-recordings', Key: filename, Body: ""};
     var request = require('request');
     request.get('http://172.21.1.155:3000/'+filename, function(err, res, body){
-    console.log("Running s3 upload");
-    uploadParams.Body = body;
-    // call S3 to retrieve upload file to specified bucket
-    s3.upload (uploadParams, function (err, data) {
-      if (err) {
-        console.log("Error", err);
-      } if (data) {
-        console.log("Upload Success", data.Location);
-	var params = { 
-  		Bucket: 'task3acrdemo-recordings'
-		}
+      console.log("Running s3 upload");
+      uploadParams.Body = body;
+      // call S3 to retrieve upload file to specified bucket
+      s3.upload (uploadParams, function (err, data) {
+        if (err) {
+          console.log("Error", err);
+        } if (data) {
+          console.log("Upload Success", data.Location);
+          var params = { 
+            Bucket: 'task3acrdemo-recordings'
+          }
 
-	s3.listObjects(params, function (err, data) {
-  		if(err)throw err;
-  		
-		console.log(data);
-	});
-      }
-    });
+          s3.listObjects(params, function (err, data) {
+            if(err)throw err;
+              console.log(data);
+          });
+        }
+      });
     })
   }
 
