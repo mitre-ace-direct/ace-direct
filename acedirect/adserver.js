@@ -23,12 +23,18 @@ var mysql = require('mysql');
 var MongoClient = require('mongodb').MongoClient;
 var dbConnection = null;
 var dbconn = null;
+var proxy = require('proxy-agent');
 
 //Credentials needed for Call Recordings
 var AWS = require('aws-sdk');
-AWS.config.update({region: 'us-east-1'});
+AWS.config.update({
+	region: 'us-east-1',
+	httpOptions: {
+	  agent: proxy('http://10.202.1.215:3128')
+	}
+});
 
-s3 = new AWS.S3({apiVersion: '2006-03-01'});
+s3 = new AWS.S3();
 
 var bucketParams = {
 	Bucket : 'task3acrdemo-recordings',
@@ -1774,13 +1780,41 @@ io.sockets.on('connection', function (socket) {
 
 	//Retrieval of videomail records from the database
 	socket.on("get-recordings", function (data) {
+		let recordingQuery = `SELECT * FROM call_recordings WHERE agentNumber = ${token.extension}`;
+
+		dbConnection.query(recordingQuery, function (err, result) {
+			if (err) {
+				logger.error("GET-RECORDINGS ERROR: " + err.code);
+			} else {
+				console.log("Got recording data " + JSON.stringify(data));
+				//TODO Get s3 bucket url
+				io.to(token.extension).emit('got-call-recordings', result);
+			}
+		});
+
 		// Call S3 to obtain a list of the objects in the bucket
-		console.log("Checking the S3 bucket " + JSON.stringify(bucketParams));
+		/*console.log("Checking the S3 bucket " + JSON.stringify(bucketParams));
 		s3.listObjects(bucketParams, function(err, data) {
 			if (err) {
 				console.log("Error", err);
 			} else {
 				console.log("Success: " + JSON.stringify(data));
+			}
+		});*/
+	});
+
+	//updates recording records when the agent changes the status
+	socket.on("recording-status-change", function (data) {
+		logger.debug('updating MySQL entry');
+		let recording_sql_query = `UPDATE call_recordings SET status = ?, WHERE fileName = ?;`;
+		let recording_sql_params = [data.status, data.fileName];
+
+		dbConnection.query(recording_sql_query, recording_sql_params,function (err, result) {
+			if (err) {
+				logger.error('RECORDING-STATUS-CHANGE ERROR: '+ err.code);
+			} else {
+				logger.debug(result);
+				io.to(token.extension).emit('record-changed-status', result);
 			}
 		});
 	});
@@ -4049,6 +4083,19 @@ app.get('/getVideomail', agent.shield(cookieShield),function (req, res) {
 		}
 	});
 });
+
+/**
+ * Get the specific recording 
+ */
+app.get('/getRecording', agent.shield(cookieShield), function(req, res) {
+	
+	console.log("USING " + req.query.fileName);
+	var file = s3.getObject({Bucket: "task3acrdemo-recordings", Key: req.query.fileName});
+
+	res.attachment(req.query.fileName);
+	var filestream = file.createReadStream();
+	filestream.pipe(res);
+})
 
 //For fileshare
 //TODO Needs middleware for agent and consumer
