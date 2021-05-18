@@ -19,11 +19,8 @@
 	var jssip_debug = false; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
 	var maxRecordingSeconds = 90;
 	var call_terminated = false;
-<<<<<<< HEAD
 	var privacy_video_url = window.location.origin + "/" + nginxPath + "/media/videoPrivacy.webm";
-=======
 	var monitorExt;
->>>>>>> Fix hangups while monitoring
 
 	//VIDEOMAIL recording progress bar
 	var recordId = null;
