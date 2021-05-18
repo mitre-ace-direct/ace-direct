@@ -1,11 +1,11 @@
-const debug = require('debug')('ace:conf-man');
-const Events = require('events');
-const NodeWS = require('jssip-node-websocket');
-const SIP = require('jssip');
-const param = require('param');
-const RTCCall = require('./webrtc_media_session');
-const VideoMail = require('./video_mail');
-const models = require('./dal/models');
+const debug     = require('debug')('ace:conf-man');
+const Events    = require('events');
+const NodeWS    = require('jssip-node-websocket');
+const SIP       = require('jssip');
+const param     = require('param');
+const RTCCall   = require('./webrtc_media_session');
+//const VideoMail = require('./video_mail');
+const models    = require('./dal/models');
 
 class ConfManager extends Events {
 
@@ -145,7 +145,8 @@ class ConfManager extends Events {
 
     const callee = this._index.getByExt(calleeExt);
     const caller = this._index.getByExt(callerExt);
-    if (callee && callee.busy && !callee._warmTransfer) {
+    if(callee && callee.busy && !callee._warmTransfer) {
+      /*
       debug('Callee is busy, videomail...');
       const videomail = new VideoMail();
       const answer = await videomail.setPeer(callee, evt.request.body);
@@ -167,6 +168,7 @@ class ConfManager extends Events {
           iceServers: param('ice')
         }
       });
+      */
       return;
     }
     if (callee && caller) {
