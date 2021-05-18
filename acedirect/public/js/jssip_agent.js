@@ -803,7 +803,6 @@ function terminate_call() {
 		socket.emit('chat-leave-ack', {'vrs': $('#callerPhone').val()})
 	}
 
-	isTransfer = false;
 	originalExt = null;
 	transferExt = null;
 	transferVRS = null;
