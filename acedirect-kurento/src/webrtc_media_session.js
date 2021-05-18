@@ -198,8 +198,8 @@ class WebRTCMediaSession extends Events {
     // Here we pass an optional custom codec to force a specific codec in the WebRTC leg different than the RTP leg
     offer = this.filterCodecs(offer, customWebrtcCodec);
     if (bitrates && bitrates.video) {
-      if (bitrates.video.max) await webrtc.setMaxVideoSendBandwidth(bitrates.video.max);
-      if (bitrates.video.min) await webrtc.setMinVideoSendBandwidth(bitrates.video.min);
+      if (bitrates.video.max) await webrtc.setMaxVideoRecvBandwidth(bitrates.video.max);
+      if (bitrates.video.min) await webrtc.setMinVideoRecvBandwidth(bitrates.video.min);
     }
     debug('WEBRTC FILTERED OFFER, with specified preferred video codec: ' + this._videoCodec);
     debug(offer);
@@ -349,7 +349,8 @@ class WebRTCMediaSession extends Events {
     rtp.on('Error', (error) => {
       debug(`RTPEndpoint ${ext} error: ${error}`);
     });
-    await rtp.setOutputBitrate(this._rtp_max_bitrate * 1000);
+    await rtp.setMaxOutputBitrate(this._rtp_max_bitrate * 1000);
+    await rtp.setMinOutputBitrate(this._rtp_min_bitrate * 1000);
     const p = this._participants.get(ext);
     if (p) {
       debug('EXTRA, connect audio only');
