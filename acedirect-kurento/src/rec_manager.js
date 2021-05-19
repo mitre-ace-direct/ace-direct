@@ -4,6 +4,8 @@ const Events   = require('events');
 const models   = require('./dal/models');
 const S3Client = require('./s3_client');
 var proxy = require('proxy-agent');
+var fs = require('fs');
+const request = require('request');
 /**
  * Custom logic for screen recording
  */
@@ -31,35 +33,31 @@ class RecordingManager extends Events {
     //debug('Created recording for %s: %s', peer, id);
     //Custom logic to try uploading the recording to the s3 bucket
     var uploadParams = {Bucket: '***REMOVED***-recordings', Key: filename, Body: ""};
-    // Configure the file stream and obtain the upload parameters
-/*    var fs = require('fs');
-    var fileStream = fs.createReadStream("http://172.21.1.155/MikeTest2.txt");
-    fileStream.on('error', function(err) {
-      console.log('File Error', err);
+
+    let fileRequest = 'http://172.21.1.155:3000/recordings/' + filename;
+    const filepath = 'media/' + filename;
+    let record = fs.createWriteStream(filepath);
+    request(fileRequest).pipe(record);
+    record.on('finish', function () {
+      fs.readFile(filepath, function(err, fileData){
+        uploadParams.Body = fileData;
+        // call S3 to retrieve upload file to specified bucket
+        s3.upload (uploadParams, function (err, data) {
+          if (err) {
+            console.log("Error", err);
+          } if (data) {
+            console.log("Upload Success", data.Location);
+            //Delete file from media folder
+          }
+        });
+      });
     });
-    uploadParams.Body = fileStream;
-    //var path = require('path');
-    //uploadParams.Key = path.basename(file);
-*/
-    /*var request = require('request');
-    request.get(filename, function(err, res, body){
-    console.log("Running s3 upload");
-    uploadParams.Body = body;
-    // call S3 to retrieve upload file to specified bucket
-    s3.upload (uploadParams, function (err, data) {
-      if (err) {
-        console.log("Error", err);
-      } if (data) {
-        console.log("Upload Success", data.Location);
-      }
-    });
-  })*/
-  }
+}
 
   static async upload(filename){
     var uploadParams = {Bucket: '***REMOVED***-recordings', Key: filename, Body: ""};
     var request = require('request');
-    request.get('http://172.21.1.155:3000/'+filename, function(err, res, body){
+    request.get('http://172.21.1.155:3000/recordings/'+filename, function(err, res, body){
       console.log("Running s3 upload");
       uploadParams.Body = body;
       // call S3 to retrieve upload file to specified bucket
