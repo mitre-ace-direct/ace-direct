@@ -2,7 +2,7 @@
 
 // Much of the angular datatables logic was inspired by the following SO post
 // https://stackoverflow.com/questions/11872832/how-to-respond-to-clicks-on-a-checkbox-in-an-angularjs-directive
-const adminApp = angular.module('admin', ['csrService', 'datatables']).controller('adminController', ($scope, socket, DTOptionsBuilder) => {
+angular.module('admin', ['csrService', 'datatables']).controller('adminController', ($scope, socket, DTOptionsBuilder) => {
   /**
      * Initial function fired when the DOM/window loads
      */
@@ -43,9 +43,9 @@ const adminApp = angular.module('admin', ['csrService', 'datatables']).controlle
       for (let i = 0; i < data.agents.length; i += 1) {
         const a = findAgent($scope.Agents, data.agents[i]);
         if (a) {
-          for (const prop in data.agents[i]) {
+          Object.keys(data.agents[i]).forEach((prop) => {
             a[prop] = data.agents[i][prop];
-          }
+          });
         } else {
           // Push the new agent into the angular scope
           $scope.Agents.push(data.agents[i]);
@@ -83,7 +83,7 @@ const adminApp = angular.module('admin', ['csrService', 'datatables']).controlle
      * Pretty prints the list of selected agents
      */
   function printSelectedAgents() {
-    for (let i = 0; i < $scope.selected.length; ++i) {
+    for (let i = 0; i < $scope.selected.length; i += 1) {
       console.log(JSON.stringify($scope.selected[i], null, 2, true));
     }
   }
@@ -102,7 +102,7 @@ const adminApp = angular.module('admin', ['csrService', 'datatables']).controlle
      * Check if an agent is present in the current list of selected agents
      */
   $scope.isSelected = function IsSelected(checkAgent) {
-    for (let i = 0; i < $scope.selected.length; ++i) {
+    for (let i = 0; i < $scope.selected.length; i += 1) {
       if ($scope.selected[i].agent === checkAgent.agent) {
         return true;
       }

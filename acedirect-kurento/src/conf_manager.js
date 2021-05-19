@@ -1,11 +1,11 @@
-const debug     = require('debug')('ace:conf-man');
-const Events    = require('events');
-const NodeWS    = require('jssip-node-websocket');
-const SIP       = require('jssip');
-const param     = require('param');
-const RTCCall   = require('./webrtc_media_session');
+const debug = require('debug')('ace:conf-man');
+const Events = require('events');
+const NodeWS = require('jssip-node-websocket');
+const SIP = require('jssip');
+const param = require('param');
+const RTCCall = require('./webrtc_media_session');
 const VideoMail = require('./video_mail');
-const models    = require('./dal/models');
+const models = require('./dal/models');
 
 class ConfManager extends Events {
 
@@ -24,7 +24,7 @@ class ConfManager extends Events {
     const uri = `${protocol}://${host}:${port}/ws`;
     const socket = new NodeWS(uri);
     const ua = new SIP.UA({
-      sockets: [ socket ],
+      sockets: [socket],
       uri: `sip:${user}@${host}`,
       password: pass,
       registrar_server: `sip:${host}`,
@@ -34,7 +34,7 @@ class ConfManager extends Events {
         processOffer: async (peer, offer) => {
           debug(`Processing update for ${peer}`);
           const call = this._calls.get(peer);
-          if(!call) {
+          if (!call) {
             debug(`Can't find call for ${peer}`);
             throw new Error(`Can't find call for ${peer}`);
           }
@@ -96,7 +96,7 @@ class ConfManager extends Events {
 
   async hold(calleeExt, onHold) {
     const jssip_session = this._jssipRTCSessions.get(calleeExt);
-    return onHold ? jssip_session.hold({useUpdate: true}) : jssip_session.unhold({useUpdate: true});
+    return onHold ? jssip_session.hold({ useUpdate: true }) : jssip_session.unhold({ useUpdate: true });
   }
 
   async handleRegenerateEndpoints(c, sdpOffer, session, bothPeers, isUpdate) {
@@ -129,16 +129,16 @@ class ConfManager extends Events {
     const videoMaxBitrate = param('kurento.video_webrtc_max_bitrate') || 300;
     const videoMinBitrate = param('kurento.video_webrtc_min_bitrate') || 50;
 
-    const bitrates = {audio: {max: 30, min: 10}, video: {max: videoMaxBitrate, min: videoMinBitrate}};
+    const bitrates = { audio: { max: 30, min: 10 }, video: { max: videoMaxBitrate, min: videoMinBitrate } };
     this._jssipRTCSessions.set(calleeExt, session);
     let callerExt = 'Anonymous';
-    if ( from && from.length ) {
+    if (from && from.length) {
       callerExt = from[0].parsed.uri.user;
     }
 
     const callee = this._index.getByExt(calleeExt);
     const caller = this._index.getByExt(callerExt);
-    if(callee && callee.busy && !callee._warmTransfer) {
+    if (callee && callee.busy && !callee._warmTransfer) {
       debug('Callee is busy, videomail...');
       const videomail = new VideoMail();
       const answer = await videomail.setPeer(callee, evt.request.body);
@@ -162,7 +162,7 @@ class ConfManager extends Events {
       });
       return;
     }
-    if(callee && caller) {
+    if (callee && caller) {
       const call = this._calls.get(caller.ext);
       debug('Incoming call (SIP) from %s to %s', caller.ext, callee.ext);
       const webrtcOffer = await callee.accept(caller.ext, call);
@@ -228,14 +228,14 @@ class ConfManager extends Events {
       }
     } else {
       debug(
-        'Can\t handle scenario: caller = %s callee = %s', 
+        'Can\t handle scenario: caller = %s callee = %s',
         caller ? caller.ext : '(null)',
         callee ? callee.ext : '(null)'
       );
       return;
     }
     //warm transfer allows skip videomail queue once, if skipped get back to normal
-    if(callee._warmTransfer) callee._warmTransfer = false;
+    if (callee._warmTransfer) callee._warmTransfer = false;
   }
 
   async loopbackCall(caller, callerOffer, calleeExt) {
@@ -249,7 +249,7 @@ class ConfManager extends Events {
     });
     console.log(this._calls);
     // Modify default codec and bitrate
-    let bitrates = {audio: {max: 30, min: 10}, video: {max: videoMaxBitrate, min: videoMinBitrate}};
+    let bitrates = { audio: { max: 30, min: 10 }, video: { max: videoMaxBitrate, min: videoMinBitrate } };
     debug('Starting WebRTC session %s -> %s', caller.ext, calleeExt);
     await call.addWebrtcPeer(caller, callerOffer, bitrates);
     const calleeOffer = await caller.accept(caller.ext, call);
@@ -270,8 +270,8 @@ class ConfManager extends Events {
     const callee = this._index.getByExt(calleeExt);
     const videoMaxBitrate = param('kurento.video_webrtc_max_bitrate') || 300;
     const videoMinBitrate = param('kurento.video_webrtc_min_bitrate') || 50;
-    
-    let bitrates = {audio: {max: 30, min: 10}, video: {max: videoMaxBitrate, min: videoMinBitrate}};
+
+    let bitrates = { audio: { max: 30, min: 10 }, video: { max: videoMaxBitrate, min: videoMinBitrate } };
     if (caller.busy) {
       throw new Error(`${callerExt} not available`);
     }
@@ -287,7 +287,7 @@ class ConfManager extends Events {
       this._calls.delete(calleeExt);
     });
     await call.init();
-    if(skipQueue && callee) {
+    if (skipQueue && callee) {
       debug('Starting WebRTC session %s -> %s', caller.ext, calleeExt);
       await call.addWebrtcPeer(caller, callerOffer, bitrates);
       const calleeOffer = await callee.accept(caller.ext, call);
@@ -311,8 +311,8 @@ class ConfManager extends Events {
         from: caller.ext,
         to: calleeExt
       });
-     var pfuInt; 
-     const session = caller.ua.call(calleeExt, {
+      var pfuInt;
+      const session = caller.ua.call(calleeExt, {
         eventHandlers: this.callEventHandlers(caller.ext, calleeExt),
         mediaConstraints: { audio: true, video: true },
         rtcOfferConstraints: rtpOffer,
@@ -334,28 +334,31 @@ class ConfManager extends Events {
       });
 
 
-/*
+
       session.on('confirmed', evt => {
         this._calls.set(calleeExt, call);
 
-setTimeout(()=>{
-// force pfu at start of the call
-    let body = `<?xml version="1.0" encoding="utf-8" ?>
-  <media_control>
-    <vc_primitive>
-      <to_encoder>
-        <picture_fast_update/>
-      </to_encoder>
-    </vc_primitive>
-  </media_control>`;
+        setTimeout(() => {
+          // force pfu at start of the call
+          let body = `<?xml version="1.0" encoding="utf-8" ?>
+          <media_control>
+            <vc_primitive>
+              <to_encoder>
+                <picture_fast_update/>
+              </to_encoder>
+            </vc_primitive>
+          </media_control>`;
 
-  session.sendInfo('application/media_control+xml', body)
+          session.sendInfo('application/media_control+xml', body)
 
-  pfuInt = setInterval(()=>{session.sendInfo('application/media_control+xml', body)},5000)
-},1000);
-// end
- });
-*/
+          const ms = param('asterisk.sip_media_request_interval');
+          if (ms) {
+            pfuInt = setInterval(() => { session.sendInfo('application/media_control+xml', body) }, ms);
+          }
+        }, 1000);
+        // end
+      });
+
 
 
 
@@ -364,10 +367,10 @@ setTimeout(()=>{
 
         call.on('finished', () => {
           this._calls.delete(calleeExt);
-          //clearInterval(pfuInt)
+          clearInterval(pfuInt)
         })
         call.handleRtpAnswer(calleeExt, evt.response.body, session);
-	
+
       });
     }
     return call;
@@ -376,8 +379,8 @@ setTimeout(()=>{
   callEventHandlers(from, to) {
     return {
       progress: () => {
-       debug('[%s -> %s] Call is in progress', from, to);
-     },
+        debug('[%s -> %s] Call is in progress', from, to);
+      },
       confirmed: () => {
         debug('[%s -> %s] Call confirmed', from, to);
       },
