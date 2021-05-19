@@ -11,12 +11,6 @@
       "private_key": "Full path to the private key file"
     }
   },
-  "proxy_server": {
-      "proto": "protocol (e.g., wss) of SIP proxy server",
-      "public": "FQDN of the SIP proxy server",
-      "port": "port number of the SIP proxy server, (e.g., 443)",
-      "path": "path of the SIP proxy server (e.g., /ws)"
-  },
   "signaling_server": {
       "proto": "(if no nginx) protocol (e.g., wss) of signaling server",
       "public": "(if no nginx) FQDN:port of signaling server", 
