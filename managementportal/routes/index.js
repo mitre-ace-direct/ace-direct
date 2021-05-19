@@ -349,7 +349,7 @@ function openAMOperation(openAMAgentInfo) {
   logger.info(`openAMOperation with info: ${JSON.stringify(openAMAgentInfo)}`);
 
   // Use the approach to access openam from inside the organization network
-  const urlPrefix = `https://${getConfigVal('openam:private_ip')}:${parseInt(getConfigVal('openam:port'), 10)}/${getConfigVal('openam:path')}`;
+  const urlPrefix = `https://${getConfigVal('nginx:private_ip')}:${parseInt(getConfigVal('nginx:port'), 10)}/${getConfigVal('openam:path')}`;
 
   const openAmLoginSuccess = new Promise(
     (resolve, reject) => {
@@ -364,7 +364,7 @@ function openAMOperation(openAMAgentInfo) {
           'X-OpenAM-Username': getConfigVal('openam:user'),
           'X-OpenAM-Password': getConfigVal('openam:password'),
           'Content-Type': 'application/json',
-          host: urlparse.parse(`https://${getConfigVal('openam:fqdn')}`).hostname
+          host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname
         }
       }, (error, response, data) => {
         if (error) {
@@ -396,7 +396,7 @@ function openAMOperation(openAMAgentInfo) {
               headers: {
                 iplanetDirectoryPro: succTokenId,
                 'Content-Type': 'application/json',
-                host: urlparse.parse(`https://${getConfigVal('openam:fqdn')}`).hostname
+                host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname
               },
               body: {
                 username: openAMAgentInfo.username,
@@ -431,7 +431,7 @@ function openAMOperation(openAMAgentInfo) {
               headers: {
                 iplanetDirectoryPro: succTokenId,
                 'Content-Type': 'application/json',
-                host: urlparse.parse(`https://${getConfigVal('openam:fqdn')}`).hostname
+                host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname
               },
               body: { // username and password are not updatable for now
                 mail: [openAMAgentInfo.email],
@@ -464,7 +464,7 @@ function openAMOperation(openAMAgentInfo) {
               headers: {
                 iplanetDirectoryPro: succTokenId,
                 'Content-Type': 'application/json',
-                host: urlparse.parse(`https://${getConfigVal('openam:fqdn')}`).hostname
+                host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname
               }
             }, (error, response, data) => {
               if (error) {
@@ -501,7 +501,7 @@ function openAMOperation(openAMAgentInfo) {
         headers: {
           iplanetDirectoryPro: succTokenId,
           'Content-Type': 'application/json',
-          host: urlparse.parse(`https://${getConfigVal('openam:fqdn')}`).hostname
+          host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname
         }
       }, (error, response, data) => {
         if (error) {
