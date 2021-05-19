@@ -22,8 +22,10 @@
       "public": "Fully qualified domain name of the Asterisk server",
       "private_ip": "Private IP address of the Asterisk server",
       "ws_port": "Websocket port",      
+      "protocol": "Asterisk protocol",      
       "stun": "Fully qualified domain name of the stun server",
       "stun_port": "Port of the stun server",
+      "stun_user": "username for stun server",      
       "turn": "Fully qualified domain name of turn server",
       "turn_port": "string; port number of turn server; may be empty",
       "turn_user": "turn server username",
@@ -42,10 +44,16 @@
     },
     "queues": {
       "complaint": {
-        "number": "Asterisk dial-in number for the complaint queue; from /etc/asterisk/extensions.conf on acesip.domain.com"
+        "number": "Asterisk dial-in number for the complaint queue; from /etc/asterisk/extensions.conf on acesip.domain.com",
+        "name": "string; name of complaint queue"
       },
+      "general": {
+        "number": "Asterisk dial-in number for the general queue; from /etc/asterisk/extensions.conf on acesip.domain.com",
+        "name": "string; name of general queue"        
+      },      
       "videomail": {
-        "number": "Asterisk dial-in number for the videomail queue; from /etc/asterisk/extensions.conf on acesip.domain.com"
+        "number": "Asterisk dial-in number for the videomail queue; from /etc/asterisk/extensions.conf on acesip.domain.com",
+        "name": "string; name of videomail queue"
       }
     }
   },
@@ -181,7 +189,6 @@
     "awayBlink": "boolean string (true/false) that enables blinking while Away, if callers are in queue"
   },
   "translation_server": {
-    "private_ip": "IP address of the translation server, typically runs on the Asterisk server",
     "port": "Port number of the translation server",
     "protocol": "Protocol (http/https) of the translation server"
   },
@@ -196,19 +203,9 @@
   },
   "asteriskss": {
     "comment1": "signaling server only",
-    "protocol": "wss",
-    "host": "FQDN of asterisk server",
-    "ip": "asterisk private IP",
-    "port": "Integer; Asterisk port number",
     "sip_media_request_interval": 5000,
     "ami": {
-      "ip": "<asterisk private IP>",
-      "enabled": true,
-      "id": "<asterisk AMI userid>; same AMI username as above",
-      "passwd": "<asterisk AMI password>; same AMI password as above",
-      "port": "5038",
-      "queue_names": ["from Asterisk /etc/asterisk/*.conf", "from Asterisk /etc/asterisk/*.conf"],
-      "queue_extensions": ["from Asterisk /etc/asterisk/*.conf", "from Asterisk /etc/asterisk/*.conf"]
+      "enabled": true
     }
   },
   "kurento": {
@@ -238,16 +235,6 @@
     },
     "conference_max_participants": 4
   },
-  "ice": [
-    { 
-      "urls": "stun:stun.domain.com:3478"
-    },
-    { 
-      "urls": "turn:coturn.domain.com:3478",
-      "username": "<turnusername>",
-      "credential": "<turncred>"
-    } 
-  ],  
   "videomailss": {
     "comment1": "signaling server only",
     "directory": "/tmp/videomail/",
