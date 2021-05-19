@@ -18,9 +18,9 @@ class ConfManager extends Events {
   }
 
   register(user, pass) {
-    const host = param('asteriskss.host');
-    const port = param('asteriskss.port');
-    const protocol = param('asteriskss.protocol');
+    const host = param('asterisk.sip.public');
+    const port = param('asterisk.sip.ws_port');
+    const protocol = param('asterisk.sip.protocol');
     const uri = `${protocol}://${host}:${port}/ws`;
     const socket = new NodeWS(uri);
     const ua = new SIP.UA({
@@ -162,10 +162,21 @@ class ConfManager extends Events {
       videomail.on('finished', () => {
         session.terminate();
       });
+
+      const iceArr = [
+        {
+          "urls": `${param('asterisk.sip.stun_user')}:${param('asterisk.sip.stun')}:${param('asterisk.sip.stun_port')}`
+        },
+        {
+          "urls": `${param('asterisk.sip.turn_user')}:${param('asterisk.sip.turn')}:${param('asterisk.sip.turn_port')}`,
+          "username": `${param('asterisk.sip.turn_user')}`,
+          "credential": `${param('asterisk.sip.turn_cred')}`
+        }
+      ];
       session.answer({
         rtcAnswerConstraints: answer,
         pcConfig: {
-          iceServers: param('ice')
+          iceServers: iceArr
         }
       });
       */
@@ -224,10 +235,20 @@ class ConfManager extends Events {
         debug('AND NOW WE WILL ADD RTP ENDPONT and FILTER CODECS FROM THIS OFFER...')
         const rtpAnswer = await call.addRtpPeer(callerExt, evt.request.body, session);
         debug(rtpAnswer);
+        const iceArr = [
+          {
+            "urls": `${param('asterisk.sip.stun_user')}:${param('asterisk.sip.stun')}:${param('asterisk.sip.stun_port')}`
+          },
+          {
+            "urls": `${param('asterisk.sip.turn_user')}:${param('asterisk.sip.turn')}:${param('asterisk.sip.turn_port')}`,
+            "username": `${param('asterisk.sip.turn_user')}`,
+            "credential": `${param('asterisk.sip.turn_cred')}`
+          }
+        ];        
         session.answer({
           rtcAnswerConstraints: rtpAnswer,
           pcConfig: {
-            iceServers: param('ice')
+            iceServers: iceArr
           }
         });
         await call.addWebrtcPeer(callee, webrtcOffer, bitrates);
@@ -321,12 +342,22 @@ class ConfManager extends Events {
         to: calleeExt
       });
       var pfuInt;
+      const iceArr = [
+        {
+          "urls": `${param('asterisk.sip.stun_user')}:${param('asterisk.sip.stun')}:${param('asterisk.sip.stun_port')}`
+        },
+        {
+          "urls": `${param('asterisk.sip.turn_user')}:${param('asterisk.sip.turn')}:${param('asterisk.sip.turn_port')}`,
+          "username": `${param('asterisk.sip.turn_user')}`,
+          "credential": `${param('asterisk.sip.turn_cred')}`
+        }
+      ];       
       const session = caller.ua.call(calleeExt, {
         eventHandlers: this.callEventHandlers(caller.ext, calleeExt),
         mediaConstraints: { audio: true, video: true },
         rtcOfferConstraints: rtpOffer,
         pcConfig: {
-          iceServers: param('ice')
+          iceServers: iceArr
         }
       });
       session.on('failed', e => {
