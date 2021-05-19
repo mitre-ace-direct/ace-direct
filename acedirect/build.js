@@ -44,7 +44,8 @@ const JS = [
   'gridstack/dist/gridstack.jQueryUI.min.js',
   'lodash/lodash.min.js',
   'datatables.net/js/jquery.dataTables.min.js',
-  'datatables.net-bs/js/dataTables.bootstrap.min.js'
+  'datatables.net-bs/js/dataTables.bootstrap.min.js',
+  'getstats/getStats.js'
   /*
     'admin-lte/plugins/bootstrap-slider/bootstrap-slider.js',
     'bootstrap-daterangepicker/daterangepicker.js',
