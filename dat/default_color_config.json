@@ -64,6 +64,16 @@
       "color": "yellow",
       "blink": true,
       "stop": false
-    }		
+    },
+    {
+      "id": "transferred_call",
+      "name": "Transferred Call",
+      "r": 255,
+      "g": 255,
+      "b": 255,
+      "color": "white",
+      "blink": true,
+      "stop": false
+    }  
   ]
 }
