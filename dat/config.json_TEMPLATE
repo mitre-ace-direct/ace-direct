@@ -11,12 +11,6 @@
       "private_key": "/etc/ssl/key.pem"
     }
   },
-  "proxy_server": {
-    "proto": "wss",
-    "public": "aceproxy.domain.com",
-    "port": 443,
-    "path": "/ws"
-  },
   "signaling_server": {
     "proto": "",
     "public": "",
