@@ -1643,6 +1643,7 @@ function playCallRecording(filename){
 		document.getElementById("play-video-icon").classList.remove("fa-pause");
 	}*/
 	toggle_incall_buttons(false);
+	toggle_recording_buttons(true);
 	//toggle_videomail_buttons(true);
 	recording_status_change(filename,'IN PROGRESS');
 	seekBar.value = 0;
@@ -1665,6 +1666,7 @@ function recording_status_change(fileName, recordStatus) {
 
 //Exit videomail view and return to call view
 function exitRecording() {
+	console.log("exiting recording");
 	stopRecording();
 	document.getElementById("persistCameraCheck").disabled = false;
 	if (document.getElementById("persistCameraCheck").checked == true) {
@@ -1690,6 +1692,7 @@ function stopRecording() {
 
 //Display the videomail control buttons
 function toggle_recording_buttons(make_visible) {
+	console.log("Toggling record buttons");
 	if (make_visible) record_status_buttons.style.display = "block";
 	else record_status_buttons.style.display = "none";
 }
