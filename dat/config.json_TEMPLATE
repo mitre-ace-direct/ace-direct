@@ -12,10 +12,7 @@
     }
   },
   "signaling_server": {
-    "proto": "",
-    "public": "",
-    "port": 1234,
-    "dev_url": "wss://portal.domain.com/SOMEUSER/acedirect-kurento/signaling"
+    "url": "wss://portal.domain.com/SOMEUSER/acedirect-kurento/signaling"
   },
   "asterisk": {
     "sip": {
