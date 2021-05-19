@@ -462,7 +462,7 @@ class ClientSession extends Events {
   }
 
   async requestKeyframeAndSleep() {
-    let ms = param('asteriskss.sip_media_request_interval');
+    const ms = param('asteriskss.sip_media_request_interval');
     if (ms) {
       await this.handleSipInfo();
       return new Promise(resolve => {
