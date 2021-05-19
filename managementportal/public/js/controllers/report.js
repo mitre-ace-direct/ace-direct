@@ -19,7 +19,8 @@ function getTimeZoneOffset() {
 
 const timezone = getTimeZoneOffset();
 
-function updateCallStatusLineChart(data) {
+function updateCallStatusLineChart(dataIn) {
+  const data = dataIn;
   $(() => {
     if (data.data.length === 1) {
       start = new Date(data.data[0].date);
@@ -159,14 +160,14 @@ $.ajax({
           $('#topTenStates').empty().append(content);
 
           content = '<table style="width:100%"">';
-          for (i = 0; i < data.topTenStates.length; i += 1) {
+          for (i = 0; i < data.topTenAreaCodes.length; i += 1) {
             content += `<tr><td>${data.topTenAreaCodes[i][0]}</td><td>${data.topTenAreaCodes[i][1]}</td></tr>`;
           }
           content += '</table>';
           $('#topTenAreaCodes').empty().append(content);
 
           content = '<table style="width:100%"">';
-          for (i = 0; i < data.topTenStates.length; i += 1) {
+          for (i = 0; i < data.topTenVrsNumbers.length; i += 1) {
             const vrsNumber = data.topTenVrsNumbers[i][0];
             const vrsNumerFormatted = `${vrsNumber.substring(0, 3)}-${vrsNumber.substring(3, 6)}-${vrsNumber.substring(6, vrsNumber.length)}`;
             content += `<tr><td>${vrsNumerFormatted}</td><td>${data.topTenVrsNumbers[i][1]}</td></tr>`;
