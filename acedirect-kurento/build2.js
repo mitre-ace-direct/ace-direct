@@ -50,11 +50,11 @@ function getConfigVal(param_name) {
     }
   } else {
     //did not find value for param_name
-    logger.error('');
-    logger.error('*******************************************************');
-    logger.error('ERROR!!! Config parameter is missing: ' + param_name);
-    logger.error('*******************************************************');
-    logger.error('');
+    console.log('');
+    console.log('*******************************************************');
+    console.log('ERROR!!! Config parameter is missing: ' + param_name);
+    console.log('*******************************************************');
+    console.log('');
     decodedString = "";
   }
   return (decodedString.toString());
@@ -99,6 +99,9 @@ async function go() {
   s = await execCommand('echo ' + stun_svr + ' > WebRtcEndpoint.conf.ini','./confs/kurento');
   s = await execCommand('echo ' + stun_port + ' >> WebRtcEndpoint.conf.ini','./confs/kurento');
   s = await execCommand('echo ' + turn_url + ' >> WebRtcEndpoint.conf.ini','./confs/kurento');
+
+  // link to config file for acedirect-kurento debugging
+  s = await execCommand(`ln -sf ${process.env.HOME}/ace-direct/dat/config.json src/config/development.json`, '.');
 
 }
 

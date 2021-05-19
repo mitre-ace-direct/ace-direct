@@ -105,7 +105,7 @@ const appRouter = (app, connection, itrsMode) => {
             message: 'success',
             data: [
               {
-                vrs: req.query.vrsnum, username: '', password: '', first_name: '', last_name: '', address: '', city: '', state: '', zip_code: '', email: '', isAdmin: 0, sipuri: arr[3].trim()
+                vrs: parseInt(req.query.vrsnum, 10), username: '', password: '', first_name: '', last_name: '', address: '', city: '', state: '', zip_code: '', email: '', isAdmin: 0, sipuri: arr[3].trim()
               }],
             itrs_mode: 'true'
           };
