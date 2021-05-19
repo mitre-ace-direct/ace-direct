@@ -187,12 +187,9 @@ function connect_socket() {
 						if (videomailflag) {
 							//Videomail calls must come from videomail ext
 							let ext = '99001';
-							$('#my_sip_uri').attr("name", "sip:" + ext + "@" + data.asterisk_public_hostname);
-
 							asterisk_sip_uri = "sip:" + data.queues_videomail_number + "@" + data.asterisk_public_hostname;
 						}
 						else {
-							$('#my_sip_uri').attr("name", "sip:" + data.extension + "@" + data.ps_public);
 							asterisk_sip_uri = "sip:" + data.queues_complaint_number + "@" + data.asterisk_public_hostname;
 							asterisk_sip_uri = data.queues_complaint_number; //TODO: what is this doing?
 						}
@@ -227,25 +224,8 @@ function connect_socket() {
 
                                                 //add ace kurento signal handling so we can get params, then call once we have a wv connection
                                                 if (acekurento === null) {
-                                                  signaling_server_public = globalData.signaling_server_public;
-                                                  signaling_server_port = globalData.signaling_server_port;
-
-                                                  if (!globalData.signaling_server_proto) {
-                                                     globalData.signaling_server_proto = 'wss';
-                                                  }
-
-                                                  signaling_url = globalData.signaling_server_proto+ '://' + globalData.signaling_server_public + ':' + globalData.signaling_server_port + '/signaling';
-
-                                                  //see if we should override with a full NGINX route (development only)
-                                                  var dev_url = globalData.signaling_server_dev_url;
-                                                  dev_url = dev_url.trim();
-                                                  if(dev_url !== null && dev_url !== '') {
-                                                    // do something
-                                                    console.log('Using signaling server: ' + dev_url);
-                                                    signaling_url = dev_url;
-                                                  }
-
-						  console.log('signaling_url: ' + signaling_url);
+                                                  signaling_url = globalData.signaling_server_url;
+												  signaling_url = signaling_url.trim();
 												  
 						  acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url });
 
