@@ -12,7 +12,7 @@ async function main() {
     const ix = new SessionIndex();
     const conf = new ConfManager(ix);
     const server = new WebServer();
-    const amiEnabled = param('asteriskss.ami.enabled');
+    const amiEnabled = param(.ami.enabled');
     const ami = (amiEnabled) ? new AmiManager() : null;
     server.on('connection', session => {
       ix.register(session, conf, ami);
