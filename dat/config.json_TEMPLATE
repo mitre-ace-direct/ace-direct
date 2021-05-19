@@ -19,10 +19,12 @@
       "public": "acesip.domain.com",
       "private_ip": "0.0.0.0",
       "ws_port": "443",
+      "protocol": "wss",      
       "stun": "acestun.domain.com",
       "stun_port": "3478",
+      "stun_user": "stunuser",
       "turn": "aceturn.domain.com",
-      "turn_port": "",
+      "turn_port": "3478",
       "turn_user": "username",
       "turn_cred": "password",
       "channel": "SIP"
@@ -39,10 +41,16 @@
     },
     "queues": {
       "complaint": {
-        "number": "575791"
+        "number": "575791",
+        "name": "ComplaintsQueue"
+      },
+      "general": {
+        "number": "575781",
+        "name": "GeneralQuestionsQueue"        
       },
       "videomail": {
-        "number": "575795"
+        "number": "575795",
+        "name": ""
       }
     }
   },
@@ -178,7 +186,6 @@
     "awayBlink": "true"
   },
   "translation_server": {
-    "private_ip": "<private IP address of acesip.domain.com>",
     "port": "8005",
     "protocol": "http",
     "enabled": "true"
@@ -194,25 +201,9 @@
   },
   "asteriskss": {
     "comment1": "for acedirect-kurento",
-    "protocol": "wss",
-    "host": "acesip.domain.com",
-    "ip": "<private IP address of acesip.domain.com>",
-    "port": 443,
     "sip_media_request_interval": 5000,
     "ami": {
-      "ip": "<private IP address of acesip.domain.com>",
-      "enabled": true,
-      "id": "userid",
-      "passwd": "password",
-      "port": "5038",
-      "queue_names": [
-        "GeneralQuestionsQueue",
-        "ComplaintsQueue"
-      ],
-      "queue_extensions": [
-        "575781",
-        "575791"
-      ]
+      "enabled": true
     }
   },
   "kurento": {
@@ -243,16 +234,6 @@
     },
     "conference_max_participants": 4
   },
-  "ice": [
-    {
-      "urls": "stun:acestun.domain.com:3478"
-    },
-    {
-      "urls": "turn:aceturn.domain.com:3478",
-      "username": "username",
-      "credential": "password"
-    }
-  ],
   "videomailss": {
     "comment1": "signaling server only",
     "directory": "/tmp/videomail/",
