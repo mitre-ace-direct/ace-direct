@@ -8,7 +8,8 @@
     "private_ip": "0.0.0.0",
     "https": {
       "certificate": "/etc/ssl/cert.pem",
-      "private_key": "/etc/ssl/key.pem"
+      "private_key": "/etc/ssl/key.pem",
+      "csr": "/etc/ssl/asterisk.csr"      
     }
   },
   "signaling_server": {
@@ -189,9 +190,6 @@
   "webserver": {
     "comment1": "for acedirect-kurento",
     "port": 9009,
-    "cert": "/etc/ssl/cert.pem",
-    "key": "/etc/ssl/key.pem",
-    "csr": "/etc/ssl/asterisk.csr",
     "static": "./static",
     "token": "__DEV_TOKEN__"
   },
