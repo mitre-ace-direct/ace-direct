@@ -1,11 +1,56 @@
+/* scrollbar items */
+  /* width */
+   div.captions-box::-webkit-scrollbar {
+    /* width: 12px; */
+    }
+
+    /* Track */
+    div.captions-box::-webkit-scrollbar-track {
+    /* background: #3f3f3f; */
+    }
+
+    /* Handle */
+    div.captions-box::-webkit-scrollbar-thumb {
+    /* background: #a7a7a7;  */
+    }
+
+    /* Handle on hover */
+    div.captions-box::-webkit-scrollbar-thumb:hover {
+    /* background: #8f8f8f;  */
+    } 
+
+
 #fullscreen-element {
 	padding: 0;
 	height: 100%;
-	overflow: hidden;
+	/* overflow: auto; */
 }
 #webcam {
-	height: 100%;
+	height: 70%;
 	position: relative;
+}
+
+#consumer-webcam {
+  height: 60%;
+	position: relative;
+}
+
+.captions-box {
+  background-color:#f2f2f2;
+  margin-top: -3px;
+  height:200px;
+  position:relative;
+  overflow-y:scroll;
+}
+
+.caption-box-divider {
+  border-top: 2px solid #555;
+  margin-top: 1px;
+  margin-bottom: 3px;
+}
+
+#agent-captions {
+  margin-top: 3px;
 }
 
 #selfView { 
@@ -19,7 +64,7 @@
 #remoteView { 
   max-width: 100%;
   height: 100% !important;
-  width: 100%;
+  /* width: 100%; */
   object-fit: contain;
   background-color:#fff;
 } 

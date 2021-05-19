@@ -3,38 +3,23 @@ let selectedCallBlock = 0;
 let selectedCallBlockVrs = 0;
 
 function formatModelVRS(vrs) {
-  if (vrs) {
-    vrs = vrs.toString();
-    if (vrs[0] === '1') vrs = vrs.slice(1, vrs.length);
-    vrs = `${vrs.substring(0, 3)}-${vrs.substring(3, 6)}-${vrs.substring(6, vrs.length)}`;
+  let vrsFormatted = vrs;
+  if (vrsFormatted) {
+    vrsFormatted = vrs.toString();
+    if (vrs[0] === '1') vrsFormatted = vrsFormatted.slice(1, vrsFormatted.length);
+    vrsFormatted = `${vrsFormatted.substring(0, 3)}-${vrsFormatted.substring(3, 6)}-${vrsFormatted.substring(6, vrsFormatted.length)}`;
   }
-  return vrs;
+  return vrsFormatted;
 }
 
 function formatVRS(vrs) {
-  if (vrs) {
-    vrs = vrs.toString();
-    if (vrs[0] === '1') vrs = vrs.slice(1, vrs.length);
-    vrs = `(${vrs.substring(0, 3)}) ${vrs.substring(3, 6)}-${vrs.substring(6, vrs.length)}`;
+  let vrsFormatted = vrs;
+  if (vrsFormatted) {
+    vrsFormatted = vrs.toString();
+    if (vrsFormatted[0] === '1') vrsFormatted = vrsFormatted.slice(1, vrsFormatted.length);
+    vrsFormatted = `(${vrsFormatted.substring(0, 3)}) ${vrsFormatted.substring(3, 6)}-${vrsFormatted.substring(6, vrsFormatted.length)}`;
   }
-  return vrs;
-}
-
-function getBulkDeleteCallBlockList() {
-  let callBlockVrsNumbers = '';
-  const data = table.rows().data();
-  let count = 0;
-  data.each((value, _index) => {
-    if (value.selected === 1) {
-      count += 1;
-      // console.log("Bulk delete: checked at index: ", index)
-      // console.log("agent id checked is: " + value[0] + " call block username is: " + value[3]);
-      callBlockVrsNumbers += `  ${formatVRS(value.vrs)}`;
-    }
-  });
-
-  document.getElementById('callblocklist').innerHTML = callBlockVrsNumbers;
-  return count;
+  return vrsFormatted;
 }
 
 function ConnectSocket() {
@@ -178,7 +163,7 @@ $(document).ready(() => {
     // console.log("checkbox data: " + data.selected);
   });
 
-  $('#callblocktable tbody').on('click', 'td', function () {
+  $('#callblocktable tbody').on('click', 'td', function ClickOnRow() {
     $('#cbmsg').text('');
     const data = table.row($(this).parents('tr')).data();
     const col = table.cell(this).index().column;
@@ -215,6 +200,49 @@ $(document).ready(() => {
       data
     });
 
+    $('#configModal').modal('hide');
+  }
+
+  function getBulkDeleteCallBlockList() {
+    let callBlockVrsNumbers = '';
+    const data = table.rows().data();
+    let count = 0;
+    data.each((value, _index) => {
+      if (value.selected === 1) {
+        count += 1;
+        // console.log("Bulk delete: checked at index: ", index)
+        // console.log("agent id checked is: " + value[0] + " call block username is: " + value[3]);
+        callBlockVrsNumbers += `  ${formatVRS(value.vrs)}`;
+      }
+    });
+
+    document.getElementById('callblocklist').innerHTML = callBlockVrsNumbers;
+    return count;
+  }
+
+  function addCallBlockModal() {
+    $('#cbmsg').text('');
+    $('#inputVRS').prop('disabled', false);
+    $('#addCallBlockForm').trigger('reset');
+    $('#btnUpdateCallBlock').hide();
+    $('#btnDeleteCallBlock').hide();
+    $('#btnAddCallBlock').show();
+    $('#configModal').modal();
+  }
+
+  function deleteCallBlock(event) {
+    $('#cbmsg').text('');
+    event.preventDefault();
+
+    const data = {};
+    data.id = selectedCallBlock;
+    data.vrs = selectedCallBlockVrs;
+
+    socket.emit('delete-callblock', {
+      data
+    });
+
+    $('#confirm-delete').modal('hide');
     $('#configModal').modal('hide');
   }
 
@@ -290,33 +318,13 @@ $(document).ready(() => {
     $('#configModal').modal('hide');
   });
 
-  ConnectSocket();
-});
-
-// Used with onclick in callblocking.ejs
-function addCallBlockModal() {
-  $('#cbmsg').text('');
-  $('#inputVRS').prop('disabled', false);
-  $('#addCallBlockForm').trigger('reset');
-  $('#btnUpdateCallBlock').hide();
-  $('#btnDeleteCallBlock').hide();
-  $('#btnAddCallBlock').show();
-  $('#configModal').modal();
-}
-
-// Used with onclick in callblocking.ejs
-function deleteCallBlock() {
-  $('#cbmsg').text('');
-  event.preventDefault();
-
-  const data = {};
-  data.id = selectedCallBlock;
-  data.vrs = selectedCallBlockVrs;
-
-  socket.emit('delete-callblock', {
-    data
+  $('#DeleteCallBlockConfirmButton').on('click', (event) => {
+    deleteCallBlock(event);
   });
 
-  $('#confirm-delete').modal('hide');
-  $('#configModal').modal('hide');
-}
+  $('#add_callblock_btn').on('click', () => {
+    addCallBlockModal();
+  });
+
+  ConnectSocket();
+});

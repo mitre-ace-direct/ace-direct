@@ -23,9 +23,6 @@
     "port": 1234,
     "dev_url": "wss://portal.domain.com/SOMEUSER/acedirect-kurento/signaling"
   },
-  "media_server": {
-    "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
-  },
   "asterisk": {
     "sip": {
       "public": "acesip.domain.com",
@@ -84,21 +81,21 @@
   },
   "database_servers": {
     "mysql": {
-      "host": "0.0.0.0",
+      "host": "localhost",
       "port": "3306",
-      "user": "username",
-      "password": "password",
-      "ad_database_name": "adDbName",
-      "cdr_database_name": "cdrDbName",
-      "cdr_table_name": "cdrTableName",
-      "ssuser": "signalingServerDbUser",
-      "sspassword": "signalingServerDbPassword",
-      "ssdatabase": "signalingServerDbName"
+      "user": "acedirect",
+      "password": "PASSWORD",
+      "ad_database_name": "acedirect",
+      "cdr_database_name": "asterisk",
+      "cdr_table_name": "cdr",
+      "ssuser": "media_server",
+      "sspassword": "PASSWORD",
+      "ssdatabase": "media_server"
     },
     "redis": {
       "host": "127.0.0.1",
       "port": "6379",
-      "auth": "someAuthPasswordIfEnabled"
+      "auth": "REDISPASSWORD"
     },
     "mongodb": {
       "connection_uri": "mongodb://localhost:27017/test",
@@ -110,6 +107,16 @@
       "logStatsFreq": "60000"
     }
   },
+  "webrtcstats": {
+    "logWebRTCStats": false,
+    "logWebRTCStatsFreq": "1000",
+    "logWebRTCMongo": "",
+    "fpsLow": "14.9", 
+    "fpsHigh": "25.0", 
+    "fpsMin": "0.0", 
+    "fpsMax": "30.0", 
+    "fpsOptimum": "40.0"
+  },  
   "complaint_redirect": {
     "active": "true",
     "desc": "FCC.gov",
@@ -150,10 +157,10 @@
     "https_listen_port": "9002",
     "queues": "GeneralQuestionsQueue,ComplaintsQueue,MailQueue",
     "poll_interval": "1000",
-    "force_logout_password": "secureForceLogoutPassword"
+    "force_logout_password": "securexForcexLogoutxPassword"
   },
   "zendesk": {
-    "private_ip": "<private IP address of acenode.domain.com>",
+    "private_ip": "localhost",
     "port": "9003",
     "protocol": "https",
     "user_id": "user@email.com",
@@ -226,9 +233,10 @@
     "recording_all_enabled": false,
     "recording_media_profile": "MP4",
     "recording_limit_length_in_sec": 30,
-    "video_webrtc_max_bitrate": 8000,
-    "video_webrtc_min_bitrate": 100,
-    "video_rtp_max_bitrate": 8000,
+    "video_webrtc_max_bitrate": 1000,
+    "video_webrtc_min_bitrate": 500,
+    "video_rtp_max_bitrate": 1000,
+    "video_rtp_min_bitrate": 500,
     "video_webrtc_codec": "H264",
     "_comment2": "42001F fixes some problems. 42E015 - try this too - RFC3984 - page 38",
     "_comment3": "Tried 42e01f - did not work",
@@ -262,5 +270,8 @@
       "/tmp/videomail/instructions/final.jpg"
     ],
     "media_profile": "MP4"
+  },
+  "filesharing": {
+    "virus_scan_enabled": "false"
   }
 }
