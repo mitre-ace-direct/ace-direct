@@ -352,10 +352,7 @@ if (consumerPath.length === 0) {
 }
 
 //signaling server
-var signalingServerPublic = getConfigVal('signaling_server:public');
-var signalingServerPort = getConfigVal('signaling_server:port');
-var signalingServerProto = getConfigVal('signaling_server:proto');
-var signalingServerDevUrl = getConfigVal('signaling_server:dev_url');
+var signalingServerUrl = getConfigVal('signaling_server:url');
 
 var queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
 
@@ -3416,10 +3413,7 @@ function processExtension(data) {
 						"stun_server": stunServer,
 						"ws_port": wsPort,
 						"password": extensionPassword,
-						"signaling_server_public": signalingServerPublic,
-						"signaling_server_port": signalingServerPort,
-						"signaling_server_proto": signalingServerProto,
-						"signaling_server_dev_url": signalingServerDevUrl,
+						"signaling_server_url": signalingServerUrl,
 						"queues_complaint_number": queuesComplaintNumber,
 						"queues_videomail_number": queuesVideomailNumber,
 						"queues_videomail_maxrecordsecs": queuesVideomailMaxrecordsecs,
@@ -3989,10 +3983,7 @@ app.get('/token', function (req, res) {
 		payload.asteriskPublicHostname = req.session.asteriskPublicHostname;
 		payload.stunServer = req.session.stunServer;
 		payload.wsPort = req.session.wsPort;
-		payload.signalingServerPublic = req.session.signalingServerPublic;
-		payload.signalingServerPort = req.session.signalingServerPort;
-		payload.signalingServerProto= req.session.signalingServerProto;
-		payload.signalingServerDevUrl = req.session.signalingServerDevUrl;
+		payload.signalingServerUrl = req.session.signalingServerUrl;
 		payload.queuesComplaintNumber = req.session.queuesComplaintNumber;
 		payload.extensionPassword = req.session.extensionPassword;
 		payload.complaint_queue_count = complaint_queue_count;
@@ -4170,10 +4161,7 @@ app.get('/login', agent.shield(cookieShield), function (req, res) {
 						req.session.asteriskPublicHostname = asteriskPublicHostname;
 						req.session.stunServer = stunServer;
 						req.session.wsPort = wsPort;
-						req.session.signalingServerPublic = signalingServerPublic;
-						req.session.signalingServerPort = signalingServerPort;
-						req.session.signalingServerProto= signalingServerProto;
-						req.session.signalingServerDevUrl= signalingServerDevUrl;
+						req.session.signalingServerUrl= signalingServerUrl;
 						req.session.queuesComplaintNumber = queuesComplaintNumber;
 						req.session.extensionPassword = extensionPassword;
 						req.session.complaint_queue_count = complaint_queue_count;
