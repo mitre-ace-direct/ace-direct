@@ -511,7 +511,7 @@ class WebRTCMediaSession extends Events {
   }
 
   async toggleRecording(ext, record) {
-    const participant = this._participants.get(ext);
+    var participant = this._participants.get(ext);
     //Moved out of if since we need this globally
     var fileName;
     if (record && participant.recorder) return true; // Already recording
@@ -523,12 +523,11 @@ class WebRTCMediaSession extends Events {
         const profile = param('kurento.recording_media_profile');
         fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
         //const filePath = `file:///tmp/${fileName}`;
-        const filePath = `file://home/ubuntu/kms-share/media/${fileName}`;
-        //const filePath = `file://home/mwoodman/kurento-asterisk-servlet/recordings/${fileName}`;
+        const filePath = `file://home/ubuntu/kms-share/media/recordings/${fileName}`;
         debug(`${ext} recording to  ${filePath}`);
 
         const recorder = await this._pipeline.create('RecorderEndpoint', {
-          uri: filePath,
+	        uri: filePath,
           mediaProfile: profile
         });
         await participant.endpoint.connect(recorder);
@@ -552,9 +551,10 @@ class WebRTCMediaSession extends Events {
         await recorder.record();
         participant.recorder = recorder;
         participant.recorderFile = fileName;
-        await RecMan.createRecording(fileName, ext, this._id);
+        
       } else {
         var otherCallers = "";
+        var fileName = participant.recorderFile;
         for (const p of this._participants.values()) {
           if(p.ext != ext){
             otherCallers += p.ext + ",";
@@ -567,7 +567,6 @@ class WebRTCMediaSession extends Events {
 
         const date = this.getTimestampString();
         const profile = param('kurento.recording_media_profile');
-        fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
 
         const dbConnection = await mysql.createConnection({
           host: dbHost,
@@ -576,6 +575,12 @@ class WebRTCMediaSession extends Events {
           database: dbName,
           port: dbPort
         });
+
+        await participant.recorder.stopAndWait();
+
+        await participant.recorder.release();
+
+        await RecMan.createRecording(fileName, ext, this._id);
 
         let sqlQuery = 'INSERT INTO call_recordings (fileName, agentNumber, participants, timestamp, status) VALUES (?,?,?,NOW(),?);';
         let params = [fileName, agentNumber, otherCallers, 'UNREAD'];
@@ -586,9 +591,7 @@ class WebRTCMediaSession extends Events {
 
         await dbConnection.end();
 
-        await participant.recorder.stopAndWait();
-
-        await participant.recorder.release();
+        
 
         participant.recorder = null;
         debug(`${ext} Stopped recording`);
