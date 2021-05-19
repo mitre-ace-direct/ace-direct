@@ -346,7 +346,7 @@ var complaintRedirectDesc = getConfigVal('complaint_redirect:desc');
 var complaintRedirectUrl = getConfigVal('complaint_redirect:url');
 
 // translation server
-var translationServerUrl = getConfigVal('translation_server:protocol') + '://' + getConfigVal('translation_server:private_ip') + ':' + getConfigVal('translation_server:port');
+var translationServerUrl = getConfigVal('translation_server:protocol') + '://' + getConfigVal('asterisk:sip:private_ip') + ':' + getConfigVal('translation_server:port');
 
 //get the ACE Direct version and year
 var version = getConfigVal('common:version');
