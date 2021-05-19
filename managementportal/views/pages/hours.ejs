@@ -3,166 +3,163 @@
 <html>
 
 <head>
-	<%- include("../partials/head") %>
-	<link rel="stylesheet" href="./css/hours.css">
+  <%- include("../partials/head") %>
+    <link rel="stylesheet" href="./css/hours.css">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed" ng-app="acrcsr-dashboard">
-	<div class="wrapper">
-		<%- include("../partials/header") %>
-		<%- include("../partials/sidebar") %>
-		<!-- Content Wrapper. Contains page content -->
-		<div class="content-wrapper" ng-controller="dashboardController">
-			<!-- Content Header (Page header) -->
-			<div class="content-header">
-				<div class="container-fluid">
-					<div class="row mb-2">
-						<div class="col-sm-12">
-							<h1 class="m-0 text-dark">Hours of Operation</h1>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- Main content -->
-			<div class="content">
-				<div class="container-fluid">
-					<h2 class="page-header text-center">The contact center is currently
-						<b id="opStatus" class="badge badge-danger"></b>
-					</h2>
-					<div class="row">
-						<div class="col-lg-6">
-							<div class="card">
-								<div class="card-header">
-									<h3 class="card-title">Hours of Operation</h3>
-								</div>
-								<div class="card-body">
-									<div class="table-responsive">
-										<table class="table">
-											<tbody>
-												<tr>
-													<th>Current Local Time:</th>
-													<td>
-														<div id='current_local'></div>
-													</td>
-												</tr>
-												<tr>
-													<th>Open:</th>
-													<td>
-														<input type='time' class="form-control timepicker"
-															id="start_time" />
-													</td>
-												</tr>
-												<tr>
-													<th>Close:</th>
-													<td>
-														<input type='time' class="form-control timepicker" id="end_time" />
-													</td>
-												</tr>
-												<tr>
-													<th>Business Mode:</th>
-													<td>
-														<select id="business_mode_dropdown"
-															class="form-control select2 select2-hidden-accessible"
-															style="width: 100%">
-															<option selected="selected" value="NORMAL">Use Hours of
-																Operation</option>
-															<option value="FORCE_OPEN">Always Open</option>
-															<option value="FORCE_CLOSE">Always Closed</option>
-														</select>
-													</td>
-												</tr>
-												<tr>
-													<th>Eastern:</th>
-													<td>
-														<span id='opHrsESTs'>9:00 AM - 4:30 PM</span>
-													</td>
-												</tr>
-												<tr>
-													<th>Central:</th>
-													<td>
-														<span id='opHrsCSTs'>8:00 AM - 3:30 PM</span>
-													</td>
-												</tr>
-												<tr>
-													<th>Mountain:</th>
-													<td>
-														<span id='opHrsMSTs'>7:00 AM - 2:30 PM</span>
-													</td>
-												</tr>
-												<tr>
-													<th>Pacific:</th>
-													<td>
-														<span id='opHrsPSTs'>6:00 AM - 1:30 PM</span>
-													</td>
-												</tr>
-											</tbody>
-										</table>
-									</div>
-								</div>
-								<div class="card-footer">
-									<button id="updateBtn" type="submit" class="btn btn-primary"
-										onclick="updateHoursOfOperation()">Update</button>
-									<span id="updateMessage" hidden>
-										<i class="fa fa-check text-green" aria-hidden="true"></i> Call center hours have
-										been updated.
-									</span>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-6">
-							<div class="card">
-								<div class="card-header">
-									<h3 class="card-title">Time Zones</h3>
-								</div>
-								<img class="card-img-top" src="./images/US-Timezones.png" alt="Timezones">
-								<div class="card-footer">
-									<div class="row">
-										<div class="col-sm text-center">
-											<div>
-												<strong>Pacific</strong>
-											</div>
-											<div id='current_pst'></div>
-											<div id='opHrsPST'>6:00 AM - 1:30 PM</div>
-										</div>
-										<!-- ./col -->
-										<div class="col-sm text-center" style="border-right: 1px solid #f4f4f4">
-											<div>
-												<strong>Mountain</strong>
-											</div>
-											<div id='current_mst'></div>
-											<div id='opHrsMST'>7:00 AM - 2:30 PM</div>
-										</div>
-										<!-- ./col -->
-										<div class="col-sm text-center">
-											<div>
-												<strong>Central</strong>
-											</div>
-											<div id='current_cst'></div>
-											<div id='opHrsCST'>8:00 AM - 3:30 PM</div>
-										</div>
-										<!-- ./col -->
-										<div class="col-sm text-center">
-											<div>
-												<strong>Eastern</strong>
-											</div>
-											<div id='current_est'></div>
-											<div id='opHrsEST'>9:00 AM - 4:30 PM</div>
-										</div>
-										<!-- ./col -->
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- /.content -->
-		</div>
-		<!-- /.content-wrapper -->
-		<%- include("../partials/footer") %>
-	</div>
-	<!-- ./wrapper -->
-	<script type="text/javascript" src="./js/controllers/hours.js"></script>
+  <div class="wrapper">
+    <%- include("../partials/header") %>
+      <%- include("../partials/sidebar") %>
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper" ng-controller="dashboardController">
+          <!-- Content Header (Page header) -->
+          <div class="content-header">
+            <div class="container-fluid">
+              <div class="row mb-2">
+                <div class="col-sm-12">
+                  <h1 class="m-0 text-dark">Hours of Operation</h1>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Main content -->
+          <div class="content">
+            <div class="container-fluid">
+              <h2 class="page-header text-center">The contact center is currently
+                <b id="opStatus" class="badge badge-danger"></b>
+              </h2>
+              <div class="row">
+                <div class="col-lg-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Hours of Operation</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="table-responsive">
+                        <table class="table">
+                          <tbody>
+                            <tr>
+                              <th>Current Local Time:</th>
+                              <td>
+                                <div id='current_local'></div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th>Open:</th>
+                              <td>
+                                <input type='time' class="form-control timepicker" id="start_time" />
+                              </td>
+                            </tr>
+                            <tr>
+                              <th>Close:</th>
+                              <td>
+                                <input type='time' class="form-control timepicker" id="end_time" />
+                              </td>
+                            </tr>
+                            <tr>
+                              <th>Business Mode:</th>
+                              <td>
+                                <select id="business_mode_dropdown"
+                                  class="form-control select2 select2-hidden-accessible" style="width: 100%">
+                                  <option selected="selected" value="NORMAL">Use Hours of
+                                    Operation</option>
+                                  <option value="FORCE_OPEN">Always Open</option>
+                                  <option value="FORCE_CLOSE">Always Closed</option>
+                                </select>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th>Eastern:</th>
+                              <td>
+                                <span id='opHrsESTs'>9:00 AM - 4:30 PM</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th>Central:</th>
+                              <td>
+                                <span id='opHrsCSTs'>8:00 AM - 3:30 PM</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th>Mountain:</th>
+                              <td>
+                                <span id='opHrsMSTs'>7:00 AM - 2:30 PM</span>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th>Pacific:</th>
+                              <td>
+                                <span id='opHrsPSTs'>6:00 AM - 1:30 PM</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="card-footer">
+                      <button id="updateBtn" type="submit" class="btn btn-primary">Update</button>
+                      <span id="updateMessage" hidden>
+                        <i class="fa fa-check text-green" aria-hidden="true"></i> Call center hours have
+                        been updated.
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Time Zones</h3>
+                    </div>
+                    <img class="card-img-top" src="./images/US-Timezones.png" alt="Timezones">
+                    <div class="card-footer">
+                      <div class="row">
+                        <div class="col-sm text-center">
+                          <div>
+                            <strong>Pacific</strong>
+                          </div>
+                          <div id='current_pst'></div>
+                          <div id='opHrsPST'>6:00 AM - 1:30 PM</div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-sm text-center" style="border-right: 1px solid #f4f4f4">
+                          <div>
+                            <strong>Mountain</strong>
+                          </div>
+                          <div id='current_mst'></div>
+                          <div id='opHrsMST'>7:00 AM - 2:30 PM</div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-sm text-center">
+                          <div>
+                            <strong>Central</strong>
+                          </div>
+                          <div id='current_cst'></div>
+                          <div id='opHrsCST'>8:00 AM - 3:30 PM</div>
+                        </div>
+                        <!-- ./col -->
+                        <div class="col-sm text-center">
+                          <div>
+                            <strong>Eastern</strong>
+                          </div>
+                          <div id='current_est'></div>
+                          <div id='opHrsEST'>9:00 AM - 4:30 PM</div>
+                        </div>
+                        <!-- ./col -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+        <%- include("../partials/footer") %>
+  </div>
+  <!-- ./wrapper -->
+  <script type="text/javascript" src="./js/controllers/hours.js"></script>
 </body>
 
 </html>
