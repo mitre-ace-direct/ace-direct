@@ -145,9 +145,6 @@
     "consumer_route": "customizable route for consumer portal url"
   },  
   "openam": {
-    "fqdn": "Fully qualified domain name of the NGINX server, since OpenAM is proxied through NGINX",
-    "private_ip": "Private IP address of the NGINX server",
-    "port": "NGINX server port number",
     "path": "OpenAM web path as specified in the OpenAM installation",
     "user": "openAM admin user name from the OpenAM installation",
     "password": "openAM admin password from the OpenAM installation"
