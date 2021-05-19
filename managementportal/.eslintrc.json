@@ -22,6 +22,7 @@
         "angular": "readonly",
         "moment": "readonly",
         "io": "readonly",
-        "nginxPath": "readonly"
+        "nginxPath": "readonly",
+        "iziToast": "readonly"
     }
 }

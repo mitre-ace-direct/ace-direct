@@ -21,7 +21,7 @@ $(document).ready(function () {
 	//JSSIP components
 	$('#login-full-background').hide();
 	$('#login-box').hide();
-	$('#webcam').show();
+	$('#consumer-webcam').show();
 
 	$('#complaint').keyup(function () {
 		var left = 2000 - $(this).val().length;
@@ -370,7 +370,7 @@ function connect_socket() {
 						$("#video-section").removeClass(function (index, className) {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
-						$("#video-section").addClass("col-lg-7");
+						$("#video-section").addClass("col-lg-6");
 						$("#chat-section").removeClass(function (index, className) {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
@@ -482,10 +482,11 @@ function connect_socket() {
 						$("#requestAck").html("Permission has been denied.");
 					}
 				}).on('multiparty-caption', function (transcripts) {
-					console.log(JSON.stringify(transcripts))
+					console.log('multiparty caption:', JSON.stringify(transcripts))
 					socket.emit('translate-caption', {
 						"transcripts": transcripts,
-						"callerNumber": exten
+						"callerNumber": exten,
+						"displayname": transcripts.displayname
 					});
 				}).on('caption-translated', function (transcripts) {
 					console.log('consumer received translation', transcripts);
@@ -510,6 +511,16 @@ function connect_socket() {
 					$("#languageSelectModal").modal('show');
 					// Align flags and labels to left
 					$('#language-select_msdd').css('text-align', 'left')
+				}).on('consumer-multiparty-hangup', function() {
+					// show "One Moment Please"
+					$('#multipartyTransitionModal').modal('show');
+					$('#multipartyTransitionModal').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					setTimeout(function () {
+						$('#multipartyTransitionModal').modal('hide');
+					}, 3000);
 				});
 
 			} else {
@@ -789,7 +800,6 @@ $('#screenshareButton').prop("disabled", true).click(function () {
 });
 
 $('#startScreenshare').prop("disabled", true).click(function(){
-	acekurento.screenshare(false);
 	acekurento.screenshare(true);
 });
 

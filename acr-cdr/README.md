@@ -4,23 +4,9 @@
 
 Call Detail Records (CDR) RESTful API.
 
-## SSL Configuration
+## Deployment
 
-1. ACE software uses SSL which requires a valid key and certificate.
-1. The location of the SSL key and certificate is specified in the `dat/config.json` by using the `common:https:certificate` and `common:https:private_key` parameters in the form of folder/file (e.g., `/home/centos/ssl/mycert.pem` and `/home/centos/ssl/mykey.pem`).
-1. Additional information can be found in the ACE Direct Platform Release documentation.
-
-## Getting started
-
-To install `acr-cdr`, follow the `README.md` file in the `autoinstall` folder. The instructions for a manual installation are provided below.
-
-1. Clone this repository
-1. Download and install [node.js](https://nodejs.org/en/)
-1. In the repository, run `npm run build`
-1. Update the `dat/config.json` file (see Configuration section)
-1. To start the node server manually, run `node app.js`
-
-![Starting ACR-CDR Image](resources/node_app.png "Starting ACR-CDR")
+Configuraiton and deployment of this server is part of the overall `ace-direct` installation process. See [../README.md](../README.md) for full details.
 
 ## Generating APIdocs
 
@@ -62,4 +48,3 @@ For further information, please contact:
 ©2016 The MITRE Corporation.
 
 ![The MITRE Corporation Logo](resources/mitrelogo-blueonwhite.jpg "The MITRE Corporation")
-
