@@ -8,7 +8,8 @@
     "private_ip": "Private IP address of the Node application server",
     "https": {
       "certificate": "Full path to the certificate file",
-      "private_key": "Full path to the private key file"
+      "private_key": "Full path to the private key file",
+      "csr": "full path to asterisk csr file, for signaling server demo page web server"      
     }
   },
   "signaling_server": {
@@ -191,9 +192,6 @@
   "webserver": {
     "comment1": "signaling server only",
     "port": "Integer; port number of signaling server web server ace-direct/acedirect-kurento",
-    "cert":"full path to certificate file",
-    "key": "full path to key file",
-    "csr": "full path to asterisk csr file",
     "static": "./static",
     "token": "__DEV_TOKEN__"
   },
