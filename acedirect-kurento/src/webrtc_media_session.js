@@ -25,7 +25,7 @@ const replaceMediaEl = async (el, oldEl, newEl) => {
 
 var kurento = null;
 
-const ASTERISK_QUEUE_EXT = param('asteriskss.ami.queue_extensions');
+const ASTERISK_QUEUE_EXT = [param('asterisk.queues.general.number'), param('asterisk.queues.complaint.number')]; // currently support two queues
 
 /**
  * Custom logic for mysql connection
@@ -473,8 +473,8 @@ class WebRTCMediaSession extends Events {
 
   patchOffer(offer) {
     const sdpObj = transform.parse(offer);
-    sdpObj.origin.address = param('asteriskss.ip');
-    sdpObj.connection.ip = param('asteriskss.ip');
+    sdpObj.origin.address = param('asterisk.sip.private_ip');
+    sdpObj.connection.ip = param('asterisk.sip.private_ip');
 
     sdpObj.media.forEach(media => {
       const validPayloads = new Set(
