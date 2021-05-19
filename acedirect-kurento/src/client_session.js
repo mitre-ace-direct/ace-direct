@@ -19,7 +19,7 @@ class ClientSession extends Events {
     this._session = null;
     this._queue   = [];
     this._ami     = ami;
-    this._asteriskQueueNames = param('asteriskss.ami.queue_names');
+    this._asteriskQueueNames = [ param('asterisk.queues.general.name'), param('asterisk.queues.complaint.name') ]; // currently support these two queues
     this._isMemberQueue = false;
     this._isAgent = null;
     this._sipIntervalTimeout = null;
