@@ -21,8 +21,10 @@ var jssip_debug = true; //enables debugging logs from jssip library if true NOTE
 var incomingCall = null;
 var recording = false;
 var outbound_timer = null;
-var callParticipants = [];
+var callParticipantsExt = [];
 var isMuted = false;
+var showTransferModal = false;
+var isMultipartyCall = false;
 
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
@@ -54,20 +56,22 @@ function register_jssip() {
 				var transcripts = JSON.parse(e.msg);
 				if (transcripts.transcript) {
 					if (acekurento.isMultiparty) {
-                        			socket.emit('multiparty-caption-agent', {
+						console.log('sending multiparty caption:', transcripts.transcript, extensionMe);
+                        socket.emit('multiparty-caption-agent', {
 							"transcript": transcripts.transcript,
 							"final": transcripts.final,
 							"language": transcripts.langCd,
 							"displayname": $('#callerFirstName').val() + " " + $('#callerLastName').val(),
 							"agent": false,
-							"participants": callParticipants
+							"participants": callParticipantsExt
 						});
 					} else {
 						// Acedirect will skip translation service if languages are the same
 						console.log('sending caption:', transcripts.transcript, extensionMe);
 						socket.emit('translate-caption', {
 							"transcripts": transcripts,
-							"callerNumber": extensionMe
+							"callerNumber": extensionMe,
+							"displayname": $('#callerFirstName').val() + " " + $('#callerLastName').val()
 						});
 					}
 				}
@@ -79,12 +83,87 @@ function register_jssip() {
 		'participantsUpdate': function(e) {
 			console.log('--- WV: Participants Update ---\n');
 			console.log('--- WV: ' + JSON.stringify(e));
-			callParticipants = e.participants.map(function (p) { return p.ext; });
-			if(callParticipants.length > 2){
-				multipartyCaptionsStart();
+			var participants = [];
+			acekurento.activeAgentList = [];
+			participants = e.participants.map(function (p) { return p; });
+			callParticipantsExt = participants.map(function (p) { return p.ext; });
+
+			for (var i = 0; i < participants.length; i++) {
+				if (participants[i].isAgent) {
+					acekurento.activeAgentList.push(participants[i]);
+				} else if(participants[i].type == 'participant:webrtc'){
+					// webrtc consumer. enable chat and file share
+					enable_chat_buttons();
+					socket.emit('begin-file-share', {'vrs': $('#callerPhone').val(), 'agentExt': extensionMe});
+				}  else {
+                    // provider consumer. disable chat and file share
+                    disable_chat_buttons();
+                    document.getElementById("fileInput").disabled = true;
+                    document.getElementById("sendFileButton").removeAttribute('class');
+                    document.getElementById("sendFileButton").disabled = true;
+                    document.getElementById("sendFileButton").removeAttribute('style');
+                }
+			}
+
+			if (acekurento.activeAgentList.length == participants.length) {
+				allAgentCall = true;
+				// disable chat, file share, and screenshare buttons
+				disable_chat_buttons();
+				document.getElementById("fileInput").disabled = true;
+				document.getElementById("sendFileButton").removeAttribute('class');
+				document.getElementById("sendFileButton").disabled = true;
+				document.getElementById("sendFileButton").removeAttribute('style');
+				document.getElementById("screenShareButton").removeAttribute('class');
+				document.getElementById("screenShareButton").disabled = true;
+				document.getElementById("screenShareButton").removeAttribute('style');
+				$('#end-call').attr('onclick', 'terminate_call()');
 			} else {
-				multipartyCaptionsEnd()
-			}                      
+				allAgentCall = false;
+			}
+
+			if(callParticipantsExt.length > 2) {
+				if (!isMultipartyCall) {
+					// new multiparty call
+					multipartyCaptionsStart();
+				}
+				isMultipartyCall = true;
+
+				// the last agent to join will be the backup host
+				backupHostAgent = participants[participants.length-1].ext; 
+				$('#end-call').attr('onclick', 'multipartyHangup()');
+
+				if (participants.length > 3) {
+					// set the transition agent
+					for (var i = 0; i < participants.length; i++){
+						if (participants[i].ext != hostAgent && participants[i].ext != backupHostAgent && participants[i].isAgent) {
+							transitionExt = participants[i].ext;
+						}
+					}
+				
+				}
+				if (participants.length == 3 && backupHostAgent == transitionExt) {
+					// this should only happen after the host leaves a four person call
+					transitionAgent = null;
+					transitionExt = null;
+				} else if (participants.length == 3 && transitionExt && !isMultipartyTransfer) {
+					// transition agent left the call
+					transitionAgent = null;
+					transitionExt = null;
+				}
+			} else if (participants.length == 2) {
+				isMultipartyCall = false;
+				multipartyCaptionsEnd();
+
+				if (allAgentCall) {
+					$('#end-call').attr('onclick', 'terminate_call()');
+				} else {
+					// one to one call with consumer
+					hostAgent = extensionMe;
+					backupHostAgent = null; // remove backup host if it existed
+					$('#end-call').attr('onclick', 'terminate_call()');
+				}
+				multipartyTransition = false;
+			}																						
 
 		},
 		'registerResponse': function (error) {
@@ -104,6 +183,7 @@ function register_jssip() {
 		},
 		'incomingCall': function (call) {
 			console.log('--- WV: Incoming call ---\n');
+
 			incomingCall = call;
 			direction = 'incoming';
 			//accept_call()
@@ -152,66 +232,83 @@ function register_jssip() {
 			if (remoteStream.srcObject) {
 				remoteStream.srcObject.getVideoTracks()[0].onended = function () {
 					screenShareEnabled = false;
-					acekurento.screenshare(false);
 				};
 			}
 		},
 		'ended': function (e) {
 			screenShareEnabled = false;
-			acekurento.screenshare(false);
-			if (acekurento.isMultiparty == false) {
-				//Wont enter wrap up
-			}
-			console.log('--- WV: Call ended ---\n');
-			terminate_call();
-
-			duration = $('#duration').html();
-			var currentTime = new Date();
-			callDate = (currentTime.getHours() + ":"
-				+ (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
-				+ (currentTime.getMonth() + 1) + "/"
-				+ (currentTime.getDate()) + "/"
-				+ (currentTime.getFullYear()));
-			socket.emit('callHistory', {
-				"callerName": callerName,
-				"callerNumber": callerNumber,
-				"direction": direction,
-				"duration": duration,
-				"endpoint": endpoint,
-				"callDate": callDate
-			});
-			//console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
-			loadCallHistory();
-
-			console.log("REASON: " + e.reason);
-			clearScreen();
-			if (e.reason != undefined && e.reason.includes("failed")) {
-				//show modal saying why call failed
-				//reason seems to be undefined when agent hangs up or consumer declines call
-				$('#outboundFailedBody').html(e.reason);
-				$('#modalOutboundFailed').modal({
-					backdrop: 'static',
-					keyboard: false,
-				})
-
-			}
-			/*for(var i = 0; i < acekurento.activeAgentList.length; i++){
-				if(acekurento.activeAgentList[i].ext == extensionMe){
-					console.log("Found extension");
+			if (multipartyTransition) {
+				terminate_call();
+				unpauseQueues();
+			} else {
+				if (acekurento.isMultiparty == false) {
+					//Wont enter wrap up
 				}
-			}*/
-			$('#duration').timer('pause');
-			$('#user-status').text('Wrap Up');
-			$('#complaintsInCall').hide();
-			$('#geninfoInCall').hide();
-			socket.emit('wrapup', null);
-			changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
-			changeStatusLight('WRAP_UP');
-			$('#modalWrapup').modal('show');
-			$('#modalWrapup').modal({
-				backdrop: 'static',
-				keyboard: false
-			});
+				console.log('--- WV: Call ended ---\n');
+				terminate_call();
+
+				duration = $('#duration').html();
+				var currentTime = new Date();
+				callDate = (currentTime.getHours() + ":"
+					+ (currentTime.getMinutes() < 10 ? '0' + currentTime.getMinutes() : currentTime.getMinutes()) + " "
+					+ (currentTime.getMonth() + 1) + "/"
+					+ (currentTime.getDate()) + "/"
+					+ (currentTime.getFullYear()));
+				socket.emit('callHistory', {
+					"callerName": callerName,
+					"callerNumber": callerNumber,
+					"direction": direction,
+					"duration": duration,
+					"endpoint": endpoint,
+					"callDate": callDate
+				});
+				//console.log("Table vars are " + callerName + " " + callerNumber + " " + direction + " " + duration + " " + callDate);
+				loadCallHistory();
+
+				console.log("REASON: " + e.reason);
+				clearScreen();
+				if (e.reason != undefined && e.reason.includes("failed")) {
+					//show modal saying why call failed
+					//reason seems to be undefined when agent hangs up or consumer declines call
+					$('#outboundFailedBody').html(e.reason);
+					$('#modalOutboundFailed').modal({
+						backdrop: 'static',
+						keyboard: false,
+					})
+
+				}
+				/*for(var i = 0; i < acekurento.activeAgentList.length; i++){
+					if(acekurento.activeAgentList[i].ext == extensionMe){
+						console.log("Found extension");
+					}
+				}*/
+				$('#duration').timer('pause');
+				$('#user-status').text('Wrap Up');
+				$('#complaintsInCall').hide();
+				$('#geninfoInCall').hide();
+				socket.emit('wrapup', null);
+				changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
+				changeStatusLight('WRAP_UP');
+
+				if (showTransferModal) {
+					$('#modalWrapupTransfer').modal('show');
+					$('#modalWrapupTransfer').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					showTransferModal = false;
+				} else {
+					$('#modalWrapup').modal('show');
+					$('#modalWrapup').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+				}
+
+				if (document.getElementById("persistCameraCheck").checked == true) {
+					enable_persist_view();
+				}
+			}
 		}
 	};
 
@@ -320,6 +417,8 @@ function calibrateVideo(duration) {
 
 //answers an incoming call
 function accept_call() {
+	$('#agent-captions').show();
+	$('#agent-divider').show();
 	stopVideomail();
 	disable_persist_view();
 	document.getElementById("sidebar-dialpad").removeAttribute("onclick");
@@ -353,9 +452,28 @@ function accept_call() {
 			if (document.getElementById("muteAudio").checked == true) {
 				mute_audio();
 			}
+
+			if (transitionAgent && transitionAgent != extensionMe){
+				// invite the transition agent back to the call
+				multipartyinvite(transitionAgent);
+			}
+
+			if (isTransfer) {
+				socket.emit('joiningTransfer', {'extension' : extensionMe, 'originalExt':originalExt});
+				isTransfer = false;
+				originalExt = null;
+				transferExt = null;
+				transferAccepted = true;
+				isBlindTransfer = null;
+			}
 			calibrateVideo(2000);
+			$('#multipartyTransitionModal').modal('hide');
 		}, 1000);
 	}
+
+	multipartyTransition = false;
+	isMultipartyTransfer = false;
+	autoAnswer = false;
 }
 
 //Functions for enabling and disabling persist view
@@ -500,6 +618,8 @@ function toggle_incall_buttons(make_visible) {
 }
 
 function terminate_call() {
+	$('#agent-captions').hide();
+	$('#agent-divider').hide();
 	clearTimeout(outbound_timer);
 	$('#outboundCallAlert').hide();
 	mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
@@ -519,9 +639,10 @@ function terminate_call() {
 	$('#dtmfpad').hide();
 	//RemoteView is not currently set to value so line gives an error
 	//remoteView.srcObject.getTracks().forEach(track => track.stop());
-	if (document.getElementById("persistCameraCheck").checked == true) {
+	/*if (document.getElementById("persistCameraCheck").checked == true) {
+		// this causes the webcam to stay active when the agent disables self-view after a call
 		enable_persist_view();
-	}
+	}*/
 	document.getElementById("muteAudio").disabled = false;
 	// document.getElementById("language-select").disabled = false;
 	if ($('#language-select') && $('#language-select').data('dd')) {
@@ -538,11 +659,21 @@ function terminate_call() {
 	document.getElementById("screenShareButton").disabled = true;
 	document.getElementById("screenShareButton").removeAttribute('style');
 
-	// doesn't reset the agent and consumer who can share files if an agent leaves a multiparty call
-	if (!(acekurento.isMultiparty)) {
-		//resets the agent and consumer who can share files
-		socket.emit('call-ended');
+	if($('#callerPhone').val()) {
+		socket.emit('call-ended', {'agentExt': extensionMe});
+		socket.emit('chat-leave-ack', {'vrs': $('#callerPhone').val()})
 	}
+
+	isTransfer = false;
+	originalExt = null;
+	transferExt = null;
+	transferVRS = null;
+	transferAccepted = false;
+	isBlindTransfer = false;
+
+	hostAgent = null;
+	allAgentCall = false;
+	isMultipartyCall = false;
 }
 
 function unregister_jssip() {
@@ -576,6 +707,11 @@ function remove_video() {
 		if (window.self_stream.getVideoTracks()) {
 			if (window.self_stream.getVideoTracks()[0]) {
 				window.self_stream.getVideoTracks()[0].stop();
+			}
+		}
+		if (window.self_stream.getAudioTracks()) {
+			if (window.self_stream.getAudioTracks()[0]) {
+				window.self_stream.getAudioTracks()[0].stop();
 			}
 		}
 	}
@@ -634,7 +770,7 @@ function removeElement(elementId) {
 function mute_audio() {
 	if (acekurento !== null) {
 		console.log('MUTING AUDIO');
-		acekurento.enableDisableTrack(true, true); //mute audio
+		acekurento.enableDisableTrack(false, true); //mute audio
 		mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
 		mute_audio_icon.classList.add("fa-microphone-slash");
 		mute_audio_icon.classList.remove("fa-microphone");
@@ -667,7 +803,7 @@ function mute_captions() {
 //hides self video so remote cannot see you
 function hide_video() {
 	if (acekurento !== null) {
-		acekurento.enableDisableTrack(true, false); //mute video
+		acekurento.enableDisableTrack(false, false); //mute video
 		console.log("Hide video reached");
 		selfStream.setAttribute("hidden", true);
 	}
@@ -676,7 +812,7 @@ function hide_video() {
 //unhides self video so remote can see you
 function unhide_video() {
 	if (acekurento !== null) {
-		acekurento.enableDisableTrack(false, false); //unmute video
+		acekurento.enableDisableTrack(true, false); //unmute video
 		console.log("Unhide video reached");
 		selfStream.removeAttribute("hidden");
 	}
@@ -685,7 +821,7 @@ function unhide_video() {
 function enable_video_privacy() {
 	if (acekurento !== null) {
 		console.log('Enabling video privacy');
-		acekurento.enableDisableTrack(true, false); //mute video
+		acekurento.enableDisableTrack(false, false); //mute video
 		hide_video_icon.style.display = "block";
 		hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
 		acekurento.privateMode(true, privacy_video_url);
@@ -696,7 +832,7 @@ function disable_video_privacy() {
 	if (acekurento !== null) {
 		console.log('Disabling video privacy');
 		mirrorMode("selfView", true);
-		acekurento.enableDisableTrack(false, false); //unmute video
+		acekurento.enableDisableTrack(true, false); //unmute video
 		hide_video_icon.style.display = "none";
 		hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
 		acekurento.privateMode(false);
@@ -707,8 +843,8 @@ function disable_video_privacy() {
 function start_video_calibration() {
 	if (acekurento !== null) {
 		console.log('Start video calibration');
-		acekurento.enableDisableTrack(true, false); //mute video
-		acekurento.calibrateMode(true, privacy_video_url);
+		acekurento.enableDisableTrack(false, false); //mute video
+		acekurento.privateMode(true, calibrate_video_url);
 	}
 }
 
@@ -716,8 +852,8 @@ function end_video_calibration() {
 	if (acekurento !== null) {
 		console.log('End video calibration');
 		mirrorMode("selfView", true);
-		acekurento.enableDisableTrack(false, false); //unmute video
-		acekurento.calibrateMode(false);
+		acekurento.enableDisableTrack(true, false); //unmute video
+		acekurento.privateMode(false);
 	}
 }
 
@@ -874,8 +1010,8 @@ function shareScreen() {
 				acekurento.selfStream = document.getElementById('selfView');
 			}
 		}
-		acekurento.screenshare(false);
 		acekurento.screenshare(true);
+		screenShareEnabled = true;
 	}
 }
 
@@ -895,7 +1031,8 @@ function multipartyinvite(extension) {
 	acekurento.invitePeer(extension.toString());
 	socket.emit('multiparty-invite', {
 		"extensions": extension.toString(),
-		"callerNumber": extensionMe
+		"callerNumber": extensionMe,
+		'vrs':$('#callerPhone').val()
 	});
 
 	/*if(agentStatus == 'IN_CALL'){
@@ -907,9 +1044,62 @@ function multipartyinvite(extension) {
 	}*/
 }
 
-function transferCall(isBlind) {
+function multipartyHangup() {
+	if (acekurento.isMultiparty && hostAgent == extensionMe) {
+		// host agent is leaving call
+		// refer the session to the other agent in the call
+		multipartyCaptionsEnd();
+
+		socket.emit('multiparty-hangup', {'newHost' :backupHostAgent, 'transitionAgent':transitionExt, 'vrs': $('#callerPhone').val()});
+
+		setTimeout(() => {
+			acekurento.callTransfer(backupHostAgent.toString(), false);
+			terminate_call();
+			
+			hostAgent = null;
+			backupHostAgent = null;
+			transitionAgent = null;
+			transitionExt = null;
+		}, 500);
+	
+	} else {
+		// non-host leaving multiparty call
+		hostAgent = null;
+		backupHostAgent = null;
+		transitionAgent = null;
+		transitionExt = null;
+		terminate_call();
+	}
+}
+
+function getTransferType(ext) {
+    $('#modalCallTransfer').modal({
+        show: true,
+        backdrop: 'static',
+        keyboard: false
+    });
+	$('#transferExtension').val(ext);
+}
+
+/**
+ * @param {boolean} isCold 
+ */
+ function sendTransferInvite(isCold) {
 	if (agentStatus == 'IN_CALL') {
-		acekurento.callTransfer(document.getElementById('transferExtension').value, isBlind);
+		transferExt = $('#transferExtension').val();
+		showAlert('info', 'Call transfer initiated. Waiting for response...');
+
+		if (isCold) {
+			isColdTransfer = true;
+		} else {
+			isColdTransfer = false;
+		}
+
+		socket.emit('transferCallInvite', {
+			'transferExt': transferExt, 
+			'originalExt': extensionMe, 
+			'vrs': $('#callerPhone').val()
+		});
 	}
 }
 
@@ -1025,24 +1215,32 @@ function testCaptions() {
 	} else { console.log('demo running'); }
 }
 
-var tempDivTimeout = null;
+
+function createCaptionHtml(displayName, transcripts) {
+	console.log(displayName, transcripts)
+	let caption = transcripts.transcript;
+	if (!transcripts.final) {
+		caption += '...';
+	}
+	let timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+	return '<span class="timestamp">' + timestamp + '</span><strong>' + displayName + ':</strong> ' + caption;
+}
+
 function updateCaptions(transcripts) {
+	
 	console.log('transcripts in UC are ', transcripts)
 	var tDiv = document.getElementById(transcripts.msgid);
-	console.log(tDiv)
+	
 	if (!tDiv) {
 		var temp = document.createElement("div");
 		temp.id = transcripts.msgid;
-		temp.innerHTML = transcripts.transcript;
+		temp.innerHTML = createCaptionHtml('Consumer', transcripts); 
+		
 		temp.classList.add("transcripttext");
-		document.getElementById("transcriptoverlay").appendChild(temp);
-		tempDivTimeout = setTimeout(function () { temp.remove() }, 5000);
+		document.getElementById("transcriptoverlay").prepend(temp);
 	} else {
-		clearTimeout(tempDivTimeout);
-		tDiv.innerHTML = transcripts.transcript;
+		tDiv.innerHTML = createCaptionHtml('Consumer', transcripts); 
 		if (transcripts.final) {
-			setTimeout(function () { tDiv.remove() }, 5000);
-
 			$('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
 			$("#caption-messages").scrollTop($("#caption-messages")[0].scrollHeight);
 
@@ -1055,10 +1253,10 @@ function updateCaptionsMultiparty(transcripts) {
 	if(!tDiv){//prevents duplicate captions
 		var temp = document.createElement("div");
 		temp.id = transcripts.msgid;
-		temp.innerHTML = transcripts.displayname + ": " + transcripts.transcript;
+		temp.innerHTML = createCaptionHtml(transcripts.displayname, transcripts);
 		temp.classList.add("transcripttext");
-		document.getElementById("transcriptoverlay").appendChild(temp);
-		setTimeout(function () { temp.remove() }, 5000);
+		document.getElementById("transcriptoverlay").prepend(temp);
+		// setTimeout(function () { temp.remove() }, 5000);
 	}
 }
 
@@ -1119,6 +1317,7 @@ function multipartyCaptionsStart() {
 	recognition.onresult = function (event) {
 		if(!isMuted && event && event.results && (event.results.length > 0)){
 			var lastResult = event.results.length - 1;
+			console.log('sending multiparty-caption-agent caption:', event.results[lastResult][0].transcript, extensionMe);
 			socket.emit('multiparty-caption-agent', {
 				"transcript":event.results[lastResult][0].transcript,
 				"final": event.results[lastResult].isFinal, 
@@ -1126,13 +1325,13 @@ function multipartyCaptionsStart() {
 				"displayname": $('#agentname-sidebar').html().trim(),
 				"extension": extensionMe,
 				"agent": true,
-				"participants": callParticipants
+				"participants": callParticipantsExt
 			});
 		}
 	};
 
 	recognition.onend = function (event) {
-		if(acekurento.isMultiparty && (callParticipants.length > 2))
+		if(acekurento.isMultiparty && (callParticipantsExt.length > 2))
 			multipartyCaptionsStart();	
 	}
 	recognition.start();
@@ -1142,5 +1341,5 @@ function multipartyCaptionsEnd() {
 	if(recognition)
 		recognition.abort();
 	recognition = null;
-	callParticipants = [];
+	callParticipantsExt = [];
 }

@@ -1,35 +1,3 @@
-/**
- * New node file
- */
-
-angular.module('csrService', []).factory('socket', ['$rootScope', '$http', '$timeout', '$q', function ($rootScope, _$http, _$timeout, _$q) {
-  const socket = io.connect(`https://${window.location.host}`, {
-    path: `${nginxPath}/socket.io`,
-    query: `token=${socketToken()}`,
-    forceNew: true
-  });
-  return {
-    on(eventName, callback) {
-      socket.on(eventName, function () {
-        const args = arguments;
-        $rootScope.$apply(() => {
-          callback.apply(socket, args);
-        });
-      });
-    },
-    emit(eventName, data, callback) {
-      socket.emit(eventName, data, function () {
-        const args = arguments;
-        $rootScope.$apply(() => {
-          if (callback) {
-            callback.apply(socket, args);
-          }
-        });
-      });
-    }
-  };
-}]);
-
 function socketToken() {
   let token = '';
   $.ajax({
@@ -45,3 +13,29 @@ function socketToken() {
   });
   return token;
 }
+
+angular.module('csrService', []).factory('socket', ['$rootScope', '$http', '$timeout', '$q', function CsrServicesFunction($rootScope, _$http, _$timeout, _$q) {
+  const socket = io.connect(`https://${window.location.host}`, {
+    path: `${nginxPath}/socket.io`,
+    query: `token=${socketToken()}`,
+    forceNew: true
+  });
+  return {
+    on(eventName, callback) {
+      socket.on(eventName, (...args) => {
+        $rootScope.$apply(() => {
+          callback.apply(socket, args);
+        });
+      });
+    },
+    emit(eventName, data, callback) {
+      socket.emit(eventName, data, (...args) => {
+        $rootScope.$apply(() => {
+          if (callback) {
+            callback.apply(socket, args);
+          }
+        });
+      });
+    }
+  };
+}]);
