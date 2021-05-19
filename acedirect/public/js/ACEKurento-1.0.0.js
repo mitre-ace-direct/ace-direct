@@ -216,6 +216,56 @@
           dataChannel.onerror = dataChannelConfig.onerror || noop;
         }
       }
+
+      // getstats WebRTC logging; param in config.json
+      if (logWebRTCStats == 'true') {
+        var repeatInterval = logWebRTCStatsFreq; //milliseconds
+
+        getStats(pc, function(result) {
+
+          // log to Mongo?
+          if (logWebRTCMongo.length > 0) {
+            socket.emit('logWebRTCEvt', { result });
+          }
+
+          // get frame rate value
+          let results = result.results;  
+          let fpsObj = null;
+          let fps = 0;
+          meterelem.value = fps;
+          meterelemval.textContent = fps;
+          for (let i = 0; i < results.length; i += 1) {
+              fpsObj = results[i];
+              if (fpsObj.googFrameRateReceived) {
+                  fps = fpsObj.googFrameRateReceived;
+                  meterelem.value = fps;
+                  meterelemval.textContent = fps;
+                  break;
+              }
+              fpsObj = null;
+          }
+
+          // packets lost meter
+          if (result.video && result.video.packetsLost) {
+            let packetsLost = parseInt(result.video.packetsLost, 10);
+
+            // if we lose any packet, display the meter
+            if (packetsLost > 0) {
+              packetsLostElem.style.display = 'block';     
+            } 
+            packetsLostValElem.textContent = packetsLost;
+          }
+
+          if (result.ended && result.ended == true) {
+            result.nomore();
+            meterelem.value = 0.0; 
+            meterelemval.textContent = '';
+            packetsLostElem.style.display = 'none'; 
+            packetsLostValElem.value = 0;
+          }
+        }, repeatInterval);
+      }
+
     }
     pc.addEventListener('icecandidate', function (event) {
       var candidate = event.candidate;
@@ -4815,6 +4865,12 @@ function ACEKurento(config) {
     acceptCall: function (message) {
       
       setCallState(PROCESSING_CALL);
+      if (webRtcPeer) {
+        // dispose current webrtcPeer before making a new one
+        // this stops the camera from staying active after a multiparty transfer
+        webRtcPeer.dispose();
+        webRtcPeer = null;
+      }
 
       var options = {
         localVideo: this.selfStream,
@@ -4911,14 +4967,6 @@ function ACEKurento(config) {
      */
     privateMode: function (enabled, url) {
       sendMessage({ id: 'privacy', enabled: enabled, url: enabled ? url : undefined });
-    },
-    /**
-     * Sends calibration video image to peer instead of local video stream
-     * @param {Boolean} enabled - If "true" enables video calibrate mode
-     * @param {String} url - The video calibrate mode url
-     */
-    calibrateMode: function (enabled, url) {
-      sendMessage({ id: 'privacy', enabled: enabled, url: enabled ? "file://tmp/media/calibrate5.webm" : undefined });
     },
     /**
      * @param {Number} number - Number value for DTMF input
@@ -5098,34 +5146,39 @@ function ACEKurento(config) {
     },
     /**
      * Enable/Disable video or audio tracks
-     * @param {Boolean} isActive - If "true" will disable/pause media type. Otherwise will resume a specified media type.
+     * @param {Boolean} enableTrack - If "true" will enable/play media type. Otherwise will pause a specified media type.
      * @param {Boolean} isAudio - If "true" will act on the audio media stream type. Otherwise it will act on the video type.
      */
-    enableDisableTrack: function (isActive, isAudio) {
+    enableDisableTrack: function (enableTrack, isAudio) {
       var mediaStream = this.mediaStream();
-      console.log("Set " + (isAudio ? "AUDIO" : "VIDEO") + " " + (isActive ? "ON" : "OFF"));
+      console.log("Set " + (isAudio ? "AUDIO" : "VIDEO") + " " + (enableTrack ? "ON" : "OFF"));
 
       if(isAudio) {
         // mediaStream.audioEnabled = false; // fixme
         
         // console.log('ats', mediaStream.getAudioTracks())
-        mediaStream.getAudioTracks()[0].enabled = !(mediaStream.getAudioTracks()[0].enabled);
-        mediaStream.getAudioTracks()[0].muted = true; //fixme
+        mediaStream.getAudioTracks()[0].enabled = enableTrack;
+        mediaStream.getAudioTracks()[0].muted = true; //fixme ?should this be !isActive?
         console.log('enabled?', mediaStream.getAudioTracks()[0].enabled)
         console.log('muted?', mediaStream.getAudioTracks()[0].muted)
         console.log('ats', mediaStream.getAudioTracks())
         console.log(this.mediaStream())
       } else {
-        mediaStream.getVideoTracks()[0].enabled = !(mediaStream.getVideoTracks()[0].enabled);
+        mediaStream.getVideoTracks()[0].enabled = enableTrack;
       }
 
-      console.log((isAudio ? "AUDIO" : "VIDEO") + " is " + (isActive ? "ON" : "OFF"));
+      console.log((isAudio ? "AUDIO" : "VIDEO") + " is " + (enableTrack ? "ON" : "OFF"));
     },
     /**
      * Screenshare to Kurento
      * @param {Boolean} enable - If "true" will enable screenshare. Otherwise will stop and use camera.
      */
     screenshare: function (enable) {
+      if (webRtcPeer) {
+        // dispose current webrtcPeer before making a new one
+        webRtcPeer.dispose();
+        webRtcPeer = null;
+      }
       var options = {
         localVideo: this.selfStream,
         remoteVideo: this.remoteStream,

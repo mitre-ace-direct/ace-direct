@@ -7,36 +7,22 @@ The ACE USERVER is a server that provides a RESTful Web Service API to the ACE d
 > Note: Data in this README is fake.\
 > Data included here is for documentation purposes only.
 
-## SSL Configuration
+## Deployment
 
-1. ACE software uses SSL which requires a valid key and certificate.
-1. The location of the SSL key and certificate is specified in the `dat/config.json` by using the `common:https:certificate` and `common:https:private_key` parameters in the form of folder/file (e.g., `/home/centos/ssl/mycert.pem` and `/home/centos/ssl/mykey.pem`).
-1. Additional information can be found in the ACE Direct Platform Release documentation.
+Configuraiton and deployment of this server is part of the overall `ace-direct` installation process. See [../README.md](../README.md) for full details.
 
-### Getting Started
+## Generating API docs
 
-To install userver, follow the README.md file in the autoinstall folder. The instructions for manual install are also provided below for reference.
-
-1. Clone this repository
-1. Download and install [Node.js](https://nodejs.org/en/)
-1. Install the required Node.js modules: cd into the userver directory, run `npm run build`
-1. From the command line, generate docs:
-
-  ```shell
-  $  npm install apidoc -g
-  $
-  $  apidoc -i routes/ -o apidoc/
-  $
-  ```
-
-#### Running the Server
+From the command line, generate docs:
 
 ```bash
-Usage:
-nodejs app.js [ port ]
+$  npm install apidoc -g
+$
+$  apidoc -i routes/ -o apidoc/
+$
 ```
 
-#### Testing the Server in AWS
+### Testing the Server in AWS
 
 * `curl -k --request GET https://host:port/`
 * `curl -k --request GET https://host:port/vrsverify/?vrsnum=1000`
