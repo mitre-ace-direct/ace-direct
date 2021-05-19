@@ -478,7 +478,7 @@ if (!fs.existsSync(COLOR_CONFIG_JSON_PATH) || !fs.existsSync('../dat/default_col
 }
 
 logger.info(`Listen on port: ${port}`);
-const queuenames = getConfigVal('management_portal:queues');
+const queuenames = `${getConfigVal('asterisk:queues:general:name')},${getConfigVal('asterisk:queues:complaint:name')},${getConfigVal('asterisk:queues:videomail:name')}`;
 const pollInterval = parseInt(getConfigVal('management_portal:poll_interval'), 10);
 // const adUrl = `https://${getConfigVal(COMMON_PRIVATE_IP)}`;
 console.log(`port number: ${port}, poll interval:${pollInterval}`);
@@ -590,7 +590,7 @@ io.sockets.on('connection', (socket) => {
 
   //   if (message === 'webuser') {
   //     const qobj = {
-  //       queues: getConfigVal('management_portal:queues')
+  //       queues: `${getConfigVal('asterisk:queues:general:name')},${getConfigVal('asterisk:queues:complaint:name')},${getConfigVal('asterisk:queues:videomail:name')}`
   //     };
   //     socket.emit('queueconf', qobj);
   //     logger.debug('Message is webuser type');
