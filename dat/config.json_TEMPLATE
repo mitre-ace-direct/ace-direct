@@ -50,7 +50,7 @@
       },
       "videomail": {
         "number": "575795",
-        "name": ""
+        "name": "MailQueue"
       }
     }
   },
@@ -151,7 +151,6 @@
   },
   "management_portal": {
     "https_listen_port": "9002",
-    "queues": "GeneralQuestionsQueue,ComplaintsQueue,MailQueue",
     "poll_interval": "1000",
     "force_logout_password": "securexForcexLogoutxPassword"
   },
