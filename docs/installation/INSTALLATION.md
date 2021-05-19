@@ -2,7 +2,7 @@
 
 ![ACE Direct](../../images/adsmall.png)
 
-This document describes how to install, configure, and deploy ACE Direct.
+This document describes how to install, configure, and deploy ACE Direct and its external components.
 
 ## Prerequisites
 
@@ -14,21 +14,21 @@ Here are important prerequisites to complete _before_ proceeding with an ACE Dir
   * Contact a domain name registrar to register the desired _domain_ and _subdomain_ names. It may take *several days* to activate the domain after registration.
   * Domain names **must be three-level domain names**. This is a requirement by our OpenAM identity and access management server.
   * Do **not** use special characters in the domain names.
-  * Here is the suggested format for the domain names: `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`. Note that `portal` is the only public facing server.
+  * Here is the suggested format for the domain names: `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`. Note that `portal` is the only public facing server. The `/etc/hosts` files on all servers should have all other servers' private IP addresses.
 * *Create _A_ records* - Connect your IP addresses to host names with _A records_ ([link](https://www.godaddy.com/help/add-an-a-record-19238)).
 * *Update provider peering lists* - Contact video/softphone providers to update their peering lists. It could take *two weeks* to fulfill this request.
 * *Create website certificates*
   * Certificates should be *wildcard* certs to have flexibility with domain names.
   * Name the certificates `cert.pem` and `key.pem`.
-  * Place certificates in the expected folders on all the servers, for example: `/etc/ssl/`. Certificates must have `644` permissions. Remember this location for future configuration steps.
+  * Place certificates in the expected folders on all the servers, namely: `/etc/ssl/`. Certificates must have `644` permissions. Remember this location for future configuration steps.
   * If the certificate is new, you may need to execute `restorecon`, for example: `restorecon -R -v cert.pem`
   * _For local testing only_, you can create self-signed certs: `openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out cert.pem`
-* *Create the AWS instances for the ACE Direct servers*
+* *Create AWS instances for the ACE Direct servers*
   * Acquire and provision AWS servers for: `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
   * On `acenode`, modify SE Linux: `sudo setsebool -P httpd_can_network_connect 1`. You will need to do this after any reboot of the server.
   * Set all servers to the _UTC timezone_. Use `chronyd` or `ntp` to synchronize time across all servers.
   * Servers should be CentOS, RHEL Linux, or Amazon Linux 2. Other Linux flavors _may_ work with little or no changes to these instructions. For this document, CentOS is assumed.
-* *Database* - Deploy a MySQL database and note the root user and password. This may be either a standard MySQL server or an AWS RDS MySQL service.
+* *Database* - Deploy a MySQL database and note the root user and password. This may be either a local MySQL server or an AWS RDS MySQL service.
 * *Internet access* - An Internet connection is required on some servers to install or update the ACE Direct software. This allows the build processes to download software and other external dependencies.
 * *Install Git* - Git is required to clone the public repos. Install Git, for example on CentOS: `sudo yum install git`.
 * *ACE Direct User Account* - Identify a user account on `acenode` for the Node servers, for example `/home/acedirect`. All ACE Direct Node.js servers will install here.
@@ -36,6 +36,10 @@ Here are important prerequisites to complete _before_ proceeding with an ACE Dir
 ## Installation and configuration
 
 The following sections describe how to install and configure ACE Direct.
+
+### acenode
+
+The **acenode** server hosts several Node.js and application servers. See [README.md](../../README.md) for information on deploying the core ACE Direct Node servers.
 
 ### acestun
 
@@ -51,23 +55,24 @@ Install the `strongSwan` server. See [STRONGSWAN.md](STRONGSWAN.md).
 
 ### portal
 
-This is the NGINX server for ACE Direct. This server acts as a _reverse proxy_, hiding internal Node.js servers from public access.
+This is the NGINX server for ACE Direct. The server acts as a _reverse proxy_, hiding internal Node.js servers from public access.
 
 * Log into the `portal.domain.com` server.
-* Clone the `nginx` repo.
-* Install and configure NGINX. See the the `nginx` repo for complete instructions. This repo provides a template for the `nginx.conf` file.
+* See the [nginx/README.md](../../nginx/README.md) for installation instructions.
 
 ### aceopenam
 
 The `aceopenam` server is the _identity and access management_ server, implemented with OpenAM. To install and configure `aceopenam`:
 
 * Log into the `aceopenam.domain.com` server.
-* Clone the `iam` repo.
-* See the `README.md` file in the `iam` repo for detailed installation and configuration instructions.
+* Copy over the `iam` folder.
+* See [iam/README.md](../../iam/README.md) for detailed installation and configuration instructions.
 
 ### acesip
 
-The `acesip.domain.com` server is the Asterisk server. Log into the Asterisk server, clone the `asterisk` repo, and follow the installation instructions. Additionally, you can install the _ACE Quill_ `acequill-service` repo and configure it with `asterisk` to include captioning and language translation.
+* The `acesip.domain.com` server is the Asterisk server. Log into the Asterisk server, clone the `asterisk` repo, and follow the installation instructions.
+* You can install the _ACE Quill_ `acequill-service` server and configure it with `asterisk` to include captioning and language translation.
+* See the `kurento-asterisk-servlet` repo for informatioon on installing the videomail server on `acesip`.
 
 ### aceproxy
 
@@ -78,83 +83,6 @@ The `aceproxy.domain.com` server is the SIP proxy server. Log into the SIP proxy
 The `acekms.domain.com` server is the Kurento media server. Log into the Kurento media server, clone the `kurento` repo and follow the installation instructions.
 
 Additionally, install the videomail server on `acekms`. Clone the `kurento-asterisk-servlet` and follow the instructions.
-
-### acenode
-
-The **acenode** server hosts several Node.js and application servers. Here are instructions to deploy **acenode**:
-
-1. Log into the ACE Direct user account.
-1. Install Node.js `v12.18.2` and pm2 `4.4.0`. Optionally use `n` manager to manage Node.js versions:
-
-    * Make the following changes in `~/.bash_profile`:
-
-      ```bash
-      N_PREFIX=$HOME/.n
-      PATH=$N_PREFIX/bin:$PATH:$HOME/.local/bin:$HOME/bin
-      export PATH N_PREFIX
-      ```
-
-    * From the terminal:
-
-      ```bash
-      $  cd
-      $
-      $  . .bash_profile
-      $  mkdir .n
-      $  npm install -g n
-      $  n 12.18.2  # or desired version, e.g., n latest
-      $  node -v
-      ```
-
-1. Install `git`.
-1. Create an ACE Direct user account to host the Node.js servers, for example `acedirect`.
-1. Install and configure Redis. See [Redis Quick Start](https://redis.io/topics/quickstart).
-
-    * When configuring Redis, edit `/etc/redis.conf`. Uncomment the `requirepass somepassword` line. Change `somepassword` to a secret password. Restart Redis.
-    * On the Node.js server, edit `~/dat/config.json`. Update the `redis.auth` variable to match `somepassword` from the previous step. Restart the Node.js servers.
-
-1. Install and configure MongoDB. See [MongoDB installation instructions](https://docs.mongodb.com/manual/).
-1. Update the `/etc/hosts` file with the private IP addresses of `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
-1. From the terminal, go into the ACE Direct user account: `cd /home/acedirect`).
-1. Clone the `ace-direct` repo. See additional instructions in that repo to install, configure, and deploy the ACE Direct Node servers.
-1. Configure ACE Direct
-
-  ```bash
-  $  cd ace-direct/dat
-  $
-  $  cp config.json_TEMPLATE config.json  # first time only!
-  $  vi config.json  # configure (see dat/parameter_desc.json for help)  
-  ```
-
-1. Build repos
-
-  ```bash
-  $  npm run build
-  $
-  ```
-
-1. Starting/stopping ACE Direct Node.js on `acenode`:
-
-  ```bash
-  $  cd /home/acedirect/ace-direct
-  $
-  $  pm2 start dat/process.json  # first time
-  $  pm2 restart all  # subsequent
-  $  pm2 stop all  # stop
-  $  pm2 stop 0  # stop ID 0
-  $  pm2 delete all  # remove all servers from pm2
-  ```
-
-1. Making Node.js servers start on reboot:
-
-  ```bash
-  $  cd  /home/acedirect/ace-direct
-  $
-  $  pm2 start dat/process.json  # start all node servers
-  $  pm2 save
-  $  pm2 startup
-  $  # now node.js servers will start on boot
-  ```
 
 ### Database Server
 
@@ -183,9 +111,9 @@ The following instructions assume a local MySQL server:
 
 * Install and configure the stun server on _stunace_.
 * Install and configure Asterisk on _sipace_. See the `asterisk/README.md` file for detailed instructions.
-* Install and connect the BusyLight to the agent computer:
+* Install and connect the _BusyLight_ device (if available) to the agent computer:
   * Connect the USB BusyLight to the agent computer.
-  * Download the `busylightapi/exe/lightserver.jar` Java program from the `busylightapi` repo. Run it locally on the Agent's client computer.
+  * See the [obusylight/README.md](../../obusylight/README.md) file for instructions on deploying the BusyLight server program on the agent computer.
 
 ## ACE Direct Reboot Checklist
 
@@ -223,7 +151,7 @@ After rebooting servers, ACE Direct requires starting services in a specific ord
 * Check the `logs` folder in each application folder for errors or warnings: `ls /home/acedirect/ace-direct/*/logs/*.log`
 * Verify that OpenAM, Redis, MongoDB, NGINX, and MySQL are running.
 * Verify that there are no firewalls blocking internal ports (e.g., `firewalld` on OpenAM blocking access to `8443`).
-* Does the BusyLight device respond? Try the self-test mode on the `lightserver.jar` UI.
+* Does the BusyLight device respond? Try the self-test mode on the BusyLight server app.
 * Verify that the `/etc/hosts` file is configured correctly.
 * Verify that the `/etc/nginx/nginx.conf` file is configured correctly.
 * Verify that `/home/acedirect/ace-direct/dat/config.json` is configured correctly.
@@ -242,4 +170,3 @@ After rebooting servers, ACE Direct requires starting services in a specific ord
   $
   $  npm run build2
   ```
-  

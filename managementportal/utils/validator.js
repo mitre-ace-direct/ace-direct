@@ -80,10 +80,11 @@ module.exports = {
   isNameValid(name) {
     let isFormatCorrect = false;
     if (name) {
-      const legalChars = /^[A-Za-z\/\s\.'-]+$/;
+      // const legalChars = /^[A-Za-z\/\s\.'-]+$/;
+      const legalChars = /^[A-Za-z/\s.'-]+$/;
       isFormatCorrect = ((name.length >= 1) && (name.length <= 20) && (legalChars.test(name)));
     }
-    console.log(`isPhoneValid ${isFormatCorrect}`);
+    console.log(`isNameValid ${isFormatCorrect} ${name}`);
     return isFormatCorrect;
   }
 };

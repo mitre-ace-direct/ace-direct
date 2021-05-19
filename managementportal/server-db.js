@@ -18,6 +18,7 @@ const url = require('url');
 const mysql = require('mysql');
 const Json2csvParser = require('json2csv').Parser;
 const redis = require('redis');
+const socketIO = require('socket.io');
 
 // additional helpers/utility functions
 const { getConfigVal } = require('./helpers/utility');
@@ -35,7 +36,7 @@ let AgentStats = []; // last stored stats on agents
 let QueueStats = []; // last stored stats on queues
 
 const AgentMap = new Map(); // associate extension to agent database record;
-let Asterisk_queuenames = [];
+let AsteriskQueuenames = [];
 
 // colEvents and colStats for MongoDb
 let colEvents = null;
@@ -59,13 +60,13 @@ function amiaction(obj) {
  * @returns {undefined} Not used
  */
 function resetAllCounters() {
-  for (let i = 0; i < Asterisk_queuenames.length; i += 1) {
-    logger.info(`QueueReset: ${Asterisk_queuenames[i]}`);
+  for (let i = 0; i < AsteriskQueuenames.length; i += 1) {
+    logger.info(`QueueReset: ${AsteriskQueuenames[i]}`);
     amiaction({
       action: 'QueueReset',
-      Queue: Asterisk_queuenames[i]
+      Queue: AsteriskQueuenames[i]
     });
-    logger.log(Asterisk_queuenames[i]);
+    logger.log(AsteriskQueuenames[i]);
   }
 }
 
@@ -192,7 +193,7 @@ function myCleanup() {
 
 // CLEAN UP function; must be at the top!
 // for exits, abnormal ends, signals, uncaught exceptions
-const cleanup = require('./cleanup').Cleanup(myCleanup);
+require('./cleanup').Cleanup(myCleanup);
 
 // declare constants for various config values
 const COMMON_PRIVATE_IP = 'common:private_ip';
@@ -224,9 +225,9 @@ const credentials = {
 
 // Redis keys/mappings
 // Contains login name => JSON data passed from browser
-const redisStatusMap = 'statusMap';
+// const redisStatusMap = 'statusMap';
 // Map of Agent information, key agent_id value JSON object
-const redisAgentInfoMap = 'agentInfoMap';
+// const redisAgentInfoMap = 'agentInfoMap';
 
 // Create a connection to Redis
 const redisClient = redis.createClient(getConfigVal('database_servers:redis:port'), getConfigVal('database_servers:redis:host'));
@@ -270,7 +271,7 @@ if (nginxPath.length === 0) {
   nginxPath = '/ManagementPortal';
 }
 
-const agent = new openamAgent.PolicyAgent({
+const policyAgent = new openamAgent.PolicyAgent({
   serverUrl: `https://${getConfigVal(NGINX_FQDN)}:${getConfigVal('nginx:port')}/${getConfigVal('openam:path')}`,
   privateIP: getConfigVal('nginx:private_ip'),
   errorPage() {
@@ -331,13 +332,10 @@ port = parseInt(getConfigVal('management_portal:https_listen_port'), 10);
 
 const httpsServer = https.createServer(credentials, app);
 
-const io = require('socket.io')(httpsServer, {
+const io = socketIO(httpsServer, {
   cookie: false,
   origins: fqdnUrl
 });
-
-// io.set removed in socket.io 3.0. Origins now set in options during socket.io module inclusion.
-// io.set('origins', fqdnUrl);
 
 // Pull MySQL configuration from config.json file
 const dbHost = getConfigVal('database_servers:mysql:host');
@@ -380,8 +378,8 @@ if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
     forceServerObjectId: true,
     useNewUrlParser: true,
     useUnifiedTopology: true
-  }, (err, database) => {
-    if (err) {
+  }, (errConnect, database) => {
+    if (errConnect) {
       logger.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
       console.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
       process.exit(-99);
@@ -405,7 +403,7 @@ if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
 
     if (logAMIEvents) {
       // first check if collection "events" already exist, if not create one
-      mongodb.listCollections({ name: 'events' }).toArray((err, collections) => {
+      mongodb.listCollections({ name: 'events' }).toArray((errList, collections) => {
         console.log(`try to find events collection, colEvents length: ${collections.length}`);
         if (collections.length === 0) { // "stats" collection does not exist
           console.log('Creating new events colleciton in MongoDB');
@@ -432,7 +430,7 @@ if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
 
     if (logStats) {
       // first check if collection "stats" already exist, if not create one
-      mongodb.listCollections({ name: 'callstats' }).toArray((err, collections) => {
+      mongodb.listCollections({ name: 'callstats' }).toArray((errList, collections) => {
         console.log(`try to find stats collection, colStats length: ${collections.length}`);
         if (collections.length === 0) { // "stats" collection does not exist
           console.log('Creating new stats colleciton in MongoDB');
@@ -464,7 +462,7 @@ if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
 // Validates the token, if valid go to connection.
 // If token is not valid, no connection will be established.
 const jwtKey = getConfigVal('web_security:json_web_token:secret_key');
-const jwtEnc = getConfigVal('web_security:json_web_token:encoding');
+// const jwtEnc = getConfigVal('web_security:json_web_token:encoding');
 
 io.use(socketioJwt.authorize({
   // secret: ((jwtEnc == 'base64') ? Buffer.from(jwtKey , jwtEnc ): jwtKey),
@@ -482,13 +480,90 @@ if (!fs.existsSync(COLOR_CONFIG_JSON_PATH) || !fs.existsSync('../dat/default_col
 logger.info(`Listen on port: ${port}`);
 const queuenames = getConfigVal('management_portal:queues');
 const pollInterval = parseInt(getConfigVal('management_portal:poll_interval'), 10);
-const adUrl = `https://${getConfigVal(COMMON_PRIVATE_IP)}`;
+// const adUrl = `https://${getConfigVal(COMMON_PRIVATE_IP)}`;
 console.log(`port number: ${port}, poll interval:${pollInterval}`);
 
-Asterisk_queuenames = queuenames.split(',');
+AsteriskQueuenames = queuenames.split(',');
 
 logger.info('****** Restarting server-db  ****');
-logger.info(`Asterisk queuename: ${Asterisk_queuenames}, Poll Interval: ${pollInterval}`);
+logger.info(`Asterisk queuename: ${AsteriskQueuenames}, Poll Interval: ${pollInterval}`);
+
+/**
+ * Check resource status
+ * @param {type} hosts
+ * @param {type} callback
+ * @returns {undefined}
+ */
+function checkConnection(hosts, callback) {
+  const results = [];
+  const requests = hosts.size;
+
+  hosts.forEach((host, name) => {
+    const parsedurl = url.parse(host, true, true);
+    const { hostname } = parsedurl;
+    let parsedUrlPort = parsedurl.port;
+    if (parsedUrlPort === null) { parsedUrlPort = '80'; }
+    // tests if each address is online
+    tcpp.probe(hostname, parsedUrlPort, (err, isAlive) => {
+      if (err) {
+        callback({
+          error: 'An Error Occurred'
+        });
+      } else {
+        // push results to result arrary
+        results.push({
+          name,
+          host,
+          status: isAlive
+        });
+        if (results.length === requests) {
+          // Sort Request by name
+          results.sort((a, b) => {
+            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+            if (nameA < nameB) {
+              return -1;
+            }
+            if (nameA > nameB) {
+              return 1;
+            }
+            return 0;
+          });
+          // Callback with results of resource status probes
+          callback({
+            resources: results,
+            timestamp: new Date().getTime()
+          });
+        }
+      }
+    });
+  });
+}
+
+/**
+ * Send Resoure status to Management Dashboard
+ * @returns {undefined}
+ */
+function sendResourceStatus() {
+  const hostMap = new Map();
+  // list of resources to check for status
+  hostMap.set('ACR-CDR', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('acr_cdr:https_listen_port')}`);
+  hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('user_service:port')}`);
+  hostMap.set('ACE Direct', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('ace_direct:https_listen_port')}`);
+
+  hostMap.set('Zendesk', `${getConfigVal('zendesk:protocol')}://${getConfigVal('zendesk:private_ip')}:${getConfigVal('zendesk:port')}/api/v2`);
+  hostMap.set('Agent Provider', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}`);
+
+  checkConnection(hostMap, (data) => {
+    io.to('my room').emit('resource-status', data);
+  });
+
+  const metricsStartDate = 1497916801000;
+  const metricsEndDate = 1498003200000;
+  metrics.createMetrics(mongodb, metricsStartDate, metricsEndDate, (data) => {
+    io.to('my room').emit('metrics', data);
+  });
+}
 
 io.sockets.on('connection', (socket) => {
   let numClients = 0;
@@ -500,27 +575,27 @@ io.sockets.on('connection', (socket) => {
     year
   });
 
-  socket.on('config', (message) => {
-    logger.debug(`Got config message request: ${message}`);
-    const confobj = {
-      host: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
-      realm: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
-      stun: `${getConfigVal('asterisk:sip:stun')}:${getConfigVal('asterisk:sip:stun_port')}`,
-      wsport: parseInt(getConfigVal('asterisk:sip:ws_port'), 10),
-      channel: getConfigVal('asterisk:sip:channel'),
-      websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('asterisk:sip:ws_port')}/ws`
-    };
+  // socket.on('config', (message) => {
+  //   logger.debug(`Got config message request: ${message}`);
+  //   const confobj = {
+  //     host: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
+  //     realm: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
+  //     stun: `${getConfigVal('asterisk:sip:stun')}:${getConfigVal('asterisk:sip:stun_port')}`,
+  //     wsport: parseInt(getConfigVal('asterisk:sip:ws_port'), 10),
+  //     channel: getConfigVal('asterisk:sip:channel'),
+  //     websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('asterisk:sip:ws_port')}/ws`
+  //   };
 
-    socket.emit('sipconf', confobj);
+  //   socket.emit('sipconf', confobj);
 
-    if (message === 'webuser') {
-      const qobj = {
-        queues: getConfigVal('management_portal:queues')
-      };
-      socket.emit('queueconf', qobj);
-      logger.debug('Message is webuser type');
-    }
-  });
+  //   if (message === 'webuser') {
+  //     const qobj = {
+  //       queues: getConfigVal('management_portal:queues')
+  //     };
+  //     socket.emit('queueconf', qobj);
+  //     logger.debug('Message is webuser type');
+  //   }
+  // });
 
   // Handle incoming Socket.IO registration requests - add to the room
   socket.on('register-manager', () => {
@@ -600,30 +675,31 @@ io.sockets.on('connection', (socket) => {
 
   // Socket for Operating Status
   socket.on('hours-of-operation', (_data) => {
-    const url = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal(AGENT_SERVICE_PORT)}/OperatingHours`;
+    const urlOperatingHours = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal(AGENT_SERVICE_PORT)}/OperatingHours`;
     request({
-      url,
+      url: urlOperatingHours,
       json: true
     }, (err, res, hourData) => {
+      const changedHourData = hourData;
       if (err) {
         logger.error(`Aserver error: ${err}`);
       } else {
         switch (hourData.business_mode) {
           case 0:
-            hourData.business_mode = 'NORMAL';
+            changedHourData.business_mode = 'NORMAL';
             break;
           case 1:
-            hourData.business_mode = 'FORCE_OPEN';
+            changedHourData.business_mode = 'FORCE_OPEN';
             break;
           case 2:
-            hourData.business_mode = 'FORCE_CLOSE';
+            changedHourData.business_mode = 'FORCE_CLOSE';
             break;
           default:
-            hourData.business_mode = 'NORMAL';
+            changedHourData.business_mode = 'NORMAL';
             break;
         }
 
-        io.to(socket.id).emit('hours-of-operation-response', hourData);
+        io.to(socket.id).emit('hours-of-operation-response', changedHourData);
       }
     });
   }).on('hours-of-operation-update', (data) => {
@@ -656,11 +732,11 @@ io.sockets.on('connection', (socket) => {
         },
         body: requestJson,
         json: true
-      }, (error, response, data) => {
+      }, (error, response, dataOperatingHours) => {
         if (error) {
           logger.error(`Aserver error: ${error}`);
         } else {
-          io.to(socket.id).emit('hours-of-operation-update-response', data);
+          io.to(socket.id).emit('hours-of-operation-update-response', dataOperatingHours);
         }
       });
     }
@@ -668,15 +744,15 @@ io.sockets.on('connection', (socket) => {
 
   // Socket for CDR table
   socket.on('cdrtable-get-data', (data) => {
-    let url = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('acr_cdr:https_listen_port')}/getallcdrrecs`;
+    let urlGetAllCdrRecs = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('acr_cdr:https_listen_port')}/getallcdrrecs`;
     const { format } = data;
     if (data.start && data.end) {
-      url += `?start=${data.start}&end=${data.end}`;
+      urlGetAllCdrRecs += `?start=${data.start}&end=${data.end}`;
     }
     // ACR-CDR getallcdrrecs RESTful call to get CDR JSON string.
     console.log('CDRTABLE GET DATA');
     request({
-      url,
+      url: urlGetAllCdrRecs,
       json: true
     }, (err, res, cdrdata) => {
       if (err) {
@@ -767,8 +843,8 @@ io.sockets.on('connection', (socket) => {
       const metricsStartDate = new Date(data.start);
       const metricsEndDate = new Date(data.end);
       metrics.createMetrics(mongodb, metricsStartDate.getTime(),
-        metricsEndDate.getTime(), (metrics) => {
-          io.to('my room').emit('metrics', metrics);
+        metricsEndDate.getTime(), (metricsToEmit) => {
+          io.to('my room').emit('metrics', metricsToEmit);
         });
     }
   });
@@ -899,17 +975,19 @@ io.sockets.on('connection', (socket) => {
       const filePath = COLOR_CONFIG_JSON_PATH;
       const data = fs.readFileSync(filePath, 'utf8');
       let jsonData = JSON.parse(data);
-      for (const status in jsonData.statuses) {
+
+      Object.keys(jsonData.statuses).forEach((status) => {
         const colorAndAction = formData[status].split('_'); // colorAndAction[0] = color, colorAndAction[1] = "blinking" or "solid"
         jsonData.statuses[status].color = colorAndAction[0].toLowerCase();
         jsonData.statuses[status].stop = (colorAndAction[0] === 'off');
         jsonData.statuses[status].blink = (colorAndAction[1] === 'blinking');
         jsonData = setRgbValues(jsonData, status, colorAndAction[0]);
-      }
-      fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), 'utf-8', (err) => {
-        if (err) {
+      });
+
+      fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), 'utf-8', (errWriteFile) => {
+        if (errWriteFile) {
           logger.error(`ERROR writing: ${filePath}`);
-          throw err;
+          throw errWriteFile;
         } else {
           // successful write
           // send request to AD  server
@@ -960,10 +1038,10 @@ io.sockets.on('connection', (socket) => {
         requestJson.agents.push(agent);
       });
       // Send a post request to ace direct force logout route
-      const url = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal(ACE_DIRECT_PORT)}/forcelogout`;
+      const urlForceLogout = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal(ACE_DIRECT_PORT)}/forcelogout`;
       request({
         method: 'POST',
-        url,
+        url: urlForceLogout,
         headers: {
           'Content-Type': 'application/json',
           // Pass in custom header containing the MP force logout password from the config file
@@ -1010,9 +1088,9 @@ io.sockets.on('connection', (socket) => {
       const queryStr = `INSERT INTO ${callBlockTable} (vrs, admin_username, reason, timeUpdated) VALUES (?,?,?,?);`;
       const values = [dataIn.data.vrs, token.username, dataIn.data.reason, new Date()];
 
-      dbConnection.query(queryStr, values, (err, result) => {
-        if (err) {
-          logger.error('Error with adding blocked number: ', err.code);
+      dbConnection.query(queryStr, values, (errQuery, result) => {
+        if (errQuery) {
+          logger.error('Error with adding blocked number: ', errQuery.code);
           data.message = '';
           io.to(socket.id).emit('add-callblock-rec', data);
         } else {
@@ -1073,10 +1151,10 @@ io.sockets.on('connection', (socket) => {
 
     const queryStr = `DELETE FROM ${callBlockTable} WHERE call_block_id IN (${dataIn.data.id})`;
     const vmSqlParams = [];
-    dbConnection.query(queryStr, vmSqlParams, (err, result) => {
+    dbConnection.query(queryStr, vmSqlParams, (errQuery, result) => {
       const data = {};
-      if (err) {
-        logger.error(`DELETE-CALLBLOCKS ERROR: ${err.code}`);
+      if (errQuery) {
+        logger.error(`DELETE-CALLBLOCKS ERROR: ${errQuery.code}`);
         data.message = '';
         io.to(socket.id).emit('delete-callblock-rec', {});
       } else if (dataIn.data.bulk) {
@@ -1177,10 +1255,10 @@ io.sockets.on('connection', (socket) => {
     const queryStr = `SELECT vrs FROM ${callBlockTable}`;
     const vmSqlParams = [];
 
-    dbConnection.query(queryStr, vmSqlParams, (err, result) => {
+    dbConnection.query(queryStr, vmSqlParams, (errQuery, result) => {
       const data = {};
-      if (err) {
-        logger.error(`SYNC-CALLBLOCKS ERROR: ${err.code}`);
+      if (errQuery) {
+        logger.error(`SYNC-CALLBLOCKS ERROR: ${errQuery.code}`);
 
         data.message = '';
         io.to(socket.id).emit('sync-callblock-recs', data);
@@ -1201,7 +1279,7 @@ io.sockets.on('connection', (socket) => {
 
             data.message = '';
             io.to(socket.id).emit('sync-callblock-recs', data);
-          } else {
+          } else if (res.response === 'Success') {
             // {
             //  "response": "Success",
             //  "actionid": "1594741905590",
@@ -1213,188 +1291,80 @@ io.sockets.on('connection', (socket) => {
             //  ]
             // }
 
-            if (res.response === 'Success') {
-              const asteriskVRSNumbers = [];
-              // Extract VRS numbers from Output lines containing "blockcaller"
-              res.output.forEach((line) => {
-                if (line.includes('blockcaller')) {
-                  const vrs = line.replace('/blockcaller/', '').slice(0, 11);
-                  asteriskVRSNumbers.push(vrs);
+            const asteriskVRSNumbers = [];
+            // Extract VRS numbers from Output lines containing "blockcaller"
+            res.output.forEach((line) => {
+              if (line.includes('blockcaller')) {
+                const vrs = line.replace('/blockcaller/', '').slice(0, 11);
+                asteriskVRSNumbers.push(vrs);
+              }
+            });
+            logger.debug(`asterisk blocked VRS Numbers: ${JSON.stringify(asteriskVRSNumbers, null, 2)}`);
+
+            const mysqlOnlyCallblock = mysqlVrsNumbers
+              .filter((x) => asteriskVRSNumbers.indexOf(x) === -1);
+            const asteriskOnlyCallblock = asteriskVRSNumbers
+              .filter((x) => mysqlVrsNumbers.indexOf(x) === -1);
+            logger.info(`mysqlOnlyCallblock: ${JSON.stringify(mysqlOnlyCallblock, null, 2)}`);
+            logger.info(`asteriskOnlyCallblock: ${JSON.stringify(asteriskOnlyCallblock, null, 2)}`);
+
+            // If mysql has VRS numbers not in asterisk, Add them to asterisk
+            mysqlOnlyCallblock.forEach((element) => {
+              const objDbPut = {
+                Action: 'DBPut',
+                ActionID: Date.now(),
+                Family: 'blockcaller',
+                Key: element,
+                Val: 1
+              };
+
+              ami.action(objDbPut, (errDbPut, _res) => {
+                if (errDbPut) {
+                  logger.error('AMI amiaction error ');
+                  logger.error(JSON.stringify(errDbPut, null, 2));
+
+                  data.message = '';
+                  io.to(socket.id).emit('sync-callblock-recs', data);
+                } else {
+                  logger.info(`Added ${element} to asterisk callblock`);
                 }
               });
-              logger.debug(`asterisk blocked VRS Numbers: ${JSON.stringify(asteriskVRSNumbers, null, 2)}`);
+            });
 
-              const mysqlOnlyCallblock = mysqlVrsNumbers
-                .filter((x) => asteriskVRSNumbers.indexOf(x) === -1);
-              const asteriskOnlyCallblock = asteriskVRSNumbers
-                .filter((x) => mysqlVrsNumbers.indexOf(x) === -1);
-              logger.info(`mysqlOnlyCallblock: ${JSON.stringify(mysqlOnlyCallblock, null, 2)}`);
-              logger.info(`asteriskOnlyCallblock: ${JSON.stringify(asteriskOnlyCallblock, null, 2)}`);
+            // If asterisk has VRS numbers not in mysql, Delete them from asterisk
+            asteriskOnlyCallblock.forEach((element) => {
+              const objDbDel = {
+                Action: 'DBDel',
+                ActionID: Date.now(),
+                Family: 'blockcaller',
+                Key: element
+              };
 
-              // If mysql has VRS numbers not in asterisk, Add them to asterisk
-              mysqlOnlyCallblock.forEach((element) => {
-                const obj = {
-                  Action: 'DBPut',
-                  ActionID: Date.now(),
-                  Family: 'blockcaller',
-                  Key: element,
-                  Val: 1
-                };
+              ami.action(objDbDel, (errDbDel, _res) => {
+                if (errDbDel) {
+                  logger.error('AMI amiaction error ');
+                  logger.error(JSON.stringify(errDbDel, null, 2));
 
-                ami.action(obj, (err, _res) => {
-                  if (err) {
-                    logger.error('AMI amiaction error ');
-                    logger.error(JSON.stringify(err, null, 2));
-
-                    data.message = '';
-                    io.to(socket.id).emit('sync-callblock-recs', data);
-                  } else {
-                    logger.info(`Added ${element} to asterisk callblock`);
-                  }
-                });
+                  data.message = '';
+                  io.to(socket.id).emit('sync-callblock-recs', data);
+                } else {
+                  logger.info(`Removed ${element} from asterisk callblock`);
+                }
               });
+            });
 
-              // If asterisk has VRS numbers not in mysql, Delete them from asterisk
-              asteriskOnlyCallblock.forEach((element) => {
-                const obj = {
-                  Action: 'DBDel',
-                  ActionID: Date.now(),
-                  Family: 'blockcaller',
-                  Key: element
-                };
-
-                ami.action(obj, (err, _res) => {
-                  if (err) {
-                    logger.error('AMI amiaction error ');
-                    logger.error(JSON.stringify(err, null, 2));
-
-                    data.message = '';
-                    io.to(socket.id).emit('sync-callblock-recs', data);
-                  } else {
-                    logger.info(`Removed ${element} from asterisk callblock`);
-                  }
-                });
-              });
-
-              data.message = 'Success';
-              data.data = result;
-              io.to(socket.id).emit('sync-callblocks-recs', data);
-            } else {
-              data.message = '';
-              io.to(socket.id).emit('sync-callblock-recs', data);
-            }
+            data.message = 'Success';
+            data.data = result;
+            io.to(socket.id).emit('sync-callblocks-recs', data);
+          } else {
+            data.message = '';
+            io.to(socket.id).emit('sync-callblock-recs', data);
           }
         });
       }
     });
   });
 });
-
-// calls sendResourceStatus every minute
-setInterval(sendResourceStatus, 60000);
-setImmediate(initialize);
-
-/**
- * Check resource status
- * @param {type} hosts
- * @param {type} callback
- * @returns {undefined}
- */
-function checkConnection(hosts, callback) {
-  const results = [];
-  const requests = hosts.size;
-
-  hosts.forEach((host, name) => {
-    const parsedurl = url.parse(host, true, true);
-    const { hostname } = parsedurl;
-    let { port } = parsedurl;
-    if (port === null) { port = '80'; }
-    // tests if each address is online
-    tcpp.probe(hostname, port, (err, isAlive) => {
-      if (err) {
-        callback({
-          error: 'An Error Occurred'
-        });
-      } else {
-        // push results to result arrary
-        results.push({
-          name,
-          host,
-          status: isAlive
-        });
-        if (results.length === requests) {
-          // Sort Request by name
-          results.sort((a, b) => {
-            const nameA = a.name.toUpperCase(); // ignore upper and lowercase
-            const nameB = b.name.toUpperCase(); // ignore upper and lowercase
-            if (nameA < nameB) {
-              return -1;
-            }
-            if (nameA > nameB) {
-              return 1;
-            }
-            return 0;
-          });
-          // Callback with results of resource status probes
-          callback({
-            resources: results,
-            timestamp: new Date().getTime()
-          });
-        }
-      }
-    });
-  });
-}
-
-/**
- * Send Resoure status to Management Dashboard
- * @returns {undefined}
- */
-function sendResourceStatus() {
-  const hostMap = new Map();
-  // list of resources to check for status
-  hostMap.set('ACR-CDR', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('acr_cdr:https_listen_port')}`);
-  hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('user_service:port')}`);
-  hostMap.set('ACE Direct', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('ace_direct:https_listen_port')}`);
-
-  hostMap.set('Zendesk', `${getConfigVal('zendesk:protocol')}://${getConfigVal('zendesk:private_ip')}:${getConfigVal('zendesk:port')}/api/v2`);
-  hostMap.set('Agent Provider', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}`);
-
-  checkConnection(hostMap, (data) => {
-    io.to('my room').emit('resource-status', data);
-  });
-
-  const metricsStartDate = 1497916801000;
-  const metricsEndDate = 1498003200000;
-  metrics.createMetrics(mongodb, metricsStartDate, metricsEndDate, (data) => {
-    io.to('my room').emit('metrics', data);
-  });
-}
-
-/**
- * Instantiate connection to Asterisk
- * @returns {undefined} Not used
- */
-function InitAmi() {
-  if (ami === null) {
-    try {
-      ami = new AsteriskManager(parseInt(getConfigVal('asterisk:ami:port'), 10),
-        getConfigVal(ASTERISK_SIP_PRIVATE_IP),
-        getConfigVal('asterisk:ami:id'),
-        getConfigVal('asterisk:ami:passwd'), true);
-
-      ami.keepConnected();
-      ami.on('managerevent', HandleManagerEvent);
-    } catch (exp) {
-      logger.error('Init AMI error ');
-    }
-  }
-}
-
-/**
- * Initialize the AMI connection.
- */
-InitAmi();
 
 /**
  * Send message to the dashboard
@@ -1535,21 +1505,22 @@ function HandleManagerEvent(evt) {
       const agentInt = parseInt(evt.agent, 10);
       if (!a) {
         if (AgentMap.has(agentInt)) {
+          const evtNewAgent = evt;
           logger.debug('Agents: New Agent');
-          evt.name = AgentMap.get(agentInt).name;
-          evt.talktime = 0;
-          evt.holdtime = 0;
-          evt.callstaken = 0;
-          evt.avgtalktime = 0;
-          evt.queue = '--';
-          evt.status = 'Logged Out';
+          evtNewAgent.name = AgentMap.get(agentInt).name;
+          evtNewAgent.talktime = 0;
+          evtNewAgent.holdtime = 0;
+          evtNewAgent.callstaken = 0;
+          evtNewAgent.avgtalktime = 0;
+          evtNewAgent.queue = '--';
+          evtNewAgent.status = 'Logged Out';
 
-          evt.callMap = new Map();
-          for (let i = 0; i < Asterisk_queuenames.length; i += 1) {
-            evt.callMap.set(Asterisk_queuenames[i], 0); // set the total call to 0
+          evtNewAgent.callMap = new Map();
+          for (let i = 0; i < AsteriskQueuenames.length; i += 1) {
+            evtNewAgent.callMap.set(AsteriskQueuenames[i], 0); // set the total call to 0
           }
 
-          Agents.push(evt);
+          Agents.push(evtNewAgent);
         } else {
           // AMI event Agent not in AgentMap
 
@@ -1597,7 +1568,7 @@ function HandleManagerEvent(evt) {
 
         // find the queue associated with this agent complete event
         q = findQueue(evt.queue);
-        const tempQ = findQueueFromStats(evt.queue);
+        // const tempQ = findQueueFromStats(evt.queue);
         // check if this hold time is longer than the corresponding queue's
         // current longest hold time
         const agentHoldTime = (Number(evt.holdtime) / 60).toFixed(2);
@@ -1687,9 +1658,9 @@ function HandleManagerEvent(evt) {
     }
     case 'QueueSummary':
     {
-      for (let j = 0; j < Asterisk_queuenames.length; j += 1) {
+      for (let j = 0; j < AsteriskQueuenames.length; j += 1) {
         // QueueSummary: evt.queue
-        if (evt.queue === Asterisk_queuenames[j]) {
+        if (evt.queue === AsteriskQueuenames[j]) {
           q = findQueue(evt.queue);
           if (!q) {
             q = {
@@ -1777,6 +1748,31 @@ function HandleManagerEvent(evt) {
 }
 
 /**
+ * Instantiate connection to Asterisk
+ * @returns {undefined} Not used
+ */
+function InitAmi() {
+  if (ami === null) {
+    try {
+      ami = new AsteriskManager(parseInt(getConfigVal('asterisk:ami:port'), 10),
+        getConfigVal(ASTERISK_SIP_PRIVATE_IP),
+        getConfigVal('asterisk:ami:id'),
+        getConfigVal('asterisk:ami:passwd'), true);
+
+      ami.keepConnected();
+      ami.on('managerevent', HandleManagerEvent);
+    } catch (exp) {
+      logger.error('Init AMI error ');
+    }
+  }
+}
+
+/**
+ * Initialize the AMI connection.
+ */
+InitAmi();
+
+/**
  * Initiate amiAction
  * @returns {undefined} Not used
  */
@@ -1796,12 +1792,35 @@ function callAmiActions() {
 }
 
 /**
+ * Retrieve agent information from the Provider
+ * @param {type} callback
+ * @returns {undefined} Not used
+ */
+function getAgentsFromProvider(callback) {
+  const urlGetAllAgentRecs = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}/getallagentrecs`;
+  request({
+    url: urlGetAllAgentRecs,
+    json: true
+  }, (err, res, dataIn) => {
+    let data = dataIn;
+    if (err) {
+      logger.error('getAgentsFromProvider ERROR  ');
+      data = {
+        message: 'failed'
+      };
+    } else {
+      callback(data);
+    }
+  });
+}
+
+/**
  * Save agent name and extension in the agentMap
  * @returns {undefined} Not used
  */
 function mapAgents() {
   getAgentsFromProvider((data) => {
-    for (const i in data.data) {
+    Object.keys(data.data).forEach((i) => {
       if (data.data[i].extension) {
         const ext = data.data[i].extension;
         let queues = '--';
@@ -1818,7 +1837,26 @@ function mapAgents() {
         AgentMap.set(ext, usr);
         // console.log(JSON.stringify(AgentMap,undefined,2))
       }
-    }
+    });
+
+    // for (const i in data.data) {
+    //   if (data.data[i].extension) {
+    //     const ext = data.data[i].extension;
+    //     let queues = '--';
+    //     if (data.data[i].queue_name !== null) {
+    //       queues = data.data[i].queue_name;
+    //       if (data.data[i].queue2_name !== null) {
+    //         queues += `, ${data.data[i].queue2_name}`;
+    //       }
+    //     }
+    //     const usr = {
+    //       name: `${data.data[i].first_name} ${data.data[i].last_name}`,
+    //       queues
+    //     };
+    //     AgentMap.set(ext, usr);
+    //     // console.log(JSON.stringify(AgentMap,undefined,2))
+    //   }
+    // }
   });
 }
 
@@ -1843,32 +1881,14 @@ function initialize() {
   }
 }
 
-/**
- * Retrieve agent information from the Provider
- * @param {type} callback
- * @returns {undefined} Not used
- */
-function getAgentsFromProvider(callback) {
-  const url = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}/getallagentrecs`;
-  request({
-    url,
-    json: true
-  }, (err, res, data) => {
-    if (err) {
-      logger.error('getAgentsFromProvider ERROR  ');
-      data = {
-        message: 'failed'
-      };
-    } else {
-      callback(data);
-    }
-  });
-}
+// calls sendResourceStatus every minute
+setInterval(sendResourceStatus, 60000);
+setImmediate(initialize);
 
 app.use((err, req, res, next) => {
   if (err.code !== 'EBADCSRFTOKEN') return next(err);
   // handle CSRF token errors here
-  res.status(200).json({
+  return res.status(200).json({
     message: 'Form has been tampered'
   });
 });
@@ -1883,11 +1903,12 @@ app.use((err, req, res, next) => {
  * @returns {undefined} Not used
  */
 function getUserInfo(username, callback) {
-  const url = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}/getagentrec/${username}`;
+  const urlGetAgentRec = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}/getagentrec/${username}`;
   request({
-    url,
+    url: urlGetAgentRec,
     json: true
-  }, (error, response, data) => {
+  }, (error, response, dataIn) => {
+    let data = dataIn;
     if (error) {
       logger.error(`login ERROR: ${error}`);
       data = {
@@ -1907,12 +1928,14 @@ function getUserInfo(username, callback) {
  */
 app.use((req, res, next) => {
   if (req.path === nginxPath || req.path === '/agentassist') {
-    return next();
-  } if (req.path === '/logout') {
-    return next();
-  } if (req.session !== null && req.session.data) {
+    next();
+  } else if (req.path === '/logout') {
+    next();
+  } else if (req.session !== null && req.session.data) {
     if (req.session.data !== null && req.session.data.uid) {
-      if (req.session.role) { return next(); } // user is logged in go to next()
+      if (req.session.role) {
+        return next(); // user is logged in go to next()
+      }
 
       const username = req.session.data.uid;
       getUserInfo(username, (user) => {
@@ -1922,12 +1945,13 @@ app.use((req, res, next) => {
           req.session.username = user.data[0].username;
           return next();
         }
-        res.redirect('./');
+        return res.redirect('./');
       });
     }
   } else {
-    res.redirect(`.${nginxPath}`);
+    return res.redirect(`.${nginxPath}`);
   }
+  return null;
 });
 
 /**
@@ -1967,7 +1991,7 @@ app.use('/', require('./routes'));
  * @param {function} 'agent.shield(cookieShield)'
  * @param {type} param2 Not used
  */
-app.get('/resetAllCounters', agent.shield(cookieShield), () => {
+app.get('/resetAllCounters', policyAgent.shield(cookieShield), () => {
   logger.info('GET Call to reset counters');
   resetAllCounters();
   mapAgents();
@@ -1985,9 +2009,9 @@ app.get('/getVideomail', (req, res) => {
   console.log(`id: ${videoId}`);
 
   // Wrap in mysql query
-  dbConnection.query('SELECT video_filepath AS filepath, video_filename AS filename FROM videomail WHERE id = ?', videoId, (err, result) => {
-    if (err) {
-      console.log('GET VIDEOMAIL ERROR: ', err.code);
+  dbConnection.query('SELECT video_filepath AS filepath, video_filename AS filename FROM videomail WHERE id = ?', videoId, (errQuery, result) => {
+    if (errQuery) {
+      console.log('GET VIDEOMAIL ERROR: ', errQuery.code);
     } else {
       try {
         const videoFile = result[0].filepath + result[0].filename;
