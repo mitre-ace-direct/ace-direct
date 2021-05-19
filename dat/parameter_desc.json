@@ -12,10 +12,7 @@
     }
   },
   "signaling_server": {
-      "proto": "(if no nginx) protocol (e.g., wss) of signaling server",
-      "public": "(if no nginx) FQDN:port of signaling server", 
-      "port": "(if no nginx) port number of signaling server",
-      "dev_url": "(preferred way) nginx path of personal signaling server (DEV) or empty string (PROD). See the /acedirect-kurento/ route in /etc/nginx/nginx.conf on the portal.domain.com server"
+      "url": "nginx path of personal signaling server. See the /acedirect-kurento/ route in /etc/nginx/nginx.conf on the portal.domain.com server"
   },
   "media_server": {
     "privacy_video_url": "file location of privacy video file on the Kurento media server"
