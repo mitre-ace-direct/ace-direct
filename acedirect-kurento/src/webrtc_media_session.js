@@ -203,7 +203,8 @@ class WebRTCMediaSession extends Events {
     const simplePartList = [];
     this._participants.forEach(p => {
       const { ext, type, onHold } = p;
-      simplePartList.push({ ext, type, onHold });
+      const isAgent = (type == "participant:webrtc") ? p.session._isAgent : false;
+      simplePartList.push({ ext, type, onHold, isAgent });
     });
     this._participants.forEach(p => {
       if (p.type === PARTICIPANT_TYPE_WEBRTC && p.session
@@ -231,8 +232,8 @@ class WebRTCMediaSession extends Events {
     // Here we pass an optional custom codec to force a specific codec in the WebRTC leg different than the RTP leg
     offer = this.filterCodecs(offer, customWebrtcCodec);
     if (bitrates && bitrates.video) {
-      if (bitrates.video.max) await webrtc.setMaxVideoSendBandwidth(bitrates.video.max);
-      if (bitrates.video.min) await webrtc.setMinVideoSendBandwidth(bitrates.video.min);
+      if (bitrates.video.max) await webrtc.setMaxVideoRecvBandwidth(bitrates.video.max);
+      if (bitrates.video.min) await webrtc.setMinVideoRecvBandwidth(bitrates.video.min);
     }
     debug('WEBRTC FILTERED OFFER, with specified preferred video codec: ' + this._videoCodec);
     debug(offer);
@@ -382,7 +383,8 @@ class WebRTCMediaSession extends Events {
     rtp.on('Error', (error) => {
       debug(`RTPEndpoint ${ext} error: ${error}`);
     });
-    await rtp.setOutputBitrate(this._rtp_max_bitrate * 1000);
+    await rtp.setMaxOutputBitrate(this._rtp_max_bitrate * 1000);
+    await rtp.setMinOutputBitrate(this._rtp_min_bitrate * 1000);
     const p = this._participants.get(ext);
     if (p) {
       debug('EXTRA, connect audio only');
@@ -617,18 +619,14 @@ class WebRTCMediaSession extends Events {
     if (!p) {
       throw new Error(`No participant registered for ${ext}`);
     }
-
-    // disconnect asterisk queue finding extension
-    // and return to use webrtc directly
-    // REMOVED: return to fix ace quill audio issues
-    if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0) {
-      debug(`${ext} Re-invite`, offer);
-      await this.leave(ext, true);
-      return; //Eric delete this return and get the latest from develop. this was fixed in the latest code. do not merge this into git.
-    }
-
     const rtp = await this._createRtpEndpoint();
-    if (this.isMultiparty) {
+    if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0){
+      // disconnect asterisk queue finding extension
+      await this.leave(ext, true);
+      const other = this.oneToOnePeer(ext);
+      await other.endpoint.connect(rtp);
+      await rtp.connect(other.endpoint);
+    } else if (this.isMultiparty) {
       await replaceMediaEl(p.port, p.endpoint, rtp);
     } else {
       const other = this.oneToOnePeer(ext);

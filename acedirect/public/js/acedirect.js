@@ -32,7 +32,8 @@ var filter = "ALL";
 var telNumber;
 var playingVideomail = false;
 var acekurento;
-var privacy_video_url = null;
+var privacy_video_url = window.location.origin + "/" + nginxPath + "/media/videoPrivacy.webm";
+var calibrate_video_url = window.location.origin + "/" + nginxPath + "/media/calibrate.webm";
 var recipientNumber;
 //Used for tracking new videomail
 var storedData = document.getElementById("unread-mail-count").innerHTML;
@@ -45,6 +46,10 @@ var direction;
 var duration;
 var callDate;
 var endpoint;
+var meterelem = null;
+var meterelemval = null;
+var packetsLostElem = null;
+var packetsLostValElem = null;
 
 //shortcut table variables
 var originalShortcuts = [];
@@ -61,11 +66,42 @@ var isChatListOpen = false;
 var isAgentChatSaved;
 var tempSavedMessages = [[]];
 
+//transfer call variables
+var isTransfer = false;
+var originalExt;
+var transferExt;
+var transferVRS;
+var transferAccepted = false;
+var isColdTransfer;
+
+// multiparty hangup variables
+var hostAgent;
+var backupHostAgent;
+var transitionExt;
+var transitionAgent;
+
+var autoAnswer= false;
+var multipartyTransition = false;
+var isMultipartyTransfer = false;
+var allAgentCall = false;
+
 setInterval(function () {
 	busylight.light(this.agentStatus);
 }, 2000);
 
 $(document).ready(function () {
+        
+        // connection elements
+        meterelem = document.getElementById('speedMeter');
+        meterelemval = document.getElementById('speedval');
+        packetsLostElem = document.getElementById('packets-lost-a');
+        packetsLostValElem = document.getElementById('connection-packets-lost');
+        meterelem.high = fpsHigh;
+        meterelem.low = fpsLow; 
+        meterelem.max = fpsMax; 
+        meterelem.min = fpsMin
+        meterelem.optimum = fpsOptimum;
+
 	connect_socket();
 	$("#debugtab").hide();
 	$('#scriptstab').hide();
@@ -103,6 +139,9 @@ $(document).ready(function () {
 	}
 
 	enable_persist_view();
+	$('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
+		alignDataTableHeaders();
+	 });
 });
 
 function connect_socket() {
@@ -178,8 +217,6 @@ function connect_socket() {
 					$("#pc_config").attr("name", "stun:" + payload.stunServer);
 					$("#complaints-queue-num").text(payload.complaint_queue_count);
 					$("#general-queue-num").text(payload.general_queue_count);
-
-                                        privacy_video_url = payload.privacy_video_url;
 					signalingServerPublic = document.getElementById("signaling_server_public");
 					signalingServerPort = document.getElementById("signaling_server_port");
 
@@ -279,6 +316,10 @@ function connect_socket() {
 				}).on('new-caller-complaints', function (endpoint_type) {
 					// a new complaints caller has connected
 					debugtxt('new-caller-complaints', data);
+					if(isTransfer && !transferVRS) {
+					    //provider call bring transferred
+						endpoint_type = "Provider_Complaints";
+					}
 					$('#duration').timer('reset');
 					inCallADComplaints(endpoint_type);
 				}).on('no-ticket-info', function (data) {
@@ -298,6 +339,10 @@ function connect_socket() {
 						changeStatusIcon(wrap_up_color, "wrap-up", wrap_up_blinking);
 						changeStatusLight('WRAP_UP');
 						socket.emit('chat-leave-ack', data);
+					} else {
+						// consumer left multiparty call-- agents still in call together
+						socket.emit('chat-leave-ack', data);
+					  	clearScreen();
 					}
 				}).on('chat-message-new', function (data) {
 					debugtxt('chat-message-new', data);
@@ -374,6 +419,7 @@ function connect_socket() {
 							"<tr><td>Name</td>" +
 							"<td>Extension</td>" +
 							"<td>Status</td>" +
+							"<td>Transfer Call</td>" + 
 							"<td>Multi-Party Invite</td>"+
 							"<td>Chat</td></tr>"
 						);
@@ -427,6 +473,11 @@ function connect_socket() {
 									sBlinking = missed_call_blinking;
 									statusTxt = "Missed Call";
 									break;
+								case "TRANSFERRED_CALL":
+									sColor = transferred_call_color;
+									sBlinking = transferred_call_blinking;
+									statusTxt = "Transfer Call";
+									break;
 								default:
 									sColor = "gray";
 									statusTxt = "Unknown";
@@ -450,6 +501,7 @@ function connect_socket() {
 								"name": data.agents[i].name,
 								"extension": data.agents[i].extension,
 								"queues": queues,
+								"transferCall": transferAvailability(data.agents[i].status, data.agents[i].name, data.agents[i].extension),
 								"multipartyInvite" : (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != data.agents[i].name)
 								? "<Button class=\"demo-btn\" onClick=multipartyinvite(" + data.agents[i].extension + ")><i class=\"fa fa-users\"></i></Button>"
 								: "<Button class=\"secondary\" disabled><i class=\"fa fa-users\"></i></Button>",
@@ -473,27 +525,78 @@ function connect_socket() {
 						if (tabledata.data.length > 0) {
 							$('#agenttable').dataTable().fnAddData(tabledata.data);
 						}
+						alignDataTableHeaders();	
 					}
 				}).on('new-caller-ringing', function (data) {
 					debugtxt('new-caller-ringing', data);
 					$('#myRingingModal').addClass('fade');
-					changeStatusLight('INCOMING_CALL');
-					changeStatusIcon(incoming_call_color, "incoming-call", incoming_call_blinking);
-					$('#user-status').text('Incoming Call');
-					if(data.phoneNumber){
-						$('#myRingingModalPhoneNumber').html(data.phoneNumber);
-						recipientNumber = data.phoneNumber;
-						callerNumber = data.phoneNumber;
-					} else{
-						$('#myRingingModalPhoneNumber').html(data.callerNumber);
+
+					if (isTransfer) {
+						//automatically accept the incoming call so the agent doesn't have to do it twice
+						
+						if(data.phoneNumber){
+							$('#myRingingModalPhoneNumber').html(data.phoneNumber);
+							recipientNumber = data.phoneNumber;
+							callerNumber = data.phoneNumber;
+						} else{
+							$('#myRingingModalPhoneNumber').html(data.callerNumber);
+						}
+						
+						$('#myRingingModal').modal({
+							show: false,
+							backdrop: 'static',
+							keyboard: false
+						});
+
+						if (data.vrs) {
+							//get the consumer vrs
+							$('#callerPhone').val(data.vrs);
+						}
+
+						setTimeout(() => {
+							$('#accept-btn').trigger('click');
+						}, 1000);
+					} else {
+						$('#incoming-header').html('Incoming Call');
+						changeStatusLight('INCOMING_CALL');
+						changeStatusIcon(incoming_call_color, "incoming-call", incoming_call_blinking);
+						$('#user-status').text('Incoming Call');
+						if(data.phoneNumber){
+							$('#myRingingModalPhoneNumber').html(data.phoneNumber);
+							recipientNumber = data.phoneNumber;
+							callerNumber = data.phoneNumber;
+						} else{
+							$('#myRingingModalPhoneNumber').html(data.callerNumber);
+						}
+						if (autoAnswer) {
+							console.log('autoAnswer')
+							// multiparty transition
+							$('#myRingingModal').modal({
+								show: false,
+								backdrop: 'static',
+								keyboard: false
+								});
+								setTimeout(() => {
+									$('#accept-btn').trigger('click');
+								}, 1000);
+								autoAnswer = false;
+						} else {
+							// standard incoming call
+							$('#myRingingModal').modal({
+							show: true,
+							backdrop: 'static',
+							keyboard: false
+							});
+
+							if (data.vrs) {
+								console.log('webrtc call');
+								//get the consumer vrs
+								$('#callerPhone').val(data.vrs);
+							}
+						}
+						//Did come with null
+						socket.emit('incomingcall', null);
 					}
-					$('#myRingingModal').modal({
-						show: true,
-						backdrop: 'static',
-						keyboard: false
-					});
-					//Did come with null
-					socket.emit('incomingcall', null);
 				}).on('new-missed-call', function (data) {
 					maxMissedCalls = data.max_missed;
 					if (maxMissedCalls == '') {
@@ -602,10 +705,11 @@ function connect_socket() {
 						updateCaptions(transcripts); // in jssip_agent.js
 					}
 				}).on('multiparty-caption', function (transcripts) {
-					console.log(JSON.stringify(transcripts))
+					// console.log(JSON.stringify(transcripts))
 					socket.emit('translate-caption', {
 						"transcripts": transcripts,
-						"callerNumber": extensionMe
+						"callerNumber": extensionMe,
+						"displayname": transcripts.displayname
 					});
 				}).on('new-agent-chat', function(data) {
 					var count = 0;
@@ -815,7 +919,6 @@ function connect_socket() {
 				}).on('enable-translation', function() {
 					$('.language-select-li').show();
 					$("#language-select").msDropDown();
-
 				}).on('gotRecordingURL', function(data) {
 					console.log("Assigning file " + data.file);
 					const blob = new Blob([data.file]);
@@ -823,6 +926,83 @@ function connect_socket() {
 					//remoteView.setAttribute("content", "media-src 'self' blob: data:;");
 					remoteView.setAttribute("src", url);
 					//remoteView.setAttribute("src", './getVideomail?fileName=rec_33003_20210331_200114.mp4');
+				}).on('receiveTransferInvite', function(data) {
+					isTransfer = true;
+					originalExt = data.originalExt;
+					transferVRS = data.vrs;
+					transferExt = data.transferExt;
+                    
+					$('#modalTransferCall').show();
+					$('#modalTransferCall').addClass('fade');
+					$('#incomingTransferExtension').html(data.originalExt)
+					$('#modalTransferCall').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+					changeStatusLight('TRANSFERRED_CALL');
+					changeStatusIcon(transferred_call_color, "transferred_call", transferred_call_blinking);
+					$('#user-status').text('Transfer Call');
+					socket.emit('incomingtransferredcall', null);
+				}).on('transferDenied', function() {
+                    if ($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#shortcuts-tab').hasClass('active')) {
+                        $('#agents-btn').trigger('click');
+                    }
+                    showAlert('info', 'Transfer Denied. Please try again.');
+                    //reset transfer variables
+					$('#transferExtension').val('');
+                    isTransfer = false;
+					originalExt = null;
+					transferVRS = null;
+					transferAccepted = false;
+					isColdTransfer = false;
+                }).on('beginTransfer', function() {
+					// initiate the call transfer in the signaling server
+					if (isColdTransfer) {
+						acekurento.callTransfer(transferExt.toString(), true);
+					} else {
+						// warm transfers are multiparty calls
+						multipartyinvite(transferExt);
+					}
+				}).on('transferJoined', function() {
+
+                    //close the sidebar if it's open
+                    if ($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#shortcuts-tab').hasClass('active')) {
+                        $('#agents-btn').trigger('click');
+					}
+
+					showTransferModal = true;
+					if (isColdTransfer) {
+						//we terminate the call for the original agent
+						terminate_call();
+						socket.emit('call-ended', {'agentExt': extensionMe}); //stop allowing file share between consumer and original agent
+					} else {
+						console.log('warm transfer success!')
+					}
+                }).on ('multiparty-transfer', function(data) {
+					// backup host is becoming the new host of the call
+					multipartyCaptionsEnd();
+					
+					isTransfer = true;
+					isMultipartyTransfer = true;
+					hostAgent = extensionMe;
+					transitionAgent = data.transitionAgent;
+					transferVRS = data.vrs;
+
+					$('#multipartyTransitionModal').modal('show');
+					$('#multipartyTransitionModal').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
+				}).on('multiparty-reinvite', function(){
+					// transition agent
+					autoAnswer = true;
+					multipartyTransition = true;
+					terminate_call();
+					$('#multipartyTransitionModal').modal('show');
+					$('#multipartyTransitionModal').modal({
+						backdrop: 'static',
+						keyboard: false
+					});
 				});
 
 			} else {
@@ -852,6 +1032,9 @@ $('#agenttable').DataTable({
 			"mDataProp": "queues"
 		},
 		{
+            "mDataProp": "transferCall"
+        },
+		{
 			"mDataProp": "multipartyInvite"
 		},
 		{
@@ -861,8 +1044,19 @@ $('#agenttable').DataTable({
 	searching: false,
 	paging: false,
 	scrollY: 600,
+	scrollX: '100%',
 	order: []
 });
+
+function alignDataTableHeaders() {
+	$($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+}
+
+function transferAvailability(status, name, ext) {
+	return (status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != name) 
+  	? '<Button class=\"demo-btn\" onClick="getTransferType(' + ext + ')"><i class=\"fa fa-share-square\"></i></Button>' 
+	: "<Button class=\"secondary\" disabled><i class=\"fa fa-share-square\"></i></Button>"
+}
 
 $("#ivrsnum").keyup(function (event) {
 	if (event.keyCode === 13) {
@@ -1120,7 +1314,7 @@ function inCallADComplaints(endpoint_type) {
 		$('#remoteView').css('object-fit', ' contain');
 
 		//allow file sharing
-		socket.emit('begin-file-share', {'vrs': vrs});
+		socket.emit('begin-file-share', {'vrs': vrs, 'agentExt': extensionMe});
 	}
 
 
@@ -1154,7 +1348,7 @@ function inCallADGeneral(endpoint_type) {
 		$('#remoteView').css('object-fit', ' contain');
 
 		//allow file sharing
-		socket.emit('begin-file-share', {'vrs': vrs});
+		socket.emit('begin-file-share', {'vrs': vrs, 'agentExt': extensionMe});
 	}
 }
 
@@ -1221,6 +1415,7 @@ function clearScreen() {
 	$('#ticketTab').removeClass("bg-pink");
 	clearInterval(ticketTabFade);
 
+	$('#modalWrapupTransfer').modal('hide');
 	$('#modalWrapup').modal('hide');
 	$('#modalOutboundCall').modal('hide');
 
@@ -1229,6 +1424,8 @@ function clearScreen() {
 	$('#fileInput').val('');
 	$('#fileSent').hide();
 	$('#fileSentError').hide();
+
+	$('#transferExtension').val('');
 }
 
 function changeStatusLight(state) {
@@ -1275,6 +1472,23 @@ function updateColors(data) {
 		return (className.match(/\bbtn-\S+/g) || []).join(' ');
 	});
 	$("#wrapup-color").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+
+	//remove colors from transfer wrapup modal 
+	$("#away-btn-transfer").removeClass(function (index, className) {
+		return (className.match(/\bbtn-\S+/g) || []).join(' ');
+	});
+	$("#away-color-transfer").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	$("#ready-color-transfer").removeClass(function (index, className) {
+		return (className.match(/\btext-\S+/g) || []).join(' ');
+	});
+	$("#ready-btn-transfer").removeClass(function (index, className) {
+		return (className.match(/\bbtn-\S+/g) || []).join(' ');
+	});
+	$("#wrapup-color-transfer").removeClass(function (index, className) {
 		return (className.match(/\btext-\S+/g) || []).join(' ');
 	});
 
@@ -1347,6 +1561,16 @@ function updateColors(data) {
 	else $('#ready-color').addClass("text-" + ready_color);
 	$('#away-btn').addClass("btn-" + away_color);
 	$('#ready-btn').addClass("btn-" + ready_color);
+
+	//add colors to transfer wrapup modal
+	if (wrap_up_color === "white") $('#wrapup-color-transfer').addClass("text-gray");
+	else $('#wrapup-color-transfer').addClass("text-" + wrap_up_color);
+	if (away_color === "white") $('#away-color-transfer').addClass("text-gray");
+	else $('#away-color-transfer').addClass("text-" + away_color);
+	if (ready_color === "white") $('#ready-color-transfer').addClass("text-gray");
+	else $('#ready-color-transfer').addClass("text-" + ready_color);
+	$('#away-btn-transfer').addClass("btn-" + away_color);
+	$('#ready-btn-transfer').addClass("btn-" + ready_color);
 
 	//add new color to status-icon element
 	if ($("#status-icon").hasClass("currently-away")) changeStatusIcon(away_color, "away", away_blinking);
@@ -2604,6 +2828,26 @@ function multipartyModal(){
 	})
 }
 
+function transferResponse(isAccepted) {
+	$('#modalTransferCall').hide();
+
+	if (!isAccepted) {
+		socket.emit('denyingTransfer', {'originalExt':originalExt})
+		unpauseQueues();
+	 
+		isTransfer = false;
+		originalExt = null;
+		transferExt = null;
+		transferVRS = null;
+		transferAccepted = false;
+	} else {
+		socket.emit('transferInviteAccepted', {
+			'originalExt': originalExt,
+			'transferVRS': transferVRS
+		});
+	}
+}
+
 //Check if status needs to be changed
 $('#accept-btn').click(function () {
 	$('#user-status').text('In Call');
@@ -2637,6 +2881,8 @@ $("#accept-btn").click(function () {
 $("#decline-btn").click(function () {
 	$('#myRingingModalPhoneNumber').html('');
 	$('#myRingingModal').modal('hide');
+	unpauseQueues();
+	$('#callerPhone').val('');
 });
 
 //Dialpad functionality
