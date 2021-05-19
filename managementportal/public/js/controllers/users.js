@@ -9,8 +9,12 @@ $(document).ready(() => {
     order: [],
     columnDefs: [{
       targets: [0],
+      data: 'userId',
       visible: false,
       searchable: false
+    }, {
+      targets: [3],
+      data: 'username'
     }, {
       targets: [4],
       render(data, _type, _row) {
@@ -57,17 +61,17 @@ $(document).ready(() => {
     // console.log("checkbox data: " + data.selected);
   });
 
-  $('#usertable tbody').on('click', 'td', function () {
+  $('#usertable tbody').on('click', 'td', function ClickOnRow() {
     const data = table.row($(this).parents('tr')).data();
     const col = table.cell(this).index().column;
     // console.log("cell clicked with col: " + col + " data: " + JSON.stringify(data));
 
     if (col !== 5) { // do not load agent info if the clicked cell is the checkbox
-      const url = `./GetAgent/${data[3]}`;
+      const url = `./GetAgent/${data.username}`;
       console.log(`GetAgent url: ${url}`);
-      selectedUser = data[0];
+      selectedUser = data.userId;
       $.get('./GetAgent', {
-        username: data[3]
+        username: data.username
       },
       (result, _status) => {
         console.log(`GetAgent returned: ${JSON.stringify(result)}`);
@@ -106,9 +110,10 @@ $(document).ready(() => {
     const pass = $('#inputPassword').val();
     const pass2 = $('#inputPassword2').val();
     if (pass !== pass2) {
-      alert('Re-entered password does not match!');
+      $('#passwordMatchError').attr('hidden', false);
       return;
     }
+    $('#passwordMatchError').attr('hidden', true);
 
     $.post('./AddAgent', {
       username: $('#inputUsername').val(),
@@ -124,11 +129,13 @@ $(document).ready(() => {
     },
     (data, _status) => {
       if (data.result === 'success') {
-        console.log('Saved!!!!');
-        location.reload();
+        // console.log('Saved!!!!');
+        $('#actionError').attr('hidden', true);
+        window.location.reload();
       } else {
-        console.log(`POST failed: ${JSON.stringify(data)}`);
-        alert(data.message);
+        // console.log(`POST failed: ${JSON.stringify(data)}`);
+        $('#errorMessage').text(' Add agent');
+        $('#actionError').attr('hidden', false);
       }
     });
   });
@@ -156,44 +163,15 @@ $(document).ready(() => {
     },
     (data, _status) => {
       if (data.result === 'success') {
-        console.log(`POST succ: ${JSON.stringify(data)}`);
-        location.reload();
+        // console.log(`POST succ: ${JSON.stringify(data)}`);
+        $('#actionError').attr('hidden', true);
+        window.location.reload();
       } else {
-        console.log(`POST failed: ${JSON.stringify(data)}`);
-        alert(data.message);
+        // console.log(`POST failed: ${JSON.stringify(data)}`);
+        $('#errorMessage').text(' Update agent');
+        $('#actionError').attr('hidden', false);
       }
     });
-  });
-
-  $('#delete_user_btn').on('click', () => {
-    getBulkDeleteAgentList();
-    $('#confirm-bulk-delete').modal();
-  });
-
-  $('#bulk_delete_btn').on('click', (event) => {
-    event.preventDefault();
-
-    const data = table.rows().data();
-    data.each((value, _index) => {
-      if (value.selected === 1) {
-        // console.log("Bulk delete: checked at index: ", index)
-        // console.log("agent id checked is: " + value[0] + " agent username is: " + value[3]);
-
-        // Issue delete at backend
-        $.post('./DeleteAgent', {
-          id: value[0],
-          username: value[3]
-        },
-        (data, _status) => {
-          if (data.result !== 'success') {
-            console.log(`DeleteAgent ${value[3]} failed: ${JSON.stringify(data)}`);
-            alert(data.message);
-          }
-        });
-      }
-    });
-
-    location.reload();
   });
 
   function getBulkDeleteAgentList() {
@@ -204,14 +182,52 @@ $(document).ready(() => {
     data.each((value, _index) => {
       if (value.selected === 1) {
         // console.log("Bulk delete: checked at index: ", index)
-        // console.log("agent id checked is: " + value[0] + " agent username is: " + value[3]);
-        agentNames += `  ${value[3]}`;
+        // console.log("agent id checked is: " + value[0]
+        // + " agent username is: " + value.username);
+        agentNames += `  ${value.username}`;
       }
     });
 
     // present dynamically generated agentlist
     document.getElementById('agentlist').innerHTML = agentNames;
   }
+
+  $('#delete_user_btn').on('click', () => {
+    getBulkDeleteAgentList();
+    $('#confirm-bulk-delete').modal();
+  });
+
+  $('#bulk_delete_btn').on('click', (event) => {
+    event.preventDefault();
+
+    const tableData = table.rows().data();
+    tableData.each((value, _index) => {
+      if (value.selected === 1) {
+        // console.log("Bulk delete: checked at index: ", index)
+        // console.log("agent id checked is: " + value.userId
+        // + " agent username is: " + value.username);
+
+        // Issue delete at backend
+        $.post('./DeleteAgent', {
+          id: value.userId,
+          username: value.username
+        },
+        (data, _status) => {
+          if (data.result === 'success') {
+            // console.log(`POST succ: ${JSON.stringify(data)}`);
+            $('#actionError').attr('hidden', true);
+            window.location.reload();
+          } else {
+            // console.log(`DeleteAgent ${value.username} failed: ${JSON.stringify(data)}`);
+            $('#errorMessage').text(' Delete agent');
+            $('#actionError').attr('hidden', false);
+          }
+        });
+      }
+    });
+
+    window.location.reload();
+  });
 });
 
 function addUserModal() {
@@ -228,6 +244,10 @@ function addUserModal() {
   $('#inputPassword2').prop('disabled', false);
 }
 
+$('#add_user_btn').on('click', () => {
+  addUserModal();
+});
+
 function deleteUser() {
   $.post('./DeleteAgent', {
     id: selectedUser,
@@ -235,11 +255,15 @@ function deleteUser() {
   },
   (_data, _status) => {
     console.log('Deleted!!!!');
-    location.reload();
+    window.location.reload();
   });
 }
 
-$('.glyphicon-eye-open').on('mouseover mouseout', function (_e) {
+$('#delete_user_confirm_btn').on('click', () => {
+  deleteUser();
+});
+
+$('.glyphicon-eye-open').on('mouseover mouseout', function MouseOnEyeOpen(_e) {
   $(this).toggleClass('glyphicon-eye-close');
   const field = $(this).parent().children('input');
   const type = $(field).attr('type');

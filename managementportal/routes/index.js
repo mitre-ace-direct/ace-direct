@@ -108,6 +108,22 @@ router.get('/report', agent.shield(cookieShield), (req, res) => {
 });
 
 /**
+ * Handles a GET request for /webrtcstats. Checks user has
+ * a valid session and displays report page.
+ *
+ * @param {string} '/webrtcstats'
+ * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} function(req, res)
+ */
+router.get('/webrtcstats', agent.shield(cookieShield), (req, res) => {
+  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
+    res.render('pages/webrtcstats');
+  } else {
+    res.redirect('./');
+  }
+});
+
+/**
  * Handles a GET request for /videomail. Checks user has
  * a valid session and displays videomail page.
  *
@@ -196,7 +212,8 @@ function getAgentInfo(username, callback) {
   request({
     url,
     json: true
-  }, (error, response, data) => {
+  }, (error, response, dataIn) => {
+    let data = dataIn;
     if (error) {
       logger.error(`login ERROR: ${error}`);
       data = {
@@ -352,7 +369,7 @@ function openAMOperation(openAMAgentInfo) {
       }, (error, response, data) => {
         if (error) {
           logger.error(`openAM ERROR: ${error}`);
-          reject('openAM login failed');
+          reject(new Error('openAM login failed'));
         } else {
           logger.info('openAM no error');
           logger.debug(`openam call data: ${JSON.stringify(data)}`);
@@ -615,7 +632,7 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
 router.post('/UpdateAgent', agent.shield(cookieShield), (req, res) => {
   const agentId = req.body.agent_id;
   const { username } = req.body;
-  const { password } = req.body;
+  // const { password } = req.body; // Password is not changable now.
   const firstName = req.body.first_name;
   const lastName = req.body.last_name;
   const { email } = req.body;
