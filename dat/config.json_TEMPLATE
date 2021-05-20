@@ -273,5 +273,9 @@
   },
   "filesharing": {
     "virus_scan_enabled": "false"
+  },
+  "awsACE": {
+    "recording_bucket": "Bucket-name",
+    "recording_proxy": "http://0.0.0.0:1234"
   }
 }
