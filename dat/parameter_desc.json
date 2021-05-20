@@ -38,6 +38,13 @@
       "protocol": "wss",
       "path": "This is the acedirect-kurento route in /etc/nginx/nginx.conf on the portal.domain.com server"
   },
+  "nginx": {
+    "port": "NGINX server port number",    
+    "ad_path": "customizable NGINX path for agent/consumer portals",
+    "mp_path": "customizable NGINX path for management portal",
+    "agent_route": "customizable route for agent portal url",
+    "consumer_route": "customizable route for consumer portal url"
+  },  
   "media_server": {
     "privacy_video_url": "file location of privacy video file on the Kurento media server"
   },
@@ -153,14 +160,7 @@
   "caption_mode" : {
     "agent": "Enable captions for the agent portal",
     "consumer" : "Enable captions for the consumer portal"
-  },
-  "nginx": {
-    "port": "NGINX server port number",    
-    "ad_path": "customizable NGINX path for agent/consumer portals",
-    "mp_path": "customizable NGINX path for management portal",
-    "agent_route": "customizable route for agent portal url",
-    "consumer_route": "customizable route for consumer portal url"
-  },  
+  }, 
   "openam": {
     "path": "OpenAM web path as specified in the OpenAM installation",
     "user": "openAM admin user name from the OpenAM installation",
