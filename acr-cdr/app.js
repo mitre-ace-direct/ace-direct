@@ -120,7 +120,7 @@ logger.fatal('FATAL messages enabled.');
 logger.info(`Using config file:  ${cfile}`);
 
 const listenPort = parseInt(getConfigVal('acr_cdr:https_listen_port'), 10);
-const dbHost = getConfigVal('database_servers:mysql:host');
+const dbHost = getConfigVal('servers:mysql:fqdn');
 const dbUser = getConfigVal('database_servers:mysql:user');
 const dbPassword = getConfigVal('database_servers:mysql:password');
 const dbName = getConfigVal('database_servers:mysql:cdr_database_name');
