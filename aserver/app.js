@@ -133,7 +133,7 @@ if (debugLevel === 'DEBUG') {
 
 // Create MySQL connection and connect to it
 connection = mysql.createConnection({
-  host: getConfigVal('database_servers:mysql:host'),
+  host: getConfigVal('servers:mysql:fqdn'),
   user: getConfigVal('database_servers:mysql:user'),
   password: getConfigVal('database_servers:mysql:password'),
   database: getConfigVal('database_servers:mysql:ad_database_name')
@@ -145,7 +145,7 @@ setInterval(() => {
 }, 60000);
 
 const asterisk = new AsteriskManager(parseInt(getConfigVal('asterisk:ami:port'), 10),
-  getConfigVal('asterisk:sip:private_ip'),
+  getConfigVal('servers:asterisk:private_ip'),
   getConfigVal('asterisk:ami:id'),
   getConfigVal('asterisk:ami:passwd'), true);
 asterisk.keepConnected();
