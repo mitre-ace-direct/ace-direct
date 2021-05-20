@@ -14,7 +14,7 @@ const AWS = require('aws-sdk');
 AWS.config.update({
   region: 'us-east-1',
   httpOptions: {
-    agent: proxy('http://10.202.1.215:3128')
+    agent: proxy(param('awsACE.recording_proxy'))
   }
 });
 var s3 = new AWS.S3();
@@ -32,9 +32,9 @@ class RecordingManager extends Events {
     });
     //debug('Created recording for %s: %s', peer, id);
     //Custom logic to try uploading the recording to the s3 bucket
-    var uploadParams = {Bucket: '***REMOVED***-recordings', Key: filename, Body: ""};
+    var uploadParams = {Bucket: param('awsACE.recording_bucket'), Key: filename, Body: ""};
 
-    let fileRequest = 'http://172.21.1.155:3000/recordings/' + filename;
+    let fileRequest = param('awsACE.uploadURL') + filename;
     const filepath = 'media/' + filename;
     let record = fs.createWriteStream(filepath);
     request(fileRequest).pipe(record);
@@ -53,31 +53,6 @@ class RecordingManager extends Events {
       });
     });
 }
-
-  static async upload(filename){
-    var uploadParams = {Bucket: '***REMOVED***-recordings', Key: filename, Body: ""};
-    var request = require('request');
-    request.get('http://172.21.1.155:3000/recordings/'+filename, function(err, res, body){
-      console.log("Running s3 upload");
-      uploadParams.Body = body;
-      // call S3 to retrieve upload file to specified bucket
-      s3.upload (uploadParams, function (err, data) {
-        if (err) {
-          console.log("Error", err);
-        } if (data) {
-          console.log("Upload Success", data.Location);
-          var params = { 
-            Bucket: '***REMOVED***-recordings'
-          }
-
-          s3.listObjects(params, function (err, data) {
-            if(err)throw err;
-              console.log(data);
-          });
-        }
-      });
-    })
-  }
 
   static async listRecordings({ peer = null, session_id = null, date_interval = null, start = 0 }) {
     const where = {};
