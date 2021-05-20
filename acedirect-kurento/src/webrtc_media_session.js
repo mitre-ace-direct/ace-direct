@@ -101,7 +101,7 @@ class WebRTCMediaSession extends Events {
 
       if (kurento == null) {
         debug('CREATING KURENTO');
-        const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento.fqdn')}:${param('kurento.port')}${param('kurento.path')}`;        
+        const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento_fqdn')}:${param('kurento.port')}${param('kurento.path')}`;        
         kurento = await util.getKurentoClient(kurentoUrl, 5000);
       }
 
@@ -474,8 +474,8 @@ class WebRTCMediaSession extends Events {
 
   patchOffer(offer) {
     const sdpObj = transform.parse(offer);
-    sdpObj.origin.address = param('servers.asterisk.private_ip');
-    sdpObj.connection.ip = param('servers.asterisk.private_ip');
+    sdpObj.origin.address = param('servers.asterisk_private_ip');
+    sdpObj.connection.ip = param('servers.asterisk_private_ip');
 
     sdpObj.media.forEach(media => {
       const validPayloads = new Set(
