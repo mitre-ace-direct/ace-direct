@@ -273,5 +273,9 @@
   },
   "filesharing": {
     "virus_scan_enabled": "false"
+  },
+  "awsACE": {
+    "recording_bucket": "task3acrdemo-recordings",
+    "recording_proxy": "http://10.202.1.215:3128"
   }
 }
