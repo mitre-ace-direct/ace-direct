@@ -128,11 +128,26 @@ class WebRTCMediaSession extends Events {
       }
       for (const p of this._participants.values()) {
         if (!p.port) {
-          const port = await this._composite.createHubPort();
-          p.port = port;
-          const source = p.player || p.endpoint;
-          await source.connect(port);
-          await port.connect(p.endpoint);
+          if (this._hasMonitor) {
+            const source = p.player || p.endpoint;
+            const port = await this._composite.createHubPort();
+            await source.connect(port);
+            if (p.session._isMonitoring) {
+              // only send the composite video to the monitoring agent
+              // nothing changes for the original participants
+
+              p.port = port;
+              await port.connect(p.endpoint);
+            }
+          } else {
+            // normal multiparty call. send the composite to everyone
+
+            const port = await this._composite.createHubPort();
+            p.port = port;
+            const source = p.player || p.endpoint;
+            await source.connect(port);
+            await port.connect(p.endpoint);
+          }
         }
       }
     } else {
@@ -170,7 +185,8 @@ class WebRTCMediaSession extends Events {
     this._participants.forEach(p => {
       const { ext, type, onHold } = p;
       const isAgent = (type == "participant:webrtc") ? p.session._isAgent : false;
-      simplePartList.push({ ext, type, onHold, isAgent });
+      const isMonitor = (p.session._isMonitoring == true) ? true : false;
+      simplePartList.push({ ext, type, onHold, isAgent, isMonitor });
     });
     this._participants.forEach(p => {
       if (p.type === PARTICIPANT_TYPE_WEBRTC && p.session
@@ -575,7 +591,8 @@ class WebRTCMediaSession extends Events {
   async enablePrivateMode(ext, file) {
     const p = this._participants.get(ext);
     if (!p) {
-      throw new Error(`No participant registered for ${ext}`);
+      console.log(`No participant registered for ${ext}`);
+      return;
     }
     if (p.player) {
       debug(`${ext} Private mode already enabled`);
@@ -595,8 +612,10 @@ class WebRTCMediaSession extends Events {
     player.play();
 
     if (this.isMultiparty) {
+      if (p.port) {
       await p.endpoint.disconnect(p.port);
       await player.connect(p.port);
+      }
     } else {
       const other = this.oneToOnePeer(ext);
       if (other) {
@@ -609,15 +628,18 @@ class WebRTCMediaSession extends Events {
   async disablePrivateMode(ext) {
     const p = this._participants.get(ext);
     if (!p) {
-      throw new Error(`No participant registered for ${ext}`);
+      console.log(`No participant registered for ${ext}`);
+      return;
     }
     if (!p.player) return; // Not in private mode
     const player = p.player;
     p.player = null;
 
     if (this.isMultiparty) {
+      if (p.port) {
       await player.disconnect(p.port);
       await p.endpoint.connect(p.port);
+      }
     } else {
       const other = this.oneToOnePeer(ext);
       if (other) {
