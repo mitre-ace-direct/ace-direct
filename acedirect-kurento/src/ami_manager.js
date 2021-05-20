@@ -20,7 +20,7 @@ class AmiManager extends Events {
     let ami = null;
     const id = param('asterisk.ami.id');
     const port = param('asterisk.ami.port');
-    const ip = param('asterisk.sip.private_ip');
+    const ip = param('servers.asterisk.private_ip');
     const pass = param('asterisk.ami.passwd');
 
     try {
