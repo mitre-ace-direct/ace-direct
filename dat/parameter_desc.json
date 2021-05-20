@@ -4,30 +4,60 @@
     "version": "ACE Direct Version number for display only.",
     "year": "The Copyright year for display only.",
     "debug_level": "Logging level: ALL TRACE DEBUG INFO WARN ERROR FATAL OFF",
-    "fqdn": "Fully qualified domain name of the Node application server",
-    "private_ip": "Private IP address of the Node application server",
     "https": {
       "certificate": "Full path to the certificate file",
       "private_key": "Full path to the private key file",
       "csr": "full path to asterisk csr file, for signaling server demo page web server"      
     }
   },
+  "servers": {
+    "main": {
+      "fqdn": "Fully qualified domain name of this primary Node application server",
+      "private_ip": "Private IP address of this primary Node application server"
+    },
+    "nginx": {
+      "fqdn": "Fully qualified domain name of the NGINX server",
+      "private_ip": "Private IP address of the NGINX server"
+    },
+    "asterisk": {
+      "fqdn": "Fully qualified domain name of the Asterisk server",
+      "private_ip": "Private IP address of the Asterisk server"
+    },
+    "stun": {
+      "fqdn": "Fully qualified domain name of the stun server"    
+    },
+    "turn": {
+      "fqdn": "Fully qualified domain name of turn server"
+    },      
+    "kurento": {
+      "fqdn": "fully-qualified domain name of internal kurento media server, must point to private IP address"
+    },
+    "mysql": {
+      "fqdn": "Private IP address of the local ACE Direct MySQL server OR AWS RDS FQDN"
+    },
+    "redis": {
+      "fqdn": "Local IP address of the Redis server on acenode.domain.com: 127.0.0.1"
+    },
+    "mongodb": {
+      "fqdn": "Mongo DB host; leave blank to disable logging"
+    },
+    "zendesk": {
+      "fqdn": "fully-qualified domain name of commercial Zendesk server or private IP address of local Fendesk server"
+    }
+  },    
   "signaling_server": {
-      "url": "nginx path of personal signaling server. See the /acedirect-kurento/ route in /etc/nginx/nginx.conf on the portal.domain.com server"
+      "protocol": "wss",
+      "path": "This is the acedirect-kurento route in /etc/nginx/nginx.conf on the portal.domain.com server"
   },
   "media_server": {
     "privacy_video_url": "file location of privacy video file on the Kurento media server"
   },
   "asterisk": {
     "sip": {
-      "public": "Fully qualified domain name of the Asterisk server",
-      "private_ip": "Private IP address of the Asterisk server",
       "ws_port": "Websocket port",      
       "protocol": "Asterisk protocol",      
-      "stun": "Fully qualified domain name of the stun server",
       "stun_port": "Port of the stun server",
       "stun_user": "username for stun server",      
-      "turn": "Fully qualified domain name of turn server",
       "turn_port": "string; port number of turn server; may be empty",
       "turn_user": "turn server username",
       "turn_cred": "turn server password",
@@ -84,7 +114,6 @@
   },
   "database_servers": {
     "mysql": {
-      "host": "Private IP address of the local ACE Direct MySQL server OR AWS RDS FQDN",
       "port": "Port number for the ACE Direct MySQL server",      
       "user": "Username for the ACE Direct MySQL user",
       "password": "Password for the ACE Direct MySQL user; value for _ACEDIRECT_PASSWORD_ in MySQL configuration",
@@ -96,12 +125,12 @@
       "ssdatabase": "(for signaling server) signaling server db name"
     },
     "redis": {
-      "host": "Local IP address of the Redis server on acenode.domain.com: 127.0.0.1",
       "port": "Redis server port",
       "auth": "Redis authentication string; your chosen password for myRedisPassword during Redis installation"
     },
     "mongodb": {
-      "connection_uri": "Mongo DB connection URI; leave blank to disable call stats logging",
+      "database_name": "primary database",
+      "port": "port number, default is 27017",
       "caption_database_name": "database to log captions to",
       "caption_collection_name": "collection to log captions to",
       "logAMIevents": "true/false boolean - log AMI events",
@@ -137,8 +166,6 @@
     "consumer" : "Enable captions for the consumer portal"
   },
   "nginx": {
-    "fqdn": "Fully qualified domain name of this server",
-    "private_ip": "Private IP address of the nginx server",
     "port": "NGINX server port number",    
     "ad_path": "customizable NGINX path for agent/consumer portals",
     "mp_path": "customizable NGINX path for management portal",
@@ -159,7 +186,6 @@
     "force_logout_password": "a really secure password for the remote force agent logout feature"    
   },
   "zendesk": {
-    "private_ip": "IP address of the Node application server; localhost is fine",
     "port": "Port number of the zendesk/fendesk server",
     "protocol": "Use http for zendesk, https for fendesk",
     "user_id": "email address of the zendesk user; this is a placeholder value for a real Zendesk account if available",
@@ -190,21 +216,23 @@
     "protocol": "Protocol (http/https) of the translation server"
   },
   "webserver": {
-    "comment1": "signaling server only",
+    "comment1": "this is part of the signaling server configuration",    
     "port": "Integer; port number of signaling server web server ace-direct/acedirect-kurento",
     "static": "./static",
     "token": "__DEV_TOKEN__"
   },
   "asteriskss": {
-    "comment1": "signaling server only",
+    "comment1": "this is part of the signaling server configuration",    
     "sip_media_request_interval": 5000,
     "ami": {
       "enabled": true
     }
   },
   "kurento": {
-    "comment1": "signaling server only",
-    "url": "wss URL of Kurento media server",
+    "comment1": "this is part of the signaling server configuration",    
+    "port": 8443,
+    "protocol": "wss",
+    "path": "/kurento",
     "stats_interval": 10000,
     "sdes_crypto": "AES_128_CM_HMAC_SHA1_80",
     "monitoring_enabled": false,
@@ -215,9 +243,9 @@
     "video_webrtc_min_bitrate": 100,
     "video_rtp_max_bitrate": 8000,
     "video_webrtc_codec": "H264",
-    "_comment2": "development comment",
-    "_comment3": "development comment",
-    "_comment4" : "development comment",
+    "_comment2": "Dev Notes, unused: 42001F fixes some problems. 42E015 - try this too - RFC3984 - page 38",     
+    "_comment3": "Dev Notes, unused: WV tried 42e01f - did not work",
+    "_comment4" : "Dev Notes, unused: profile-level-id=42001F;packetization-mode=0;level-asymmetry-allowed=1",    
     "h264_config": "profile-level-id=42E01F;packetization-mode=0;level-asymmetry-allowed=0",
     "aws": {
       "s3": {
@@ -230,7 +258,7 @@
     "conference_max_participants": 4
   },
   "videomailss": {
-    "comment1": "signaling server only",
+    "comment1": "this is part of the signaling server configuration",    
     "directory": "/tmp/videomail/",
     "instructions_media": [
       "/tmp/videomail/instructions/video.mp4",
