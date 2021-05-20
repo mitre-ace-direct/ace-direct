@@ -256,14 +256,14 @@ if (!outVidTimeout) {
 logger.debug('outVidTimeout: ' + outVidTimeout);
 
 //stun & turn params
-var stunFQDN = getConfigVal('asterisk:sip:stun');
+var stunFQDN = getConfigVal('servers:stun:fqdn');
 var stunPort = getConfigVal('asterisk:sip:stun_port');
-var turnFQDN = getConfigVal('asterisk:sip:turn');
+var turnFQDN = getConfigVal('servers:turn:fqdn');
 var turnPort = getConfigVal('asterisk:sip:turn_port');
 var turnUser = getConfigVal('asterisk:sip:turn_user');
 var turnCred = getConfigVal('asterisk:sip:turn_cred');
 if (!stunFQDN) {
-  console.log('ERROR: dat/config.json is missing asterisk:sip:stun');
+  console.log('ERROR: dat/config.json is missing servers:stun:fqdn');
   process.exit(0);
 }
 if (!stunPort) {
@@ -271,7 +271,7 @@ if (!stunPort) {
   process.exit(0);
 }
 if (!turnFQDN) {
-  console.log('ERROR: dat/config.json is missing asterisk:sip:turn');
+  console.log('ERROR: dat/config.json is missing servers:turn:fqdn');
   process.exit(0);
 }
 if (!turnPort) {
@@ -352,7 +352,7 @@ if (consumerPath.length === 0) {
 }
 
 //signaling server
-var signalingServerUrl = getConfigVal('signaling_server:url');
+var signalingServerUrl = `${getConfigVal('signaling_server:protocol')}://${getConfigVal('servers:nginx:fqdn')}${getConfigVal('signaling_server:path')}`;
 
 var queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
 
@@ -362,7 +362,7 @@ var complaintRedirectDesc = getConfigVal('complaint_redirect:desc');
 var complaintRedirectUrl = getConfigVal('complaint_redirect:url');
 
 // translation server
-var translationServerUrl = getConfigVal('translation_server:protocol') + '://' + getConfigVal('asterisk:sip:private_ip') + ':' + getConfigVal('translation_server:port');
+var translationServerUrl = getConfigVal('translation_server:protocol') + '://' + getConfigVal('servers:asterisk:private_ip') + ':' + getConfigVal('translation_server:port');
 
 //get the ACE Direct version and year
 var version = getConfigVal('common:version');
@@ -370,7 +370,7 @@ var year = getConfigVal('common:year');
 logger.info("This is ACE Direct v" + version + ", Copyright " + year + ".");
 
 // Create a connection to Redis
-var redisClient = redis.createClient(getConfigVal('database_servers:redis:port'), getConfigVal('database_servers:redis:host'));
+var redisClient = redis.createClient(getConfigVal('database_servers:redis:port'), getConfigVal('servers:redis:fqdn'));
 
 redisClient.on("error", function (err) {
     logger.error("");
@@ -414,7 +414,7 @@ redisClient.on('connect', function () {
 });
 
 // Load the Zendesk login parameters
-var zenUrl = getConfigVal('zendesk:protocol') + '://' + getConfigVal('zendesk:private_ip') + ':' + getConfigVal('zendesk:port') + '/api/v2';
+var zenUrl = getConfigVal('zendesk:protocol') + '://' + getConfigVal('servers:zendesk:fqdn') + ':' + getConfigVal('zendesk:port') + '/api/v2';
 var zenUserId = getConfigVal('zendesk:user_id');
 var zenToken = getConfigVal('zendesk:token');
 
@@ -430,7 +430,7 @@ var zendeskClient = zendeskApi.createClient({
 	remoteUri: zenUrl
 });
 
-var dbHost = getConfigVal('database_servers:mysql:host');
+var dbHost = getConfigVal('servers:mysql:fqdn');
 var dbUser = getConfigVal('database_servers:mysql:user');
 var dbPassword = getConfigVal('database_servers:mysql:password');
 var dbName = getConfigVal('database_servers:mysql:ad_database_name');
@@ -469,14 +469,16 @@ dbConnection.connect(function(err) {
 });
 
 // Pull MongoDB configuration from config.json file
-var mongodbUriEncoded = nconf.get('database_servers:mongodb:connection_uri');
+var mongodbUri = null;
+const mongodbFqdn = nconf.get('servers:mongodb:fqdn');
+if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
+	mongodbUri = `mongodb://${getConfigVal('servers:mongodb:fqdn')}:${getConfigVal('mongodb:port')}/${getConfigVal('mongodb:database_name')}`;
+}
 var logCallData = nconf.get('database_servers:mongodb:logCallData');
 var mongodb;
 var colCallData = null;
-
 //Connect to MongoDB
-if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
-	var mongodbUri = getConfigVal('database_servers:mongodb:connection_uri');
+if (mongodbUri) {
 	// Initialize connection once
 	MongoClient.connect(mongodbUri, {forceServerObjectId:true, useNewUrlParser: true, useUnifiedTopology: true}, function (err, database) {
 		if (err) {
@@ -530,8 +532,8 @@ if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
 		}
 	});
 } else {
-	console.log('Missing MongoDB Connection URI in config');
-	logger.error('Missing MongoDB Connection URI in config');
+	console.log('Missing MongoDB servers:mongodb:fqdn value in dat/config.json');
+	logger.error('Missing MongoDB servers:mongodb:fqdn value in dat/config.json');
 	//httpsServer.listen(port);
 	//console.log('https web server listening on ' + port);
 }
@@ -542,8 +544,8 @@ var credentials = {
 };
 
 var agent = new openamAgent.PolicyAgent({
-	serverUrl: 'https://' + getConfigVal('nginx:fqdn') + ":" + getConfigVal('nginx:port') + '/' + getConfigVal('openam:path'),
-	privateIP: getConfigVal('nginx:private_ip'),
+	serverUrl: 'https://' + getConfigVal('servers:nginx:fqdn') + ":" + getConfigVal('nginx:port') + '/' + getConfigVal('openam:path'),
+	privateIP: getConfigVal('servers:nginx:private_ip'),
 	errorPage: function () {
 		return '<html><body><h1>Access Error</h1></body></html>';
 	}
@@ -584,11 +586,11 @@ app.use(csrf({
 }));
 
 var fqdn = '';
-if (nconf.get('nginx:fqdn')) {
-	fqdn = getConfigVal('nginx:fqdn');
+if (nconf.get('servers:nginx:fqdn')) {
+	fqdn = getConfigVal('servers:nginx:fqdn');
 } else {
     logger.error('******************************************************');
-    logger.error('ERROR nginx:fqdn parameter required in dat/config.json');
+    logger.error('ERROR servers:nginx:fqdn parameter required in dat/config.json');
     logger.error('******************************************************');
     logger.error('Exiting...');
     log4js.shutdown(function() { process.exit(-1); });
@@ -747,7 +749,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('get-file-list-agent', function(data){
 		console.log('AGENT HAS UPLOADED FILE');
 		let vrsNum =  (token.vrs) ? token.vrs : data.vrs;
-		let  url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
+		let  url = 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal('user_service:port');
 		url += '/fileListByVRS?vrs=' + vrsNum;
 			request({
 				url: url,
@@ -811,7 +813,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('get-file-list-consumer', function(data){
 		console.log('CONSUMER HAS UPLOADED FILE');
 		let vrsNum =  (token.vrs) ? token.vrs : data.vrs;
-		let  url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
+		let  url = 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal('user_service:port');
 		url += '/fileListByVRS?vrs=' + vrsNum;
 			request({
 				url: url,
@@ -1132,7 +1134,7 @@ io.sockets.on('connection', function (socket) {
 		var caption_agent = getConfigVal('caption_mode:agent');
 		io.to(token.extension).emit('caption-config', caption_agent);
 
-		var url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('agent_service:port');
+		var url = 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal('agent_service:port');
 		if (url) {
 			url += '/getallscripts/';
 
@@ -1266,7 +1268,7 @@ io.sockets.on('connection', function (socket) {
 	// Sends request for agent assistance to the Management Portal
 	socket.on('request-assistance', function () {
 		logger.info('Request Assistance - ' + token.username + ':' + token.extension);
-		var url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('management_portal:https_listen_port') + '/agentassist'; //assumes managementportal is co-located with adserver
+		var url = 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal('management_portal:https_listen_port') + '/agentassist'; //assumes managementportal is co-located with adserver
 		request({
 			url: url,
 			qs: {
@@ -1315,7 +1317,7 @@ io.sockets.on('connection', function (socket) {
 		requestJson.layout = data.gridLayout;
 		request({
 			method: 'POST',
-			url: 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('agent_service:port') + '/updateLayoutConfig',
+			url: 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal('agent_service:port') + '/updateLayoutConfig',
 			headers: {
 				'Content-Type': 'application/json'
 			},
@@ -1947,7 +1949,7 @@ io.sockets.on('connection', function (socket) {
 		// Add this socket to the room
 		socket.join(token.extension);
 
-		var url = 'https://' + getConfigVal('common:private_ip') + ':9905';
+		var url = 'https://' + getConfigVal('servers.main.private_ip') + ':9905';
 		if (url) {
 			url += '/storeFileName';
 
@@ -2977,7 +2979,7 @@ function init_ami() {
 
 		try {
 			ami = new asteriskManager(parseInt(getConfigVal('asterisk:ami:port')),
-				getConfigVal('asterisk:sip:private_ip'),
+				getConfigVal('servers:asterisk:private_ip'),
 				getConfigVal('asterisk:ami:id'),
 				getConfigVal('asterisk:ami:passwd'), true);
 			ami.keepConnected();
@@ -3043,7 +3045,7 @@ setInterval(function () {
 
 setInterval(function () {
   //query for after hours
-  var ohurl = 'https://' + getConfigVal('common:private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/operatinghours';
+  var ohurl = 'https://' + getConfigVal('servers.main.private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/operatinghours';
   request({
     method: 'GET',
       url: ohurl,
@@ -3076,7 +3078,7 @@ setInterval(function () {
  * @returns {undefined} Not used
  */
 function getUserInfo(username, callback) {
-	var url = 'https://' + getConfigVal('common:private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/getagentrec/' + username;
+	var url = 'https://' + getConfigVal('servers.main.private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/getagentrec/' + username;
 	request({
 		url: url,
 		json: true
@@ -3144,7 +3146,7 @@ function logout(token) {
  * @returns {undefined}
  */
 function getCallerInfo(phoneNumber, callback) {
-	var url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
+	var url = 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal('user_service:port');
 
 	//remove the leading characters and 1 before the VRS number (if it's there)
 
@@ -3198,7 +3200,7 @@ function checkIfBlocked(phoneNumber, callback) {
  * @returns {undefined} N/A
  */
 function getScriptInfo(queueName, queueType, callback) {
-	var url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('agent_service:port');
+	var url = 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal('agent_service:port');
 
 	if (queueType && queueName) {
 		url += '/getscript/?queue_name=' + queueType + '&type=' + queueName;
@@ -3380,8 +3382,8 @@ function processExtension(data) {
 	logger.info('processExtension - incoming ' + JSON.stringify(data));
 	console.log('processExtension - incoming ' + JSON.stringify(data));
 
-	var asteriskPublicHostname = getConfigVal('asterisk:sip:public');
-	var stunServer = getConfigVal('asterisk:sip:stun') + ":" + getConfigVal('asterisk:sip:stun_port');
+	var asteriskPublicHostname = getConfigVal('servers:asterisk:fqdn');
+	var stunServer = getConfigVal('servers:stun:fqdn') + ":" + getConfigVal('asterisk:sip:stun_port');
 
 	//if wsPort is "", then it defaults to no port in the wss url
 	var wsPort = getConfigVal('asterisk:sip:ws_port');
@@ -3758,7 +3760,7 @@ var ctoken = jwt.sign({
 // Allow cross-origin requests to be received from Management Portal
 // Used for the force logout functionality since we need to send a POST request from MP to acedirect outlining what user(s) to forcefully logout
 app.use(function (err, req, res, next) {
-	let mp = 'https://' + getConfigVal("common:private_ip") + ':' + getConfigVal("management_portal:https_listen_port");
+	let mp = 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal("management_portal:https_listen_port");
 	res.setHeader('Access-Control-Allow-Origin', mp);
 	next();
 });
@@ -3899,9 +3901,9 @@ app.get(consumerPath, function (req, res, next) {
 app.get('/logout', function (req, res) {
 	request({
 		method: 'POST',
-		url: 'https://' + getConfigVal('nginx:private_ip') + ':' + getConfigVal('nginx:port') + '/' + getConfigVal('openam:path') + '/json/sessions/?_action-logout',
+		url: 'https://' + getConfigVal('servers:nginx:private_ip') + ':' + getConfigVal('nginx:port') + '/' + getConfigVal('openam:path') + '/json/sessions/?_action-logout',
 		headers: {
-			'host': url.parse('https://' + getConfigVal('nginx:fqdn')).hostname,
+			'host': url.parse('https://' + getConfigVal('servers:nginx:fqdn')).hostname,
 			'iplanetDirectoryPro': req.session.key,
 			'Content-Type': 'application/json'
 		}
@@ -3909,7 +3911,7 @@ app.get('/logout', function (req, res) {
 		if (error) {
 			logger.error("logout ERROR: " + error);
 		} else {
-            var domaintemp = getConfigVal('nginx:fqdn');
+            var domaintemp = getConfigVal('servers:nginx:fqdn');
             var n1 = domaintemp.indexOf(".");
 			res.cookie('iPlanetDirectoryPro', 'cookievalue', {
 				maxAge: 0,
@@ -4130,8 +4132,8 @@ app.get('/login', agent.shield(cookieShield), function (req, res) {
 							redisClient.hset(rTokenMap, user.data[0].extension, JSON.stringify(tokenMap));
 
 						}
-						var asteriskPublicHostname = getConfigVal('asterisk:sip:public');
-						var stunServer = getConfigVal('asterisk:sip:stun') + ":" + getConfigVal('asterisk:sip:stun_port');
+						var asteriskPublicHostname = getConfigVal('servers:asterisk:fqdn');
+						var stunServer = getConfigVal('servers:stun:fqdn') + ":" + getConfigVal('asterisk:sip:stun_port');
 
 						var wsPort = getConfigVal('asterisk:sip:ws_port');
 						if (wsPort !== "") {
@@ -4302,7 +4304,7 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 						console.log(`${req.file.originalname} passed inspection!`);
 						request({
 							method: 'POST',
-							url: 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
+							url: 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
 							headers: {
 								'Content-Type': 'application/json'
 							},
@@ -4331,7 +4333,7 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 			console.log('WARNING: VIRUS SCAN IS DISABLED!');
 			request({
 				method: 'POST',
-				url: 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
+				url: 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
 				headers: {
 					'Content-Type': 'application/json'
 				},
@@ -4373,7 +4375,7 @@ app.get('/downloadFile',/*agent.shield(cookieShield) ,*/function(req, res) {
 						console.log('allowed to download');
 
 						let documentID = req.query.id;
-						let  url = 'https://' + getConfigVal('common:private_ip') + ':' + getConfigVal('user_service:port');
+						let  url = 'https://' + getConfigVal('servers.main.private_ip') + ':' + getConfigVal('user_service:port');
 						url += '/storeFileInfo?documentID=' + documentID;
 
 						request({
