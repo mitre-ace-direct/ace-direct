@@ -145,7 +145,7 @@ setInterval(() => {
 }, 60000);
 
 const asterisk = new AsteriskManager(parseInt(getConfigVal('asterisk:ami:port'), 10),
-  getConfigVal('servers:asterisk:private_ip'),
+  getConfigVal('servers:asterisk:fqdn'),
   getConfigVal('asterisk:ami:id'),
   getConfigVal('asterisk:ami:passwd'), true);
 asterisk.keepConnected();
