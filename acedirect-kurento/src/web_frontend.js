@@ -53,8 +53,8 @@ class WebServer extends Events {
       });
     });
 
-    server.listen(param('webserver.port'), () => {
-      debug('Listening on port %s', param('webserver.port'));
+    server.listen(param('app_ports.sswebserver'), () => {
+      debug('Listening on port %s', param('app_ports.sswebserver'));
     })
   }
 
