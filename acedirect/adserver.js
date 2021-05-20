@@ -906,7 +906,10 @@ io.sockets.on('connection', function (socket) {
 			let d = new Date();
 			data.timestamp = d.getTime();
 			data.msgid = d.getTime();
-			if(data.participants && data.participants.length > 0){
+			if (data.hasMonitor) {
+				// send multiparty captions to the monitor
+				io.to(Number(data.monitorExt)).emit('multiparty-caption', data);
+			} else if(data.participants && data.participants.length > 0){
 				data.participants.forEach(p => {
 					redisClient.hget(rExtensionToVrs, Number(p), function (err, vrsNum) {
             					if (!err){
@@ -931,6 +934,36 @@ io.sockets.on('connection', function (socket) {
 		io.to(Number(data.number)).emit('screenshareResponse', {
 			'permission' : data.permission
 		});
+	});
+
+	socket.on('askMonitor', function(data) {
+        io.to(Number(data.originalExt)).emit('initiateMonitor', {'monitorExt':data.monitorExt});
+    });
+
+    //invite the monitoring agent to the call
+    socket.on('monitor-invite', function(data){
+        console.log('at monitor invite')
+        io.to(Number(data.monitorExt)).emit('monitor-join-session', {'vrs': data.vrs});
+    });
+
+	socket.on('stopMonitoringCall', function(data) {
+		io.to(Number(data.originalExt)).emit('monitor-left');
+		if (data.vrs) {
+			io.to(Number(data.vrs)).emit('consumer-stop-monitor');
+			socket.leave(Number(data.vrs));
+		}
+	});
+
+	socket.on('start-monitoring-consumer', function(data) {
+		io.to(Number(data.vrs)).emit('consumer-being-monitored');
+	});
+
+	socket.on('force-monitor-leave', function(data) {
+		io.to(Number(data.monitorExt)).emit('monitor-leave-session', {'reinvite': data.reinvite, 'multipartyHangup': data.multipartyHangup, 'multipartyTransition':data.multipartyTransition});
+	});
+
+	socket.on('reinvite-monitor', function(data) {
+		io.to(Number(data.monitorExt)).emit('monitor-rejoin-session');
 	});
 
 	//Fired at end of call when new call history is added
