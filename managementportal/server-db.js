@@ -196,10 +196,10 @@ function myCleanup() {
 require('./cleanup').Cleanup(myCleanup);
 
 // declare constants for various config values
-const COMMON_PRIVATE_IP = 'common:private_ip';
-const NGINX_FQDN = 'nginx:fqdn';
+const COMMON_PRIVATE_IP = 'servers.main.private_ip';
+const NGINX_FQDN = 'servers:nginx:fqdn';
 const COLOR_CONFIG_JSON_PATH = '../dat/color_config.json';
-const ASTERISK_SIP_PRIVATE_IP = 'asterisk:sip:private_ip';
+const ASTERISK_SIP_PRIVATE_IP = 'servers:asterisk:private_ip';
 const AGENT_SERVICE_PORT = 'agent_service:port';
 const ACE_DIRECT_PORT = 'ace_direct:https_listen_port';
 
@@ -230,7 +230,7 @@ const credentials = {
 // const redisAgentInfoMap = 'agentInfoMap';
 
 // Create a connection to Redis
-const redisClient = redis.createClient(getConfigVal('database_servers:redis:port'), getConfigVal('database_servers:redis:host'));
+const redisClient = redis.createClient(getConfigVal('database_servers:redis:port'), getConfigVal('servers:redis:fqdn'));
 
 redisClient.on('error', (err) => {
   logger.error('');
@@ -273,7 +273,7 @@ if (nginxPath.length === 0) {
 
 const policyAgent = new openamAgent.PolicyAgent({
   serverUrl: `https://${getConfigVal(NGINX_FQDN)}:${getConfigVal('nginx:port')}/${getConfigVal('openam:path')}`,
-  privateIP: getConfigVal('nginx:private_ip'),
+  privateIP: getConfigVal('servers:nginx:private_ip'),
   errorPage() {
     return '<html><body><h1>Access Error</h1></body></html>';
   }
@@ -338,7 +338,7 @@ const io = socketIO(httpsServer, {
 });
 
 // Pull MySQL configuration from config.json file
-const dbHost = getConfigVal('database_servers:mysql:host');
+const dbHost = getConfigVal('servers:mysql:fqdn');
 const dbUser = getConfigVal('database_servers:mysql:user');
 const dbPassword = getConfigVal('database_servers:mysql:password');
 const dbName = getConfigVal('database_servers:mysql:ad_database_name');
@@ -364,15 +364,19 @@ setInterval(() => {
 }, 60000);
 
 // Pull MongoDB configuration from config.json file
-const mongodbUriEncoded = nconf.get('database_servers:mongodb:connection_uri');
+var mongodbUri = null;
+const mongodbFqdn = nconf.get('servers:mongodb:fqdn');
+if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
+	mongodbUri = `mongodb://${getConfigVal('servers:mongodb:fqdn')}:${getConfigVal('mongodb:port')}/${getConfigVal('mongodb:database_name')}`;
+}
+
 const logAMIEvents = nconf.get('database_servers:mongodb:logAMIevents');
 const logStats = nconf.get('database_servers:mongodb:logStats');
 const logStatsFreq = nconf.get('database_servers:mongodb:logStatsFreq');
 let mongodb;
 
 // Connect to MongoDB
-if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
-  const mongodbUri = getConfigVal('database_servers:mongodb:connection_uri');
+if (mongodbUri) {
   // Initialize connection once
   MongoClient.connect(mongodbUri, {
     forceServerObjectId: true,
@@ -453,7 +457,7 @@ if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
     }
   });
 } else {
-  console.log('Missing MongoDB Connection URI in config');
+  console.log('Missing MongoDB servers:mongodb:fqdn value in dat/config.json');
 
   httpsServer.listen(port);
   console.log(`https web server listening on ${port}`);
@@ -551,7 +555,7 @@ function sendResourceStatus() {
   hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('user_service:port')}`);
   hostMap.set('ACE Direct', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('ace_direct:https_listen_port')}`);
 
-  hostMap.set('Zendesk', `${getConfigVal('zendesk:protocol')}://${getConfigVal('zendesk:private_ip')}:${getConfigVal('zendesk:port')}/api/v2`);
+  hostMap.set('Zendesk', `${getConfigVal('zendesk:protocol')}://${getConfigVal('servers:zendesk:fqdn')}:${getConfigVal('zendesk:port')}/api/v2`);
   hostMap.set('Agent Provider', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}`);
 
   checkConnection(hostMap, (data) => {
@@ -580,7 +584,7 @@ io.sockets.on('connection', (socket) => {
   //   const confobj = {
   //     host: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
   //     realm: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
-  //     stun: `${getConfigVal('asterisk:sip:stun')}:${getConfigVal('asterisk:sip:stun_port')}`,
+  //     stun: `${getConfigVal('servers:stun:fqdn')}:${getConfigVal('asterisk:sip:stun_port')}`,
   //     wsport: parseInt(getConfigVal('asterisk:sip:ws_port'), 10),
   //     channel: getConfigVal('asterisk:sip:channel'),
   //     websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('asterisk:sip:ws_port')}/ws`
