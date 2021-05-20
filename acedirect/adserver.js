@@ -362,7 +362,7 @@ var complaintRedirectDesc = getConfigVal('complaint_redirect:desc');
 var complaintRedirectUrl = getConfigVal('complaint_redirect:url');
 
 // translation server
-var translationServerUrl = getConfigVal('translation_server:protocol') + '://' + getConfigVal('servers:asterisk:private_ip') + ':' + getConfigVal('translation_server:port');
+var translationServerUrl = getConfigVal('translation_server:protocol') + '://' + getConfigVal('servers:asterisk:fqdn') + ':' + getConfigVal('translation_server:port');
 
 //get the ACE Direct version and year
 var version = getConfigVal('common:version');
@@ -545,7 +545,7 @@ var credentials = {
 
 var agent = new openamAgent.PolicyAgent({
 	serverUrl: 'https://' + getConfigVal('servers:nginx:fqdn') + ":" + getConfigVal('nginx:port') + '/' + getConfigVal('openam:path'),
-	privateIP: getConfigVal('servers:nginx:private_ip'),
+	privateIP: getConfigVal('servers:nginx:fqdn'),
 	errorPage: function () {
 		return '<html><body><h1>Access Error</h1></body></html>';
 	}
@@ -749,7 +749,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('get-file-list-agent', function(data){
 		console.log('AGENT HAS UPLOADED FILE');
 		let vrsNum =  (token.vrs) ? token.vrs : data.vrs;
-		let  url = 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal('user_service:port');
+		let  url = 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal('user_service:port');
 		url += '/fileListByVRS?vrs=' + vrsNum;
 			request({
 				url: url,
@@ -813,7 +813,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('get-file-list-consumer', function(data){
 		console.log('CONSUMER HAS UPLOADED FILE');
 		let vrsNum =  (token.vrs) ? token.vrs : data.vrs;
-		let  url = 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal('user_service:port');
+		let  url = 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal('user_service:port');
 		url += '/fileListByVRS?vrs=' + vrsNum;
 			request({
 				url: url,
@@ -1134,7 +1134,7 @@ io.sockets.on('connection', function (socket) {
 		var caption_agent = getConfigVal('caption_mode:agent');
 		io.to(token.extension).emit('caption-config', caption_agent);
 
-		var url = 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal('agent_service:port');
+		var url = 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal('agent_service:port');
 		if (url) {
 			url += '/getallscripts/';
 
@@ -1268,7 +1268,7 @@ io.sockets.on('connection', function (socket) {
 	// Sends request for agent assistance to the Management Portal
 	socket.on('request-assistance', function () {
 		logger.info('Request Assistance - ' + token.username + ':' + token.extension);
-		var url = 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal('management_portal:https_listen_port') + '/agentassist'; //assumes managementportal is co-located with adserver
+		var url = 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal('management_portal:https_listen_port') + '/agentassist'; //assumes managementportal is co-located with adserver
 		request({
 			url: url,
 			qs: {
@@ -1317,7 +1317,7 @@ io.sockets.on('connection', function (socket) {
 		requestJson.layout = data.gridLayout;
 		request({
 			method: 'POST',
-			url: 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal('agent_service:port') + '/updateLayoutConfig',
+			url: 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal('agent_service:port') + '/updateLayoutConfig',
 			headers: {
 				'Content-Type': 'application/json'
 			},
@@ -1949,7 +1949,7 @@ io.sockets.on('connection', function (socket) {
 		// Add this socket to the room
 		socket.join(token.extension);
 
-		var url = 'https://' + getConfigVal('servers:main:private_ip') + ':9905';
+		var url = 'https://' + getConfigVal('servers:main:fqdn') + ':9905';
 		if (url) {
 			url += '/storeFileName';
 
@@ -2979,7 +2979,7 @@ function init_ami() {
 
 		try {
 			ami = new asteriskManager(parseInt(getConfigVal('asterisk:ami:port')),
-				getConfigVal('servers:asterisk:private_ip'),
+				getConfigVal('servers:asterisk:fqdn'),
 				getConfigVal('asterisk:ami:id'),
 				getConfigVal('asterisk:ami:passwd'), true);
 			ami.keepConnected();
@@ -3045,7 +3045,7 @@ setInterval(function () {
 
 setInterval(function () {
   //query for after hours
-  var ohurl = 'https://' + getConfigVal('servers:main:private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/operatinghours';
+  var ohurl = 'https://' + getConfigVal('servers:main:fqdn') + ":" + parseInt(getConfigVal('agent_service:port')) + '/operatinghours';
   request({
     method: 'GET',
       url: ohurl,
@@ -3078,7 +3078,7 @@ setInterval(function () {
  * @returns {undefined} Not used
  */
 function getUserInfo(username, callback) {
-	var url = 'https://' + getConfigVal('servers:main:private_ip') + ":" + parseInt(getConfigVal('agent_service:port')) + '/getagentrec/' + username;
+	var url = 'https://' + getConfigVal('servers:main:fqdn') + ":" + parseInt(getConfigVal('agent_service:port')) + '/getagentrec/' + username;
 	request({
 		url: url,
 		json: true
@@ -3146,7 +3146,7 @@ function logout(token) {
  * @returns {undefined}
  */
 function getCallerInfo(phoneNumber, callback) {
-	var url = 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal('user_service:port');
+	var url = 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal('user_service:port');
 
 	//remove the leading characters and 1 before the VRS number (if it's there)
 
@@ -3200,7 +3200,7 @@ function checkIfBlocked(phoneNumber, callback) {
  * @returns {undefined} N/A
  */
 function getScriptInfo(queueName, queueType, callback) {
-	var url = 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal('agent_service:port');
+	var url = 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal('agent_service:port');
 
 	if (queueType && queueName) {
 		url += '/getscript/?queue_name=' + queueType + '&type=' + queueName;
@@ -3760,7 +3760,7 @@ var ctoken = jwt.sign({
 // Allow cross-origin requests to be received from Management Portal
 // Used for the force logout functionality since we need to send a POST request from MP to acedirect outlining what user(s) to forcefully logout
 app.use(function (err, req, res, next) {
-	let mp = 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal("management_portal:https_listen_port");
+	let mp = 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal("management_portal:https_listen_port");
 	res.setHeader('Access-Control-Allow-Origin', mp);
 	next();
 });
@@ -3901,7 +3901,7 @@ app.get(consumerPath, function (req, res, next) {
 app.get('/logout', function (req, res) {
 	request({
 		method: 'POST',
-		url: 'https://' + getConfigVal('servers:nginx:private_ip') + ':' + getConfigVal('nginx:port') + '/' + getConfigVal('openam:path') + '/json/sessions/?_action-logout',
+		url: 'https://' + getConfigVal('servers:nginx:fqdn') + ':' + getConfigVal('nginx:port') + '/' + getConfigVal('openam:path') + '/json/sessions/?_action-logout',
 		headers: {
 			'host': url.parse('https://' + getConfigVal('servers:nginx:fqdn')).hostname,
 			'iplanetDirectoryPro': req.session.key,
@@ -4304,7 +4304,7 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 						console.log(`${req.file.originalname} passed inspection!`);
 						request({
 							method: 'POST',
-							url: 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
+							url: 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
 							headers: {
 								'Content-Type': 'application/json'
 							},
@@ -4333,7 +4333,7 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 			console.log('WARNING: VIRUS SCAN IS DISABLED!');
 			request({
 				method: 'POST',
-				url: 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
+				url: 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal('user_service:port') + '/storeFileInfo',
 				headers: {
 					'Content-Type': 'application/json'
 				},
@@ -4375,7 +4375,7 @@ app.get('/downloadFile',/*agent.shield(cookieShield) ,*/function(req, res) {
 						console.log('allowed to download');
 
 						let documentID = req.query.id;
-						let  url = 'https://' + getConfigVal('servers:main:private_ip') + ':' + getConfigVal('user_service:port');
+						let  url = 'https://' + getConfigVal('servers:main:fqdn') + ':' + getConfigVal('user_service:port');
 						url += '/storeFileInfo?documentID=' + documentID;
 
 						request({
