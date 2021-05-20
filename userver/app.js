@@ -134,7 +134,7 @@ const credentials = {
 
 // Create MySQL connection and connect to it
 connection = mysql.createConnection({
-  host: getConfigVal('servers:mysql:fqdn'),
+  host: getConfigVal('servers:mysql_fqdn'),
   user: getConfigVal('database_servers:mysql:user'),
   password: getConfigVal('database_servers:mysql:password'),
   database: getConfigVal('database_servers:mysql:ad_database_name')
@@ -157,8 +157,8 @@ app.use(bodyParser.json({ type: 'application/vnd/api+json' }));
 require('./routes/routes.js')(app, connection, itrsMode);
 
 const httpsServer = https.createServer(credentials, app);
-const appServer = httpsServer.listen(parseInt(getConfigVal('user_service:port'), 10));
-console.log('https web server for agent portal up and running on port=%s   (Ctrl+C to Quit)', parseInt(getConfigVal('user_service:port'), 10));
+const appServer = httpsServer.listen(parseInt(getConfigVal('app_ports:userver'), 10));
+console.log('https web server for agent portal up and running on port=%s   (Ctrl+C to Quit)', parseInt(getConfigVal('app_ports:userver'), 10));
 
 module.exports = appServer;
 module.exports.myCleanup = myCleanup;
