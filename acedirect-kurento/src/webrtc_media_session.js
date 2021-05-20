@@ -10,6 +10,7 @@ const IceCandidate = Kurento.getComplexType('IceCandidate');
 const crypto = require('crypto');
 const util = require('./util');
 const RecMan = require('./rec_manager');
+var mysql = require('mysql2/promise');
 
 const PARTICIPANT_TYPE_WEBRTC = 'participant:webrtc';
 const PARTICIPANT_TYPE_RTP = 'participant:rtp';
@@ -26,6 +27,39 @@ var kurento = null;
 
 const ASTERISK_QUEUE_EXT = param('asteriskss.ami.queue_extensions');
 
+/**
+ * Custom logic for mysql connection
+ */
+
+var dbHost = param('database_servers.mysql.host');
+var dbUser = param('database_servers.mysql.user');
+var dbPassword = param('database_servers.mysql.password');
+var dbName = param('database_servers.mysql.ad_database_name');
+var dbPort = parseInt(param('database_servers.mysql.port'));
+console.log("Using host: " + dbHost);
+console.log("Using username: " + dbUser);
+console.log("Using name: " + dbName);
+console.log("Using port: " + dbPort);
+
+/**
+ * Function to verify the config parameter name and
+ * decode it from Base64 (if necessary).
+ * @param {type} param_name of the config parameter
+ * @returns {unresolved} Decoded readable string.
+ */
+function getConfigVal(param_name) {
+  var val = nconf.get(param_name);
+  var decodedString = null;
+  if (typeof val !== 'undefined' && val !== null) {
+    //found value for param_name
+    decodedString = Buffer.alloc(val.length, val, 'base64');
+  } else {
+    //did not find value for param_name
+    console.log("Did not find config value " + param_name);
+    decodedString = "";
+  }
+  return (decodedString.toString());
+}
 
 class WebRTCMediaSession extends Events {
 
@@ -495,7 +529,9 @@ class WebRTCMediaSession extends Events {
   }
 
   async toggleRecording(ext, record) {
-    const participant = this._participants.get(ext);
+    var participant = this._participants.get(ext);
+    //Moved out of if since we need this globally
+    var fileName;
     if (record && participant.recorder) return true; // Already recording
     if (!record && !participant.recorder) return true; // Already not recording
     try {
@@ -503,12 +539,13 @@ class WebRTCMediaSession extends Events {
         debug(`${ext} Start recording`);
         const date = this.getTimestampString();
         const profile = param('kurento.recording_media_profile');
-        const fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
-        const filePath = `file:///tmp/${fileName}`;
+        fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
+        //const filePath = `file:///tmp/${fileName}`;
+        const filePath = `file://home/ubuntu/kms-share/media/recordings/${fileName}`;
         debug(`${ext} recording to  ${filePath}`);
 
         const recorder = await this._pipeline.create('RecorderEndpoint', {
-          uri: filePath,
+	        uri: filePath,
           mediaProfile: profile
         });
         await participant.endpoint.connect(recorder);
@@ -531,14 +568,53 @@ class WebRTCMediaSession extends Events {
         });
         await recorder.record();
         participant.recorder = recorder;
-        await RecMan.createRecording(fileName, ext, this._id);
+        participant.recorderFile = fileName;
+        
       } else {
+        var otherCallers = "";
+        var fileName = participant.recorderFile;
+        for (const p of this._participants.values()) {
+          if(p.ext != ext){
+            otherCallers += p.ext + ",";
+          }
+        }
+        if(otherCallers.length > 0){
+          otherCallers = otherCallers.slice(0,-1);
+        }
+        var agentNumber = ext;
+
+        const date = this.getTimestampString();
+        const profile = param('kurento.recording_media_profile');
+
+        const dbConnection = await mysql.createConnection({
+          host: dbHost,
+          user: dbUser,
+          password: dbPassword,
+          database: dbName,
+          port: dbPort
+        });
+
         await participant.recorder.stopAndWait();
+
         await participant.recorder.release();
+
+        await RecMan.createRecording(fileName, ext, this._id);
+
+        let sqlQuery = 'INSERT INTO call_recordings (fileName, agentNumber, participants, timestamp, status) VALUES (?,?,?,NOW(),?);';
+        let params = [fileName, agentNumber, otherCallers, 'UNREAD'];
+        console.log("QUERY is " + sqlQuery);
+
+        //var [rows,fields] = await dbConnection.execute(sqlQuery, params);
+        await dbConnection.execute(sqlQuery, params);
+
+        await dbConnection.end();
+
+        
+
         participant.recorder = null;
         debug(`${ext} Stopped recording`);
       }
-      return true;
+      //return true; //??? Eric check this
     } catch (ex) {
       debug(`${ext} Recording error: ${ex.message}`);
     }
