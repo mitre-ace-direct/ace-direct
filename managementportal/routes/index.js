@@ -10,8 +10,8 @@ const validator = require('../utils/validator');
 const router = express.Router();
 
 const agent = new openamAgent.PolicyAgent({
-  serverUrl: `https://${getConfigVal('nginx:fqdn')}:${getConfigVal('nginx:port')}/${getConfigVal('openam:path')}`,
-  privateIP: getConfigVal('nginx:private_ip'),
+  serverUrl: `https://${getConfigVal('servers:nginx:fqdn')}:${getConfigVal('nginx:port')}/${getConfigVal('openam:path')}`,
+  privateIP: getConfigVal('servers:nginx:private_ip'),
   errorPage() {
     return '<html><body><h1>Access Error</h1></body></html>';
   }
@@ -203,9 +203,9 @@ function getAgentInfo(username, callback) {
   let url;
 
   if (username) {
-    url = `https://${getConfigVal('common:private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/getagentrec/${username}`;
+    url = `https://${getConfigVal('servers.main.private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/getagentrec/${username}`;
   } else {
-    url = `https://${getConfigVal('common:private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/getallagentrecs`;
+    url = `https://${getConfigVal('servers.main.private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/getallagentrecs`;
   }
   logger.info(`getAgentInfo query URL: ${url}`);
 
@@ -311,9 +311,9 @@ router.get('/token', agent.shield(cookieShield), (req, res) => {
 router.get('/logout', (req, res) => {
   request({
     method: 'POST',
-    url: `https://${getConfigVal('nginx:private_ip')}:${getConfigVal('nginx:port')}/json/sessions/?_action-logout`,
+    url: `https://${getConfigVal('servers:nginx:private_ip')}:${getConfigVal('nginx:port')}/json/sessions/?_action-logout`,
     headers: {
-      host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname,
+      host: urlparse.parse(`https://${getConfigVal('servers:nginx:fqdn')}`).hostname,
       iplanetDirectoryPro: req.session.key,
       'Content-Type': 'application/json'
     }
@@ -321,7 +321,7 @@ router.get('/logout', (req, res) => {
     if (error) {
       logger.error(`logout ERROR: ${error}`);
     } else {
-      const domaintemp = getConfigVal('nginx:fqdn');
+      const domaintemp = getConfigVal('servers:nginx:fqdn');
       const n1 = domaintemp.indexOf('.');
       res.cookie('iPlanetDirectoryPro', 'cookievalue', {
         maxAge: 0,
@@ -349,7 +349,7 @@ function openAMOperation(openAMAgentInfo) {
   logger.info(`openAMOperation with info: ${JSON.stringify(openAMAgentInfo)}`);
 
   // Use the approach to access openam from inside the organization network
-  const urlPrefix = `https://${getConfigVal('nginx:private_ip')}:${parseInt(getConfigVal('nginx:port'), 10)}/${getConfigVal('openam:path')}`;
+  const urlPrefix = `https://${getConfigVal('servers:nginx:private_ip')}:${parseInt(getConfigVal('nginx:port'), 10)}/${getConfigVal('openam:path')}`;
 
   const openAmLoginSuccess = new Promise(
     (resolve, reject) => {
@@ -364,7 +364,7 @@ function openAMOperation(openAMAgentInfo) {
           'X-OpenAM-Username': getConfigVal('openam:user'),
           'X-OpenAM-Password': getConfigVal('openam:password'),
           'Content-Type': 'application/json',
-          host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname
+          host: urlparse.parse(`https://${getConfigVal('servers:nginx:fqdn')}`).hostname
         }
       }, (error, response, data) => {
         if (error) {
@@ -396,7 +396,7 @@ function openAMOperation(openAMAgentInfo) {
               headers: {
                 iplanetDirectoryPro: succTokenId,
                 'Content-Type': 'application/json',
-                host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname
+                host: urlparse.parse(`https://${getConfigVal('servers:nginx:fqdn')}`).hostname
               },
               body: {
                 username: openAMAgentInfo.username,
@@ -431,7 +431,7 @@ function openAMOperation(openAMAgentInfo) {
               headers: {
                 iplanetDirectoryPro: succTokenId,
                 'Content-Type': 'application/json',
-                host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname
+                host: urlparse.parse(`https://${getConfigVal('servers:nginx:fqdn')}`).hostname
               },
               body: { // username and password are not updatable for now
                 mail: [openAMAgentInfo.email],
@@ -464,7 +464,7 @@ function openAMOperation(openAMAgentInfo) {
               headers: {
                 iplanetDirectoryPro: succTokenId,
                 'Content-Type': 'application/json',
-                host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname
+                host: urlparse.parse(`https://${getConfigVal('servers:nginx:fqdn')}`).hostname
               }
             }, (error, response, data) => {
               if (error) {
@@ -501,7 +501,7 @@ function openAMOperation(openAMAgentInfo) {
         headers: {
           iplanetDirectoryPro: succTokenId,
           'Content-Type': 'application/json',
-          host: urlparse.parse(`https://${getConfigVal('nginx:fqdn')}`).hostname
+          host: urlparse.parse(`https://${getConfigVal('servers:nginx:fqdn')}`).hostname
         }
       }, (error, response, data) => {
         if (error) {
@@ -554,7 +554,7 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
         });
       } else {
         // prepare added user data
-        const url = `https://${getConfigVal('common:private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/addAgents/`;
+        const url = `https://${getConfigVal('servers.main.private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/addAgents/`;
 
         // create newAgent JSON object from inputs
 
@@ -653,7 +653,7 @@ router.post('/UpdateAgent', agent.shield(cookieShield), (req, res) => {
         });
       } else {
         // prepare user data
-        const url = `https://${getConfigVal('common:private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/UpdateProfile/`;
+        const url = `https://${getConfigVal('servers.main.private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/UpdateProfile/`;
 
         // create newAgent JSON object from inputs
 
@@ -732,7 +732,7 @@ router.post('/DeleteAgent', agent.shield(cookieShield), (req, res) => {
   logger.info(`Hit DeleteAgent with agentId: ${agentId}, username: ${username}`);
 
   if (agentId) {
-    const url = `https://${getConfigVal('common:private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/DeleteAgent/`;
+    const url = `https://${getConfigVal('servers.main.private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/DeleteAgent/`;
 
     request.post({
       url,
