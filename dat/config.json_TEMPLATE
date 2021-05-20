@@ -38,6 +38,16 @@
     "protocol": "wss",
     "path": "/SOMEUSER/acedirect-kurento/signaling"
   },
+  "nginx": {
+    "port": "443",
+    "ad_path": "/ACEDirect",
+    "mp_path": "/ManagementPortal",
+    "agent_route": "/agent",
+    "consumer_route": "/call"
+  },  
+  "media_server": {
+      "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
+  },  
   "asterisk": {
     "sip": {
       "ws_port": "443",
@@ -150,13 +160,6 @@
   "caption_mode": {
     "agent": "true",
     "consumer": "true"
-  },
-  "nginx": {
-    "port": "443",
-    "ad_path": "/ACEDirect",
-    "mp_path": "/ManagementPortal",
-    "agent_route": "/agent",
-    "consumer_route": "/call"
   },
   "openam": {
     "path": "ace",
