@@ -11,40 +11,29 @@
     }
   },
   "servers": {
-    "main": {
-      "fqdn": "acenode.domain.com",
-      "private_ip": "0.0.0.0"
-    },
-    "nginx": {
-      "fqdn": "portal.domain.com",
-      "private_ip": "0.0.0.0"
-    },    
-    "asterisk": {
-      "fqdn": "acesip.domain.com",
-      "private_ip": "0.0.0.0"
-    },
-    "stun": {
-      "fqdn": "acestun.domain.com"    
-    },
-    "turn": {
-      "fqdn": "aceturn.domain.com"
-    },    
-    "kurento": {
-      "fqdn": "acekms.domain.com"
-    },
-    "mysql": {
-      "fqdn": "localhost"
-    },
-    "redis": {
-      "fqdn": "127.0.0.1"
-    },
-    "mongodb": {
-      "fqdn": "localhost"
-    },
-    "zendesk": {
-      "fqdn": "localhost"
-    }    
-  },  
+    "main_fqdn": "acenode.domain.com",
+    "main_private_ip": "0.0.0.0",
+    "nginx_fqdn": "portal.domain.com",
+    "nginx_private_ip": "0.0.0.0",
+    "asterisk_fqdn": "acesip.domain.com",
+    "asterisk_private_ip": "0.0.0.0",
+    "stun_fqdn": "acestun.domain.com",
+    "turn_fqdn": "aceturn.domain.com",
+    "kurento_fqdn": "acekms.domain.com",
+    "mysql_fqdn": "localhost",
+    "redis_fqdn": "127.0.0.1",
+    "mongodb_fqdn": "localhost",
+    "zendesk_fqdn": "localhost"
+  },
+  "app_ports": {
+    "acedirect": 9001,
+    "managementportal": 9002,
+    "zendesk": 9003,
+    "acr-cdr": 9004,
+    "userver": 9005,
+    "aserver": 9006,
+    "sswebserver": 9009
+  },    
   "signaling_server": {
     "protocol": "wss",
     "path": "/SOMEUSER/acedirect-kurento/signaling"
@@ -174,29 +163,17 @@
     "user": "adminUsername",
     "password": "adminPassword"
   },
-  "ace_direct": {
-    "https_listen_port": "9001"
-  },
   "management_portal": {
-    "https_listen_port": "9002",
     "poll_interval": "1000",
     "force_logout_password": "securexForcexLogoutxPassword"
   },
   "zendesk": {
-    "port": "9003",
     "protocol": "https",
     "user_id": "user@email.com",
     "token": "userToken"
   },
-  "acr_cdr": {
-    "https_listen_port": "9004"
-  },
   "user_service": {
-    "port": "9005",
     "itrs_mode": "false"
-  },
-  "agent_service": {
-    "port": "9006"
   },
   "agent_chat": {
     "save_agent_chats": "false"
@@ -214,7 +191,6 @@
     "enabled": "true"
   },
   "webserver": {
-    "port": 9009,
     "static": "./static",
     "token": "__DEV_TOKEN__"
   },
