@@ -93,9 +93,9 @@ async function go() {
   s = await execCommand('yarn install  ','./vendor/reconnect-ws');
 
   //generate the confs/kurento/WebRtcEndpoint.conf.ini file...
-  stun_svr = "stunServerAddress=" + getConfigVal('servers:stun:fqdn');
+  stun_svr = "stunServerAddress=" + getConfigVal('servers:stun_fqdn');
   stun_port = "stunServerPort=" + getConfigVal('asterisk:sip:stun_port');
-  turn_url = "turnURL=" + getConfigVal('asterisk:sip:turn_user') + ":" + getConfigVal('asterisk:sip:turn_cred') + "@" + getConfigVal('servers:turn:fqdn');
+  turn_url = "turnURL=" + getConfigVal('asterisk:sip:turn_user') + ":" + getConfigVal('asterisk:sip:turn_cred') + "@" + getConfigVal('servers:turn_fqdn');
   s = await execCommand('echo ' + stun_svr + ' > WebRtcEndpoint.conf.ini','./confs/kurento');
   s = await execCommand('echo ' + stun_port + ' >> WebRtcEndpoint.conf.ini','./confs/kurento');
   s = await execCommand('echo ' + turn_url + ' >> WebRtcEndpoint.conf.ini','./confs/kurento');
