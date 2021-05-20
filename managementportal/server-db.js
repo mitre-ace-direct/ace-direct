@@ -367,7 +367,7 @@ setInterval(() => {
 var mongodbUri = null;
 const mongodbFqdn = nconf.get('servers:mongodb:fqdn');
 if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
-	mongodbUri = `mongodb://${getConfigVal('servers:mongodb:fqdn')}:${getConfigVal('mongodb:port')}/${getConfigVal('mongodb:database_name')}`;
+	mongodbUri = `mongodb://${getConfigVal('servers:mongodb:fqdn')}:${getConfigVal('database_servers:mongodb:port')}/${getConfigVal('database_servers:mongodb:database_name')}`;
 }
 
 const logAMIEvents = nconf.get('database_servers:mongodb:logAMIevents');
