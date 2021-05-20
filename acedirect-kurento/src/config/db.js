@@ -50,7 +50,7 @@ if (typeof(nconf.get('common:cleartext')) !== "undefined"  && nconf.get('common:
 base.username = getConfigVal('database_servers:mysql:ssuser');
 base.password = getConfigVal('database_servers:mysql:sspassword');
 base.database = getConfigVal('database_servers:mysql:ssdatabase');
-base.host = getConfigVal('servers:mysql:fqdn');
+base.host = getConfigVal('servers:mysql_fqdn');
 base.dialect = "mysql";
 
 /**
