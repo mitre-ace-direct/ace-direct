@@ -203,9 +203,9 @@ function getAgentInfo(username, callback) {
   let url;
 
   if (username) {
-    url = `https://${getConfigVal('servers.main.private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/getagentrec/${username}`;
+    url = `https://${getConfigVal('servers:main:private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/getagentrec/${username}`;
   } else {
-    url = `https://${getConfigVal('servers.main.private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/getallagentrecs`;
+    url = `https://${getConfigVal('servers:main:private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/getallagentrecs`;
   }
   logger.info(`getAgentInfo query URL: ${url}`);
 
@@ -554,7 +554,7 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
         });
       } else {
         // prepare added user data
-        const url = `https://${getConfigVal('servers.main.private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/addAgents/`;
+        const url = `https://${getConfigVal('servers:main:private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/addAgents/`;
 
         // create newAgent JSON object from inputs
 
@@ -653,7 +653,7 @@ router.post('/UpdateAgent', agent.shield(cookieShield), (req, res) => {
         });
       } else {
         // prepare user data
-        const url = `https://${getConfigVal('servers.main.private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/UpdateProfile/`;
+        const url = `https://${getConfigVal('servers:main:private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/UpdateProfile/`;
 
         // create newAgent JSON object from inputs
 
@@ -732,7 +732,7 @@ router.post('/DeleteAgent', agent.shield(cookieShield), (req, res) => {
   logger.info(`Hit DeleteAgent with agentId: ${agentId}, username: ${username}`);
 
   if (agentId) {
-    const url = `https://${getConfigVal('servers.main.private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/DeleteAgent/`;
+    const url = `https://${getConfigVal('servers:main:private_ip')}:${parseInt(getConfigVal('agent_service:port'), 10)}/DeleteAgent/`;
 
     request.post({
       url,
