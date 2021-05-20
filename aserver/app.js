@@ -1,3 +1,4 @@
+
 // This is the main JS for the USERVER RESTFul server
 const https = require('https');
 const express = require('express');
@@ -145,7 +146,7 @@ setInterval(() => {
 }, 60000);
 
 const asterisk = new AsteriskManager(parseInt(getConfigVal('asterisk:ami:port'), 10),
-  getConfigVal('servers:asterisk:fqdn'),
+  getConfigVal('servers:asterisk:private_ip'),
   getConfigVal('asterisk:ami:id'),
   getConfigVal('asterisk:ami:passwd'), true);
 asterisk.keepConnected();
