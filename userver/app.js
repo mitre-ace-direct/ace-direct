@@ -134,7 +134,7 @@ const credentials = {
 
 // Create MySQL connection and connect to it
 connection = mysql.createConnection({
-  host: getConfigVal('database_servers:mysql:host'),
+  host: getConfigVal('servers:mysql:fqdn'),
   user: getConfigVal('database_servers:mysql:user'),
   password: getConfigVal('database_servers:mysql:password'),
   database: getConfigVal('database_servers:mysql:ad_database_name')
