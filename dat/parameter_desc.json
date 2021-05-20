@@ -11,40 +11,29 @@
     }
   },
   "servers": {
-    "main": {
-      "fqdn": "Fully qualified domain name of this primary Node application server",
-      "private_ip": "Private IP address of this primary Node application server"
-    },
-    "nginx": {
-      "fqdn": "Fully qualified domain name of the NGINX server",
-      "private_ip": "Private IP address of the NGINX server"
-    },
-    "asterisk": {
-      "fqdn": "Fully qualified domain name of the Asterisk server",
-      "private_ip": "Private IP address of the Asterisk server"
-    },
-    "stun": {
-      "fqdn": "Fully qualified domain name of the stun server"    
-    },
-    "turn": {
-      "fqdn": "Fully qualified domain name of turn server"
-    },      
-    "kurento": {
-      "fqdn": "fully-qualified domain name of internal kurento media server, must point to private IP address"
-    },
-    "mysql": {
-      "fqdn": "Private IP address of the local ACE Direct MySQL server OR AWS RDS FQDN"
-    },
-    "redis": {
-      "fqdn": "Local IP address of the Redis server on acenode.domain.com: 127.0.0.1"
-    },
-    "mongodb": {
-      "fqdn": "Mongo DB host; leave blank to disable logging"
-    },
-    "zendesk": {
-      "fqdn": "fully-qualified domain name of commercial Zendesk server or private IP address of local Fendesk server"
-    }
-  },    
+    "main_fqdn": "Fully qualified domain name of this primary Node application server",
+    "main_private_ip": "Private IP address of this primary Node application server",
+    "nginx_fqdn": "Fully qualified domain name of the NGINX server",
+    "nginx_private_ip": "Private IP address of the NGINX server",
+    "asterisk_fqdn": "Fully qualified domain name of the Asterisk server",
+    "asterisk_private_ip": "Private IP address of the Asterisk server",
+    "stun_fqdn": "Fully qualified domain name of the stun server",
+    "turn_fqdn": "Fully qualified domain name of turn server",
+    "kurento_fqdn": "fully-qualified domain name of internal kurento media server, must point to private IP address",
+    "mysql_fqdn": "Private IP address of the local ACE Direct MySQL server OR AWS RDS FQDN OR localhost",
+    "redis_fqdn": "Local IP address of the Redis server on acenode.domain.com: 127.0.0.1",
+    "mongodb_fqdn": "Mongo DB host; leave blank to disable logging",
+    "zendesk_fqdn": "fully-qualified domain name of commercial Zendesk server or private IP address of local Fendesk server"
+  },  
+  "app_ports": {
+    "acedirect": "local HTTPS listen port for ACE direct server; must match value in nginx.conf on the NGINX server",
+    "managementportal": "local HTTPS listen port for management portal server; must match value in nginx.conf on the NGINX server",
+    "zendesk": "local application port for fendesk (or use port from commercial Zendesk instance)",
+    "acr-cdr": "local application port for acr-cdr server",
+    "userver": "local application port for userver",
+    "aserver": "local application port for aserver",
+    "sswebserver": "local application port for signaling server acedirect-kurento webserver"
+  },     
   "signaling_server": {
       "protocol": "wss",
       "path": "This is the acedirect-kurento route in /etc/nginx/nginx.conf on the portal.domain.com server"
@@ -177,29 +166,17 @@
     "user": "openAM admin user name from the OpenAM installation",
     "password": "openAM admin password from the OpenAM installation"
   },
-  "ace_direct": {
-    "https_listen_port": "Port that the ACE Direct portal listens on; must match value in nginx.conf on the NGINX server"
-  },
   "management_portal": {
-    "https_listen_port": "Port that the Management Portal listens on; must match value in nginx.conf on the NGINX server",
     "poll_interval" : "Poll frequency (seconds) of the Management Portal statistics",
     "force_logout_password": "a really secure password for the remote force agent logout feature"    
   },
   "zendesk": {
-    "port": "Port number of the zendesk/fendesk server",
     "protocol": "Use http for zendesk, https for fendesk",
     "user_id": "email address of the zendesk user; this is a placeholder value for a real Zendesk account if available",
     "token": "token of the zendesk user; this is a placeholder value for a real Zendesk account if available"
   },
-  "acr_cdr": {
-    "https_listen_port": "Port that the ACR CDR portal listens on"
-  },
   "user_service": {
-    "port": "Port number of the USERVER server",
     "itrs_mode": "Use ITRS to verify numbers? true|false"
-  },
-  "agent_service": {
-    "port": "Port number of the ASERVER server"
   },
   "agent_chat": {
     "save_agent_chats":"boolean string (true/false) that enables or disables saving the agent chats to MongoDB"
@@ -217,7 +194,6 @@
   },
   "webserver": {
     "comment1": "this is part of the signaling server configuration",    
-    "port": "Integer; port number of signaling server web server ace-direct/acedirect-kurento",
     "static": "./static",
     "token": "__DEV_TOKEN__"
   },
