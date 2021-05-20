@@ -196,7 +196,7 @@ function myCleanup() {
 require('./cleanup').Cleanup(myCleanup);
 
 // declare constants for various config values
-const COMMON_PRIVATE_IP = 'servers.main.private_ip';
+const COMMON_PRIVATE_IP = 'servers:main:private_ip';
 const NGINX_FQDN = 'servers:nginx:fqdn';
 const COLOR_CONFIG_JSON_PATH = '../dat/color_config.json';
 const ASTERISK_SIP_PRIVATE_IP = 'servers:asterisk:private_ip';
