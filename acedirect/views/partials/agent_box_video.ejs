@@ -62,10 +62,10 @@
 					</button>
 					<!--<button id="toggleDTMF" type="button" class="btn btn-gray">
 						<i class="fa fa-phone-square"></i>
-					</button>
+					</button>-->
 					<button id="recordscreen" type="button" class="btn btn-gray" onclick="recordScreen()">
 						<i id="recordIcon" class="fa fa-circle text-red"></i>
-					</button>-->
+					</button>
 					<button type="button" class="btn btn-gray" onclick="enterFullscreen()">
 						<i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
 					</button>
@@ -116,32 +116,50 @@
 	</div>
 	<div class="box-footer">
 		<div id="videomail-status-buttons-footer">
-			<div>
-				<input type="range" id="seek-bar" value="0" hidden>
-			</div>
-			<div id="inner-videomail">
-				<span id="vmail-current-time" class="text-gray" hidden>0:00</span>
-				<span class="text-gray" hidden> / </span>
-				<span id="vmail-total-time" class="text-gray" hidden>1:30</span>
-				<span id = "videomail-status-dropdown" class="btn-group dropup">
+				<div>
+					<input type="range" id="seek-bar" value="0" hidden>
+				</div>
+				<div id="inner-videomail">
+					<span id="vmail-current-time" class="text-gray" hidden>0:00</span>
+					<span class="text-gray" hidden> / </span>
+					<span id="vmail-total-time" class="text-gray" hidden>1:30</span>
+					<span id = "videomail-status-dropdown" class="btn-group dropup">
+						<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+							<span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span>&nbsp;&nbsp;&nbsp;
+							<span id="user-status" >Mark as...</span>
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'UNREAD')"><a href="#"><span>Unread</span></a></li>
+							<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ')"><a href="#"><span>Read</span></a></li>
+							<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS')"><a href="#"><span>In Progress</span></a></li>
+							<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'CLOSED')"><a href="#"><span>Closed</span></a></li>
+							<li onclick="videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
+						</ul>
+					</span>
+					<button id="videomail callback" class="btn btn-primary" type="button" onclick="videomailCallback(document.getElementById('callbacknum').getAttribute('name'))">Call Consumer</button>
+					<button id="exit-btn" class="btn btn-primary" type="button" onclick="exitVideomail()">Exit Videomail</button>
+				</div>
+		</div>
+		<div id="record-status-buttons-footer">
+			<div id="inner-record">
+				<span id="recording-status-dropdown" class="btn-group dropup">
 					<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
 						<span><i id="status-icon" class="call-btn-icon fa fa-envelope"></i></span>&nbsp;&nbsp;&nbsp;
-						<span id="user-status" >Mark as...</span>
+						<span id="user-status" >Change Status</span>
 						<span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu">
-						<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'UNREAD')"><a href="#"><span>Unread</span></a></li>
-						<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'READ')"><a href="#"><span>Read</span></a></li>
-						<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS')"><a href="#"><span>In Progress</span></a></li>
-						<li onclick="videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'CLOSED')"><a href="#"><span>Closed</span></a></li>
-						<li onclick="videomail_deleted(document.getElementById('videomailId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
+						<li onclick="recording_status_change(document.getElementById('recordId').getAttribute('name'),'UNREAD')"><a href="#"><span>Unread</span></a></li>
+						<li onclick="recording_status_change(document.getElementById('recordId').getAttribute('name'),'READ')"><a href="#"><span>Read</span></a></li>
+						<li onclick="recording_status_change(document.getElementById('recordId').getAttribute('name'),'IN PROGRESS')"><a href="#"><span>In Progress</span></a></li>
+						<li onclick="recording_status_change(document.getElementById('recordId').getAttribute('name'),'CLOSED')"><a href="#"><span>Closed</span></a></li>
+						<li onclick="recording_deleted(document.getElementById('recordId').getAttribute('name'))"><a href="#"><span>Deleted</span></a></li>
 					</ul>
 				</span>
-				<button id="videomail callback" class="btn btn-primary" type="button" onclick="videomailCallback(document.getElementById('callbacknum').getAttribute('name'))">Call Consumer</button>
-				<button id="exit-btn" class="btn btn-primary" type="button" onclick="exitVideomail()">Exit Videomail</button>
+				<button id="exit-btn" class="btn btn-primary" type="button" onclick="exitRecording()">Exit Recording</button>
 			</div>
 		</div>
-		
 	</div>
 </div>
 
