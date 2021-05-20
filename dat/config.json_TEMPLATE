@@ -4,27 +4,57 @@
     "version": "5.0",
     "year": "2021",
     "debug_level": "ERROR",
-    "fqdn": "acenode.domain.com",
-    "private_ip": "0.0.0.0",
     "https": {
       "certificate": "/etc/ssl/cert.pem",
       "private_key": "/etc/ssl/key.pem",
       "csr": "/etc/ssl/asterisk.csr"      
     }
   },
+  "servers": {
+    "main": {
+      "fqdn": "acenode.domain.com",
+      "private_ip": "0.0.0.0"
+    },
+    "nginx": {
+      "fqdn": "portal.domain.com",
+      "private_ip": "0.0.0.0"
+    },    
+    "asterisk": {
+      "fqdn": "acesip.domain.com",
+      "private_ip": "0.0.0.0"
+    },
+    "stun": {
+      "fqdn": "acestun.domain.com"    
+    },
+    "turn": {
+      "fqdn": "aceturn.domain.com"
+    },    
+    "kurento": {
+      "fqdn": "acekms.domain.com"
+    },
+    "mysql": {
+      "fqdn": "localhost"
+    },
+    "redis": {
+      "fqdn": "127.0.0.1"
+    },
+    "mongodb": {
+      "fqdn": "localhost"
+    },
+    "zendesk": {
+      "fqdn": "localhost"
+    }    
+  },  
   "signaling_server": {
-    "url": "wss://portal.domain.com/SOMEUSER/acedirect-kurento/signaling"
+    "protocol": "wss",
+    "path": "/SOMEUSER/acedirect-kurento/signaling"
   },
   "asterisk": {
     "sip": {
-      "public": "acesip.domain.com",
-      "private_ip": "0.0.0.0",
       "ws_port": "443",
-      "protocol": "wss",      
-      "stun": "acestun.domain.com",
+      "protocol": "wss",         
       "stun_port": "3478",
       "stun_user": "stunuser",
-      "turn": "aceturn.domain.com",
       "turn_port": "3478",
       "turn_user": "username",
       "turn_cred": "password",
@@ -81,7 +111,6 @@
   },
   "database_servers": {
     "mysql": {
-      "host": "localhost",
       "port": "3306",
       "user": "acedirect",
       "password": "PASSWORD",
@@ -93,12 +122,12 @@
       "ssdatabase": "media_server"
     },
     "redis": {
-      "host": "127.0.0.1",
       "port": "6379",
       "auth": "REDISPASSWORD"
     },
     "mongodb": {
-      "connection_uri": "mongodb://localhost:27017/test",
+      "database_name": "test",
+      "port": 27017,
       "caption_database_name": "caption_db",
       "caption_collection_name": "captions",
       "logAMIevents": false,
@@ -134,8 +163,6 @@
     "consumer": "true"
   },
   "nginx": {
-    "fqdn": "portal.domain.com",
-    "private_ip": "0.0.0.0",
     "port": "443",
     "ad_path": "/ACEDirect",
     "mp_path": "/ManagementPortal",
@@ -156,7 +183,6 @@
     "force_logout_password": "securexForcexLogoutxPassword"
   },
   "zendesk": {
-    "private_ip": "localhost",
     "port": "9003",
     "protocol": "https",
     "user_id": "user@email.com",
@@ -188,21 +214,20 @@
     "enabled": "true"
   },
   "webserver": {
-    "comment1": "for acedirect-kurento",
     "port": 9009,
     "static": "./static",
     "token": "__DEV_TOKEN__"
   },
   "asteriskss": {
-    "comment1": "for acedirect-kurento",
     "sip_media_request_interval": 5000,
     "ami": {
       "enabled": true
     }
   },
   "kurento": {
-    "comment1": "signaling server only",
-    "url": "wss://acekms.domain.com:8443/kurento",
+    "port": 8443,
+    "protocol": "wss",
+    "path": "/kurento",    
     "stats_interval": 10000,
     "sdes_crypto": "AES_128_CM_HMAC_SHA1_80",
     "monitoring_enabled": false,
@@ -214,9 +239,6 @@
     "video_rtp_max_bitrate": 1000,
     "video_rtp_min_bitrate": 500,
     "video_webrtc_codec": "H264",
-    "_comment2": "42001F fixes some problems. 42E015 - try this too - RFC3984 - page 38",
-    "_comment3": "Tried 42e01f - did not work",
-    "_comment4": "profile-level-id=42001F;packetization-mode=0;level-asymmetry-allowed=1",
     "h264_config": "profile-level-id=42E01F;packetization-mode=0;level-asymmetry-allowed=0",
     "aws": {
       "s3": {
@@ -229,7 +251,6 @@
     "conference_max_participants": 4
   },
   "videomailss": {
-    "comment1": "signaling server only",
     "directory": "/tmp/videomail/",
     "instructions_media": [
       "/tmp/videomail/instructions/video.mp4",
