@@ -1,3 +1,4 @@
+
 // node modules
 let dbconn = null;
 let dbConnection = null;
@@ -196,10 +197,10 @@ function myCleanup() {
 require('./cleanup').Cleanup(myCleanup);
 
 // declare constants for various config values
-const COMMON_PRIVATE_IP = 'servers:main:fqdn';
+const COMMON_PRIVATE_IP = 'servers:main:private_ip';
 const NGINX_FQDN = 'servers:nginx:fqdn';
 const COLOR_CONFIG_JSON_PATH = '../dat/color_config.json';
-const ASTERISK_SIP_PRIVATE_IP = 'servers:asterisk:fqdn';
+const ASTERISK_SIP_PRIVATE_IP = 'servers:asterisk:private_ip';
 const AGENT_SERVICE_PORT = 'agent_service:port';
 const ACE_DIRECT_PORT = 'ace_direct:https_listen_port';
 
@@ -273,7 +274,7 @@ if (nginxPath.length === 0) {
 
 const policyAgent = new openamAgent.PolicyAgent({
   serverUrl: `https://${getConfigVal(NGINX_FQDN)}:${getConfigVal('nginx:port')}/${getConfigVal('openam:path')}`,
-  privateIP: getConfigVal('servers:nginx:fqdn'),
+  privateIP: getConfigVal('servers:nginx:private_ip'),
   errorPage() {
     return '<html><body><h1>Access Error</h1></body></html>';
   }
