@@ -521,6 +521,14 @@ function connect_socket() {
 					setTimeout(function () {
 						$('#multipartyTransitionModal').modal('hide');
 					}, 3000);
+				}).on('consumer-being-monitored', function() {
+					// keep self-view and don't enable multiparty captions during a monitored one-to-one call
+					acekurento.isMonitoring = true;
+					$('#end-call').attr('onclick', 'monitorHangup()');
+				}).on('consumer-stop-monitor', function() {
+					acekurento.isMonitoring = false;
+					monitorExt = null;
+					$('#end-call').attr('onclick', 'terminate_call()');
 				});
 
 			} else {
@@ -800,6 +808,10 @@ $('#screenshareButton').prop("disabled", true).click(function () {
 });
 
 $('#startScreenshare').prop("disabled", true).click(function(){
+    if (monitorExt) {
+        // kick the monitor from the session first 
+        socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
+    }
 	acekurento.screenshare(true);
 });
 
