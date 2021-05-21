@@ -371,7 +371,7 @@ var year = getConfigVal('common:year');
 logger.info("This is ACE Direct v" + version + ", Copyright " + year + ".");
 
 // Create a connection to Redis
-var redisClient = redis.createClient(getConfigVal('database_servers:app_ports:redis').toString(), getConfigVal('servers:redis_fqdn'));
+var redisClient = redis.createClient(getConfigVal('app_ports:redis').toString(), getConfigVal('servers:redis_fqdn'));
 
 redisClient.on("error", function (err) {
     logger.error("");
@@ -473,7 +473,7 @@ dbConnection.connect(function(err) {
 var mongodbUri = null;
 const mongodbFqdn = nconf.get('servers:mongodb_fqdn');
 if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
-	mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('database_servers:app_ports:mongodb')}/${getConfigVal('database_servers:mongodb:database_name')}`;
+	mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('app_ports:mongodb')}/${getConfigVal('database_servers:mongodb:database_name')}`;
 }
 var logCallData = nconf.get('database_servers:mongodb:logCallData');
 var mongodb;
