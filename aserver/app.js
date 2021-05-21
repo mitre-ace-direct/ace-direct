@@ -145,7 +145,7 @@ setInterval(() => {
   connection.ping();
 }, 60000);
 
-const asterisk = new AsteriskManager(parseInt(getConfigVal('app_ports:asterisk_ami'), 10),
+const asterisk = new AsteriskManager(getConfigVal('app_ports:asterisk_ami').toString(),
   getConfigVal('servers:asterisk_private_ip'),
   getConfigVal('asterisk:ami:id'),
   getConfigVal('asterisk:ami:passwd'), true);
