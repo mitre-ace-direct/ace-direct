@@ -54,6 +54,11 @@
     "agent_route": "customizable route for agent portal url",
     "consumer_route": "customizable route for consumer portal url"
   },  
+  "openam": {
+    "path": "OpenAM web path as specified in the OpenAM installation",
+    "user": "openAM admin user name from the OpenAM installation",
+    "password": "openAM admin password from the OpenAM installation"
+  },  
   "media_server": {
     "privacy_video_url": "file location of privacy video file on the Kurento media server"
   },
@@ -163,11 +168,6 @@
     "agent": "Enable captions for the agent portal",
     "consumer" : "Enable captions for the consumer portal"
   }, 
-  "openam": {
-    "path": "OpenAM web path as specified in the OpenAM installation",
-    "user": "openAM admin user name from the OpenAM installation",
-    "password": "openAM admin password from the OpenAM installation"
-  },
   "management_portal": {
     "poll_interval" : "Poll frequency (seconds) of the Management Portal statistics",
     "force_logout_password": "a really secure password for the remote force agent logout feature"    
