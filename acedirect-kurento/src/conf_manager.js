@@ -19,7 +19,7 @@ class ConfManager extends Events {
 
   register(user, pass) {
     const host = param('servers.asterisk_fqdn');
-    const port = param('asterisk.sip.ws_port');
+    const port = param('app_ports.asterisk_ws');
     const protocol = param('asterisk.sip.protocol');
     const uri = `${protocol}://${host}:${port}/ws`;
     const socket = new NodeWS(uri);
@@ -157,10 +157,10 @@ class ConfManager extends Events {
 
       const iceArr = [
         {
-          "urls": `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('asterisk.sip.stun_port')}`
+          "urls": `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('app_ports.stun')}`
         },
         {
-          "urls": `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('asterisk.sip.turn_port')}`,
+          "urls": `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('app_ports.turn')}`,
           "username": `${param('asterisk.sip.turn_user')}`,
           "credential": `${param('asterisk.sip.turn_cred')}`
         }
@@ -228,10 +228,10 @@ class ConfManager extends Events {
         debug(rtpAnswer);
         const iceArr = [
           {
-            "urls": `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('asterisk.sip.stun_port')}`
+            "urls": `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('app_ports.stun')}`
           },
           {
-            "urls": `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('asterisk.sip.turn_port')}`,
+            "urls": `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('app_ports.turn')}`,
             "username": `${param('asterisk.sip.turn_user')}`,
             "credential": `${param('asterisk.sip.turn_cred')}`
           }
@@ -335,10 +335,10 @@ class ConfManager extends Events {
       var pfuInt;
       const iceArr = [
         {
-          "urls": `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('asterisk.sip.stun_port')}`
+          "urls": `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('app_ports.stun')}`
         },
         {
-          "urls": `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('asterisk.sip.turn_port')}`,
+          "urls": `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('app_ports.turn')}`,
           "username": `${param('asterisk.sip.turn_user')}`,
           "credential": `${param('asterisk.sip.turn_cred')}`
         }
