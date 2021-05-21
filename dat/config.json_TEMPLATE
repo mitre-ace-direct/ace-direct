@@ -54,6 +54,11 @@
     "agent_route": "/agent",
     "consumer_route": "/call"
   },  
+  "openam": {
+    "path": "ace",
+    "user": "adminUsername",
+    "password": "adminPassword"
+  },  
   "media_server": {
       "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
   },  
@@ -162,11 +167,6 @@
   "caption_mode": {
     "agent": "true",
     "consumer": "true"
-  },
-  "openam": {
-    "path": "ace",
-    "user": "adminUsername",
-    "password": "adminPassword"
   },
   "management_portal": {
     "poll_interval": "1000",
