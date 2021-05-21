@@ -231,7 +231,7 @@ const credentials = {
 // const redisAgentInfoMap = 'agentInfoMap';
 
 // Create a connection to Redis
-const redisClient = redis.createClient(getConfigVal('database_servers:redis:port'), getConfigVal('servers:redis_fqdn'));
+const redisClient = redis.createClient(getConfigVal('database_servers:app_ports:redis'), getConfigVal('servers:redis_fqdn'));
 
 redisClient.on('error', (err) => {
   logger.error('');
@@ -273,7 +273,7 @@ if (nginxPath.length === 0) {
 }
 
 const policyAgent = new openamAgent.PolicyAgent({
-  serverUrl: `https://${getConfigVal(NGINX_FQDN)}:${getConfigVal('nginx:port')}/${getConfigVal('openam:path')}`,
+  serverUrl: `https://${getConfigVal(NGINX_FQDN)}:${getConfigVal('app_ports:nginx')}/${getConfigVal('openam:path')}`,
   privateIP: getConfigVal('servers:nginx_private_ip'),
   errorPage() {
     return '<html><body><h1>Access Error</h1></body></html>';
@@ -343,7 +343,7 @@ const dbHost = getConfigVal('servers:mysql_fqdn');
 const dbUser = getConfigVal('database_servers:mysql:user');
 const dbPassword = getConfigVal('database_servers:mysql:password');
 const dbName = getConfigVal('database_servers:mysql:ad_database_name');
-const dbPort = parseInt(getConfigVal('database_servers:mysql:port'), 10);
+const dbPort = parseInt(getConfigVal('app_ports:mysql'), 10);
 const vmTable = 'videomail';
 const callBlockTable = 'call_block';
 const callBlockVrsPrefix = '1';
@@ -368,7 +368,7 @@ setInterval(() => {
 var mongodbUri = null;
 const mongodbFqdn = nconf.get('servers:mongodb_fqdn');
 if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
-	mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('database_servers:mongodb:port')}/${getConfigVal('database_servers:mongodb:database_name')}`;
+	mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('database_servers:app_ports:mongodb')}/${getConfigVal('database_servers:mongodb:database_name')}`;
 }
 
 const logAMIEvents = nconf.get('database_servers:mongodb:logAMIevents');
@@ -585,10 +585,10 @@ io.sockets.on('connection', (socket) => {
   //   const confobj = {
   //     host: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
   //     realm: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
-  //     stun: `${getConfigVal('servers:stun_fqdn')}:${getConfigVal('asterisk:sip:stun_port')}`,
-  //     wsport: parseInt(getConfigVal('asterisk:sip:ws_port'), 10),
+  //     stun: `${getConfigVal('servers:stun_fqdn')}:${getConfigVal('app_ports:stun')}`,
+  //     wsport: parseInt(getConfigVal('app_ports:asterisk_ws'), 10),
   //     channel: getConfigVal('asterisk:sip:channel'),
-  //     websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('asterisk:sip:ws_port')}/ws`
+  //     websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('app_ports:asterisk_ws')}/ws`
   //   };
 
   //   socket.emit('sipconf', confobj);
@@ -1759,7 +1759,7 @@ function HandleManagerEvent(evt) {
 function InitAmi() {
   if (ami === null) {
     try {
-      ami = new AsteriskManager(parseInt(getConfigVal('asterisk:ami:port'), 10),
+      ami = new AsteriskManager(parseInt(getConfigVal('app_ports:asterisk_ami'), 10),
         getConfigVal(ASTERISK_SIP_PRIVATE_IP),
         getConfigVal('asterisk:ami:id'),
         getConfigVal('asterisk:ami:passwd'), true);
