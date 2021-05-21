@@ -32,14 +32,23 @@
     "acr-cdr": "local application port for acr-cdr server",
     "userver": "local application port for userver",
     "aserver": "local application port for aserver",
-    "sswebserver": "local application port for signaling server acedirect-kurento webserver"
+    "sswebserver": "local application port for signaling server acedirect-kurento webserver",
+    "nginx": "NGINX server port number",
+    "asterisk_ws": "Asterisk websocket port",
+    "asterisk_ami": "Asterisk AMI port",    
+    "stun": "STUN server port",
+    "turn": "TURN server port; may be empty string",    
+    "mysql": "Port number for the ACE Direct MySQL server",
+    "redis": "Redis server port",
+    "mongodb": "MongoDB port number, default is 27017",
+    "translation_server": "Port number of the translation server",
+    "kurento": "Kurento media server port"
   },     
   "signaling_server": {
       "protocol": "wss",
       "path": "This is the acedirect-kurento route in /etc/nginx/nginx.conf on the portal.domain.com server"
   },
-  "nginx": {
-    "port": "NGINX server port number",    
+  "nginx": { 
     "ad_path": "customizable NGINX path for agent/consumer portals",
     "mp_path": "customizable NGINX path for management portal",
     "agent_route": "customizable route for agent portal url",
@@ -49,20 +58,16 @@
     "privacy_video_url": "file location of privacy video file on the Kurento media server"
   },
   "asterisk": {
-    "sip": {
-      "ws_port": "Websocket port",      
+    "sip": {  
       "protocol": "Asterisk protocol",      
-      "stun_port": "Port of the stun server",
       "stun_user": "username for stun server",      
-      "turn_port": "string; port number of turn server; may be empty",
       "turn_user": "turn server username",
       "turn_cred": "turn server password",
       "channel": "default to SIP"
     },
     "ami": {
       "id": "Asterisk AMI userid; retrieve from /etc/asterisk/manager.conf on acesip.domain.com",
-      "passwd": "Asterisk AMI password; retrieve from /etc/asterisk/manager.conf on acesip.domain.com",
-      "port": "Asterisk AMI port"
+      "passwd": "Asterisk AMI password; retrieve from /etc/asterisk/manager.conf on acesip.domain.com"
     },
     "extensions": {
       "start_number": "First consumer extension; see 'password=' in /etc/asterisk/pjsip.conf on acesip.domain.com",
@@ -109,8 +114,7 @@
     }
   },
   "database_servers": {
-    "mysql": {
-      "port": "Port number for the ACE Direct MySQL server",      
+    "mysql": {  
       "user": "Username for the ACE Direct MySQL user",
       "password": "Password for the ACE Direct MySQL user; value for _ACEDIRECT_PASSWORD_ in MySQL configuration",
       "ad_database_name": "ACE Direct database name",
@@ -121,12 +125,10 @@
       "ssdatabase": "(for signaling server) signaling server db name"
     },
     "redis": {
-      "port": "Redis server port",
       "auth": "Redis authentication string; your chosen password for myRedisPassword during Redis installation"
     },
     "mongodb": {
       "database_name": "primary database",
-      "port": "port number, default is 27017",
       "caption_database_name": "database to log captions to",
       "caption_collection_name": "collection to log captions to",
       "logAMIevents": "true/false boolean - log AMI events",
@@ -189,8 +191,8 @@
     "awayBlink": "boolean string (true/false) that enables blinking while Away, if callers are in queue"
   },
   "translation_server": {
-    "port": "Port number of the translation server",
-    "protocol": "Protocol (http/https) of the translation server"
+    "protocol": "Protocol (http/https) of the translation server",
+    "enabled": "Boolean; enable/disable translation server"    
   },
   "webserver": {
     "comment1": "this is part of the signaling server configuration",    
@@ -206,7 +208,6 @@
   },
   "kurento": {
     "comment1": "this is part of the signaling server configuration",    
-    "port": 8443,
     "protocol": "wss",
     "path": "/kurento",
     "stats_interval": 10000,
