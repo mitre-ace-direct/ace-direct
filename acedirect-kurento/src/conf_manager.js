@@ -87,10 +87,12 @@ class ConfManager extends Events {
     return true;
   }
 
-  async callTransfer(caller, session, ext, isBlind) {
+  async callTransfer(caller, session, ext, isBlind) { //calleePeer = receiving agent, caller = original agent
     const calleePeer = this._index.getByExt(ext);
     calleePeer._warmTransfer = !isBlind;
     const jssip_session = this._jssipRTCSessions.get(caller._ext);
+    console.log(caller._ext)
+    console.log(calleePeer._ext)
     jssip_session.refer(calleePeer._ext);
     return true;
   }
@@ -131,12 +133,15 @@ class ConfManager extends Events {
   }
 
   async handleNewSession(calleeExt, evt) {
+    console.log('at handleNewSession')
     const { From: from } = evt.request.headers;
     const { session } = evt;
     const videoMaxBitrate = param('kurento.video_webrtc_max_bitrate') || 300;
     const videoMinBitrate = param('kurento.video_webrtc_min_bitrate') || 50;
 
     const bitrates = { audio: { max: 30, min: 10 }, video: { max: videoMaxBitrate, min: videoMinBitrate } };
+    console.log('setting jssipRTCSession')
+    console.log(calleeExt)
     this._jssipRTCSessions.set(calleeExt, session);
     let callerExt = 'Anonymous';
     if (from && from.length) {
@@ -172,6 +177,7 @@ class ConfManager extends Events {
       return;
     }
     if (callee && caller) {
+      console.log('here')
       const call = this._calls.get(caller.ext);
       debug('Incoming call (SIP) from %s to %s', caller.ext, callee.ext);
       const webrtcOffer = await callee.accept(caller.ext, call);
@@ -193,6 +199,7 @@ class ConfManager extends Events {
         call.finish();
       }
     } else if (callee) {
+      console.log('here1')
       const call = new RTCCall('H264');
       this._calls.set(callerExt, call);
       this._calls.set(callee.ext, call);
@@ -276,6 +283,7 @@ class ConfManager extends Events {
   }
 
   async call(caller, callerOffer, calleeExt, skipQueue) {
+    console.log('at call()')
     const callee = this._index.getByExt(calleeExt);
     const videoMaxBitrate = param('kurento.video_webrtc_max_bitrate') || 300;
     const videoMinBitrate = param('kurento.video_webrtc_min_bitrate') || 50;
@@ -297,6 +305,7 @@ class ConfManager extends Events {
     });
     await call.init();
     if (skipQueue && callee) {
+      console.log('look here')
       debug('Starting WebRTC session %s -> %s', caller.ext, calleeExt);
       await call.addWebrtcPeer(caller, callerOffer, bitrates);
       const calleeOffer = await callee.accept(caller.ext, call);
@@ -313,6 +322,7 @@ class ConfManager extends Events {
         call.finish();
       }
     } else {
+      console.log('look here 1')
       await call.addWebrtcPeer(caller, callerOffer, bitrates);
       const rtpOffer = await call.addRtpPeer(calleeExt);
       await models.WebrtcSession.create({
@@ -329,6 +339,9 @@ class ConfManager extends Events {
           iceServers: param('ice')
         }
       });
+
+      this._jssipRTCSessions.set(caller.ext, session);
+
       session.on('failed', e => {
         if (e.message) {
           call.onFailed(calleeExt, e.message.reason_phrase);
