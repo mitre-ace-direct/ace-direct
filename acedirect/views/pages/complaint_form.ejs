@@ -170,7 +170,7 @@
 						</div>
 					</section>
 					<!-- Middle Col -->
-					<section class="col-lg-7" id="video-section">
+					<section class="col-lg-6" id="video-section">
 						<div class="box">
 							<div class="box-header with-border">
 								<i class="fa fa-video-camera"></i>
@@ -183,12 +183,11 @@
 							</div>
 
 							<div class="box-body" id="fullscreen-element">
-								<div id="webcam" hidden>
+								<div id="consumer-webcam" hidden>
 
 
 									<video id="remoteView" autoplay poster="images/acedirect-logo.png"></video>
 									<video id="selfView" autoplay muted="true" class="mirror-mode" hidden></video>
-									<div id="transcriptoverlay" class="transcriptoverlay"></div> <!-- Caption code -->
 
 									<div id="call-option-buttons">
 										<div id="inner">
@@ -234,8 +233,12 @@
 
 									</div>
 								</div>
+								<hr id="consumer-divider" class="caption-box-divider"  style="display:none" />
+								<div id="consumer-captions" class="captions-box" style="display:none">
+									<div id="transcriptoverlay" class=""></div> 
+								</div>
 
-								<div class="row">
+								<div>
 									<div class="col-xs-12 text-center" id="start-call-buttons"
 										style="margin-top: 10px; margin-bottom: 10px;">
 										<button class="btn btn-primary" id="callbutton" style="width: 80px;"
@@ -247,6 +250,7 @@
 										</button>
 									</div>
 								</div>
+								
 								<div class="col-xs-12 text-center" id="agent-name-box"
 									style="margin-bottom: 5px; margin-top: 5px;" hidden>
 									<p> You are talking to CSR <strong id="agent-name"> </strong>.</p>
@@ -463,25 +467,7 @@
 
 							</div>
 							<div class="row">
-								<div class="col-xs-12 " style="margin-top: 10px; margin-bottom: 10px;">
-									<!-- <div class="row">
-										<div class="col-xs-12 " style="margin-top: 10px; margin-bottom: 10px;">
-											<span>Preferred Language</span>
-											<select name="webmenu" id="language-select" style="width: 210px;margin-left:10px">
-												<option value="en" selected title="images/flags/us.png">English</option>
-												<option value="ar" title="images/flags/ae.png">Arabic</option>
-												<option value="zh" title="images/flags/cn.png">Chinese (Mandarin)</option>
-												<option value="nl" title="images/flags/nl.png">Dutch</option>
-												<option value="fr" title="images/flags/fr.png">French</option>
-												<option value="de" title="images/flags/de.png">German</option>
-												<option value="it" title="images/flags/in.png">Italian</option>
-												<option value="ja" title="images/flags/jp.png">Japanese</option>
-												<option value="ko" title="images/flags/kr.png">Korean</option>
-												<option value="pt" title="images/flags/pt.png">Portuguese</option>
-												<option value="es" title="images/flags/mx.png">Spanish</option>
-											</select>
-										</div>
-									</div> -->
+								<div id="consumer-tools-container" class="col-xs-6" style="margin-top: 10px; margin-bottom: 10px;">
 									<a class="btn btn-primary" id="screenshareButton" disabled>Request Screenshare</a>
 									<p id="requestAck" hidden>Screenshare Request Sent</p>
 									<div id="screenshareButtonGroup" hidden>
