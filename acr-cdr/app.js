@@ -124,7 +124,7 @@ const dbHost = getConfigVal('servers:mysql_fqdn');
 const dbUser = getConfigVal('database_servers:mysql:user');
 const dbPassword = getConfigVal('database_servers:mysql:password');
 const dbName = getConfigVal('database_servers:mysql:cdr_database_name');
-const dbPort = parseInt(getConfigVal('database_servers:mysql:port'), 10);
+const dbPort = parseInt(getConfigVal('app_ports:mysql'), 10);
 const cdrTable = getConfigVal('database_servers:mysql:cdr_table_name');
 
 clear(); // clear console
