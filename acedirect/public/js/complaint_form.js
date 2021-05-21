@@ -21,7 +21,7 @@ $(document).ready(function () {
 	//JSSIP components
 	$('#login-full-background').hide();
 	$('#login-box').hide();
-	$('#webcam').show();
+	$('#consumer-webcam').show();
 
 	$('#complaint').keyup(function () {
 		var left = 2000 - $(this).val().length;
@@ -370,7 +370,7 @@ function connect_socket() {
 						$("#video-section").removeClass(function (index, className) {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
-						$("#video-section").addClass("col-lg-7");
+						$("#video-section").addClass("col-lg-6");
 						$("#chat-section").removeClass(function (index, className) {
 							return (className.match(/\bcol-\S+/g) || []).join(' ');
 						});
@@ -482,7 +482,7 @@ function connect_socket() {
 						$("#requestAck").html("Permission has been denied.");
 					}
 				}).on('multiparty-caption', function (transcripts) {
-					console.log(JSON.stringify(transcripts))
+					console.log('multiparty caption:', JSON.stringify(transcripts))
 					socket.emit('translate-caption', {
 						"transcripts": transcripts,
 						"callerNumber": exten,
@@ -521,6 +521,14 @@ function connect_socket() {
 					setTimeout(function () {
 						$('#multipartyTransitionModal').modal('hide');
 					}, 3000);
+				}).on('consumer-being-monitored', function() {
+					// keep self-view and don't enable multiparty captions during a monitored one-to-one call
+					acekurento.isMonitoring = true;
+					$('#end-call').attr('onclick', 'monitorHangup()');
+				}).on('consumer-stop-monitor', function() {
+					acekurento.isMonitoring = false;
+					monitorExt = null;
+					$('#end-call').attr('onclick', 'terminate_call()');
 				});
 
 			} else {
@@ -800,6 +808,10 @@ $('#screenshareButton').prop("disabled", true).click(function () {
 });
 
 $('#startScreenshare').prop("disabled", true).click(function(){
+    if (monitorExt) {
+        // kick the monitor from the session first 
+        socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
+    }
 	acekurento.screenshare(true);
 });
 

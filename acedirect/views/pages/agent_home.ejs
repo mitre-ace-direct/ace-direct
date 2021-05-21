@@ -103,7 +103,7 @@
         <%- include("../partials/acedirect_footer") %>
 
             <!-- Control Sidebar -->
-            <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark" style="width: 565px; right:-565px">
+            <aside id="ctrl-sidebar" class="control-sidebar control-sidebar-dark" style="width: 630px; right:-630px">
                 <!-- Create the tabs -->
                 <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
                     <li class="active">
@@ -117,6 +117,10 @@
                     <li>
                         <a href="#control-sidebar-shortcuts-tab" data-toggle="tab" id="shortcuts-tab" name="Shortcuts_Tab">
                             <i class="fa fa-keyboard-o"></i>&nbsp;&nbsp;Shortcuts</a>
+                    </li>
+                    <li>
+                        <a href="#control-sidebar-recordings-tab" data-toggle="tab" id="recordings-tab" name="Recordings_Tab">
+                            <i class="fa fa-users"></i>&nbsp;&nbsp;Call Recordings</a>
                     </li>
                     <li id="debugtab">
                         <a href="#control-sidebar-debug-tab" data-toggle="tab">
@@ -136,6 +140,7 @@
                                         <th>Agent</th>
                                         <th>Ext</th>
                                         <th>Queues</th>
+                                        <th>Monitor Call</th>
                                         <th>Transfer Call</th>
                                         <th>Multi-Party Invite</th>
                                         <th>Chat</th>
@@ -248,6 +253,26 @@
                         </div>
                     </div>
                     <!-- /.Keyboard Shortcuts tab content -->
+
+                    <!-- Call Recordings tab content -->
+                    <div class="tab-pane" id="control-sidebar-recordings-tab">
+                        <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
+                            <table id='agenttable' class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Recording</th>
+                                        <th>Caller</th>
+                                        <th>Date</th>
+                                        <th>Length</th>
+                                        <th>Status</th>
+                                </thead>
+                                <tbody id='callRecordingTbody'>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- /.Call Recordings tab content -->
                 </div>
                 <!-- /.Tab panes -->
             </aside>
@@ -804,6 +829,11 @@
         <div hidden>
             <div id="videomailId"> </div>
             <div id="callbacknum"> </div>
+        </div>
+
+        <!-- Recording hidden data -->
+        <div hidden>
+            <div id="recordId"> </div>
         </div>
 
         <div id="snackbar">Default Text</div>
