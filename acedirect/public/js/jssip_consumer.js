@@ -19,6 +19,8 @@
 	var jssip_debug = false; //enables debugging logs from jssip library if true NOTE: may have to refresh a lot to update change
 	var maxRecordingSeconds = 90;
 	var call_terminated = false;
+	var privacy_video_url = window.location.origin + "/" + nginxPath + "/media/videoPrivacy.webm";
+	var monitorExt;
 
 	//VIDEOMAIL recording progress bar
 	var recordId = null;
@@ -152,22 +154,38 @@
 			'failed': function(e) {
 				console.log('--- WV: Failed ---\n' + e);
 			},
-                        'restartCallResponse': function (e) {
-                                console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e) );
-                                if (selfStream && selfStream.srcObject) {
-                                  selfStream.srcObject.getVideoTracks()[0].onended = function () {
-                                    console.log('screensharing ended self');
-				    $("#startScreenshare").hide();
-                                    if (acekurento) acekurento.screenshare(false);
-                                  };
-                                }
-                                if (remoteStream && remoteStream.srcObject) {
-                                  remoteStream.srcObject.getVideoTracks()[0].onended = function () {
-                                    console.log('screensharing ended remote');
-				    $("#startScreenshare").hide();
-                                  };
-                                }
-                        },
+			'restartCallResponse': function (e) {
+				console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e));
+				if (selfStream && selfStream.srcObject) {
+					selfStream.srcObject.getVideoTracks()[0].onended = function () {
+						console.log('screensharing ended self');
+						$("#startScreenshare").hide();
+
+						if (monitorExt) {
+							// force monitor to leave the session first
+							socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
+
+							setTimeout(() => {
+								screenShareEnabled = false;
+								if (acekurento) acekurento.screenshare(false);
+							}, 500);
+						} else {
+							if (acekurento) acekurento.screenshare(false);
+						}
+					};
+				}
+				if (remoteStream && remoteStream.srcObject) {
+					remoteStream.srcObject.getVideoTracks()[0].onended = function () {
+						console.log('screensharing ended remote');
+						$("#startScreenshare").hide();
+					};
+				}
+
+				if (monitorExt) {
+					// bring the monitor back to the session
+					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+				}
+			},
 			'ended': function(e) {
 				console.log('--- WV: Call ended ---\n');
 
@@ -180,6 +198,7 @@
 				$("#start-call-buttons").show();
 				$("#agent-name-box").hide();
 				$("#agent-name").text("");
+				$('#end-call').attr('onclick', 'terminate_call()');
 
 			},
 			'participantsUpdate': function(e) {
@@ -189,6 +208,12 @@
 				var partCount = e.participants.filter(t=>t.type == "participant:webrtc").length;
 
 				console.log("--- WV: partCount: " + partCount);
+
+				for (var i = 0; i < e.participants.length; i++) {
+					if (e.participants[i].isMonitor) {
+						monitorExt = e.participants[i].ext;
+					}
+				}
 
 				if (partCount >=2 || videomailflag) {
 					console.log("--- WV: CONNECTED");
@@ -213,6 +238,8 @@
 	function start_call(other_sip_uri, myExtension) {
           console.log("start_call: " + other_sip_uri);
 		  selfStream.removeAttribute("hidden");
+		  $('#consumer-captions').show();
+		  $('#consumer-divider').show();
 		
 		$("#screenshareButton").removeAttr('disabled');
 		  $("#fileInput").removeAttr('disabled');
@@ -260,6 +287,14 @@
 		}
 	}
 
+	function monitorHangup() {
+		socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite': false});
+		
+		setTimeout(() => {
+			terminate_call();
+		}, 500);
+	}
+
 	//handles cleanup from jssip call. removes the session if it is active and removes video.
 	function terminate_call() {
 		if (acekurento !== null) {
@@ -267,6 +302,7 @@
 			acekurento = null;
 		}
 		call_terminated = true;
+		monitorExt = null;
 
 		
 		document.getElementById("screenshareButton").disabled = true;
@@ -283,6 +319,8 @@
 		$("#agent-name").text("");
 		exitFullscreen();
 		$('#transcriptoverlay').html('');
+		$('#consumer-captions').hide();
+		$('#consumer-divider').hide();
 
 		//reset the incall mute button
 		mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
@@ -338,10 +376,10 @@
 		}
 		removeElement("selfView");
 		removeElement("remoteView");
-		addElement("webcam", "video", "remoteView");
+		addElement("consumer-webcam", "video", "remoteView");
 		remoteView.setAttribute("autoplay", "autoplay");
 		remoteView.setAttribute("poster", "images/acedirect-logo-trim.png");
-		addElement("webcam", "video", "selfView");
+		addElement("consumer-webcam", "video", "selfView");
 		selfView.setAttribute("style", "right: 11px");
 		selfView.setAttribute("autoplay", "autoplay");
 		selfView.setAttribute("muted", true);
@@ -439,25 +477,49 @@
 	}
 
 	function enable_video_privacy() {
-                if (acekurento !== null) {
-				  selfStream.classList.remove("mirror-mode");
-                  acekurento.enableDisableTrack(false, false); //mute video
-                  hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
-                  hide_video_icon.style.display = "block";
-                  acekurento.privateMode(true, globalData.privacy_video_url);
-                }
+		if (acekurento !== null) {
+			if (acekurento.isMonitoring) {
+				socket.emit('force-monitor-leave', { 'monitorExt': monitorExt, 'reinvite': true });
+				setTimeout(() => {
+					selfStream.classList.remove("mirror-mode");
+					acekurento.enableDisableTrack(false, false); //mute video
+					hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
+					hide_video_icon.style.display = "block";
+					acekurento.privateMode(true, privacy_video_url);
+					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+				}, 500);
+			} else {
+				selfStream.classList.remove("mirror-mode");
+				acekurento.enableDisableTrack(false, false); //mute video
+				hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
+				hide_video_icon.style.display = "block";
+				acekurento.privateMode(true, privacy_video_url);
+			}
+		}
 	}
 
 	function disable_video_privacy() {
-                if (acekurento !== null) {
-
-				  selfStream.classList.add("mirror-mode");
-                  acekurento.enableDisableTrack(true, false); //unmute video
-                  hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
-                  hide_video_icon.style.display = "none";
-                  acekurento.privateMode(false);
-                  hide_video_icon.style.display = "none";
-                }
+		if (acekurento !== null) {
+			if (acekurento.isMonitoring) {
+				socket.emit('force-monitor-leave', { 'monitorExt': monitorExt, 'reinvite': true });
+				setTimeout(() => {
+					selfStream.classList.add("mirror-mode");
+					acekurento.enableDisableTrack(true, false); //unmute video
+					hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+					hide_video_icon.style.display = "none";
+					acekurento.privateMode(false);
+					hide_video_icon.style.display = "none";
+					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+				}, 500);
+			} else {
+			selfStream.classList.add("mirror-mode");
+			acekurento.enableDisableTrack(true, false); //unmute video
+			hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+			hide_video_icon.style.display = "none";
+			acekurento.privateMode(false);
+			hide_video_icon.style.display = "none";
+			}
+		}
 	}
 	// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout".
 	// puts session on hold
@@ -540,24 +602,37 @@
 		var color = current.substring(0,current.lastIndexOf(',')+1) + alpha + ')';
 		document.documentElement.style.setProperty('--caption-bg-color', color);
 	});
-	var tempDivTimeout = null;
+
+
+	function createCaptionHtml(displayName, transcripts) {
+		console.log(displayName, transcripts)
+		let caption = transcripts.transcript;
+		if (!transcripts.final) {
+			caption += '...';
+		}
+		let timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+		return '<span class="timestamp">' + timestamp + '</span><strong>' + displayName + ':</strong> ' + caption;
+	}
+
 	function updateConsumerCaptions(transcripts) {
 		console.log('--- WV: transcripts.transcript ---\n');
 		console.log('consumer uc: ', transcripts)
 
 		var tDiv = document.getElementById(transcripts.msgid);
+		let displayName = 'CSR ' +  $('#agent-name').text();
+		let caption = createCaptionHtml(displayName, transcripts);
 		if(!tDiv) {
 			var temp = document.createElement("div");
 			temp.id = transcripts.msgid;
-			temp.innerHTML = transcripts.transcript;
+			temp.innerHTML = caption;
 			temp.classList.add("transcripttext");
-			document.getElementById("transcriptoverlay").appendChild(temp);
-			tempDivTimeout = setTimeout(function () { temp.remove() }, 5000);
+			document.getElementById("transcriptoverlay").prepend(temp);
+			let elem = $('#consumer-captions')
+			// elem.scrollTop(elem.prop("scrollHeight")); // Scroll to bottom
 		} else {
-			clearTimeout(tempDivTimeout);
-			tempDivTimeout = setTimeout(function(){tDiv.remove();},5000);
-			tDiv.innerHTML = transcripts.transcript;
+			tDiv.innerHTML = caption;
 			if(transcripts.final || call_terminated) {
+				// setTimeout(function(){tDiv.remove();},5000);
 
 				//var captionBubble = '<div><b>' +transcripts.timestamp + ':</b>&nbsp;'+transcripts.transcript+'<br/><div>';
 				//$(captionBubble).appendTo($("#caption-messages"));
@@ -568,45 +643,46 @@
 	}
 
 	// Run caption demo
-	var demo_running = false;
-	function testCaptions() {
+	// This doesn't work anymore -- jkorb
+	// var demo_running = false;
+	// function testCaptions() {
 
-		if(!demo_running) {
-			demo_running = true;
+	// 	if(!demo_running) {
+	// 		demo_running = true;
 
-			var temp = document.createElement("div");
-			temp.classList.add("transcripttext");
+	// 		var temp = document.createElement("div");
+	// 		temp.classList.add("transcripttext");
 
-			document.getElementById("transcriptoverlay").appendChild(temp);
-			temp.innerHTML = 'Hello, how can I help you today?';
-			var count = 0;
-			var intervalId = window.setInterval(function() {
-				switch (count) {
-					case 0:
-						temp.innerHTML = "No problem, I'll just need your account number";
-						break;
-					case 1:
-						temp.innerHTML = 'You are all set. Thank you for your patience';
-						break;
-					case 2:
-						temp.innerHTML = 'Is there anything else I can help you with today?';
-						break;
-					case 3:
-						temp.innerHTML = 'Have a nice day.';
-						break;
-				}
-				count++;
+	// 		document.getElementById("transcriptoverlay").appendChild(temp);
+	// 		temp.innerHTML = 'Hello, how can I help you today?';
+	// 		var count = 0;
+	// 		var intervalId = window.setInterval(function() {
+	// 			switch (count) {
+	// 				case 0:
+	// 					temp.innerHTML = "No problem, I'll just need your account number";
+	// 					break;
+	// 				case 1:
+	// 					temp.innerHTML = 'You are all set. Thank you for your patience';
+	// 					break;
+	// 				case 2:
+	// 					temp.innerHTML = 'Is there anything else I can help you with today?';
+	// 					break;
+	// 				case 3:
+	// 					temp.innerHTML = 'Have a nice day.';
+	// 					break;
+	// 			}
+	// 			count++;
 
-				if(count > 4) {
-					window.clearInterval(intervalId);
-					temp.innerHTML = '';
-					demo_running = false;
-				}
-			}, 6000);
-		} else { console.log('demo running'); }
+	// 			if(count > 4) {
+	// 				window.clearInterval(intervalId);
+	// 				temp.innerHTML = '';
+	// 				demo_running = false;
+	// 			}
+	// 		}, 6000);
+	// 	} else { console.log('demo running'); }
 
 
-	}
+	// }
 
 	
 	// Default to English
@@ -664,11 +740,28 @@
 	}
 
 
+// function getAgentColor(displayName) {
+// 	console.log('returning cyan for', displayName)
+// 	return 'cyan'; // fixme
+// }
+
 function updateCaptionsMultiparty(transcripts) {
 	var temp = document.createElement("div");
 	temp.id = transcripts.msgid;
-	temp.innerHTML = transcripts.displayname + ": " + transcripts.transcript;
+	
+	// fixme how do i know if this is consumer
+	let displayName = '';
+	if (transcripts.agent) {
+		displayName = 'CSR ';
+	}
+	displayName = displayName +  transcripts.displayname;
+	temp.innerHTML = createCaptionHtml(displayName, transcripts);
+	
 	temp.classList.add("transcripttext");
-	document.getElementById("transcriptoverlay").appendChild(temp);
-	setTimeout(function () { temp.remove() }, 5000);
+	// if (transcripts.agent) {
+
+	// 	temp.classList.add("agent-color-" + getAgentColor(transcripts.displayname) ); //fixme
+	// }
+	document.getElementById("transcriptoverlay").prepend(temp);
+	// setTimeout(function () { temp.remove() }, 5000);
 }

@@ -10,6 +10,7 @@ const IceCandidate = Kurento.getComplexType('IceCandidate');
 const crypto = require('crypto');
 const util = require('./util');
 const RecMan = require('./rec_manager');
+var mysql = require('mysql2/promise');
 
 const PARTICIPANT_TYPE_WEBRTC = 'participant:webrtc';
 const PARTICIPANT_TYPE_RTP = 'participant:rtp';
@@ -26,6 +27,39 @@ var kurento = null;
 
 const ASTERISK_QUEUE_EXT = param('asteriskss.ami.queue_extensions');
 
+/**
+ * Custom logic for mysql connection
+ */
+
+var dbHost = param('database_servers.mysql.host');
+var dbUser = param('database_servers.mysql.user');
+var dbPassword = param('database_servers.mysql.password');
+var dbName = param('database_servers.mysql.ad_database_name');
+var dbPort = parseInt(param('database_servers.mysql.port'));
+console.log("Using host: " + dbHost);
+console.log("Using username: " + dbUser);
+console.log("Using name: " + dbName);
+console.log("Using port: " + dbPort);
+
+/**
+ * Function to verify the config parameter name and
+ * decode it from Base64 (if necessary).
+ * @param {type} param_name of the config parameter
+ * @returns {unresolved} Decoded readable string.
+ */
+function getConfigVal(param_name) {
+  var val = nconf.get(param_name);
+  var decodedString = null;
+  if (typeof val !== 'undefined' && val !== null) {
+    //found value for param_name
+    decodedString = Buffer.alloc(val.length, val, 'base64');
+  } else {
+    //did not find value for param_name
+    console.log("Did not find config value " + param_name);
+    decodedString = "";
+  }
+  return (decodedString.toString());
+}
 
 class WebRTCMediaSession extends Events {
 
@@ -128,11 +162,26 @@ class WebRTCMediaSession extends Events {
       }
       for (const p of this._participants.values()) {
         if (!p.port) {
-          const port = await this._composite.createHubPort();
-          p.port = port;
-          const source = p.player || p.endpoint;
-          await source.connect(port);
-          await port.connect(p.endpoint);
+          if (this._hasMonitor) {
+            const source = p.player || p.endpoint;
+            const port = await this._composite.createHubPort();
+            await source.connect(port);
+            if (p.session._isMonitoring) {
+              // only send the composite video to the monitoring agent
+              // nothing changes for the original participants
+
+              p.port = port;
+              await port.connect(p.endpoint);
+            }
+          } else {
+            // normal multiparty call. send the composite to everyone
+
+            const port = await this._composite.createHubPort();
+            p.port = port;
+            const source = p.player || p.endpoint;
+            await source.connect(port);
+            await port.connect(p.endpoint);
+          }
         }
       }
     } else {
@@ -170,7 +219,8 @@ class WebRTCMediaSession extends Events {
     this._participants.forEach(p => {
       const { ext, type, onHold } = p;
       const isAgent = (type == "participant:webrtc") ? p.session._isAgent : false;
-      simplePartList.push({ ext, type, onHold, isAgent });
+      const isMonitor = (p.session._isMonitoring == true) ? true : false;
+      simplePartList.push({ ext, type, onHold, isAgent, isMonitor });
     });
     this._participants.forEach(p => {
       if (p.type === PARTICIPANT_TYPE_WEBRTC && p.session
@@ -198,8 +248,8 @@ class WebRTCMediaSession extends Events {
     // Here we pass an optional custom codec to force a specific codec in the WebRTC leg different than the RTP leg
     offer = this.filterCodecs(offer, customWebrtcCodec);
     if (bitrates && bitrates.video) {
-      if (bitrates.video.max) await webrtc.setMaxVideoSendBandwidth(bitrates.video.max);
-      if (bitrates.video.min) await webrtc.setMinVideoSendBandwidth(bitrates.video.min);
+      if (bitrates.video.max) await webrtc.setMaxVideoRecvBandwidth(bitrates.video.max);
+      if (bitrates.video.min) await webrtc.setMinVideoRecvBandwidth(bitrates.video.min);
     }
     debug('WEBRTC FILTERED OFFER, with specified preferred video codec: ' + this._videoCodec);
     debug(offer);
@@ -349,7 +399,8 @@ class WebRTCMediaSession extends Events {
     rtp.on('Error', (error) => {
       debug(`RTPEndpoint ${ext} error: ${error}`);
     });
-    await rtp.setOutputBitrate(this._rtp_max_bitrate * 1000);
+    await rtp.setMaxOutputBitrate(this._rtp_max_bitrate * 1000);
+    await rtp.setMinOutputBitrate(this._rtp_min_bitrate * 1000);
     const p = this._participants.get(ext);
     if (p) {
       debug('EXTRA, connect audio only');
@@ -478,7 +529,9 @@ class WebRTCMediaSession extends Events {
   }
 
   async toggleRecording(ext, record) {
-    const participant = this._participants.get(ext);
+    var participant = this._participants.get(ext);
+    //Moved out of if since we need this globally
+    var fileName;
     if (record && participant.recorder) return true; // Already recording
     if (!record && !participant.recorder) return true; // Already not recording
     try {
@@ -486,12 +539,13 @@ class WebRTCMediaSession extends Events {
         debug(`${ext} Start recording`);
         const date = this.getTimestampString();
         const profile = param('kurento.recording_media_profile');
-        const fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
-        const filePath = `file:///tmp/${fileName}`;
+        fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
+        //const filePath = `file:///tmp/${fileName}`;
+        const filePath = `file://home/ubuntu/kms-share/media/recordings/${fileName}`;
         debug(`${ext} recording to  ${filePath}`);
 
         const recorder = await this._pipeline.create('RecorderEndpoint', {
-          uri: filePath,
+	        uri: filePath,
           mediaProfile: profile
         });
         await participant.endpoint.connect(recorder);
@@ -514,14 +568,53 @@ class WebRTCMediaSession extends Events {
         });
         await recorder.record();
         participant.recorder = recorder;
-        await RecMan.createRecording(fileName, ext, this._id);
+        participant.recorderFile = fileName;
+        
       } else {
+        var otherCallers = "";
+        var fileName = participant.recorderFile;
+        for (const p of this._participants.values()) {
+          if(p.ext != ext){
+            otherCallers += p.ext + ",";
+          }
+        }
+        if(otherCallers.length > 0){
+          otherCallers = otherCallers.slice(0,-1);
+        }
+        var agentNumber = ext;
+
+        const date = this.getTimestampString();
+        const profile = param('kurento.recording_media_profile');
+
+        const dbConnection = await mysql.createConnection({
+          host: dbHost,
+          user: dbUser,
+          password: dbPassword,
+          database: dbName,
+          port: dbPort
+        });
+
         await participant.recorder.stopAndWait();
+
         await participant.recorder.release();
+
+        await RecMan.createRecording(fileName, ext, this._id);
+
+        let sqlQuery = 'INSERT INTO call_recordings (fileName, agentNumber, participants, timestamp, status) VALUES (?,?,?,NOW(),?);';
+        let params = [fileName, agentNumber, otherCallers, 'UNREAD'];
+        console.log("QUERY is " + sqlQuery);
+
+        //var [rows,fields] = await dbConnection.execute(sqlQuery, params);
+        await dbConnection.execute(sqlQuery, params);
+
+        await dbConnection.end();
+
+        
+
         participant.recorder = null;
         debug(`${ext} Stopped recording`);
       }
-      return true;
+      //return true; //??? Eric check this
     } catch (ex) {
       debug(`${ext} Recording error: ${ex.message}`);
     }
@@ -574,7 +667,8 @@ class WebRTCMediaSession extends Events {
   async enablePrivateMode(ext, file) {
     const p = this._participants.get(ext);
     if (!p) {
-      throw new Error(`No participant registered for ${ext}`);
+      console.log(`No participant registered for ${ext}`);
+      return;
     }
     if (p.player) {
       debug(`${ext} Private mode already enabled`);
@@ -594,8 +688,10 @@ class WebRTCMediaSession extends Events {
     player.play();
 
     if (this.isMultiparty) {
+      if (p.port) {
       await p.endpoint.disconnect(p.port);
       await player.connect(p.port);
+      }
     } else {
       const other = this.oneToOnePeer(ext);
       if (other) {
@@ -608,15 +704,18 @@ class WebRTCMediaSession extends Events {
   async disablePrivateMode(ext) {
     const p = this._participants.get(ext);
     if (!p) {
-      throw new Error(`No participant registered for ${ext}`);
+      console.log(`No participant registered for ${ext}`);
+      return;
     }
     if (!p.player) return; // Not in private mode
     const player = p.player;
     p.player = null;
 
     if (this.isMultiparty) {
+      if (p.port) {
       await player.disconnect(p.port);
       await p.endpoint.connect(p.port);
+      }
     } else {
       const other = this.oneToOnePeer(ext);
       if (other) {

@@ -1,7 +1,7 @@
 :root {
-  --caption-bg-color: grey;
-  --caption-font-color: white;
-  --caption-font-size: 2.5rem;
+  --caption-bg-color: #f2f2f2;
+  --caption-font-color: black;
+  --caption-font-size: 1.75rem;
 }
 body{
 
@@ -921,8 +921,8 @@ div#call-controls button#button-hangup {
 .transcriptoverlay {
   display: block;
   width: 100%;
-  text-align: center;
-  position: absolute;
+  text-align: left;
+  /* position: absolute; */
   bottom: 10px;
   left: 0px;
   z-index: 2147483647;
@@ -931,8 +931,8 @@ div#call-controls button#button-hangup {
   transition: all 0.5s ease;
 }
 .transcripttext{
-  margin: 0 auto;
-  text-align: center;
+  /* margin: 0 auto; */
+  text-align: left;
   position: relative;
   font-size: var(--caption-font-size);
   color: var(--caption-font-color);
@@ -940,6 +940,11 @@ div#call-controls button#button-hangup {
   display: table;
   padding: 0px 15px 0px 15px;
 }
+
+.timestamp {
+  margin-right: 15px;
+}
+
 /* Caption setting interface */
 .cap-setting span {
   color: #ccc;
@@ -1055,3 +1060,6 @@ div#call-controls button#button-hangup {
   overflow: scroll;
 }
 
+#consumer-tools-container .btn {
+  width: 100%;
+}
