@@ -32,14 +32,23 @@
     "acr-cdr": 9004,
     "userver": 9005,
     "aserver": 9006,
-    "sswebserver": 9009
+    "sswebserver": 9009,
+    "nginx": 443,
+    "asterisk_ws": 443,
+    "asterisk_ami": 5038,    
+    "stun": 3478,
+    "turn": 3478,    
+    "mysql": 3306,
+    "redis": 6379,
+    "mongodb": 27017,
+    "translation_server": 8005,
+    "kurento": 8443    
   },    
   "signaling_server": {
     "protocol": "wss",
     "path": "/SOMEUSER/acedirect-kurento/signaling"
   },
   "nginx": {
-    "port": "443",
     "ad_path": "/ACEDirect",
     "mp_path": "/ManagementPortal",
     "agent_route": "/agent",
@@ -50,19 +59,15 @@
   },  
   "asterisk": {
     "sip": {
-      "ws_port": "443",
       "protocol": "wss",         
-      "stun_port": "3478",
       "stun_user": "stunuser",
-      "turn_port": "3478",
       "turn_user": "username",
       "turn_cred": "password",
       "channel": "SIP"
     },
     "ami": {
       "id": "userid",
-      "passwd": "password",
-      "port": "5038"
+      "passwd": "password"
     },
     "extensions": {
       "start_number": "90001",
@@ -110,7 +115,6 @@
   },
   "database_servers": {
     "mysql": {
-      "port": "3306",
       "user": "acedirect",
       "password": "PASSWORD",
       "ad_database_name": "acedirect",
@@ -121,12 +125,10 @@
       "ssdatabase": "media_server"
     },
     "redis": {
-      "port": "6379",
       "auth": "REDISPASSWORD"
     },
     "mongodb": {
-      "database_name": "test",
-      "port": 27017,
+      "database_name": "test"
       "caption_database_name": "caption_db",
       "caption_collection_name": "captions",
       "logAMIevents": false,
@@ -189,7 +191,6 @@
     "awayBlink": "true"
   },
   "translation_server": {
-    "port": "8005",
     "protocol": "http",
     "enabled": "true"
   },
@@ -204,7 +205,6 @@
     }
   },
   "kurento": {
-    "port": 8443,
     "protocol": "wss",
     "path": "/kurento",    
     "stats_interval": 10000,
