@@ -11,7 +11,7 @@ const validator = require('../utils/validator');
 const router = express.Router();
 
 const agent = new openamAgent.PolicyAgent({
-  serverUrl: `https://${getConfigVal('servers:nginx_fqdn')}:${getConfigVal('nginx:port')}/${getConfigVal('openam:path')}`,
+  serverUrl: `https://${getConfigVal('servers:nginx_fqdn')}:${getConfigVal('app_ports:nginx')}/${getConfigVal('openam:path')}`,
   privateIP: getConfigVal('servers:nginx_private_ip'),
   errorPage() {
     return '<html><body><h1>Access Error</h1></body></html>';
@@ -312,7 +312,7 @@ router.get('/token', agent.shield(cookieShield), (req, res) => {
 router.get('/logout', (req, res) => {
   request({
     method: 'POST',
-    url: `https://${getConfigVal('servers:nginx_private_ip')}:${getConfigVal('nginx:port')}/json/sessions/?_action-logout`,
+    url: `https://${getConfigVal('servers:nginx_private_ip')}:${getConfigVal('app_ports:nginx')}/json/sessions/?_action-logout`,
     headers: {
       host: urlparse.parse(`https://${getConfigVal('servers:nginx_fqdn')}`).hostname,
       iplanetDirectoryPro: req.session.key,
@@ -350,7 +350,7 @@ function openAMOperation(openAMAgentInfo) {
   logger.info(`openAMOperation with info: ${JSON.stringify(openAMAgentInfo)}`);
 
   // Use the approach to access openam from inside the organization network
-  const urlPrefix = `https://${getConfigVal('servers:nginx_private_ip')}:${parseInt(getConfigVal('nginx:port'), 10)}/${getConfigVal('openam:path')}`;
+  const urlPrefix = `https://${getConfigVal('servers:nginx_private_ip')}:${parseInt(getConfigVal('app_ports:nginx'), 10)}/${getConfigVal('openam:path')}`;
 
   const openAmLoginSuccess = new Promise(
     (resolve, reject) => {
