@@ -242,9 +242,9 @@ logger.debug('outVidTimeout: ' + outVidTimeout);
 
 //stun & turn params
 var stunFQDN = getConfigVal('servers:stun_fqdn');
-var stunPort = getConfigVal('asterisk:sip:stun_port');
+var stunPort = getConfigVal('app_ports:stun');
 var turnFQDN = getConfigVal('servers:turn_fqdn');
-var turnPort = getConfigVal('asterisk:sip:turn_port');
+var turnPort = getConfigVal('app_ports:turn');
 var turnUser = getConfigVal('asterisk:sip:turn_user');
 var turnCred = getConfigVal('asterisk:sip:turn_cred');
 if (!stunFQDN) {
@@ -252,7 +252,7 @@ if (!stunFQDN) {
   process.exit(0);
 }
 if (!stunPort) {
-  console.log('ERROR: dat/config.json is missing asterisk:sip:stun_port');
+  console.log('ERROR: dat/config.json is missing app_ports:stun');
   process.exit(0);
 }
 if (!turnFQDN) {
@@ -347,7 +347,7 @@ var complaintRedirectDesc = getConfigVal('complaint_redirect:desc');
 var complaintRedirectUrl = getConfigVal('complaint_redirect:url');
 
 // translation server
-var translationServerUrl = getConfigVal('translation_server:protocol') + '://' + getConfigVal('servers:asterisk_private_ip') + ':' + getConfigVal('translation_server:port');
+var translationServerUrl = getConfigVal('translation_server:protocol') + '://' + getConfigVal('servers:asterisk_private_ip') + ':' + getConfigVal('app_ports:translation_server');
 
 //get the ACE Direct version and year
 var version = getConfigVal('common:version');
@@ -355,7 +355,7 @@ var year = getConfigVal('common:year');
 logger.info("This is ACE Direct v" + version + ", Copyright " + year + ".");
 
 // Create a connection to Redis
-var redisClient = redis.createClient(getConfigVal('database_servers:redis:port'), getConfigVal('servers:redis_fqdn'));
+var redisClient = redis.createClient(getConfigVal('database_servers:app_ports:redis'), getConfigVal('servers:redis_fqdn'));
 
 redisClient.on("error", function (err) {
     logger.error("");
@@ -419,7 +419,7 @@ var dbHost = getConfigVal('servers:mysql_fqdn');
 var dbUser = getConfigVal('database_servers:mysql:user');
 var dbPassword = getConfigVal('database_servers:mysql:password');
 var dbName = getConfigVal('database_servers:mysql:ad_database_name');
-var dbPort = parseInt(getConfigVal('database_servers:mysql:port'));
+var dbPort = parseInt(getConfigVal('app_ports:mysql'));
 var vmTable = "videomail";
 
 // Create MySQL connection and connect to the database
@@ -457,7 +457,7 @@ dbConnection.connect(function(err) {
 var mongodbUri = null;
 const mongodbFqdn = nconf.get('servers:mongodb_fqdn');
 if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
-	mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('database_servers:mongodb:port')}/${getConfigVal('database_servers:mongodb:database_name')}`;
+	mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('database_servers:app_ports:mongodb')}/${getConfigVal('database_servers:mongodb:database_name')}`;
 }
 var logCallData = nconf.get('database_servers:mongodb:logCallData');
 var mongodb;
@@ -529,7 +529,7 @@ var credentials = {
 };
 
 var agent = new openamAgent.PolicyAgent({
-	serverUrl: 'https://' + getConfigVal('servers:nginx_fqdn') + ":" + getConfigVal('nginx:port') + '/' + getConfigVal('openam:path'),
+	serverUrl: 'https://' + getConfigVal('servers:nginx_fqdn') + ":" + getConfigVal('app_ports:nginx') + '/' + getConfigVal('openam:path'),
 	privateIP: getConfigVal('servers:nginx_private_ip'),
 	errorPage: function () {
 		return '<html><body><h1>Access Error</h1></body></html>';
@@ -2889,7 +2889,7 @@ function init_ami() {
 	if (ami === null) {
 
 		try {
-			ami = new asteriskManager(parseInt(getConfigVal('asterisk:ami:port')),
+			ami = new asteriskManager(parseInt(getConfigVal('app_ports:asterisk_ami')),
 				getConfigVal('servers:asterisk_private_ip'),
 				getConfigVal('asterisk:ami:id'),
 				getConfigVal('asterisk:ami:passwd'), true);
@@ -3294,10 +3294,10 @@ function processExtension(data) {
 	console.log('processExtension - incoming ' + JSON.stringify(data));
 
 	var asteriskPublicHostname = getConfigVal('servers:asterisk_fqdn');
-	var stunServer = getConfigVal('servers:stun_fqdn') + ":" + getConfigVal('asterisk:sip:stun_port');
+	var stunServer = getConfigVal('servers:stun_fqdn') + ":" + getConfigVal('app_ports:stun');
 
 	//if wsPort is "", then it defaults to no port in the wss url
-	var wsPort = getConfigVal('asterisk:sip:ws_port');
+	var wsPort = getConfigVal('app_ports:asterisk_ws');
 	if (wsPort !== "") {
 		wsPort = parseInt(wsPort);
 	}
@@ -3812,7 +3812,7 @@ app.get(consumerPath, function (req, res, next) {
 app.get('/logout', function (req, res) {
 	request({
 		method: 'POST',
-		url: 'https://' + getConfigVal('servers:nginx_private_ip') + ':' + getConfigVal('nginx:port') + '/' + getConfigVal('openam:path') + '/json/sessions/?_action-logout',
+		url: 'https://' + getConfigVal('servers:nginx_private_ip') + ':' + getConfigVal('app_ports:nginx') + '/' + getConfigVal('openam:path') + '/json/sessions/?_action-logout',
 		headers: {
 			'host': url.parse('https://' + getConfigVal('servers:nginx_fqdn')).hostname,
 			'iplanetDirectoryPro': req.session.key,
@@ -4044,9 +4044,9 @@ app.get('/login', agent.shield(cookieShield), function (req, res) {
 
 						}
 						var asteriskPublicHostname = getConfigVal('servers:asterisk_fqdn');
-						var stunServer = getConfigVal('servers:stun_fqdn') + ":" + getConfigVal('asterisk:sip:stun_port');
+						var stunServer = getConfigVal('servers:stun_fqdn') + ":" + getConfigVal('app_ports:stun');
 
-						var wsPort = getConfigVal('asterisk:sip:ws_port');
+						var wsPort = getConfigVal('app_ports:asterisk_ws');
 						if (wsPort !== "") {
 							wsPort = parseInt(wsPort);
 						}
