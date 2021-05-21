@@ -350,7 +350,7 @@ function openAMOperation(openAMAgentInfo) {
   logger.info(`openAMOperation with info: ${JSON.stringify(openAMAgentInfo)}`);
 
   // Use the approach to access openam from inside the organization network
-  const urlPrefix = `https://${getConfigVal('servers:nginx_private_ip')}:${parseInt(getConfigVal('app_ports:nginx'), 10)}/${getConfigVal('openam:path')}`;
+  const urlPrefix = `https://${getConfigVal('servers:nginx_private_ip')}:${getConfigVal('app_ports:nginx')}/${getConfigVal('openam:path')}`;
 
   const openAmLoginSuccess = new Promise(
     (resolve, reject) => {
