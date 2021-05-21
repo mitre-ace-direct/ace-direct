@@ -101,7 +101,7 @@ class WebRTCMediaSession extends Events {
 
       if (kurento == null) {
         debug('CREATING KURENTO');
-        const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento_fqdn')}:${param('kurento.port')}${param('kurento.path')}`;        
+        const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento_fqdn')}:${param('app_ports.kurento')}${param('kurento.path')}`;        
         kurento = await util.getKurentoClient(kurentoUrl, 5000);
       }
 
