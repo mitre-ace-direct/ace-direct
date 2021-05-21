@@ -231,7 +231,7 @@ const credentials = {
 // const redisAgentInfoMap = 'agentInfoMap';
 
 // Create a connection to Redis
-const redisClient = redis.createClient(getConfigVal('database_servers:app_ports:redis'), getConfigVal('servers:redis_fqdn'));
+const redisClient = redis.createClient(getConfigVal('database_servers:app_ports:redis').toString(), getConfigVal('servers:redis_fqdn'));
 
 redisClient.on('error', (err) => {
   logger.error('');
@@ -343,7 +343,7 @@ const dbHost = getConfigVal('servers:mysql_fqdn');
 const dbUser = getConfigVal('database_servers:mysql:user');
 const dbPassword = getConfigVal('database_servers:mysql:password');
 const dbName = getConfigVal('database_servers:mysql:ad_database_name');
-const dbPort = parseInt(getConfigVal('app_ports:mysql'), 10);
+const dbPort = getConfigVal('app_ports:mysql');
 const vmTable = 'videomail';
 const callBlockTable = 'call_block';
 const callBlockVrsPrefix = '1';
@@ -1759,7 +1759,7 @@ function HandleManagerEvent(evt) {
 function InitAmi() {
   if (ami === null) {
     try {
-      ami = new AsteriskManager(parseInt(getConfigVal('app_ports:asterisk_ami'), 10),
+      ami = new AsteriskManager(getConfigVal('app_ports:asterisk_ami').toString(),
         getConfigVal(ASTERISK_SIP_PRIVATE_IP),
         getConfigVal('asterisk:ami:id'),
         getConfigVal('asterisk:ami:passwd'), true);
