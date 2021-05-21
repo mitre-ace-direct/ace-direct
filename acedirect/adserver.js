@@ -258,9 +258,9 @@ logger.debug('outVidTimeout: ' + outVidTimeout);
 
 //stun & turn params
 var stunFQDN = getConfigVal('servers:stun_fqdn');
-var stunPort = getConfigVal('app_ports:stun');
+var stunPort = getConfigVal('app_ports:stun').toString();
 var turnFQDN = getConfigVal('servers:turn_fqdn');
-var turnPort = getConfigVal('app_ports:turn');
+var turnPort = getConfigVal('app_ports:turn').toString();
 var turnUser = getConfigVal('asterisk:sip:turn_user');
 var turnCred = getConfigVal('asterisk:sip:turn_cred');
 if (!stunFQDN) {
@@ -371,7 +371,7 @@ var year = getConfigVal('common:year');
 logger.info("This is ACE Direct v" + version + ", Copyright " + year + ".");
 
 // Create a connection to Redis
-var redisClient = redis.createClient(getConfigVal('database_servers:app_ports:redis'), getConfigVal('servers:redis_fqdn'));
+var redisClient = redis.createClient(getConfigVal('database_servers:app_ports:redis').toString(), getConfigVal('servers:redis_fqdn'));
 
 redisClient.on("error", function (err) {
     logger.error("");
@@ -435,7 +435,7 @@ var dbHost = getConfigVal('servers:mysql_fqdn');
 var dbUser = getConfigVal('database_servers:mysql:user');
 var dbPassword = getConfigVal('database_servers:mysql:password');
 var dbName = getConfigVal('database_servers:mysql:ad_database_name');
-var dbPort = parseInt(getConfigVal('app_ports:mysql'));
+var dbPort = getConfigVal('app_ports:mysql');
 var vmTable = "videomail";
 
 // Create MySQL connection and connect to the database
@@ -2979,7 +2979,7 @@ function init_ami() {
 	if (ami === null) {
 
 		try {
-			ami = new asteriskManager(parseInt(getConfigVal('app_ports:asterisk_ami')),
+			ami = new asteriskManager(getConfigVal('app_ports:asterisk_ami').toString(),
 				getConfigVal('servers:asterisk_private_ip'),
 				getConfigVal('asterisk:ami:id'),
 				getConfigVal('asterisk:ami:passwd'), true);
