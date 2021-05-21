@@ -4616,6 +4616,10 @@ function ACEKurento(config) {
      */
     isMultiparty: false,
     /**
+     * custom variable to check is the call is being monitored
+     */
+    isMonitoring: false,
+    /**
      * Custom list of involved agents
      */
     activeAgentList: [],
@@ -4917,6 +4921,51 @@ function ACEKurento(config) {
       acekurento.stop();
     },
     /**
+     * 
+     * Add a monitoring agent to the call
+     */
+    monitorCall: function (message) {
+      setCallState(PROCESSING_CALL);
+
+      if (webRtcPeer) {
+        // dispose current webrtcPeer before making a new one
+        webRtcPeer.dispose();
+        webRtcPeer = null;
+      }
+
+      this.isMonitoring = true;
+
+      var options = {
+        localVideo: this.selfStream,
+        remoteVideo: this.remoteStream,
+        onicecandidate: onIceCandidate,
+        mediaConstraints: {
+          audio: this.enableAudio,
+          video: this.enableVideo
+        }
+      }
+
+      webRtcPeer = kurentoUtils.WebRtcPeer.WebRtcPeerRecvonly(options, function (error) {
+        if (error) {
+          console.error(error);
+          setCallState(NO_CALL);
+        }
+
+        this.generateOffer(function (error, offerSdp) {
+          if (error) {
+            console.error(error);
+            setCallState(NO_CALL);
+          }
+          var response = {
+            id: 'accept',
+            caller: message.caller,
+            sdp: offerSdp
+          };
+          sendMessage(response);
+        });
+      });
+    },
+    /**
      * Stops a call
      * @param {Boolean} removeFromQueue - removeFromQueue boolean "true" to send hangup message and leave member queue.
      * Else just hangup
@@ -4967,14 +5016,6 @@ function ACEKurento(config) {
      */
     privateMode: function (enabled, url) {
       sendMessage({ id: 'privacy', enabled: enabled, url: enabled ? url : undefined });
-    },
-    /**
-     * Sends calibration video image to peer instead of local video stream
-     * @param {Boolean} enabled - If "true" enables video calibrate mode
-     * @param {String} url - The video calibrate mode url
-     */
-    calibrateMode: function (enabled, url) {
-      sendMessage({ id: 'privacy', enabled: enabled, url: enabled ? "file://tmp/media/calibrate5.webm" : undefined });
     },
     /**
      * @param {Number} number - Number value for DTMF input
@@ -5129,11 +5170,14 @@ function ACEKurento(config) {
     /**
      * Invite peer
      * @param {String} ext - ext is the callee extension, the person to call
+     * @param {boolean} isMonitor - if "true" will add agent as an observer
      */
-    invitePeer: function (ext) {
+    invitePeer: function (ext, isMonitor) {
+      if(isMonitor) acekurento.isMonitoring = true;
       var message = {
         id: 'invitePeer',
-        ext: ext
+        ext: ext,
+        isMonitor: isMonitor
       };
       sendMessage(message);
     },
@@ -5275,19 +5319,22 @@ function ACEKurento(config) {
 
     if(message.id === 'participantList'){
       console.log("Participant size is " + message.participants.length);
-      if(message.participants.length >= 3){
-        console.log("Call is multiparty");
-        acekurento.isMultiparty = true;
-        $('#selfView').hide();
-        if($('#user-status').text() === 'Incoming Call'){
-          $('#user-status').text('In Call');
-	        changeStatusIcon(in_call_color, "in-call", in_call_blinking);
-	        changeStatusLight('IN_CALL');
+
+      if (message.participants.length == 3 && acekurento.isMonitoring) {
+        // the monitor is the third participant. ignore them
+      } else if(message.participants.length >= 3){
+          console.log("Call is multiparty");
+          acekurento.isMultiparty = true;
+          $('#selfView').hide();
+          if($('#user-status').text() === 'Incoming Call'){
+            $('#user-status').text('In Call');
+            changeStatusIcon(in_call_color, "in-call", in_call_blinking);
+            changeStatusLight('IN_CALL');
+          }
+        } else{
+          acekurento.isMultiparty = false;
+          $('#selfView').show();
         }
-      } else{
-        acekurento.isMultiparty = false;
-        $('#selfView').show(); 
-      }
     }
 
     switch (message.id) {
@@ -5405,6 +5452,9 @@ function ACEKurento(config) {
     console.log("Message was not declined.")
     acekurento.eventHandlers.incomingCall({
       from: message.caller,
+      monitor: function() {
+        acekurento.monitorCall(message)
+      },
       accept: function() {
         console.log("Call was accepted");
         acekurento.acceptCall(message)

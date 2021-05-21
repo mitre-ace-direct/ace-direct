@@ -23,6 +23,22 @@ var mysql = require('mysql');
 var MongoClient = require('mongodb').MongoClient;
 var dbConnection = null;
 var dbconn = null;
+var proxy = require('proxy-agent');
+
+//Credentials needed for Call Recordings
+var AWS = require('aws-sdk');
+AWS.config.update({
+	region: 'us-east-1',
+	httpOptions: {
+	  agent: proxy('http://10.202.1.215:3128')
+	}
+});
+
+s3 = new AWS.S3();
+
+var bucketParams = {
+	Bucket : 'task3acrdemo-recordings',
+};
 
 // Clam AV
 const NodeClam = require('clamscan');
@@ -142,8 +158,8 @@ log4js.configure({
 		filename: 'logs/' + logname + '.log',
 		pattern: '-yyyy-MM-dd',
 		alwaysIncludePattern: false,
-		maxLogSize: 20480,
-		backups: 10
+		maxLogSize: 20971520,
+		backups: 0
 	  }
 	},
 	categories: {
@@ -280,7 +296,7 @@ if (!logWebRTCStats) {
 }
 logger.debug('logWebRTCStats: ' + logWebRTCStats);
 if (logWebRTCStats) {
-  logWebRTCStatsFreqVal = getConfigVal('webrtcstats:logWebRTCStatsFreq'); 
+  logWebRTCStatsFreqVal = getConfigVal('webrtcstats:logWebRTCStatsFreq');
   if (!logWebRTCStatsFreqVal) {
     logWebRTCStatsFreq = 0;
   } else {
@@ -586,15 +602,6 @@ var fqdnUrl = 'https://' + fqdnTrimmed + ':*';
 
 logger.info('FQDN URL: ' + fqdnUrl);
 
-//Note: privacy video file must be configured and served by media server
-var privacy_video_url = '';
-if (nconf.get('media_server:privacy_video_url')) {
-  privacy_video_url = getConfigVal('media_server:privacy_video_url');
-} else {
-  privacy_video_url = 'file:///tmp/media/videoPrivacy.webm'; //default to this if not in config.json
-}
-// Remove the newline
-var privacy_video_url = privacy_video_url.trim();
 
 var httpsServer = https.createServer(credentials, app);
 
@@ -915,10 +922,13 @@ io.sockets.on('connection', function (socket) {
 			let d = new Date();
 			data.timestamp = d.getTime();
 			data.msgid = d.getTime();
-			if(data.participants && data.participants.length > 0){
+			if (data.hasMonitor) {
+				// send multiparty captions to the monitor
+				io.to(Number(data.monitorExt)).emit('multiparty-caption', data);
+			} else if(data.participants && data.participants.length > 0){
 				data.participants.forEach(p => {
 					redisClient.hget(rExtensionToVrs, Number(p), function (err, vrsNum) {
-            					if (!err){ 
+            					if (!err){
 							p = (vrsNum) ? vrsNum : p;
 							io.to(Number(p)).emit('multiparty-caption', data);
 						}
@@ -940,6 +950,36 @@ io.sockets.on('connection', function (socket) {
 		io.to(Number(data.number)).emit('screenshareResponse', {
 			'permission' : data.permission
 		});
+	});
+
+	socket.on('askMonitor', function(data) {
+        io.to(Number(data.originalExt)).emit('initiateMonitor', {'monitorExt':data.monitorExt});
+    });
+
+    //invite the monitoring agent to the call
+    socket.on('monitor-invite', function(data){
+        console.log('at monitor invite')
+        io.to(Number(data.monitorExt)).emit('monitor-join-session', {'vrs': data.vrs});
+    });
+
+	socket.on('stopMonitoringCall', function(data) {
+		io.to(Number(data.originalExt)).emit('monitor-left');
+		if (data.vrs) {
+			io.to(Number(data.vrs)).emit('consumer-stop-monitor');
+			socket.leave(Number(data.vrs));
+		}
+	});
+
+	socket.on('start-monitoring-consumer', function(data) {
+		io.to(Number(data.vrs)).emit('consumer-being-monitored');
+	});
+
+	socket.on('force-monitor-leave', function(data) {
+		io.to(Number(data.monitorExt)).emit('monitor-leave-session', {'reinvite': data.reinvite, 'multipartyHangup': data.multipartyHangup, 'multipartyTransition':data.multipartyTransition});
+	});
+
+	socket.on('reinvite-monitor', function(data) {
+		io.to(Number(data.monitorExt)).emit('monitor-rejoin-session');
 	});
 
 	//Fired at end of call when new call history is added
@@ -1857,6 +1897,47 @@ io.sockets.on('connection', function (socket) {
 		});
 	});
 
+	//Retrieval of videomail records from the database
+	socket.on("get-recordings", function (data) {
+		let recordingQuery = `SELECT * FROM call_recordings WHERE agentNumber = ${token.extension}`;
+
+		dbConnection.query(recordingQuery, function (err, result) {
+			if (err) {
+				logger.error("GET-RECORDINGS ERROR: " + err.code);
+			} else {
+				console.log("Got recording data " + JSON.stringify(data));
+				//TODO Get s3 bucket url
+				io.to(token.extension).emit('got-call-recordings', result);
+			}
+		});
+
+		// Call S3 to obtain a list of the objects in the bucket
+		/*console.log("Checking the S3 bucket " + JSON.stringify(bucketParams));
+		s3.listObjects(bucketParams, function(err, data) {
+			if (err) {
+				console.log("Error", err);
+			} else {
+				console.log("Success: " + JSON.stringify(data));
+			}
+		});*/
+	});
+
+	//updates recording records when the agent changes the status
+	socket.on("recording-status-change", function (data) {
+		logger.debug('updating MySQL entry');
+		let recording_sql_query = `UPDATE call_recordings SET status = ?, WHERE fileName = ?;`;
+		let recording_sql_params = [data.status, data.fileName];
+
+		dbConnection.query(recording_sql_query, recording_sql_params,function (err, result) {
+			if (err) {
+				logger.error('RECORDING-STATUS-CHANGE ERROR: '+ err.code);
+			} else {
+				logger.debug(result);
+				io.to(token.extension).emit('record-changed-status', result);
+			}
+		});
+	});
+
 	/**
 	 * Socket call for request to obtain file from fileShare
 	 */
@@ -1974,11 +2055,13 @@ io.sockets.on('connection', function (socket) {
 					console.log('translating', data.transcripts.transcript, 'from', languageFrom, 'to', languageTo);
 					let encodedText = encodeURI(data.transcripts.transcript.trim());
 					let translationUrl = translationServerUrl + '/translate?languageFrom=' + languageFrom + '&text=' + encodedText + '&languageTo=' + languageTo;
+					console.log('is agent here? if so use color', data);
 					if (languageTo === languageFrom) {
 						console.log('same language!');
 						socket.emit('caption-translated', {
-							'transcript' : data.transcripts.transcript.trim(),
-							'displayname' : displayname,
+							'transcript': data.transcripts.transcript.trim(),
+							'displayname': data.transcripts.displayname,
+							'agent': data.transcripts.agent,
 							'msgid': msgid,
 							'final': final
 						});
@@ -1996,19 +2079,23 @@ io.sockets.on('connection', function (socket) {
 							if (error) {
 								logger.error("GET translation: " + error);
 								console.error("GET translation error: " + error);
-								socket.emit('caption-translated', {
-									'transcript' : 'Error using translation server: ' + translationUrl,
-									'displayname' : displayname,
-									'msgid': msgid,
-									'final': final
-								});
+								// socket.emit('caption-translated', {
+								// 	'transcript' : 'Error using translation server: ' + translationUrl,
+								// 	'displayname' : data.transcripts.displayname,
+								// 	'msgid': msgid,
+								// 	'final': final
+								// });
+							} else if (!data.translation) {
+								console.error("No translation was received from translation server");
 							} else {
 								console.log('received translation', data);
 								console.log(languageFrom, languageTo, translationUrl);
+								
 								// fixme will this be wrong if multiple clients/agents?
 								socket.emit('caption-translated', {
 									'transcript' : data.translation,
-									'displayname' : displayname,
+									'displayname' : data.transcripts.displayname,
+									'agent': data.transcripts.agent,
 									'msgid': msgid,
 									'final': final
 									});
@@ -2146,11 +2233,11 @@ function popZendesk(callId,ani,agentid,agentphonenum,skillgrpnum,skillgrpnam,cal
  *
  * @param {string} eventType One of these event types: "Handled", "Web", "Videomail", "Abandoned"
  */
-function insertCallDataRecord (eventType, vrs) {
+function insertCallDataRecord (eventType, vrs, uniqueId, origin) {
 	if (logCallData) {
 		colCallData = mongodb.collection('calldata');
 
-		var data = {"Timestamp": new Date(), "Event": eventType};
+		var data = {"Timestamp": new Date(), "Event": eventType, "UniqueId": uniqueId, "Origin": origin};
 		if (vrs != null) {
 			data.vrs = vrs;
 
@@ -2258,8 +2345,8 @@ function handle_manager_event(evt) {
 			  logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
 			//   console.log("HAVE VRS NUMBER " + vrsNum);
 			//   console.log("INSERTING WEB CALL HANDLED");
-			  insertCallDataRecord("Handled", vrsNum);
-			  insertCallDataRecord("Web", vrsNum);
+			  insertCallDataRecord("Handled", vrsNum, evt.uniqueid, "D1");
+			  insertCallDataRecord("Web", vrsNum, evt.uniqueid, "D1");
 
               //mapped consumer extension to a vrs num. so now we can finally pop
               popZendesk(evt.destuniqueid,vrsNum,destExtension[1],destExtension[1],"","","","");
@@ -2294,7 +2381,7 @@ function handle_manager_event(evt) {
            */
 
 		  //console.log("INSERTING HARDWARE OR SOFTPHONE CALL HANDLED");
-		  insertCallDataRecord("Handled", evt.calleridnum);
+		  insertCallDataRecord("Handled", evt.calleridnum, evt.uniqueid, "D2");
 
           if (JSON.stringify(evt.channel).indexOf(PROVIDER_STR) !== -1) {
             // This is a Zphone or Sorenson call
@@ -2369,7 +2456,7 @@ function handle_manager_event(evt) {
               popZendesk(evt.destuniqueid, evt.calleridnum, agentExtension[1], agentExtension[1],"","","","");
 
 			  // Save handled call??? What is in calleridnum ?
-			  //insertCallDataRecord("Handled", evt.calleridnum);
+			  //insertCallDataRecord("Handled", evt.calleridnum, evt.uniqueid);
             }
             /** HOT FIX NOT IN GITHUB; MUST CARRY FORWARD */
 
@@ -2409,7 +2496,7 @@ function handle_manager_event(evt) {
               // Call new function
               logger.info('Calling vrsAndZenLookup with ' + vrsNum + ' and ' + destExtension[1]);
 
-			  insertCallDataRecord("Handled", vrsNum);
+			  insertCallDataRecord("Handled", vrsNum, evt.uniqueid, "D3");
 
               //mapped consumer extension to a vrs num. so now we can finally pop
               popZendesk(evt.destuniqueid,vrsNum,destExtension[1],destExtension[1],"","","","");
@@ -2441,7 +2528,7 @@ function handle_manager_event(evt) {
 
 	  if (evt.context === 'Provider_Videomail') {
 		console.log("VIDOEMAIL evt: " +  JSON.stringify(evt, null, 2));
-		insertCallDataRecord("Videomail", evt.calleridnum);
+		insertCallDataRecord("Videomail", evt.calleridnum, evt.uniqueid, "D4");
 	  }
       else if ( evt.connectedlinenum == queuesComplaintNumber || evt.exten === queuesComplaintNumber ) {
         // Consumer portal ONLY! Zphone Complaint queue calls will go to the next if clause
@@ -2584,7 +2671,7 @@ function handle_manager_event(evt) {
           if (!err && vrsNum) {
 
 			console.log("VIDOEMAIL WebRTC evt: " +  JSON.stringify(evt, null, 2));
-			insertCallDataRecord("Videomail", vrsNum);
+			insertCallDataRecord("Videomail", vrsNum, evt.uniqueid, "D5");
 
             // Remove the extension when we're finished
             redisClient.hdel(rExtensionToVrs, Number(evt.calleridnum));
@@ -2614,7 +2701,7 @@ function handle_manager_event(evt) {
 
 		  // calleridnum is for agent, connectedlinenum is for caller
 		  logger.info('HANGUP RECEIVED ABANDONED CALL calleridnum & : connectedlinenum' + evt.calleridnum + " connectedlinenum " + evt.connectedlinenum);
-		  insertCallDataRecord('Abandoned', evt.connectedlinenum);
+		  insertCallDataRecord('Abandoned', evt.connectedlinenum, evt.uniqueid, "D6");
 
           //this agent(agentExtension) must now go to away status
           io.to(Number(agentExtension)).emit('new-missed-call', {"max_missed":getConfigVal('missed_calls:max_missed_calls')}); //should send missed call number
@@ -2639,14 +2726,14 @@ function handle_manager_event(evt) {
 					redisClient.hset(rConsumerExtensions, Number(extension[1]), JSON.stringify(val));
 				}
 				});
-	
+
 				redisClient.hget(rExtensionToVrs, Number(extension[1]), function (err, vrsNum) {
 					if (!err && vrsNum) {
 						logger.info('Sending chat-leave for socket id ' + vrsNum);
 						io.to(Number(vrsNum)).emit('chat-leave', {
 						"vrs": vrsNum
 						});
-		
+
 						// Remove the extension when we're finished
 						redisClient.hdel(rExtensionToVrs, Number(extension[1]));
 						redisClient.hdel(rExtensionToVrs, Number(vrsNum));
@@ -2857,7 +2944,7 @@ function handle_manager_event(evt) {
 				logger.info('ABANDONED WebRTC VRS NUMBER ' + vrsNum);
 				vrs = vrsNum;
 
-				insertCallDataRecord('Abandoned', vrs);
+				insertCallDataRecord('Abandoned', vrs, evt.uniqueid, "D7");
 			}
 		});
 
@@ -3343,7 +3430,6 @@ function processExtension(data) {
 						"signaling_server_port": signalingServerPort,
 						"signaling_server_proto": signalingServerProto,
 						"signaling_server_dev_url": signalingServerDevUrl,
-					        "privacy_video_url": privacy_video_url,
 						"queues_complaint_number": queuesComplaintNumber,
 						"queues_videomail_number": queuesVideomailNumber,
 						"queues_videomail_maxrecordsecs": queuesVideomailMaxrecordsecs,
@@ -3638,7 +3724,7 @@ function getConfigVal(param_name) {
     //found value for param_name
     if (clearText) {
       decodedString = val;
-    } else {
+    } else {``
       decodedString = Buffer.alloc(val.length, val, 'base64');
     }
   } else {
@@ -3917,7 +4003,6 @@ app.get('/token', function (req, res) {
 		payload.signalingServerPort = req.session.signalingServerPort;
 		payload.signalingServerProto= req.session.signalingServerProto;
 		payload.signalingServerDevUrl = req.session.signalingServerDevUrl;
-                payload.privacy_video_url = privacy_video_url;
 		payload.queuesComplaintNumber = req.session.queuesComplaintNumber;
 		payload.extensionPassword = req.session.extensionPassword;
 		payload.complaint_queue_count = complaint_queue_count;
@@ -4099,7 +4184,6 @@ app.get('/login', agent.shield(cookieShield), function (req, res) {
 						req.session.signalingServerPort = signalingServerPort;
 						req.session.signalingServerProto= signalingServerProto;
 						req.session.signalingServerDevUrl= signalingServerDevUrl;
-						req.session.privacy_video_url = privacy_video_url;
 						req.session.queuesComplaintNumber = queuesComplaintNumber;
 						req.session.extensionPassword = extensionPassword;
 						req.session.complaint_queue_count = complaint_queue_count;
@@ -4158,6 +4242,19 @@ app.get('/getVideomail', agent.shield(cookieShield),function (req, res) {
 	});
 });
 
+/**
+ * Get the specific recording 
+ */
+app.get('/getRecording', agent.shield(cookieShield), function(req, res) {
+	
+	console.log("USING " + req.query.fileName);
+	var file = s3.getObject({Bucket: "task3acrdemo-recordings", Key: req.query.fileName});
+
+	res.attachment(req.query.fileName);
+	var filestream = file.createReadStream();
+	filestream.pipe(res);
+})
+
 //For fileshare
 //TODO Needs middleware for agent and consumer
 //Use app,get for cooki to see if auth,  If not kicked
@@ -4178,8 +4275,8 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 	console.log("SESSION " + JSON.stringify(req.session));
 
 
-	
-	
+
+
 	if(uploadedBy){
 		console.log("Valid agent " + uploadedBy);
 		let uploadMetadata = {};
@@ -4213,11 +4310,11 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 			ClamScan.then(async clamscan => {
 				try {
 					console.log('scanning', uploadMetadata.filepath, 'as', require("os").userInfo().username, fs.existsSync(uploadMetadata.filepath));
-			 
+
 					// You can re-use the `clamscan` object as many times as you want
 					// const version = await clamscan.get_version();
 					// console.log(`ClamAV Version: ${version}`);
-					
+
 					const {is_infected, file, viruses} = await clamscan.is_infected(uploadMetadata.filepath);
 					if (is_infected) {
 						console.log(`${req.file.originalname} is infected with ${viruses}!`);
@@ -4273,8 +4370,8 @@ app.post('/fileUpload', upload.single('uploadfile'), function(req, res) {
 		}
 
 
-		
-		
+
+
 	}else{
 		console.log("Not valid agent");
 		res.status(403).send("Unauthorized");
