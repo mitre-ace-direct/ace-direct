@@ -176,7 +176,7 @@ function register_jssip() {
 			} else if(activeParticipantCount > 2) {
 				if (!isMultipartyCall && !monitorCaptions) {
 					// new multiparty call
-					//multipartyCaptionsStart();
+					multipartyCaptionsStart();
 					monitorCaptions = true;
 				}
 				isMultipartyCall = true;
