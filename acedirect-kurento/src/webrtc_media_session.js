@@ -25,41 +25,21 @@ const replaceMediaEl = async (el, oldEl, newEl) => {
 
 var kurento = null;
 
-const ASTERISK_QUEUE_EXT = param('asteriskss.ami.queue_extensions');
+const ASTERISK_QUEUE_EXT = [param('asterisk.queues.general.number'), param('asterisk.queues.complaint.number')]; // currently support two queues
 
 /**
  * Custom logic for mysql connection
  */
 
-var dbHost = param('database_servers.mysql.host');
+var dbHost = param('servers.mysql_fqdn');
 var dbUser = param('database_servers.mysql.user');
 var dbPassword = param('database_servers.mysql.password');
 var dbName = param('database_servers.mysql.ad_database_name');
-var dbPort = parseInt(param('database_servers.mysql.port'));
+var dbPort = parseInt(param('app_ports.mysql'));
 console.log("Using host: " + dbHost);
 console.log("Using username: " + dbUser);
 console.log("Using name: " + dbName);
 console.log("Using port: " + dbPort);
-
-/**
- * Function to verify the config parameter name and
- * decode it from Base64 (if necessary).
- * @param {type} param_name of the config parameter
- * @returns {unresolved} Decoded readable string.
- */
-function getConfigVal(param_name) {
-  var val = nconf.get(param_name);
-  var decodedString = null;
-  if (typeof val !== 'undefined' && val !== null) {
-    //found value for param_name
-    decodedString = Buffer.alloc(val.length, val, 'base64');
-  } else {
-    //did not find value for param_name
-    console.log("Did not find config value " + param_name);
-    decodedString = "";
-  }
-  return (decodedString.toString());
-}
 
 class WebRTCMediaSession extends Events {
 
@@ -101,7 +81,8 @@ class WebRTCMediaSession extends Events {
 
       if (kurento == null) {
         debug('CREATING KURENTO');
-        kurento = await util.getKurentoClient(param('kurento.url'), 5000);
+        const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento_fqdn')}:${param('app_ports.kurento')}${param('kurento.path')}`;        
+        kurento = await util.getKurentoClient(kurentoUrl, 5000);
       }
 
       if (!kurento) throw new Error(`Can't create kurento client`);
@@ -473,8 +454,8 @@ class WebRTCMediaSession extends Events {
 
   patchOffer(offer) {
     const sdpObj = transform.parse(offer);
-    sdpObj.origin.address = param('asteriskss.ip');
-    sdpObj.connection.ip = param('asteriskss.ip');
+    sdpObj.origin.address = param('servers.asterisk_private_ip');
+    sdpObj.connection.ip = param('servers.asterisk_private_ip');
 
     sdpObj.media.forEach(media => {
       const validPayloads = new Set(
