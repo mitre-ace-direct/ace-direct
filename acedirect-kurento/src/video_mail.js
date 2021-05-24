@@ -29,7 +29,8 @@ class VideoMail extends Events {
   async init() {
     debug('Initializing video mail');
     try {
-      const kurento = await Kurento.getSingleton(param('kurento.url'));
+      const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento_fqdn')}:${param('app_ports.kurento')}${param('kurento.path')}`;
+      const kurento = await Kurento.getSingleton(kurentoUrl);
       this._pipeline = await kurento.create('MediaPipeline');
       await this._pipeline.setLatencyStats(true);
     } catch (error) {

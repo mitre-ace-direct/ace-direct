@@ -4,45 +4,75 @@
     "version": "ACE Direct Version number for display only.",
     "year": "The Copyright year for display only.",
     "debug_level": "Logging level: ALL TRACE DEBUG INFO WARN ERROR FATAL OFF",
-    "fqdn": "Fully qualified domain name of the Node application server",
-    "private_ip": "Private IP address of the Node application server",
     "https": {
       "certificate": "Full path to the certificate file",
-      "private_key": "Full path to the private key file"
+      "private_key": "Full path to the private key file",
+      "csr": "full path to asterisk csr file, for signaling server demo page web server"      
     }
   },
-  "proxy_server": {
-      "proto": "protocol (e.g., wss) of SIP proxy server",
-      "public": "FQDN of the SIP proxy server",
-      "port": "port number of the SIP proxy server, (e.g., 443)",
-      "path": "path of the SIP proxy server (e.g., /ws)"
-  },
+  "servers": {
+    "main_fqdn": "Fully qualified domain name of this primary Node application server",
+    "main_private_ip": "Private IP address of this primary Node application server",
+    "nginx_fqdn": "Fully qualified domain name of the NGINX server",
+    "nginx_private_ip": "Private IP address of the NGINX server",
+    "asterisk_fqdn": "Fully qualified domain name of the Asterisk server",
+    "asterisk_private_ip": "Private IP address of the Asterisk server",
+    "stun_fqdn": "Fully qualified domain name of the stun server",
+    "turn_fqdn": "Fully qualified domain name of turn server",
+    "kurento_fqdn": "fully-qualified domain name of internal kurento media server, must point to private IP address",
+    "mysql_fqdn": "Private IP address of the local ACE Direct MySQL server OR AWS RDS FQDN OR localhost",
+    "redis_fqdn": "Local IP address of the Redis server on acenode.domain.com: 127.0.0.1",
+    "mongodb_fqdn": "Mongo DB host; leave blank to disable logging",
+    "zendesk_fqdn": "fully-qualified domain name of commercial Zendesk server or private IP address of local Fendesk server"
+  },  
+  "app_ports": {
+    "acedirect": "local HTTPS listen port for ACE direct server; must match value in nginx.conf on the NGINX server",
+    "managementportal": "local HTTPS listen port for management portal server; must match value in nginx.conf on the NGINX server",
+    "zendesk": "local application port for fendesk (or use port from commercial Zendesk instance)",
+    "acr-cdr": "local application port for acr-cdr server",
+    "userver": "local application port for userver",
+    "aserver": "local application port for aserver",
+    "sswebserver": "local application port for signaling server acedirect-kurento webserver",
+    "nginx": "NGINX server port number",
+    "asterisk_ws": "Asterisk websocket port",
+    "asterisk_ami": "Asterisk AMI port",    
+    "stun": "STUN server port",
+    "turn": "TURN server port; may be empty string",    
+    "mysql": "Port number for the ACE Direct MySQL server",
+    "redis": "Redis server port",
+    "mongodb": "MongoDB port number, default is 27017",
+    "translation_server": "Port number of the translation server",
+    "kurento": "Kurento media server port"
+  },     
   "signaling_server": {
-      "proto": "(if no nginx) protocol (e.g., wss) of signaling server",
-      "public": "(if no nginx) FQDN:port of signaling server", 
-      "port": "(if no nginx) port number of signaling server",
-      "dev_url": "(preferred way) nginx path of personal signaling server (DEV) or empty string (PROD). See the /acedirect-kurento/ route in /etc/nginx/nginx.conf on the portal.domain.com server"
+      "protocol": "wss",
+      "path": "This is the acedirect-kurento route in /etc/nginx/nginx.conf on the portal.domain.com server"
   },
+  "nginx": { 
+    "ad_path": "customizable NGINX path for agent/consumer portals",
+    "mp_path": "customizable NGINX path for management portal",
+    "agent_route": "customizable route for agent portal url",
+    "consumer_route": "customizable route for consumer portal url"
+  },  
+  "openam": {
+    "path": "OpenAM web path as specified in the OpenAM installation",
+    "user": "openAM admin user name from the OpenAM installation",
+    "password": "openAM admin password from the OpenAM installation"
+  },  
   "media_server": {
     "privacy_video_url": "file location of privacy video file on the Kurento media server"
   },
   "asterisk": {
-    "sip": {
-      "public": "Fully qualified domain name of the Asterisk server",
-      "private_ip": "Private IP address of the Asterisk server",
-      "ws_port": "Websocket port",      
-      "stun": "Fully qualified domain name of the stun server",
-      "stun_port": "Port of the stun server",
-      "turn": "Fully qualified domain name of turn server",
-      "turn_port": "string; port number of turn server; may be empty",
+    "sip": {  
+      "protocol": "Asterisk protocol",      
+      "stun_user": "username for stun server",      
       "turn_user": "turn server username",
       "turn_cred": "turn server password",
       "channel": "default to SIP"
     },
     "ami": {
       "id": "Asterisk AMI userid; retrieve from /etc/asterisk/manager.conf on acesip.domain.com",
-      "passwd": "Asterisk AMI password; retrieve from /etc/asterisk/manager.conf on acesip.domain.com",
-      "port": "Asterisk AMI port"
+      "passwd": "Asterisk AMI password; retrieve from /etc/asterisk/manager.conf on acesip.domain.com"
     },
     "extensions": {
       "start_number": "First consumer extension; see 'password=' in /etc/asterisk/pjsip.conf on acesip.domain.com",
@@ -51,10 +81,16 @@
     },
     "queues": {
       "complaint": {
-        "number": "Asterisk dial-in number for the complaint queue; from /etc/asterisk/extensions.conf on acesip.domain.com"
+        "number": "Asterisk dial-in number for the complaint queue; from /etc/asterisk/extensions.conf on acesip.domain.com",
+        "name": "string; name of complaint queue"
       },
+      "general": {
+        "number": "Asterisk dial-in number for the general queue; from /etc/asterisk/extensions.conf on acesip.domain.com",
+        "name": "string; name of general queue"        
+      },      
       "videomail": {
-        "number": "Asterisk dial-in number for the videomail queue; from /etc/asterisk/extensions.conf on acesip.domain.com"
+        "number": "Asterisk dial-in number for the videomail queue; from /etc/asterisk/extensions.conf on acesip.domain.com",
+        "name": "string; name of videomail queue"
       }
     }
   },
@@ -83,9 +119,7 @@
     }
   },
   "database_servers": {
-    "mysql": {
-      "host": "Private IP address of the local ACE Direct MySQL server OR AWS RDS FQDN",
-      "port": "Port number for the ACE Direct MySQL server",      
+    "mysql": {  
       "user": "Username for the ACE Direct MySQL user",
       "password": "Password for the ACE Direct MySQL user; value for _ACEDIRECT_PASSWORD_ in MySQL configuration",
       "ad_database_name": "ACE Direct database name",
@@ -96,12 +130,10 @@
       "ssdatabase": "(for signaling server) signaling server db name"
     },
     "redis": {
-      "host": "Local IP address of the Redis server on acenode.domain.com: 127.0.0.1",
-      "port": "Redis server port",
       "auth": "Redis authentication string; your chosen password for myRedisPassword during Redis installation"
     },
     "mongodb": {
-      "connection_uri": "Mongo DB connection URI; leave blank to disable call stats logging",
+      "database_name": "primary database",
       "caption_database_name": "database to log captions to",
       "caption_collection_name": "collection to log captions to",
       "logAMIevents": "true/false boolean - log AMI events",
@@ -135,49 +167,18 @@
   "caption_mode" : {
     "agent": "Enable captions for the agent portal",
     "consumer" : "Enable captions for the consumer portal"
-  },
-  "nginx": {
-    "fqdn": "Fully qualified domain name of this server",
-    "private_ip": "Private IP address of the nginx server",
-    "port": "NGINX server port number",    
-    "ad_path": "customizable NGINX path for agent/consumer portals",
-    "mp_path": "customizable NGINX path for management portal",
-    "agent_route": "customizable route for agent portal url",
-    "consumer_route": "customizable route for consumer portal url"
-  },  
-  "openam": {
-    "fqdn": "Fully qualified domain name of the NGINX server, since OpenAM is proxied through NGINX",
-    "private_ip": "Private IP address of the NGINX server",
-    "port": "NGINX server port number",
-    "path": "OpenAM web path as specified in the OpenAM installation",
-    "user": "openAM admin user name from the OpenAM installation",
-    "password": "openAM admin password from the OpenAM installation"
-  },
-  "ace_direct": {
-    "https_listen_port": "Port that the ACE Direct portal listens on; must match value in nginx.conf on the NGINX server"
-  },
+  }, 
   "management_portal": {
-    "https_listen_port": "Port that the Management Portal listens on; must match value in nginx.conf on the NGINX server",
-    "queues" : "Comma-separated values of the Asterisk queues; see the /etc/asterisk/queues.conf file",
     "poll_interval" : "Poll frequency (seconds) of the Management Portal statistics",
     "force_logout_password": "a really secure password for the remote force agent logout feature"    
   },
   "zendesk": {
-    "private_ip": "IP address of the Node application server; localhost is fine",
-    "port": "Port number of the zendesk/fendesk server",
     "protocol": "Use http for zendesk, https for fendesk",
     "user_id": "email address of the zendesk user; this is a placeholder value for a real Zendesk account if available",
     "token": "token of the zendesk user; this is a placeholder value for a real Zendesk account if available"
   },
-  "acr_cdr": {
-    "https_listen_port": "Port that the ACR CDR portal listens on"
-  },
   "user_service": {
-    "port": "Port number of the USERVER server",
     "itrs_mode": "Use ITRS to verify numbers? true|false"
-  },
-  "agent_service": {
-    "port": "Port number of the ASERVER server"
   },
   "agent_chat": {
     "save_agent_chats":"boolean string (true/false) that enables or disables saving the agent chats to MongoDB"
@@ -190,39 +191,25 @@
     "awayBlink": "boolean string (true/false) that enables blinking while Away, if callers are in queue"
   },
   "translation_server": {
-    "private_ip": "IP address of the translation server, typically runs on the Asterisk server",
-    "port": "Port number of the translation server",
-    "protocol": "Protocol (http/https) of the translation server"
+    "protocol": "Protocol (http/https) of the translation server",
+    "enabled": "Boolean; enable/disable translation server"    
   },
   "webserver": {
-    "comment1": "signaling server only",
-    "port": "Integer; port number of signaling server web server ace-direct/acedirect-kurento",
-    "cert":"full path to certificate file",
-    "key": "full path to key file",
-    "csr": "full path to asterisk csr file",
+    "comment1": "this is part of the signaling server configuration",    
     "static": "./static",
     "token": "__DEV_TOKEN__"
   },
   "asteriskss": {
-    "comment1": "signaling server only",
-    "protocol": "wss",
-    "host": "FQDN of asterisk server",
-    "ip": "asterisk private IP",
-    "port": "Integer; Asterisk port number",
+    "comment1": "this is part of the signaling server configuration",    
     "sip_media_request_interval": 5000,
     "ami": {
-      "ip": "<asterisk private IP>",
-      "enabled": true,
-      "id": "<asterisk AMI userid>; same AMI username as above",
-      "passwd": "<asterisk AMI password>; same AMI password as above",
-      "port": "5038",
-      "queue_names": ["from Asterisk /etc/asterisk/*.conf", "from Asterisk /etc/asterisk/*.conf"],
-      "queue_extensions": ["from Asterisk /etc/asterisk/*.conf", "from Asterisk /etc/asterisk/*.conf"]
+      "enabled": true
     }
   },
   "kurento": {
-    "comment1": "signaling server only",
-    "url": "wss URL of Kurento media server",
+    "comment1": "this is part of the signaling server configuration",    
+    "protocol": "wss",
+    "path": "/kurento",
     "stats_interval": 10000,
     "sdes_crypto": "AES_128_CM_HMAC_SHA1_80",
     "monitoring_enabled": false,
@@ -233,9 +220,9 @@
     "video_webrtc_min_bitrate": 100,
     "video_rtp_max_bitrate": 8000,
     "video_webrtc_codec": "H264",
-    "_comment2": "development comment",
-    "_comment3": "development comment",
-    "_comment4" : "development comment",
+    "_comment2": "Dev Notes, unused: 42001F fixes some problems. 42E015 - try this too - RFC3984 - page 38",     
+    "_comment3": "Dev Notes, unused: WV tried 42e01f - did not work",
+    "_comment4" : "Dev Notes, unused: profile-level-id=42001F;packetization-mode=0;level-asymmetry-allowed=1",    
     "h264_config": "profile-level-id=42E01F;packetization-mode=0;level-asymmetry-allowed=0",
     "aws": {
       "s3": {
@@ -247,18 +234,8 @@
     },
     "conference_max_participants": 4
   },
-  "ice": [
-    { 
-      "urls": "stun:stun.domain.com:3478"
-    },
-    { 
-      "urls": "turn:coturn.domain.com:3478",
-      "username": "<turnusername>",
-      "credential": "<turncred>"
-    } 
-  ],  
   "videomailss": {
-    "comment1": "signaling server only",
+    "comment1": "this is part of the signaling server configuration",    
     "directory": "/tmp/videomail/",
     "instructions_media": [
       "/tmp/videomail/instructions/video.mp4",
