@@ -189,22 +189,9 @@ function connect_socket() {
 
 					//get the payload from the token
 					var payload = jwt_decode(data.token);
-                                        if (!payload.signalingServerProto) {
-                                           payload.signalingServerProto = 'wss';
-                                        }
-				        var signaling_url  = payload.signalingServerProto + '://' + payload.signalingServerPublic + ':' + payload.signalingServerPort + '/signaling';
-
-                                        //see if we should override with a full NGINX route (development only)
-                                        var dev_url = payload.signalingServerDevUrl;
-                                        dev_url = dev_url.trim();
-                                        if(dev_url !== null && dev_url !== '') {
-                                          console.log('Using signaling server: ' + dev_url);
-                                          signaling_url = dev_url;
-                                        }
-
-					console.log('signaling_url: ' + signaling_url);
-
-				        acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url  });
+					var signaling_url = payload.signalingServerUrl;
+					signaling_url = signaling_url.trim();
+				    acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url  });
 
 					acekurento.remoteStream = document.getElementById('remoteView');
 					acekurento.selfStream = document.getElementById('selfView');
@@ -218,15 +205,10 @@ function connect_socket() {
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
 					$('#agentrole-headerdropdown').html("<small>" + payload.role + "</small>");
-					$('#my_sip_uri').attr("name", "sip:" + payload.extension + "@" + payload.asteriskPublicHostname);
-					$('#signaling_server_public').attr("name", payload.signalingServerPublic);
-					$('#signaling_server_port').attr("name", payload.signalingServerPort);
 					$('#sip_password').attr("name", payload.extensionPassword);
 					$("#pc_config").attr("name", "stun:" + payload.stunServer);
 					$("#complaints-queue-num").text(payload.complaint_queue_count);
 					$("#general-queue-num").text(payload.general_queue_count);
-					signalingServerPublic = document.getElementById("signaling_server_public");
-					signalingServerPort = document.getElementById("signaling_server_port");
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
 						$('#sidebar-complaints').show();
