@@ -1,0 +1,8 @@
+.DS_Store
+node_modules
+
+media/*
+!media/recordings
+media/recordings/*
+!media/recordings/README.md
+
