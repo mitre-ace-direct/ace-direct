@@ -147,12 +147,14 @@ class WebRTCMediaSession extends Events {
             const source = p.player || p.endpoint;
             const port = await this._composite.createHubPort();
             await source.connect(port);
-            if (p.session._isMonitoring) {
-              // only send the composite video to the monitoring agent
-              // nothing changes for the original participants
+            if (p.session) {
+              if (p.session._isMonitoring) {
+                // only send the composite video to the monitoring agent
+                // nothing changes for the original participants
 
-              p.port = port;
-              await port.connect(p.endpoint);
+                p.port = port;
+                await port.connect(p.endpoint);
+              }
             }
           } else {
             // normal multiparty call. send the composite to everyone
@@ -200,7 +202,12 @@ class WebRTCMediaSession extends Events {
     this._participants.forEach(p => {
       const { ext, type, onHold } = p;
       const isAgent = (type == "participant:webrtc") ? p.session._isAgent : false;
-      const isMonitor = (p.session._isMonitoring == true) ? true : false;
+      var isMonitor;
+      if (p.session) {
+        isMonitor = (p.session._isMonitoring == true) ? true : false;
+      } else {
+        isMonitor = false;
+      }
       simplePartList.push({ ext, type, onHold, isAgent, isMonitor });
     });
     this._participants.forEach(p => {

@@ -360,6 +360,9 @@ class ConfManager extends Events {
           iceServers: iceArr
         }
       });
+
+      this._jssipRTCSessions.set(caller.ext, session);
+
       session.on('failed', e => {
         if (e.message) {
           call.onFailed(calleeExt, e.message.reason_phrase);
