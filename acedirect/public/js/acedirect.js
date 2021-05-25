@@ -975,8 +975,10 @@ function connect_socket() {
 					showTransferModal = true;
 					if (isColdTransfer) {
 						//we terminate the call for the original agent
-						terminate_call();
-						socket.emit('call-ended', {'agentExt': extensionMe}); //stop allowing file share between consumer and original agent
+						setTimeout(() => {
+							terminate_call();
+							socket.emit('call-ended', {'agentExt': extensionMe}); //stop allowing file share between consumer and original agent
+						}, 1200);
 					} else {
 						console.log('warm transfer success!')
 					}
