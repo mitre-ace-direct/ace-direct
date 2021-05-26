@@ -38,6 +38,5 @@ $  node adserver.js  # run the server manually
 
 Depending on your configuration, use the following URLs to access the ACE Direct portal:
 
-1. ACE Direct Consumer Portal: `https://host/ACEDirect/complaint`
+1. ACE Direct Consumer Portal: `https://host/ACEDirect/call`
 1. ACE Direct Customer Service Rep (CSR) portal: `https://host/ACEDirect/agent`
-
