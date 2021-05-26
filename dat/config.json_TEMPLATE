@@ -1,7 +1,7 @@
 {
   "common": {
     "cleartext": "true",
-    "version": "5.0",
+    "version": "6.0",
     "year": "2021",
     "debug_level": "ERROR",
     "https": {
@@ -133,7 +133,7 @@
       "auth": "REDISPASSWORD"
     },
     "mongodb": {
-      "database_name": "test"
+      "database_name": "test",
       "caption_database_name": "caption_db",
       "caption_collection_name": "captions",
       "logAMIevents": false,
