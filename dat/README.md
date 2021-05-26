@@ -20,18 +20,16 @@ The purpose of the process.json_TEMPLATE file is to simplify the starting/stoppi
 
 ## acedirectdefault.sql
 
-This file is a SQL script to create the initial ACE Direct database and populate it with sample data. You should replace the following parameters in the file with your own: 
+This file is a SQL script to create the initial ACE Direct database and populate it with sample data. You should replace the following parameters in the file with your own:
 
 * _EXTENSION_PASSWORD_ : the password used for the WebRTC agent extensions (found in pjsip.conf of Asterisk)
-* _ACEDIRECT_PASSWORD_: The password of the `acedirect` MySQL user 
-* _ASTERISK_PASSWORD_: The password of the `asterisk` MySQL user 
+* _ACEDIRECT_PASSWORD_: The password of the `acedirect` MySQL user
+* _ASTERISK_PASSWORD_: The password of the `asterisk` MySQL user
 
 After installing MySQL, you can import the database and user config with the following command:
 
-```
+```bash
 [centos@dev1demo ~]$ mysql -u someuser -p -h 127.0.0.1 acedirect < acedirectdefault.sql
 ```
 
 Finally, update your ~/dat/config.json file to point to this ACE Direct database.
-
-
