@@ -42,6 +42,12 @@ function post(callinfo) {
         }
       } else if (stat && stat.size == 0) {
         console.log('Error Videomail file contains no data: ', new Date(), callinfo.incomingCaller, callinfo.recordingFile);
+        try {
+          fs.unlinkSync(filepath)
+        } catch (err) {
+          console.error(err)
+        }
+        return
       } else {
         let videomailFile = fs.createReadStream(filepath);
         videomailFile.on('data', (chunk) => {
@@ -51,11 +57,6 @@ function post(callinfo) {
         videomailFile.on('end', function () {
           console.log("file has ended, upload the file", callinfo.incomingCaller)
           getVideoDurationInSeconds(filepath).then((duration) => {
-            try {
-              fs.unlinkSync(filepath)
-            } catch (err) {
-              console.error(err)
-            }
             fs.readFile(filepath, function (err, fileData) {
               var uploadParams = { Bucket: 'task3acrdemo-recordings', Key: callinfo.recordingFile, Body: "" };
               uploadParams.Body = fileData;
@@ -64,17 +65,30 @@ function post(callinfo) {
                   console.log("Error", err);
                   return
                 }
+                try {
+                  fs.unlinkSync(filepath)
+                } catch (err) {
+                  console.error(err)
+                }
+                console.log();
                 let formData = new FormData();
                 formData.append('duration', Math.floor(duration));
                 formData.append('ext', callinfo.ext);
                 formData.append('phoneNumber', callinfo.incomingCaller);
                 formData.append('filename', callinfo.recordingFile);
 
+                console.log("ext", callinfo.ext)
+
                 request({
                   method: 'POST',
                   url: uploadAPI,
                   rejectUnauthorized: false,
-                  body: formData,
+                  form: { 
+                    ext: callinfo.ext, 
+                    duration: Math.floor(duration), 
+                    phoneNumber: callinfo.incomingCaller, 
+                    filename: callinfo.recordingFile 
+                  },
                   headers: formData.getHeaders(),
                 }, function (error, response, data) {
                   if (error) {
