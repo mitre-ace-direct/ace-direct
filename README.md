@@ -303,12 +303,13 @@ The ACE Direct application servers are Node.js servers.
     ```bash
     $  cd ~/ace-direct
     $
+    $  # full build
     $  npm install
-    $  npm run build  # build
+    $  npm run build
     $  npm run config
     $
     $  # other commands
-    $  npm run test  # automated tests
+    $  npm run test  # automated tests, make sure all Node servers are down
     $  npm run lint  # run linting tests
     $  npm run clean  # remove all external libs
     $  npm run clean:logs  # remove log files
