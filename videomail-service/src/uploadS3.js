@@ -6,7 +6,6 @@ const config = require('./configuration.js');
 const fs = require('fs');
 const request = require('request');
 const uploadAPI = config.uploadServer + '/UploadVideomail';
-const FormData = require('form-data');
 const { getVideoDurationInSeconds } = require('get-video-duration');
 const AWS = require('aws-sdk');
 const proxy = require('proxy-agent');
@@ -70,14 +69,7 @@ function post(callinfo) {
                 } catch (err) {
                   console.error(err)
                 }
-                console.log();
-                let formData = new FormData();
-                formData.append('duration', Math.floor(duration));
-                formData.append('ext', callinfo.ext);
-                formData.append('phoneNumber', callinfo.incomingCaller);
-                formData.append('filename', callinfo.recordingFile);
 
-                console.log("ext", callinfo.ext)
 
                 request({
                   method: 'POST',
