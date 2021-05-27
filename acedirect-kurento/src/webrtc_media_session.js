@@ -25,7 +25,7 @@ const replaceMediaEl = async (el, oldEl, newEl) => {
 
 var kurento = null;
 
-const ASTERISK_QUEUE_EXT = param('asteriskss.ami.queue_extensions');
+const ASTERISK_QUEUE_EXT = [param('asterisk.queues.general.number'), param('asterisk.queues.complaint.number')]; // currently support two queues
 
 
 class WebRTCMediaSession extends Events {
@@ -68,7 +68,8 @@ class WebRTCMediaSession extends Events {
 
       if (kurento == null) {
         debug('CREATING KURENTO');
-        kurento = await util.getKurentoClient(param('kurento.url'), 5000);
+        const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento_fqdn')}:${param('app_ports.kurento')}${param('kurento.path')}`;        
+        kurento = await util.getKurentoClient(kurentoUrl, 5000);
       }
 
       if (!kurento) throw new Error(`Can't create kurento client`);
@@ -129,11 +130,28 @@ class WebRTCMediaSession extends Events {
       }
       for (const p of this._participants.values()) {
         if (!p.port) {
-          const port = await this._composite.createHubPort();
-          p.port = port;
-          const source = p.player || p.endpoint;
-          await source.connect(port);
-          await port.connect(p.endpoint);
+          if (this._hasMonitor) {
+            const source = p.player || p.endpoint;
+            const port = await this._composite.createHubPort();
+            await source.connect(port);
+            if (p.session) {
+              if (p.session._isMonitoring) {
+                // only send the composite video to the monitoring agent
+                // nothing changes for the original participants
+
+                p.port = port;
+                await port.connect(p.endpoint);
+              }
+            }
+          } else {
+            // normal multiparty call. send the composite to everyone
+
+            const port = await this._composite.createHubPort();
+            p.port = port;
+            const source = p.player || p.endpoint;
+            await source.connect(port);
+            await port.connect(p.endpoint);
+          }
         }
       }
     } else {
@@ -171,7 +189,13 @@ class WebRTCMediaSession extends Events {
     this._participants.forEach(p => {
       const { ext, type, onHold } = p;
       const isAgent = (type == "participant:webrtc") ? p.session._isAgent : false;
-      simplePartList.push({ ext, type, onHold, isAgent });
+      var isMonitor;
+      if (p.session) {
+        isMonitor = (p.session._isMonitoring == true) ? true : false;
+      } else {
+        isMonitor = false;
+      }
+      simplePartList.push({ ext, type, onHold, isAgent, isMonitor });
     });
     this._participants.forEach(p => {
       if (p.type === PARTICIPANT_TYPE_WEBRTC && p.session
@@ -424,8 +448,8 @@ class WebRTCMediaSession extends Events {
 
   patchOffer(offer) {
     const sdpObj = transform.parse(offer);
-    sdpObj.origin.address = param('asteriskss.ip');
-    sdpObj.connection.ip = param('asteriskss.ip');
+    sdpObj.origin.address = param('servers.asterisk_private_ip');
+    sdpObj.connection.ip = param('servers.asterisk_private_ip');
 
     sdpObj.media.forEach(media => {
       const validPayloads = new Set(
@@ -597,7 +621,8 @@ class WebRTCMediaSession extends Events {
   async enablePrivateMode(ext, file) {
     const p = this._participants.get(ext);
     if (!p) {
-      throw new Error(`No participant registered for ${ext}`);
+      console.log(`No participant registered for ${ext}`);
+      return;
     }
     if (p.player) {
       debug(`${ext} Private mode already enabled`);
@@ -617,8 +642,10 @@ class WebRTCMediaSession extends Events {
     player.play();
 
     if (this.isMultiparty) {
+      if (p.port) {
       await p.endpoint.disconnect(p.port);
       await player.connect(p.port);
+      }
     } else {
       const other = this.oneToOnePeer(ext);
       if (other) {
@@ -631,15 +658,18 @@ class WebRTCMediaSession extends Events {
   async disablePrivateMode(ext) {
     const p = this._participants.get(ext);
     if (!p) {
-      throw new Error(`No participant registered for ${ext}`);
+      console.log(`No participant registered for ${ext}`);
+      return;
     }
     if (!p.player) return; // Not in private mode
     const player = p.player;
     p.player = null;
 
     if (this.isMultiparty) {
+      if (p.port) {
       await player.disconnect(p.port);
       await p.endpoint.connect(p.port);
+      }
     } else {
       const other = this.oneToOnePeer(ext);
       if (other) {

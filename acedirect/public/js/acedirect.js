@@ -86,6 +86,14 @@ var autoAnswer= false;
 var multipartyTransition = false;
 var isMultipartyTransfer = false;
 var allAgentCall = false;
+var consumerType;
+
+// call monitoring 
+var isMonitoring = false;
+var beingMonitored = false;
+var monitorExt;
+var extensionBeingMonitored;
+var monitorTransition = false;
 
 setInterval(function () {
 	busylight.light(this.agentStatus);
@@ -183,22 +191,9 @@ function connect_socket() {
 
 					//get the payload from the token
 					var payload = jwt_decode(data.token);
-                                        if (!payload.signalingServerProto) {
-                                           payload.signalingServerProto = 'wss';
-                                        }
-				        var signaling_url  = payload.signalingServerProto + '://' + payload.signalingServerPublic + ':' + payload.signalingServerPort + '/signaling';
-
-                                        //see if we should override with a full NGINX route (development only)
-                                        var dev_url = payload.signalingServerDevUrl;
-                                        dev_url = dev_url.trim();
-                                        if(dev_url !== null && dev_url !== '') {
-                                          console.log('Using signaling server: ' + dev_url);
-                                          signaling_url = dev_url;
-                                        }
-
-					console.log('signaling_url: ' + signaling_url);
-
-				        acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url  });
+					var signaling_url = payload.signalingServerUrl;
+					signaling_url = signaling_url.trim();
+				    acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url  });
 
 					acekurento.remoteStream = document.getElementById('remoteView');
 					acekurento.selfStream = document.getElementById('selfView');
@@ -212,15 +207,10 @@ function connect_socket() {
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
 					$('#agentrole-headerdropdown').html("<small>" + payload.role + "</small>");
-					$('#my_sip_uri').attr("name", "sip:" + payload.extension + "@" + payload.asteriskPublicHostname);
-					$('#signaling_server_public').attr("name", payload.signalingServerPublic);
-					$('#signaling_server_port').attr("name", payload.signalingServerPort);
 					$('#sip_password').attr("name", payload.extensionPassword);
 					$("#pc_config").attr("name", "stun:" + payload.stunServer);
 					$("#complaints-queue-num").text(payload.complaint_queue_count);
 					$("#general-queue-num").text(payload.general_queue_count);
-					signalingServerPublic = document.getElementById("signaling_server_public");
-					signalingServerPort = document.getElementById("signaling_server_port");
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
 						$('#sidebar-complaints').show();
@@ -431,6 +421,7 @@ function connect_socket() {
 							"<tr><td>Name</td>" +
 							"<td>Extension</td>" +
 							"<td>Status</td>" +
+							"<td>Monitor Call</td>" + 
 							"<td>Transfer Call</td>" + 
 							"<td>Multi-Party Invite</td>"+
 							"<td>Chat</td></tr>"
@@ -513,6 +504,7 @@ function connect_socket() {
 								"name": data.agents[i].name,
 								"extension": data.agents[i].extension,
 								"queues": queues,
+								"monitorCall": monitorAvailability(data.agents[i].status, data.agents[i].name, data.agents[i].extension),
 								"transferCall": transferAvailability(data.agents[i].status, data.agents[i].name, data.agents[i].extension),
 								"multipartyInvite" : (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $("#agentname-sidebar").text() != data.agents[i].name)
 								? "<Button class=\"demo-btn\" onClick=multipartyinvite(" + data.agents[i].extension + ")><i class=\"fa fa-users\"></i></Button>"
@@ -704,14 +696,16 @@ function connect_socket() {
 					$('#fileInput').val('');
 				}).on('screenshareRequest', function(data){
 					//$('#screenshareButtons').show()
-					$('#screenshareRequest').modal({
-						show: true,
-						backdrop: 'static',
-						keyboard: false
-					});
+					if (!isMonitoring) {
+						$('#screenshareRequest').modal({
+							show: true,
+							backdrop: 'static',
+							keyboard: false
+						});
+					}
 				}).on('caption-translated', function (transcripts) {
 						console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
-					if(acekurento.isMultiparty){
+					if(acekurento.isMultiparty || isMonitoring){
 						updateCaptionsMultiparty(transcripts);
 					}else{
 						updateCaptions(transcripts); // in jssip_agent.js
@@ -970,7 +964,15 @@ function connect_socket() {
                 }).on('beginTransfer', function() {
 					// initiate the call transfer in the signaling server
 					if (isColdTransfer) {
+						if (beingMonitored) {
+							// remove monitor first
+							socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':false});
+							setTimeout(() => {
+								acekurento.callTransfer(transferExt.toString(), true);
+							}, 500);
+						} else {
 						acekurento.callTransfer(transferExt.toString(), true);
+						}
 					} else {
 						// warm transfers are multiparty calls
 						multipartyinvite(transferExt);
@@ -985,14 +987,21 @@ function connect_socket() {
 					showTransferModal = true;
 					if (isColdTransfer) {
 						//we terminate the call for the original agent
-						terminate_call();
-						socket.emit('call-ended', {'agentExt': extensionMe}); //stop allowing file share between consumer and original agent
+						setTimeout(() => {
+							terminate_call();
+							socket.emit('call-ended', {'agentExt': extensionMe}); //stop allowing file share between consumer and original agent
+						}, 1200);
 					} else {
 						console.log('warm transfer success!')
 					}
                 }).on ('multiparty-transfer', function(data) {
 					// backup host is becoming the new host of the call
 					multipartyCaptionsEnd();
+					if (consumerType == 'provider') {
+						terminate_call();
+						unpauseQueues();
+						autoAnswer = true;
+					}
 					
 					isTransfer = true;
 					isMultipartyTransfer = true;
@@ -1015,7 +1024,68 @@ function connect_socket() {
 						backdrop: 'static',
 						keyboard: false
 					});
-				});
+				}).on('initiateMonitor', function(data) {
+                    console.log('inviting ' +data.monitorExt.toString()+' to monitor this call');
+                    acekurento.invitePeer(data.monitorExt.toString(), true);
+                    socket.emit('monitor-invite', {'monitorExt': data.monitorExt, 'vrs': $('#callerPhone').val()});
+					if ($('#callerPhone').val()) {
+						// tell web consumer there's a monitor
+						socket.emit('start-monitoring-consumer', {'vrs': $('#callerPhone').val()});
+					}
+                    beingMonitored = true;
+					monitorExt = data.monitorExt;
+					if (!isMultipartyCall && !monitorCaptions) {
+						multipartyCaptionsStart();
+						monitorCaptions = true;
+					}
+                }).on('monitor-join-session', function(data) {
+                    //accept the call to monitor the session
+					if (data.vrs) {
+						console.log('webrtc call');
+						$('#callerPhone').val(data.vrs);
+					}
+                    $('#myRingingModal').modal({
+                        show: false,
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    setTimeout(() => {
+                        $('#accept-btn').trigger('click');
+                    }, 1000);
+					$('#multipartyTransitionModal').modal('hide');
+                }).on('monitor-left', function() {
+					acekurento.isMonitoring = false;
+					beingMonitored = false;
+					monitorExt = null;
+					if(!acekurento.isMultiparty) {
+						multipartyCaptionsEnd();
+					}
+				}).on('monitor-leave-session', function(data) {
+					terminate_call();
+					if (data.reinvite) {
+						monitorTransition = true;
+                        $('#multipartyTransitionModal').modal('show');
+                        $('#multipartyTransitionModal').modal({
+                            backdrop: 'static',
+                            keyboard: false
+                        });
+						if (data.multipartyTransition) {
+							// do nothing
+						} else if (data.multipartyHangup) {
+							setTimeout(() => {
+								startMonitoringCall(extensionBeingMonitored);
+							}, 1000);
+						}
+                    } else {
+						// remove monitor variables
+						extensionBeingMonitored = null;
+						isMonitoring = false;
+						monitorTransition = false;
+						socket.emit('stopMonitoringCall', {'originalExt':extensionBeingMonitored, 'vrs': $('#callerPhone').val()});
+					}
+				}).on('monitor-rejoin-session', function() {
+					startMonitoringCall(extensionBeingMonitored);
+                });
 
 			} else {
 				//we do nothing with bad connections
@@ -1044,6 +1114,9 @@ $('#agenttable').DataTable({
 			"mDataProp": "queues"
 		},
 		{
+            "mDataProp": "monitorCall"
+        },
+		{
             "mDataProp": "transferCall"
         },
 		{
@@ -1062,6 +1135,12 @@ $('#agenttable').DataTable({
 
 function alignDataTableHeaders() {
 	$($.fn.dataTable.tables(true)).DataTable().columns.adjust();
+}
+
+function monitorAvailability(status, name, ext) {
+	return (($('#user-status').text() == 'Ready' || $('#user-status').text() == 'Away') && status == 'INCALL' && $("#agentname-sidebar").text() != name) 
+	? "<Button class=\"demo-btn\" onClick=startMonitoringCall(" + ext + ")><i class=\"fa fa-eye\"></i></Button>"
+	: "<Button class=\"secondary\" disabled><i class=\"fa fa-eye\"></i></Button>"
 }
 
 function transferAvailability(status, name, ext) {
@@ -1096,6 +1175,20 @@ $('#submitvrs').on('click', function (event) {
 	}
 });
 
+function startMonitoringCall(ext) {
+    isMonitoring = true;
+	extensionBeingMonitored = ext;
+    socket.emit('askMonitor', {'monitorExt': extensionMe, 'originalExt': ext})
+}
+
+function stopMonitoringCall(ext) {
+	monitorTransition = false;
+    terminate_call();
+	acekurento.isMonitoring = false;
+	extensionBeingMonitored = null;
+
+    socket.emit('stopMonitoringCall', {'originalExt':ext, 'vrs': $('#callerPhone').val()});
+}
 
 $("#newchatmessage").on('change keydown paste input', function () {
 	var value = $("#newchatmessage").val();
@@ -1438,6 +1531,7 @@ function clearScreen() {
 	$('#fileSentError').hide();
 
 	$('#transferExtension').val('');
+	consumerType = '';
 }
 
 function changeStatusLight(state) {
