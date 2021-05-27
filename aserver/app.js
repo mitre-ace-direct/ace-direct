@@ -133,7 +133,7 @@ if (debugLevel === 'DEBUG') {
 
 // Create MySQL connection and connect to it
 connection = mysql.createConnection({
-  host: getConfigVal('database_servers:mysql:host'),
+  host: getConfigVal('servers:mysql_fqdn'),
   user: getConfigVal('database_servers:mysql:user'),
   password: getConfigVal('database_servers:mysql:password'),
   database: getConfigVal('database_servers:mysql:ad_database_name')
@@ -144,8 +144,8 @@ setInterval(() => {
   connection.ping();
 }, 60000);
 
-const asterisk = new AsteriskManager(parseInt(getConfigVal('asterisk:ami:port'), 10),
-  getConfigVal('asterisk:sip:private_ip'),
+const asterisk = new AsteriskManager(getConfigVal('app_ports:asterisk_ami').toString(),
+  getConfigVal('servers:asterisk_private_ip'),
   getConfigVal('asterisk:ami:id'),
   getConfigVal('asterisk:ami:passwd'), true);
 asterisk.keepConnected();
@@ -166,8 +166,8 @@ const credentials = {
 };
 const server = https.createServer(credentials, app);
 
-const appServer = server.listen(parseInt(getConfigVal('agent_service:port'), 10));
-console.log('https web server for agent portal up and running on port %s   (Ctrl+C to Quit)', parseInt(getConfigVal('agent_service:port'), 10));
+const appServer = server.listen(parseInt(getConfigVal('app_ports:aserver'), 10));
+console.log('https web server for agent portal up and running on port %s   (Ctrl+C to Quit)', parseInt(getConfigVal('app_ports:aserver'), 10));
 
 module.exports = appServer;
 module.exports.myCleanup = myCleanup;

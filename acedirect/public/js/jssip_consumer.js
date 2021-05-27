@@ -20,6 +20,7 @@
 	var maxRecordingSeconds = 90;
 	var call_terminated = false;
 	var privacy_video_url = window.location.origin + "/" + nginxPath + "/media/videoPrivacy.webm";
+	var monitorExt;
 
 	//VIDEOMAIL recording progress bar
 	var recordId = null;
@@ -153,22 +154,38 @@
 			'failed': function(e) {
 				console.log('--- WV: Failed ---\n' + e);
 			},
-                        'restartCallResponse': function (e) {
-                                console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e) );
-                                if (selfStream && selfStream.srcObject) {
-                                  selfStream.srcObject.getVideoTracks()[0].onended = function () {
-                                    console.log('screensharing ended self');
-				    $("#startScreenshare").hide();
-                                    if (acekurento) acekurento.screenshare(false);
-                                  };
-                                }
-                                if (remoteStream && remoteStream.srcObject) {
-                                  remoteStream.srcObject.getVideoTracks()[0].onended = function () {
-                                    console.log('screensharing ended remote');
-				    $("#startScreenshare").hide();
-                                  };
-                                }
-                        },
+			'restartCallResponse': function (e) {
+				console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e));
+				if (selfStream && selfStream.srcObject) {
+					selfStream.srcObject.getVideoTracks()[0].onended = function () {
+						console.log('screensharing ended self');
+						$("#startScreenshare").hide();
+
+						if (monitorExt) {
+							// force monitor to leave the session first
+							socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
+
+							setTimeout(() => {
+								screenShareEnabled = false;
+								if (acekurento) acekurento.screenshare(false);
+							}, 500);
+						} else {
+							if (acekurento) acekurento.screenshare(false);
+						}
+					};
+				}
+				if (remoteStream && remoteStream.srcObject) {
+					remoteStream.srcObject.getVideoTracks()[0].onended = function () {
+						console.log('screensharing ended remote');
+						$("#startScreenshare").hide();
+					};
+				}
+
+				if (monitorExt) {
+					// bring the monitor back to the session
+					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+				}
+			},
 			'ended': function(e) {
 				console.log('--- WV: Call ended ---\n');
 
@@ -181,6 +198,7 @@
 				$("#start-call-buttons").show();
 				$("#agent-name-box").hide();
 				$("#agent-name").text("");
+				$('#end-call').attr('onclick', 'terminate_call()');
 
 			},
 			'participantsUpdate': function(e) {
@@ -190,6 +208,12 @@
 				var partCount = e.participants.filter(t=>t.type == "participant:webrtc").length;
 
 				console.log("--- WV: partCount: " + partCount);
+
+				for (var i = 0; i < e.participants.length; i++) {
+					if (e.participants[i].isMonitor) {
+						monitorExt = e.participants[i].ext;
+					}
+				}
 
 				if (partCount >=2 || videomailflag) {
 					console.log("--- WV: CONNECTED");
@@ -263,6 +287,14 @@
 		}
 	}
 
+	function monitorHangup() {
+		socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite': false});
+		
+		setTimeout(() => {
+			terminate_call();
+		}, 500);
+	}
+
 	//handles cleanup from jssip call. removes the session if it is active and removes video.
 	function terminate_call() {
 		if (acekurento !== null) {
@@ -270,6 +302,7 @@
 			acekurento = null;
 		}
 		call_terminated = true;
+		monitorExt = null;
 
 		
 		document.getElementById("screenshareButton").disabled = true;
@@ -444,25 +477,49 @@
 	}
 
 	function enable_video_privacy() {
-                if (acekurento !== null) {
-				  selfStream.classList.remove("mirror-mode");
-                  acekurento.enableDisableTrack(false, false); //mute video
-                  hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
-                  hide_video_icon.style.display = "block";
-                  acekurento.privateMode(true, privacy_video_url);
-                }
+		if (acekurento !== null) {
+			if (acekurento.isMonitoring) {
+				socket.emit('force-monitor-leave', { 'monitorExt': monitorExt, 'reinvite': true });
+				setTimeout(() => {
+					selfStream.classList.remove("mirror-mode");
+					acekurento.enableDisableTrack(false, false); //mute video
+					hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
+					hide_video_icon.style.display = "block";
+					acekurento.privateMode(true, privacy_video_url);
+					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+				}, 500);
+			} else {
+				selfStream.classList.remove("mirror-mode");
+				acekurento.enableDisableTrack(false, false); //mute video
+				hide_video_button.setAttribute("onclick", "javascript: disable_video_privacy();");
+				hide_video_icon.style.display = "block";
+				acekurento.privateMode(true, privacy_video_url);
+			}
+		}
 	}
 
 	function disable_video_privacy() {
-                if (acekurento !== null) {
-
-				  selfStream.classList.add("mirror-mode");
-                  acekurento.enableDisableTrack(true, false); //unmute video
-                  hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
-                  hide_video_icon.style.display = "none";
-                  acekurento.privateMode(false);
-                  hide_video_icon.style.display = "none";
-                }
+		if (acekurento !== null) {
+			if (acekurento.isMonitoring) {
+				socket.emit('force-monitor-leave', { 'monitorExt': monitorExt, 'reinvite': true });
+				setTimeout(() => {
+					selfStream.classList.add("mirror-mode");
+					acekurento.enableDisableTrack(true, false); //unmute video
+					hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+					hide_video_icon.style.display = "none";
+					acekurento.privateMode(false);
+					hide_video_icon.style.display = "none";
+					socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+				}, 500);
+			} else {
+			selfStream.classList.add("mirror-mode");
+			acekurento.enableDisableTrack(true, false); //unmute video
+			hide_video_button.setAttribute("onclick", "javascript: enable_video_privacy();");
+			hide_video_icon.style.display = "none";
+			acekurento.privateMode(false);
+			hide_video_icon.style.display = "none";
+			}
+		}
 	}
 	// times out and ends call after 30 or so seconds. agent gets event "ended" with cause "RTP Timeout".
 	// puts session on hold

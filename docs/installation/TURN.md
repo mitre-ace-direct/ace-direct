@@ -17,6 +17,7 @@ user = user:password
 ```
 
 ## TURN Server Startup
+
 Edit `/etc/init.d/coturn` and verify the following parameters:
 
 ```bash
@@ -41,12 +42,14 @@ TURNSERVER_ENABLED=1
 ```
 
 ## Starting the TURN Server
+
 To start:
 
 ```bash
 sudo turnserver –o –v
 ```
-or 
+
+or
 
 ```bash
 sudo service start coturn
