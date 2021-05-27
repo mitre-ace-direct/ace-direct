@@ -1,11 +1,11 @@
-const debug = require('debug')('ace:conf-man');
-const Events = require('events');
-const NodeWS = require('jssip-node-websocket');
-const SIP = require('jssip');
-const param = require('param');
-const RTCCall = require('./webrtc_media_session');
-const VideoMail = require('./video_mail');
-const models = require('./dal/models');
+const debug     = require('debug')('ace:conf-man');
+const Events    = require('events');
+const NodeWS    = require('jssip-node-websocket');
+const SIP       = require('jssip');
+const param     = require('param');
+const RTCCall   = require('./webrtc_media_session');
+//const VideoMail = require('./video_mail');
+const models    = require('./dal/models');
 
 class ConfManager extends Events {
 
@@ -18,9 +18,9 @@ class ConfManager extends Events {
   }
 
   register(user, pass) {
-    const host = param('asteriskss.host');
-    const port = param('asteriskss.port');
-    const protocol = param('asteriskss.protocol');
+    const host = param('servers.asterisk_fqdn');
+    const port = param('app_ports.asterisk_ws').toString();
+    const protocol = param('asterisk.sip.protocol');
     const uri = `${protocol}://${host}:${port}/ws`;
     const socket = new NodeWS(uri);
     const ua = new SIP.UA({
@@ -68,7 +68,7 @@ class ConfManager extends Events {
     });
   }
 
-  async invitePeer(caller, session, ext) {
+  async invitePeer(caller, session, ext, isMonitor) {
     if (session.atMaxCapacity) {
       return false;
     }
@@ -76,6 +76,13 @@ class ConfManager extends Events {
     if (!peer) return false;
     const webrtcOffer = await peer.askJoinSession(caller._ext, session);
     if (!webrtcOffer) return false;
+
+    if (isMonitor && peer._isAgent) {
+      // adding a monitor to the call
+      peer._isMonitoring = true;
+      session._hasMonitor = true;
+    }
+ 
     await session.addWebrtcPeer(peer, webrtcOffer);
     return true;
   }
@@ -138,7 +145,8 @@ class ConfManager extends Events {
 
     const callee = this._index.getByExt(calleeExt);
     const caller = this._index.getByExt(callerExt);
-    if (callee && callee.busy && !callee._warmTransfer) {
+    if(callee && callee.busy && !callee._warmTransfer) {
+      /*
       debug('Callee is busy, videomail...');
       const videomail = new VideoMail();
       const answer = await videomail.setPeer(callee, evt.request.body);
@@ -154,12 +162,24 @@ class ConfManager extends Events {
       videomail.on('finished', () => {
         session.terminate();
       });
+
+      const iceArr = [
+        {
+          "urls": `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('app_ports.stun')}`
+        },
+        {
+          "urls": `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('app_ports.turn')}`,
+          "username": `${param('asterisk.sip.turn_user')}`,
+          "credential": `${param('asterisk.sip.turn_cred')}`
+        }
+      ];
       session.answer({
         rtcAnswerConstraints: answer,
         pcConfig: {
-          iceServers: param('ice')
+          iceServers: iceArr
         }
       });
+      */
       return;
     }
     if (callee && caller) {
@@ -215,10 +235,20 @@ class ConfManager extends Events {
         debug('AND NOW WE WILL ADD RTP ENDPONT and FILTER CODECS FROM THIS OFFER...')
         const rtpAnswer = await call.addRtpPeer(callerExt, evt.request.body, session);
         debug(rtpAnswer);
+        const iceArr = [
+          {
+            "urls": `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('app_ports.stun')}`
+          },
+          {
+            "urls": `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('app_ports.turn')}`,
+            "username": `${param('asterisk.sip.turn_user')}`,
+            "credential": `${param('asterisk.sip.turn_cred')}`
+          }
+        ];        
         session.answer({
           rtcAnswerConstraints: rtpAnswer,
           pcConfig: {
-            iceServers: param('ice')
+            iceServers: iceArr
           }
         });
         await call.addWebrtcPeer(callee, webrtcOffer, bitrates);
@@ -312,14 +342,27 @@ class ConfManager extends Events {
         to: calleeExt
       });
       var pfuInt;
+      const iceArr = [
+        {
+          "urls": `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('app_ports.stun')}`
+        },
+        {
+          "urls": `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('app_ports.turn')}`,
+          "username": `${param('asterisk.sip.turn_user')}`,
+          "credential": `${param('asterisk.sip.turn_cred')}`
+        }
+      ];       
       const session = caller.ua.call(calleeExt, {
         eventHandlers: this.callEventHandlers(caller.ext, calleeExt),
         mediaConstraints: { audio: true, video: true },
         rtcOfferConstraints: rtpOffer,
         pcConfig: {
-          iceServers: param('ice')
+          iceServers: iceArr
         }
       });
+
+      this._jssipRTCSessions.set(caller.ext, session);
+
       session.on('failed', e => {
         if (e.message) {
           call.onFailed(calleeExt, e.message.reason_phrase);
