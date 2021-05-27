@@ -1866,7 +1866,36 @@ io.sockets.on('connection', function (socket) {
 
 	//Retrieval of videomail records from the database
 	socket.on("get-recordings", function (data) {
-		let recordingQuery = `SELECT * FROM call_recordings WHERE agentNumber = ${token.extension}`;
+		let filterFlag = (data.filter === "ALL"||typeof data.filter === 'undefined')?false:true;
+		let sort = (typeof data.sortBy === 'undefined')?[]:data.sortBy.split(" ");
+
+		let recording_sql_select = `SELECT fileName, agentNumber, timeStamp, participants, status, duration FROM call_recordings`;
+		let recording_sql_where = `WHERE deleted = 0 AND agentNumber = "${token.extension}"`;
+		let recording_sql_order = ``;
+		let recording_sql_params = [];
+
+		if(filterFlag){
+			recording_sql_where += ` and status = ?`;
+			recording_sql_params.push(data.filter);
+		}
+		if(sort.length == 2){
+			recording_sql_order = ` ORDER BY ??`;
+			recording_sql_params.push(sort[0]);
+			if(sort[1] == 'desc')
+				recording_sql_order += ` DESC`;
+		}
+
+		let recording_sql_query = `${recording_sql_select} ${recording_sql_where} ${recording_sql_order};`;
+		dbConnection.query(recording_sql_query, recording_sql_params, function (err, result) {
+			if (err) {
+				logger.error("RECORDING-ERROR: " + err.code);
+				console.log("Got recording error: " + err);
+			} else {
+				io.to(token.extension).emit('got-call-recordings', result);
+			}
+		});
+
+		/*let recordingQuery = `SELECT * FROM call_recordings WHERE agentNumber = ${token.extension}`;
 
 		dbConnection.query(recordingQuery, function (err, result) {
 			if (err) {
@@ -1876,34 +1905,41 @@ io.sockets.on('connection', function (socket) {
 				//TODO Get s3 bucket url
 				io.to(token.extension).emit('got-call-recordings', result);
 			}
-		});
-
-		// Call S3 to obtain a list of the objects in the bucket
-		/*console.log("Checking the S3 bucket " + JSON.stringify(bucketParams));
-		s3.listObjects(bucketParams, function(err, data) {
-			if (err) {
-				console.log("Error", err);
-			} else {
-				console.log("Success: " + JSON.stringify(data));
-			}
 		});*/
 	});
 
 	//updates recording records when the agent changes the status
 	socket.on("recording-status-change", function (data) {
 		logger.debug('updating MySQL entry');
-		let recording_sql_query = `UPDATE call_recordings SET status = ?, WHERE fileName = ?;`;
+		let recording_sql_query = `UPDATE call_recordings SET status = ? WHERE fileName = ?;`;
 		let recording_sql_params = [data.status, data.fileName];
-
 		dbConnection.query(recording_sql_query, recording_sql_params,function (err, result) {
 			if (err) {
+				console.log("Recording status error " + err);
 				logger.error('RECORDING-STATUS-CHANGE ERROR: '+ err.code);
 			} else {
 				logger.debug(result);
+				console.log("Status change results " + JSON.stringify(result));
 				io.to(token.extension).emit('record-changed-status', result);
 			}
 		});
 	});
+
+	socket.on("recording-deleted", function (data) {
+		let recording_sql_query = `UPDATE call_recordings SET deleted_time = CURRENT_TIMESTAMP, deleted_by = ?, deleted = 1  WHERE fileName = ?;`;
+		let recording_sql_params = [data.extension, data.fileName];
+
+		logger.debug(recording_sql_query + " " + recording_sql_params);
+
+		dbConnection.query(recording_sql_query, recording_sql_params, function (err, result) {
+			if (err) {
+				logger.error('RECORDING-DELETE ERROR: ' + err.code);
+			} else {
+				logger.debug(result);
+				io.to(token.extension).emit('record-changed-status', result);
+			}
+		})
+	})
 
 	/**
 	 * Socket call for request to obtain file from fileShare

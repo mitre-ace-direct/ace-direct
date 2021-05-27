@@ -29,6 +29,8 @@ var videomail_status_buttons = document.getElementById("videomail-status-buttons
 var record_status_buttons = document.getElementById("record-status-buttons-footer");
 var sortFlag = "id desc";
 var filter = "ALL";
+var recordSortFlag = "timestamp desc";
+var recordFilter = "ALL";
 var telNumber;
 var playingVideomail = false;
 var acekurento;
@@ -258,8 +260,18 @@ function connect_socket() {
 						});
 					}, 5000);
 					socket.emit('get-recordings', {
-						"extension": extensionMe
-					})
+						"extension": extensionMe,
+						"sortBy": "timestamp desc",
+						"filter": "ALL"
+					});
+					setInterval(function () {
+						console.log("Interval recording sort");
+						socket.emit('get-recordings', {
+							"extension": extensionMe,
+							"sortBy": recordSortFlag,
+							"filter": recordFilter
+						});
+					}, 5000)
 					toggle_videomail_buttons(false);
 					toggle_recording_buttons(false);
 					console.log('Sent a get-videomail event');
@@ -1808,7 +1820,7 @@ function updateVideomailTable(data) {
 
 function updateCallRecordingTable(data){
 	$("#callRecordingTbody").html("");
-	console.log("GOT RECORDING DATA " + JSON.stringify(data));
+	//console.log("GOT RECORDING DATA " + JSON.stringify(data));
 	var table;
 	var row;
 
@@ -1820,9 +1832,9 @@ function updateCallRecordingTable(data){
 	for (var i = 0; i < data.length; i++) {
 		var recordFilename = data[i].fileName;
 		var recordConsumer = data[i].participants;
-		var recordTimestamp = data[i].timestamp;
-		var recordLength = 0; //Need logic from s# here
-		var recordStatus = "UNREAD";
+		var recordTimestamp = data[i].timeStamp;
+		var recordLength = data[i].duration;
+		var recordStatus = data[i].status;
 		table = document.getElementById("callRecordingTbody");
 		row = table.insertRow(table.length);
 		fileNameCell = row.insertCell(0);
@@ -1844,6 +1856,8 @@ $('#callRecordingTbody').on('click', 'tr', function () {
 	var tableData = $(this).children("td").map(function () {
 		return $(this).text();
 	}).get();
+	
+	$("#recordId").attr("name", tableData[0]);
 
 	if(agentStatus != 'IN_CALL'){
 		playCallRecording(tableData[0]);
@@ -1882,6 +1896,7 @@ function playCallRecording(filename){
 
 //Socket emit for changing status of a videomail
 function recording_status_change(fileName, recordStatus) {
+	console.log("Changing status with " + fileName + " " + recordStatus);
 	socket.emit('recording-status-change', {
 		"fileName": fileName,
 		"status": recordStatus
@@ -1920,6 +1935,72 @@ function toggle_recording_buttons(make_visible) {
 	if (make_visible) record_status_buttons.style.display = "block";
 	else record_status_buttons.style.display = "none";
 }
+
+//Socket emit for deleting a videomail
+function recording_deleted(id) {
+	socket.emit('recording-deleted', {
+		"fileName": id,
+		"extension": extensionMe
+	});
+}
+
+//Recording Sorting
+//Sorting the videomail table
+$('#recording-filename').on('click', function () {
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort === "asc") {
+		recordSortFlag = "fileName asc";
+	} else if (sort === "desc") {
+		recordSortFlag = "fileName desc";
+	}
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+});
+
+$('#recording-date').on('click', function () {
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort === "asc") {
+		recordSortFlag = "timestamp asc";
+	} else if (sort === "desc") {
+		recordSortFlag = "timestamp desc";
+	}
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+});
+
+$('#recording-length').on('click', function () {
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort === "asc") {
+		recordSortFlag = "length asc";
+	} else if (sort === "desc") {
+		recordSortFlag = "length desc";
+	}
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+});
+
+$('#recording-status').on('click', function () {
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort === "asc") {
+		recordSortFlag = "status asc";
+	} else if (sort === "desc") {
+		recordSortFlag = "status desc";
+	}
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+});
 
 /**
  * End recording section
