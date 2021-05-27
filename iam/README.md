@@ -441,7 +441,7 @@ With OpenAM/Tomcat up and running, set up the OpenAM admin tools:
 
 1. **This step requires that your NGINX server is running and providing the route to OpenAM.** Configure success login URLs - each user (e.g. `dagent1`, `dagent2`, ... , `manager`, ...) should have a designated URL to go to upon successful login. This sets up the URL that agents and managers navigate to upon successful login:
 
-    * From a web browser, log into OpenAM admin: [https://portal.domain.com/ace/XUI/](https://portal.domain.com/ace/XUI/)
+    * From a web browser, log into OpenAM as an admin (see the `oam.adminid` value and `oam.admin_pwd_file` in `/root/iam/config/config.json` for the admin user and password): [https://portal.domain.com/ace/XUI/](https://portal.domain.com/ace/XUI/)
     * Click _Top Level Realm_.
     * Click _Subjects_.
     * Click an agent _User_ (e.g., `dagent1`, `dagent2`).
@@ -984,6 +984,18 @@ How can I add additional agents to OpenAM?
 1. Add the agents to `/root/iam/config/config.json`
 1. `cd /root/iam/scripts`
 1. `python create_users.py`
+
+---
+
+#### Problem 21
+
+When accessing links in the OpenAM admin web page, the following error occurs: `414 Request-URI Too Large`
+
+#### Solution 21
+
+1. Go to the NGINX server.
+1. Edit `/etc/nginx/nginx.conf`
+1. Update this variable and value to be: `large_client_header_buffers 4 32k;`
 
 ---
 
