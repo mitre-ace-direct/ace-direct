@@ -2,6 +2,29 @@
 
 ![ACE Direct](images/adsmall.png)
 
+## Release v6.0, mm/dd/yyyy
+
+* _Call Monitoring_ – The Agent portal now allows for an Agent to passively monitor an ongoing call between another Agent and a consumer.
+* _Call Transfers_ – The Agent portal now supports the transferring of calls between Agents.
+* _Call Recording_ – The Agent portal now supports recording of a call. Call recordings can be used for training purposes or to record behavior that may concern the agent.
+* _File-Sharing Enhancements_ – ACE Direct now supports a more secure file sharing between the Agent and Consumer. An open-source virus and malware scanner (ClamAV) has been integrated into the ACE Direct file sharing function.
+* _Multi-Party Captions and Chat_ – The Agent and Consumer portals will display scrollable captions and chat in multi-party calls.
+* _WebRTC In-Call Statistics and FPS Indicator_ - The agent portal has the ability to retrieve and log WebRTC in-call statistics. New frames per second and packets lost indicators appear on the agent portal.
+* Added basic mocha tests for web servers
+* Add JavaScript linting capability and linted code
+* Refactor, consolidate, and simplify global configurtion file
+* General improvements to the build scripts
+* Update to iTRS lookup script (Consumer Portal)
+* Minor UI enhancements, agent table, etc. (Agent Portal)
+* Fix for complaint tickets when iTRS mode is enabled (Agent Portal)
+* Minor fixes for VRS number formatting and report query (Management Portal)
+* Minor fixes to call blocking and light configuration (Management Portal)
+* Call summary chart modifications (Management Portal)
+* Area code validation (Management Portal)
+* Fix report totals (Management Portal)
+* Minor fix to webcam shutdown processes (Consumer/Agent Portals)
+* Minor fix to privacy mode (Consumer/Agent Portals)
+
 ## Release v5.0, 02/05/2021
 
 * Language Translation – The Agent and Consumer portals now provide the option to display captions and text chats in languages other than the default English language. The Agent or Consumer must select their preferred language prior to accepting or making a call.
