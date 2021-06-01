@@ -105,6 +105,7 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
       ```bash
       $  cd
+      $  mkdir -p .nvm
       $
       $  # install NVM
       $  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
