@@ -7,7 +7,7 @@
     "https": {
       "certificate": "Full path to the certificate file",
       "private_key": "Full path to the private key file",
-      "csr": "full path to asterisk csr file, for signaling server demo page web server"      
+      "csr": "full path to asterisk csr file, for signaling server demo/test page; disabled by default"
     }
   },
   "servers": {
