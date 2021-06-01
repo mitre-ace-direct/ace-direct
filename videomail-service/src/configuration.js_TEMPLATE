@@ -1,0 +1,57 @@
+var config = {
+	clearText: true,
+	debug: 0, //0: no debug, 1: yes debug 
+	// SIP server configurations
+	sipServer: '<hostname of sip server>',
+	sipWsPort: '<wss port for sip server>',
+	credArray: [
+		{ sipId: '88001', sipPass: '<password>' },
+		{ sipId: '88002', sipPass: '<password>' },
+		{ sipId: '88003', sipPass: '<password>' },
+		{ sipId: '88004', sipPass: '<password>' },
+		{ sipId: '88005', sipPass: '<password>' }],
+	// Kurento server configurations
+	kurentoServer: "<wss for kurento media server>",
+	uploadServer: "<aserver location and port>",
+	proxy: "<Proxy address>",
+	awsRegion: "<AWS Region>",
+	redisHost: "<IP address of redis server>",
+	redisPort: "<Redis port>",
+	redisAuth: "<Redis authentication phrase>",
+	redisExt2VRS: '<extensionToVrs>',
+	kmsMediaPath: 'filepath for recordings on kms',
+	kmsMediaPathURL: 'url for file on kms',
+	path: '<full path to videomail servlet>',
+	playFileIntro1: 'onemoment2.mp4',
+	playFileIntro2: 'original_gc_raw.mp4',
+	playFileIntro3: 'FCC_IVVR_videomail_ready.mp4',
+	playFileRec: 'recording2.webm',
+	recordLength: '180' //max time in seconds for recording
+}
+
+
+if (config.clearText == false) {
+	for (key in config) {
+		if (key != 'clearText') {
+			config[key] = decodeValue(config[key])
+		}
+	}
+}
+
+function decodeValue(value) {
+	if (typeof value == 'object') {
+		value = decodeObject(value)
+	} else {
+		value = Buffer.from(value, 'base64').toString();
+	}
+	return value
+}
+
+function decodeObject(obj) {
+	for (x in obj) {
+		obj[x] = decodeValue(obj[x])
+	}
+	return obj;
+}
+
+module.exports = config;
