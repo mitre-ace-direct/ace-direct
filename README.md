@@ -134,7 +134,7 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
       $  mkdir .n
       $  npm install -g n
       $  n 12.18.2
-      $  node -v
+      $  node -v  # make sure it is version 12.18.2
       $
       $  npm install -g pm2  # for process management
       $
