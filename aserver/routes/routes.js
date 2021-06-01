@@ -844,26 +844,14 @@ const appRouter = (app, connection, asterisk) => {
     }
   });
 
-  const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'videomails/');
-    },
-    filename: (req, file, cb) => {
-      cb(null, `${file.fieldname}-${Date.now()}.webm`);
-    }
-  });
-  const upload = multer({ storage });
-
-  app.post('/UploadVideomail', upload.single('videomail'), (req, res) => {
+  app.post('/UploadVideomail', (req, res) => {
     console.log('UPLOAD VIDEOMAIL');
     const { ext } = req.body;
     const { phoneNumber } = req.body;
     const { duration } = req.body;
     const { channel } = req.body;
     const { uniqueid } = req.body;
-    const { filename } = req.file;
-    let filepath = `${__dirname}/../${req.file.path}`;
-    filepath = filepath.replace(filename, '');
+    const { filename } = req.body;
 
     const query = `INSERT INTO videomail
                      (extension, callbacknumber, recording_agent, 
@@ -872,7 +860,7 @@ const appRouter = (app, connection, asterisk) => {
                      video_filename, video_filepath)
                      VALUES (?,?,'kms_agent',null, NOW(), null, ?, 'UNREAD',0,null,?,?,?,?);`;
 
-    const params = [ext, phoneNumber, duration, channel, uniqueid, filename, filepath];
+    const params = [ext, phoneNumber, duration, channel, uniqueid, filename, 's3'];
     connection.query(query, params, (err, results) => {
       if (err) {
         console.log(err);

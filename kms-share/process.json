@@ -1,0 +1,9 @@
+{
+  "apps": [{
+    "name": "KMS Share",
+    "script": "bin/www",
+    "restart_delay": 5000,
+    "autorestart": true,
+    "log_date_format" : "YYYY-MM-DD HH:mm:ss.SSS"
+  }]
+}
