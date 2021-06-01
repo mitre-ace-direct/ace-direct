@@ -72,7 +72,7 @@ OpenAM requires a few environment variables:
 * **JRE_HOME** - This is the base Java folder
 * **JAVA_OPTS** - These are Java options
 
-Set the environment variables in `/root/.bashrc` , for example:
+Set the environment variables in `/root/.bashrc` or `/root/.bash_profile` (whichever one is relevant) , for example:
 
 ```bash
 OPENAM_BASE_NAME=ace
