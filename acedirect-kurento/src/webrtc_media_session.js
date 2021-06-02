@@ -10,7 +10,7 @@ const IceCandidate = Kurento.getComplexType('IceCandidate');
 const crypto = require('crypto');
 const util = require('./util');
 const RecMan = require('./rec_manager');
-var mysql = require('mysql2/promise');
+
 
 const PARTICIPANT_TYPE_WEBRTC = 'participant:webrtc';
 const PARTICIPANT_TYPE_RTP = 'participant:rtp';
@@ -27,19 +27,6 @@ var kurento = null;
 
 const ASTERISK_QUEUE_EXT = [param('asterisk.queues.general.number'), param('asterisk.queues.complaint.number')]; // currently support two queues
 
-/**
- * Custom logic for mysql connection
- */
-
-var dbHost = param('servers.mysql_fqdn');
-var dbUser = param('database_servers.mysql.user');
-var dbPassword = param('database_servers.mysql.password');
-var dbName = param('database_servers.mysql.ad_database_name');
-var dbPort = parseInt(param('app_ports.mysql'));
-console.log("Using host: " + dbHost);
-console.log("Using username: " + dbUser);
-console.log("Using name: " + dbName);
-console.log("Using port: " + dbPort);
 
 class WebRTCMediaSession extends Events {
 
@@ -570,32 +557,11 @@ class WebRTCMediaSession extends Events {
           otherCallers = otherCallers.slice(0,-1);
         }
         var agentNumber = ext;
-
-        const date = this.getTimestampString();
-        const profile = param('kurento.recording_media_profile');
-
-        const dbConnection = await mysql.createConnection({
-          host: dbHost,
-          user: dbUser,
-          password: dbPassword,
-          database: dbName,
-          port: dbPort
-        });
-
         await participant.recorder.stopAndWait();
 
         await participant.recorder.release();
 
-        await RecMan.createRecording(fileName, ext, this._id);
-
-        let sqlQuery = 'INSERT INTO call_recordings (fileName, agentNumber, participants, timestamp, status) VALUES (?,?,?,NOW(),?);';
-        let params = [fileName, agentNumber, otherCallers, 'UNREAD'];
-        console.log("QUERY is " + sqlQuery);
-
-        //var [rows,fields] = await dbConnection.execute(sqlQuery, params);
-        await dbConnection.execute(sqlQuery, params);
-
-        await dbConnection.end();
+        await RecMan.createRecording(fileName, ext, this._id, agentNumber, otherCallers);
 
         
 
