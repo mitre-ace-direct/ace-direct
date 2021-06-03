@@ -4,6 +4,7 @@
     "version": "ACE Direct Version number for display only.",
     "year": "The Copyright year for display only.",
     "debug_level": "Logging level: ALL TRACE DEBUG INFO WARN ERROR FATAL OFF",
+    "proxy" : "The proxy address, e.g. http://0.0.0.0:1234",
     "https": {
       "certificate": "Full path to the certificate file",
       "private_key": "Full path to the private key file",
@@ -42,7 +43,9 @@
     "redis": "Redis server port",
     "mongodb": "MongoDB port number, default is 27017",
     "translation_server": "Port number of the translation server",
-    "kurento": "Kurento media server port"
+    "kurento": "Kurento media server port",
+    "videomail": "local application port for the videomail service",    
+    "kmsshare": "kms-share application port, default is 3000"    
   },     
   "signaling_server": {
       "protocol": "wss",
@@ -176,6 +179,10 @@
     "protocol": "Use http for zendesk, https for fendesk",
     "user_id": "email address of the zendesk user; this is a placeholder value for a real Zendesk account if available",
     "token": "token of the zendesk user; this is a placeholder value for a real Zendesk account if available"
+  },
+  "s3": {
+    "region": "The AWS region for the s3, example: us-east-1",
+    "bucketname": "The s3 bucketname"
   },
   "user_service": {
     "itrs_mode": "Use ITRS to verify numbers? true|false"

@@ -63,7 +63,7 @@ register(user.sipId, user.sipPass);
 // Create server
 http.createServer(function onRequest (req, res) {
   serve(req, res, finalhandler(req, res))
-}).listen(9321)
+}).listen(config.videomail.port)
 
 // ********************** METHOD DEFINITIONS ********************************
 
@@ -555,7 +555,7 @@ function createMediaElements(ext, pipeline, callback) {
 
             var playerParams1 = {
                 mediaPipeline: pipeline,
-                uri: 'http://dev3demo.task3acrdemo.com:9321/' + config.playFileIntro1,
+                uri: config.videomailServer + config.playFileIntro1,
                 useEncodedMedia: true
             }
 
@@ -571,7 +571,7 @@ function createMediaElements(ext, pipeline, callback) {
 
                 var playerParams2 = {
                     mediaPipeline: pipeline,
-                    uri: 'http://dev3demo.task3acrdemo.com:9321/' + config.playFileIntro2,
+                    uri: config.videomailServer + config.playFileIntro2,
                     useEncodedMedia: true
                 }
 
@@ -588,7 +588,7 @@ function createMediaElements(ext, pipeline, callback) {
 
                     var playerParams3 = {
                         mediaPipeline: pipeline,
-                        uri: 'http://dev3demo.task3acrdemo.com:9321/' + config.playFileIntro3,
+                        uri: config.videomailServer + config.playFileIntro3,
                         useEncodedMedia: true
                     }
 
@@ -605,7 +605,7 @@ function createMediaElements(ext, pipeline, callback) {
 
                         playerParamsRec = {
                             mediaPipeline: pipeline,
-                            uri: 'http://dev3demo.task3acrdemo.com:9321/' + config.playFileRec,
+                            uri: config.videomailServer + config.playFileRec,
                             useEncodedMedia: true
                         }
                         pipeline.create('PlayerEndpoint', playerParamsRec, function (error, playerEndpointRec) {
