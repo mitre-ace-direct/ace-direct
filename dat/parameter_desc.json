@@ -125,9 +125,7 @@
       "ad_database_name": "ACE Direct database name",
       "cdr_database_name": "Asterisk database name",
       "cdr_table_name": "Asterisk table name",
-      "ssuser": "(for signaling server) signaling server db user",
-      "sspassword": "(for signaling server) signaling server db password; value for _MEDIASERVER_PASSWORD_ in MySQL configuration",
-      "ssdatabase": "(for signaling server) signaling server db name"
+      "ssdatabase": "Signaling server db name"
     },
     "redis": {
       "auth": "Redis authentication string; your chosen password for myRedisPassword during Redis installation"
