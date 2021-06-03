@@ -47,8 +47,8 @@ if (typeof(nconf.get('common:cleartext')) !== "undefined"  && nconf.get('common:
 }
 
 //get dat/config.json vars
-base.username = getConfigVal('database_servers:mysql:ssuser');
-base.password = getConfigVal('database_servers:mysql:sspassword');
+base.username = getConfigVal('database_servers:mysql:user');
+base.password = getConfigVal('database_servers:mysql:password');
 base.database = getConfigVal('database_servers:mysql:ssdatabase');
 base.host = getConfigVal('servers:mysql_fqdn');
 base.dialect = "mysql";
