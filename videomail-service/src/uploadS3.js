@@ -16,7 +16,9 @@ AWS.config.update({
     agent: proxy(config.proxy)
   }
 });
-
+console.log(config.proxy)
+console.log(config.awsRegion)
+console.log(config.awsS3Bucket)
 const s3 = new AWS.S3();
 
 function UploadVideomail() {
@@ -57,7 +59,7 @@ function post(callinfo) {
           console.log("file has ended, upload the file", callinfo.incomingCaller)
           getVideoDurationInSeconds(filepath).then((duration) => {
             fs.readFile(filepath, function (err, fileData) {
-              var uploadParams = { Bucket: 'task3acrdemo-recordings', Key: callinfo.recordingFile, Body: "" };
+              var uploadParams = { Bucket: config.awsS3Bucket, Key: callinfo.recordingFile, Body: "" };
               uploadParams.Body = fileData;
               s3.upload(uploadParams, function (err, data) {
                 if (err) {
