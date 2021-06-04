@@ -71,11 +71,11 @@ function getConfigVal(param_name) {
     }
   } else {
     //did not find value for param_name
-    logger.error('');
-    logger.error('*******************************************************');
-    logger.error('ERROR!!! Config parameter is missing: ' + param_name);
-    logger.error('*******************************************************');
-    logger.error('');
+    console.error('');
+    console.error('*******************************************************');
+    console.error('ERROR!!! Config parameter is missing: ' + param_name);
+    console.error('*******************************************************');
+    console.error('');
     decodedString = "";
   }
   return (decodedString.toString());
