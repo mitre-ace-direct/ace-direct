@@ -125,8 +125,6 @@
       "ad_database_name": "acedirect",
       "cdr_database_name": "asterisk",
       "cdr_table_name": "cdr",
-      "ssuser": "media_server",
-      "sspassword": "PASSWORD",
       "ssdatabase": "media_server"
     },
     "redis": {
