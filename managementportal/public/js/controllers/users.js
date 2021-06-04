@@ -105,12 +105,21 @@ $(document).ready(() => {
   });
 
   $('#btnAddAgent').on('click', (event) => {
-    event.preventDefault();
+    $('#btnAddAgent').prop("disabled", true);
     /* check if both password inputs match */
     const pass = $('#inputPassword').val();
     const pass2 = $('#inputPassword2').val();
     if (pass !== pass2) {
       $('#passwordMatchError').attr('hidden', false);
+      $('#btnAddAgent').prop("disabled", false);
+      return;
+    }
+    const org = $('#inputOrganization').val().trim();
+    if (!org || org.length === 0) {
+      $('#errorMessage').text(' Add agent - fields missing');
+      $('#actionError').attr('hidden', false);
+      $('#actionError').show();
+      $('#btnAddAgent').prop("disabled", false);
       return;
     }
     $('#passwordMatchError').attr('hidden', true);
@@ -131,11 +140,14 @@ $(document).ready(() => {
       if (data.result === 'success') {
         // console.log('Saved!!!!');
         $('#actionError').attr('hidden', true);
+        $('#btnAddAgent').prop("disabled", false);
         window.location.reload();
       } else {
-        // console.log(`POST failed: ${JSON.stringify(data)}`);
+        console.log(`POST failed: ${JSON.stringify(data)}`);
         $('#errorMessage').text(' Add agent');
         $('#actionError').attr('hidden', false);
+        $('#actionError').show();
+        $('#btnAddAgent').prop("disabled", false);
       }
     });
   });
@@ -147,7 +159,16 @@ $(document).ready(() => {
   });
 
   $('#btnUpdateAgent').on('click', (event) => {
-    event.preventDefault();
+    $('#btnUpdateAgent').prop("disabled", true);
+
+    const org = $('#inputOrganization').val().trim();
+    if (!org || org.length === 0) {
+      $('#errorMessage').text(' Update agent');
+      $('#actionError').attr('hidden', false);
+      $('#actionError').show();
+      $('#btnUpdateAgent').prop("disabled", false);
+      return;
+    }
 
     $.post('./UpdateAgent', {
       agent_id: selectedUser,
@@ -165,11 +186,14 @@ $(document).ready(() => {
       if (data.result === 'success') {
         // console.log(`POST succ: ${JSON.stringify(data)}`);
         $('#actionError').attr('hidden', true);
+        $('#btnUpdateAgent').prop("disabled", false);
         window.location.reload();
       } else {
         // console.log(`POST failed: ${JSON.stringify(data)}`);
         $('#errorMessage').text(' Update agent');
-        $('#actionError').attr('hidden', false);
+        $('#actionError').attr('hidden', false); 
+        $('#actionError').show();
+        $('#btnUpdateAgent').prop("disabled", false);
       }
     });
   });
