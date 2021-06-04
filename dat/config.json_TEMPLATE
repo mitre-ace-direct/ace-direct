@@ -103,7 +103,13 @@
     "introfile1": "onemoment2.mp4",
     "introfile2": "original_gc_raw.mp4",
     "introfile3": "FCC_IVVR_videomail_ready.mp4",
-    "recordfile": "recording2.webm"
+    "recordfile": "recording2.webm",
+    "agents": [
+      { "sipId": "88001", "sipPass": "password" },
+      { "sipId": "88002", "sipPass": "password" },
+      { "sipId": "88003", "sipPass": "password" },
+      { "sipId": "88004", "sipPass": "password" },
+      { "sipId": "88005", "sipPass": "password" }]
   },
   "missed_calls": {
     "max_missed_calls": "3"
