@@ -96,7 +96,7 @@ Here are the OpenAM configuration files:
 In `/root/iam/config/config.json`:
 
 * Set the `common:java` variable to your base Java folder.
-* You may optionally change the  `common:tomcat` version.
+* You may optionally change the  `common:tomcat` version; the version in the `config.json` file may be outdated.
 
 ### Apache Tomcat configuration
 
@@ -856,7 +856,7 @@ com.sun.identity.security.AMSecurityPropertiesException: AdminTokenAction: FATAL
 
 #### Solution 14
 
-Resolution: it is likely that the certificates in `/root/iam/ssl/` are expired or invalid. Make sure `cert.pem` and `key.pem` are valid, not expired, and have appropriate permissions.
+Resolution: it is likely that the certificates in `/root/iam/ssl/` are expired or invalid. Make sure `cert.pem` and `key.pem` are valid, not expired, and have appropriate permissions. See Solution 10 for the resolution.
 
 ---
 
