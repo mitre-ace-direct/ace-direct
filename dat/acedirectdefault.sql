@@ -17,14 +17,13 @@
 
 
 -- IMPORTANT!!!
--- RUN THIS SCRIPT AS the root USER
+-- RUN THIS SCRIPT AS an admin MySQL USER
 
 -- PREREQUISITES:
 -- Globally replace _EXTENSION_PASSWORD_
 -- Globally replace _ACEDIRECT_PASSWORD_
 -- Globally replace _ASTERISK_PASSWORD_ 
--- Globally replace _MEDIASERVER_PASSWORD_
--- Users are: acedirect , asterisk, media_server
+-- Create MySQL useres: acedirect , asterisk
 
 
 -- create media server database
@@ -345,11 +344,10 @@ UNLOCK TABLES;
 
 CREATE USER 'acedirect'@'%' IDENTIFIED BY '_ACEDIRECT_PASSWORD_';
 CREATE USER 'asterisk'@'%' IDENTIFIED BY '_ASTERISK_PASSWORD_';
-CREATE USER 'media_server'@'%' IDENTIFIED BY '_MEDIASERVER_PASSWORD_'; 
 
 GRANT ALL PRIVILEGES ON acedirect.* TO 'acedirect'@'%';
 GRANT ALL PRIVILEGES ON asterisk.* TO 'asterisk'@'%' ;
-GRANT ALL PRIVILEGES ON media_server.* TO 'media_server'@'%';
+GRANT ALL PRIVILEGES ON media_server.* TO 'acedirect'@'%';
 GRANT SELECT ON asterisk.* to 'acedirect'@'%';
 
 FLUSH PRIVILEGES;
