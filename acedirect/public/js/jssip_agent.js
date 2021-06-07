@@ -11,7 +11,7 @@ var mute_audio_button = document.getElementById("mute-audio");
 var hide_video_button = document.getElementById("hide-video");
 var mute_audio_icon = document.getElementById("mute-audio-icon");
 var mute_captions_button = document.getElementById("mute-captions");
-var mute_captions_icon = document.getElementById("mute-captions-off-icon");
+var mute_captions_off_icon = document.getElementById("mute-captions-off-icon");
 var transcript_overlay = document.getElementById("transcriptoverlay");
 var hide_video_icon = document.getElementById("mute-camera-off-icon");
 var hold_button = document.getElementById("hold-call");
@@ -453,7 +453,6 @@ function callTimedOut() {
 //makes a call
 //@param other_sip_uri: is the sip uri of the person to call
 function start_call(other_sip_uri) {
-
 	outbound_timer = setTimeout(callTimedOut, outVidTimeout); //config var
 	exitVideomail();
 	//Used for call history
@@ -526,8 +525,10 @@ function calibrateVideo(duration) {
 
 //answers an incoming call
 function accept_call() {
-	$('#agent-captions').show();
-	$('#agent-divider').show();
+	if (!captionsMuted()) {
+		show_captions();
+	}
+
 	stopVideomail();
 	disable_persist_view();
 	document.getElementById("sidebar-dialpad").removeAttribute("onclick");
@@ -656,10 +657,10 @@ function disable_persist_view() {
 
 	removeElement("selfView");
 	removeElement("remoteView");
-	addElement("webcam", "video", "remoteView");
+	addElement("agent-webcam", "video", "remoteView");
 	remoteView.setAttribute("autoplay", "autoplay");
 	remoteView.setAttribute("poster", "images/acedirect-logo-trim.png");
-	addElement("webcam", "video", "selfView");
+	addElement("agent-webcam", "video", "selfView");
 	selfView.setAttribute("style", "right: 11px");
 	selfView.setAttribute("autoplay", "autoplay");
 	selfView.setAttribute("muted", true);
@@ -757,8 +758,6 @@ function toggle_incall_buttons(make_visible) {
 }
 
 function terminate_call() {
-	$('#agent-captions').hide();
-	$('#agent-divider').hide();
 	clearTimeout(outbound_timer);
 	$('#outboundCallAlert').hide();
 	mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
@@ -766,7 +765,8 @@ function terminate_call() {
 	mute_audio_icon.classList.remove("fa-microphone-slash");
 	acekurento.stop(false);
 	remove_video();
-	mute_captions();
+	// mute_captions();
+	hide_captions();
 	disable_chat_buttons();
 	enable_initial_buttons();
 	multipartyCaptionsEnd();
@@ -857,10 +857,10 @@ function remove_video() {
 	}
 	removeElement("selfView");
 	removeElement("remoteView");
-	addElement("webcam", "video", "remoteView");
+	addElement("agent-webcam", "video", "remoteView");
 	remoteView.setAttribute("autoplay", "autoplay");
 	remoteView.setAttribute("poster", "images/acedirect-logo-trim.png");
-	addElement("webcam", "video", "selfView");
+	addElement("agent-webcam", "video", "selfView");
 	selfView.setAttribute("style", "right: 11px");
 	selfView.setAttribute("autoplay", "autoplay");
 	selfView.setAttribute("muted", true);
@@ -930,13 +930,31 @@ function unmute_audio() {
 	}
 }
 
-function mute_captions() {
-	if (mute_captions_icon.style.display === "none") {
-		mute_captions_icon.style.display = "block";
+function show_captions() {
+	$('#agent-webcam').css('height', '70%');
+	$('#agent-captions').show();
+	$('#agent-divider').show();
+}
+
+function hide_captions() {
+	$('#agent-webcam').css('height', '100%');
+	$('#agent-captions').hide();
+	$('#agent-divider').hide();
+}
+
+function captionsMuted() {
+	return mute_captions_off_icon.style.display === "block";
+}
+
+function toggle_captions() {
+	if (!captionsMuted()) {
+		mute_captions_off_icon.style.display = "block";
 		transcript_overlay.style.display = "none"
+		hide_captions();
 	} else {
-		mute_captions_icon.style.display = "none";
+		mute_captions_off_icon.style.display = "none";
 		transcript_overlay.style.display = "block";
+		show_captions();
 	}
 }
 
