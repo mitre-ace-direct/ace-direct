@@ -1,7 +1,7 @@
 {
     "apps": [
         {
-            "name": "Kurento Asterisk Servlet",
+            "name": "Videomail Service",
             "script": "src/server.js",
             "autorestart": true,
             "log_date_format" : "YYYY-MM-DD HH:mm Z"
