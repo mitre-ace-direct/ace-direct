@@ -47,8 +47,8 @@ if (typeof(nconf.get('common:cleartext')) !== "undefined"  && nconf.get('common:
 }
 
 //get dat/config.json vars
-base.username = getConfigVal('database_servers:mysql:ssuser');
-base.password = getConfigVal('database_servers:mysql:sspassword');
+base.username = getConfigVal('database_servers:mysql:user');
+base.password = getConfigVal('database_servers:mysql:password');
 base.database = getConfigVal('database_servers:mysql:ssdatabase');
 base.host = getConfigVal('servers:mysql_fqdn');
 base.dialect = "mysql";
@@ -71,11 +71,11 @@ function getConfigVal(param_name) {
     }
   } else {
     //did not find value for param_name
-    logger.error('');
-    logger.error('*******************************************************');
-    logger.error('ERROR!!! Config parameter is missing: ' + param_name);
-    logger.error('*******************************************************');
-    logger.error('');
+    console.error('');
+    console.error('*******************************************************');
+    console.error('ERROR!!! Config parameter is missing: ' + param_name);
+    console.error('*******************************************************');
+    console.error('');
     decodedString = "";
   }
   return (decodedString.toString());

@@ -4276,19 +4276,33 @@ app.get('/getVideomail', agent.shield(cookieShield),function (req, res) {
 		if (err) {
 			logger.error('GET VIDEOMAIL ERROR: '+ err.code);
 		} else {
-			var videoFile = result[0].filepath + result[0].filename;
-			try {
-				var stat = fs.statSync(videoFile);
-				// Added Accept-Ranges bytes to header so seek bar & setting video.currentTime works in Chrome without always going to time zero.
+			console.log("|"+result[0].filepath+"|")
+			if (result[0].filepath === 's3'){
+				console.log("s3 videomail")
+				var file = s3.getObject({Bucket: "***REMOVED***-recordings", Key: result[0].filename});
+
 				res.writeHead(200, {
 					'Content-Type': 'video/webm',
-					'Content-Length': stat.size,
 					'Accept-Ranges': 'bytes'
 				});
-				var readStream = fs.createReadStream(videoFile);
-				readStream.pipe(res);
-			} catch (err) {
-				io.to(Number(agentExt)).emit('videomail-retrieval-error', videoId);
+				var filestream = file.createReadStream();
+				filestream.pipe(res);
+			}else{
+				console.log("other videomail ")
+				var videoFile = result[0].filepath + result[0].filename;
+				try {
+					var stat = fs.statSync(videoFile);
+					// Added Accept-Ranges bytes to header so seek bar & setting video.currentTime works in Chrome without always going to time zero.
+					res.writeHead(200, {
+						'Content-Type': 'video/webm',
+						'Content-Length': stat.size,
+						'Accept-Ranges': 'bytes'
+					});
+					var readStream = fs.createReadStream(videoFile);
+					readStream.pipe(res);
+				} catch (err) {
+					io.to(Number(agentExt)).emit('videomail-retrieval-error', videoId);
+				}
 			}
 		}
 	});

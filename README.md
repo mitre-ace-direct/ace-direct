@@ -63,7 +63,7 @@ There are several components to install on `acesip.domain.com`:
 
 * Clone the `asterisk` repo, and follow the installation instructions. Additionally:
 
-  * Acquire an Asterisk certificate and copy it to `/etc/ssl/asterisk.csr` to enable the signaling server demo page. Otherwise, just create a blank one: `sudo touch /etc/ssl/asterisk.csr ; sudo chmod 644 /etc/ssl/asterisk.csr`
+  * Acquire an Asterisk certificate and copy it to `/etc/ssl/asterisk.csr` to enable the signaling server demo/test page. Then update the `common.https.csr` variable in `dat/config.json` to be `/etc/ssl/asterisk.csr`. Finally, execute: `sudo chmod 644 ~/ace-direct/dat/asterisk.csr`  . Note that the demo/test page is for development only. It is disabled in `dat/config.json` by default.
 
 * Clone the `kurento-asterisk-servlet` repo and follow the instructions to deploy the videomail server.
 * Clone the `acequill-service` repo and follow the instructions to enable captioning and language translation.
@@ -105,6 +105,7 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
       ```bash
       $  cd
+      $  mkdir -p .nvm
       $
       $  # install NVM
       $  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
@@ -133,7 +134,7 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
       $  mkdir .n
       $  npm install -g n
       $  n 12.18.2
-      $  node -v
+      $  node -v  # make sure it is version 12.18.2
       $
       $  npm install -g pm2  # for process management
       $
