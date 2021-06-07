@@ -99,7 +99,17 @@
   },
   "videomail": {
     "max_record_secs": "Maximum time (seconds) for a video mail",
-    "outbound_timeout_secs": "Integer; maximum seconds to wait for outbound videomail server to respond"
+    "outbound_timeout_secs": "Integer; maximum seconds to wait for outbound videomail server to respond",    
+    "introfile1": "Intro 1 video filename",
+    "introfile2": "Intro 2 video filename",
+    "introfile3": "Intro 3 video filename",
+    "recordfile": "Recording video filename",
+    "agents": [
+      { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" },
+      { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" },
+      { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" },
+      { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" },
+      { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" }]
   },
   "missed_calls": {
     "max_missed_calls": "Number of consecutive missed calls before forcing the agent to Away status"
