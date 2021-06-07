@@ -664,6 +664,8 @@ function connect_socket() {
 					updateVideomailNotification(data);
 				}).on('got-call-recordings', function (data) {
 					updateCallRecordingTable(data);
+				}).on('got-call-recordings-by-number', function (data) {
+					updateCallRecordingTable(data);
 				}).on('changed-status', function () {
 					getVideomailRecs();
 				}).on('videomail-retrieval-error', function (data) {
@@ -2047,6 +2049,7 @@ $('#recording-filename').on('click', function () {
 	} else if (sort === "desc") {
 		recordSortFlag = "fileName desc";
 	}
+	recordFilter = "";
 	socket.emit('get-recordings', {
 		"extension": extensionMe,
 		"sortBy": recordSortFlag,
@@ -2061,6 +2064,7 @@ $('#recording-date').on('click', function () {
 	} else if (sort === "desc") {
 		recordSortFlag = "timestamp desc";
 	}
+	recordFilter = "";
 	socket.emit('get-recordings', {
 		"extension": extensionMe,
 		"sortBy": recordSortFlag,
@@ -2075,6 +2079,7 @@ $('#recording-length').on('click', function () {
 	} else if (sort === "desc") {
 		recordSortFlag = "length desc";
 	}
+	recordFilter = "";
 	socket.emit('get-recordings', {
 		"extension": extensionMe,
 		"sortBy": recordSortFlag,
@@ -2089,12 +2094,37 @@ $('#recording-status').on('click', function () {
 	} else if (sort === "desc") {
 		recordSortFlag = "status desc";
 	}
+	recordFilter = "";
 	socket.emit('get-recordings', {
 		"extension": extensionMe,
 		"sortBy": recordSortFlag,
 		"filter": recordFilter
 	});
 });
+
+function ShowRecordFilterModal(){
+	$('#callRecordingNumberFilter').modal({
+		backdrop: 'static',
+		keyboard: false
+	});
+}
+
+function filterRecordNumber(){
+	var filterNumber = $('#RecordNumberInput').val();
+	$('#callRecordingNumberFilter').modal('hide');
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort === "asc") {
+		recordSortFlag = "status asc";
+	} else if (sort === "desc") {
+		recordSortFlag = "status desc";
+	}
+	recordFilter = "participants LIKE '%" + filterNumber + "%'";
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+}
 
 /**
  * End recording section
