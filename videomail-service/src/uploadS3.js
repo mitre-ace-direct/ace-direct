@@ -57,11 +57,12 @@ function post(callinfo) {
           console.log("file has ended, upload the file", callinfo.incomingCaller)
           getVideoDurationInSeconds(filepath).then((duration) => {
             fs.readFile(filepath, function (err, fileData) {
-              var uploadParams = { Bucket: '***REMOVED***-recordings', Key: callinfo.recordingFile, Body: "" };
+              var uploadParams = { Bucket: config.awsS3Bucket, Key: callinfo.recordingFile, Body: "" };
+              console.log("uploadParams",JSON.stringify(uploadParams))
               uploadParams.Body = fileData;
-              s3.upload(uploadParams, function (err, data) {
+              s3.upload(uploadParams, function (err) {
                 if (err) {
-                  console.log("Error", err);
+                  console.log("Error!:", err);
                   return
                 }
                 try {
@@ -81,7 +82,6 @@ function post(callinfo) {
                     phoneNumber: callinfo.incomingCaller, 
                     filename: callinfo.recordingFile 
                   },
-                  headers: formData.getHeaders(),
                 }, function (error, response, data) {
                   if (error) {
                     console.log("Error", error);

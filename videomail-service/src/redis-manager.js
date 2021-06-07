@@ -9,8 +9,11 @@ const { promisify } = require("util");
 
 
 var redisClient, hGetAsync;
-var rExtensionToVrs = config.redisExt2VRS;
-
+var rExtensionToVrs = "extensionToVrs";
+const pfx = process.env.LOGNAME;
+if (pfx != undefined)
+  rExtensionToVrs = pfx + rExtensionToVrs;
+  
 // Definition of helper class to represent registrar of users
 function RedisManager() {
     this.vrsLookup = vrsLookup;
