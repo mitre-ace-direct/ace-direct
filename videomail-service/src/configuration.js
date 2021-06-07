@@ -1,7 +1,7 @@
 const dC = require('./../../dat/config.json');
 
 var config = {
-	debug: 1, //0: no debug, 1: yes debug 
+	debug: 0, //0: no debug, 1: yes debug 
 	clearText: dC.common.cleartext,
 	// SIP server configurations
 	sipServer: dC.servers.asterisk_fqdn,
