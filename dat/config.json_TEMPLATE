@@ -4,6 +4,7 @@
     "version": "6.0",
     "year": "2021",
     "debug_level": "ERROR",
+    "proxy" : "http://0.0.0.0:1234",
     "https": {
       "certificate": "/etc/ssl/cert.pem",
       "private_key": "/etc/ssl/key.pem",
@@ -42,7 +43,9 @@
     "redis": 6379,
     "mongodb": 27017,
     "translation_server": 8005,
-    "kurento": 8443    
+    "kurento": 8443,    
+    "videomail": 9321,    
+    "kmsshare": 3000    
   },    
   "signaling_server": {
     "protocol": "wss",
@@ -96,7 +99,17 @@
   },
   "videomail": {
     "max_record_secs": "90",
-    "outbound_timeout_secs": 60
+    "outbound_timeout_secs": 60,    
+    "introfile1": "onemoment2.mp4",
+    "introfile2": "original_gc_raw.mp4",
+    "introfile3": "FCC_IVVR_videomail_ready.mp4",
+    "recordfile": "recording2.webm",
+    "agents": [
+      { "sipId": "88001", "sipPass": "password" },
+      { "sipId": "88002", "sipPass": "password" },
+      { "sipId": "88003", "sipPass": "password" },
+      { "sipId": "88004", "sipPass": "password" },
+      { "sipId": "88005", "sipPass": "password" }]
   },
   "missed_calls": {
     "max_missed_calls": "3"
@@ -175,6 +188,10 @@
     "user_id": "user@email.com",
     "token": "userToken"
   },
+  "s3": {
+    "region": "aws-region",
+    "bucketname": "bucketname"
+  },
   "user_service": {
     "itrs_mode": "false"
   },
@@ -225,7 +242,8 @@
         "bucket": "{$AWS_BUCKET_NAME}"
       }
     },
-    "conference_max_participants": 4
+    "conference_max_participants": 4,
+    "mediapath": "/home/ubuntu/kms-share/media/"
   },
   "videomailss": {
     "directory": "/tmp/videomail/",
