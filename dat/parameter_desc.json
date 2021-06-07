@@ -177,6 +177,11 @@
     "user_id": "email address of the zendesk user; this is a placeholder value for a real Zendesk account if available",
     "token": "token of the zendesk user; this is a placeholder value for a real Zendesk account if available"
   },
+  "s3": {
+    "region": "The AWS region for the s3, example: us-east-1",
+    "bucketname": "The s3 bucketname",
+    "recordingURL": "The URL that the recordings will be sent to upon completion."
+  },
   "user_service": {
     "itrs_mode": "Use ITRS to verify numbers? true|false"
   },
