@@ -504,7 +504,8 @@ class WebRTCMediaSession extends Events {
   }
 
   async toggleRecording(ext, record) {
-    var participant = this._participants.get(ext);
+    //var participant = this._participants.get(ext);
+    var participant = this.oneToOnePeer(ext);
     //Moved out of if since we need this globally
     var fileName;
     if (record && participant.recorder) return true; // Already recording
