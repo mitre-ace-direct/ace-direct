@@ -10,6 +10,8 @@
 * _File-Sharing Enhancements_ – ACE Direct now supports a more secure file sharing between the Agent and Consumer. An open-source virus and malware scanner (ClamAV) has been integrated into the ACE Direct file sharing function.
 * _Multi-Party Captions and Chat_ – The Agent and Consumer portals will display scrollable captions and chat in multi-party calls.
 * _WebRTC In-Call Statistics and FPS Indicator_ - The agent portal has the ability to retrieve and log WebRTC in-call statistics. New frames per second and packets lost indicators appear on the agent portal.
+* _S3 Bucket for media_ - Videomails and call recordings are now stored in an S3 bucket, with encryption at rest
+* _Improvements to captioning_ - Updated caption display.
 * Added basic mocha tests for web servers
 * Add JavaScript linting capability and linted code
 * Refactor, consolidate, and simplify global configurtion file
