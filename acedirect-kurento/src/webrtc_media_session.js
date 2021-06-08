@@ -560,7 +560,7 @@ class WebRTCMediaSession extends Events {
         await participant.recorder.stopAndWait();
 
         await participant.recorder.release();
-
+        
         await RecMan.createRecording(fileName, ext, this._id, agentNumber, otherCallers);
 
         
