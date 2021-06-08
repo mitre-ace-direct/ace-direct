@@ -259,13 +259,11 @@
                         <div class="form-group" style='height: 90vh; max-height:90vh; overflow-y:scroll;'>
                             <table id='agenttable' class="table table-hover">
                                 <thead>
-                                    <!--<tr>
-                                        <th>Recording</th>
-                                        <th>Caller</th>
-                                        <th>Date</th>
-                                        <th>Length</th>
-                                        <th>Status</th>
-                                    </tr>-->
+                                    <span id="recording-number-filter" style='float:right'>
+                                        <button class="btn btn-default" type="button" data-toggle="dropdown" aria-expanded="false">
+                                            <span id="videomail-filter" name="Videomail_Filter" accesskey="Q" onclick="ShowRecordFilterModal()">Filter Phone Number
+                                        </button>
+                                    </span>
                                     <tr>
                                         <th id="recording-filename">Recording
                                           <i id="recording-id-sort" class="fa fa-sort"> </i>
@@ -828,6 +826,19 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2 text-align="center" class="modal-title">One moment please...</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call Recording Number Filter Modal -->
+        <div id="callRecordingNumberFilter" class="modal fade">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <label for="RecordNumberInput">Type the number you want to filter for: </label>
+                        <input type="text" id="RecordNumberInput">
+                        <button type="button" onclick="filterRecordNumber()" class="btn btn-danger btn-style" style="width: 50%; height: 50px;">Search</button>
                     </div>
                 </div>
             </div>
