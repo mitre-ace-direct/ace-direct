@@ -10,8 +10,8 @@
 	var hide_video_button = document.getElementById("hide-video");
 	var mute_audio_icon = document.getElementById("mute-audio-icon");
 	var mute_captions_button = document.getElementById("mute-captions");
-        var mute_captions_icon = document.getElementById("mute-captions-off-icon");
-        var transcript_overlay = document.getElementById("transcriptoverlay");
+	var mute_captions_off_icon = document.getElementById("mute-captions-off-icon");
+	var transcript_overlay = document.getElementById("transcriptoverlay");
 	var hide_video_icon = document.getElementById("mute-camera-off-icon");
 	var hold_button = document.getElementById("hold-call");
 	var recording_progress_bar = document.getElementById("recording-progress-bar");
@@ -238,8 +238,9 @@
 	function start_call(other_sip_uri, myExtension) {
           console.log("start_call: " + other_sip_uri);
 		  selfStream.removeAttribute("hidden");
-		  $('#consumer-captions').show();
-		  $('#consumer-divider').show();
+		  if (!captionsMuted()) {
+			show_captions();
+		  }
 		
 		$("#screenshareButton").removeAttr('disabled');
 		  $("#fileInput").removeAttr('disabled');
@@ -319,8 +320,7 @@
 		$("#agent-name").text("");
 		exitFullscreen();
 		$('#transcriptoverlay').html('');
-		$('#consumer-captions').hide();
-		$('#consumer-divider').hide();
+		hide_captions();
 
 		//reset the incall mute button
 		mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
@@ -449,16 +449,35 @@
                 }
 	}
 
+
+	function show_captions() {
+		$('#consumer-webcam').css('height', '70%');
+		$('#consumer-captions').show();
+		$('#consumer-divider').show();
+	}
+	
+	function hide_captions() {
+		$('#consumer-webcam').css('height', '100%');
+		$('#consumer-captions').hide();
+		$('#consumer-divider').hide();
+	}
+
+	function captionsMuted() {
+		return mute_captions_off_icon.style.display === "block";
+	}
+
 	//hide/unhide captions
-	function mute_captions() {
-                if(mute_captions_icon.style.display === "none"){
-                        mute_captions_icon.style.display = "block";
-                        transcript_overlay.style.display = "none";
-                } else {
-                        mute_captions_icon.style.display = "none";
-                        transcript_overlay.style.display = "block";
-                }
-        }
+	function toggle_captions() {
+		if (!captionsMuted()) {
+			mute_captions_off_icon.style.display = "block";
+			transcript_overlay.style.display = "none";
+			hide_captions();
+		} else {
+			mute_captions_off_icon.style.display = "none";
+			transcript_overlay.style.display = "block";
+			show_captions();
+		}
+	}
 
 	//hides self video so remote cannot see you
 	function hide_video() {
