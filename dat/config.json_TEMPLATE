@@ -190,8 +190,7 @@
   },
   "s3": {
       "region": "aws-region",
-      "bucketname": "bucketname",
-      "recordingURL": "uploadURL"
+      "bucketname": "bucketname"
   },
   "user_service": {
     "itrs_mode": "false"

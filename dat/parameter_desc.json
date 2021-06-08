@@ -190,8 +190,7 @@
   },
   "s3": {
     "region": "The AWS region for the s3, example: us-east-1",
-    "bucketname": "The s3 bucketname",
-    "recordingURL": "The URL that the recordings will be sent to upon completion."
+    "bucketname": "The s3 bucketname"
   },
   "user_service": {
     "itrs_mode": "Use ITRS to verify numbers? true|false"
