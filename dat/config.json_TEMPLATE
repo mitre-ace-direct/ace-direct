@@ -189,8 +189,9 @@
     "token": "userToken"
   },
   "s3": {
-    "region": "aws-region",
-    "bucketname": "bucketname"
+      "region": "aws-region",
+      "bucketname": "bucketname",
+      "recordingURL": "uploadURL"
   },
   "user_service": {
     "itrs_mode": "false"
