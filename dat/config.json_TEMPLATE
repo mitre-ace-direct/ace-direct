@@ -21,6 +21,7 @@
     "stun_fqdn": "acestun.domain.com",
     "turn_fqdn": "aceturn.domain.com",
     "kurento_fqdn": "acekms.domain.com",
+    "kurento_private_ip": "0.0.0.0",
     "mysql_fqdn": "localhost",
     "redis_fqdn": "127.0.0.1",
     "mongodb_fqdn": "localhost",

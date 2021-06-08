@@ -12,7 +12,7 @@ var redisClient, hGetAsync;
 var rExtensionToVrs = "extensionToVrs";
 const pfx = process.env.LOGNAME;
 if (pfx != undefined)
-  rExtensionToVrs = pfx + rExtensionToVrs;
+  rExtensionToVrs = pfx + "_" + rExtensionToVrs;
   
 // Definition of helper class to represent registrar of users
 function RedisManager() {
