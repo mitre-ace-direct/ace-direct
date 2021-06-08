@@ -21,6 +21,7 @@
     "stun_fqdn": "Fully qualified domain name of the stun server",
     "turn_fqdn": "Fully qualified domain name of turn server",
     "kurento_fqdn": "fully-qualified domain name of internal kurento media server, must point to private IP address",
+    "kurento_private_ip": "Private IP address of the Kurento server",
     "mysql_fqdn": "Private IP address of the local ACE Direct MySQL server OR AWS RDS FQDN OR localhost",
     "redis_fqdn": "Local IP address of the Redis server on acenode.domain.com: 127.0.0.1",
     "mongodb_fqdn": "Mongo DB host; leave blank to disable logging",
