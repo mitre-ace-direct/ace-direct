@@ -28,18 +28,7 @@ var proxy = require('proxy-agent');
 
 //Credentials needed for Call Recordings
 var AWS = require('aws-sdk');
-AWS.config.update({
-	region: 'us-east-1',
-	httpOptions: {
-	  agent: proxy('http://10.202.1.215:3128')
-	}
-});
 
-s3 = new AWS.S3();
-
-var bucketParams = {
-	Bucket : 'task3acrdemo-recordings',
-};
 
 // Clam AV
 const NodeClam = require('clamscan');
@@ -196,6 +185,17 @@ var logger = log4js.getLogger('ad_server');
 nconf.file({
 	file: cfile
 });
+
+
+AWS.config.update({
+	region: getConfigVal('s3:region'),
+	httpOptions: {
+	  agent: proxy(getConfigVal('common:proxy'))
+	}
+});
+
+s3 = new AWS.S3();
+
 
 //the presence of a populated the 'cleartext' field in config.json means that the file is in clear text
 //REMOVE the field or set it to "" if config.json is encoded
@@ -4279,7 +4279,7 @@ app.get('/getVideomail', agent.shield(cookieShield),function (req, res) {
 			console.log("|"+result[0].filepath+"|")
 			if (result[0].filepath === 's3'){
 				console.log("s3 videomail")
-				var file = s3.getObject({Bucket: "task3acrdemo-recordings", Key: result[0].filename});
+				var file = s3.getObject({Bucket: getConfigVal('s3:bucketname'), Key: result[0].filename});
 
 				res.writeHead(200, {
 					'Content-Type': 'video/webm',
@@ -4314,7 +4314,7 @@ app.get('/getVideomail', agent.shield(cookieShield),function (req, res) {
 app.get('/getRecording', agent.shield(cookieShield), function(req, res) {
 	
 	console.log("USING " + req.query.fileName);
-	var file = s3.getObject({Bucket: "task3acrdemo-recordings", Key: req.query.fileName});
+	var file = s3.getObject({Bucket: getConfigVal('s3:bucketname'), Key: req.query.fileName});
 
 	res.attachment(req.query.fileName);
 	var filestream = file.createReadStream();
