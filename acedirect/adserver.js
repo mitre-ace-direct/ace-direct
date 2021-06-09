@@ -187,15 +187,6 @@ nconf.file({
 });
 
 
-AWS.config.update({
-	region: getConfigVal('s3:region'),
-	httpOptions: {
-	  agent: proxy(getConfigVal('common:proxy'))
-	}
-});
-
-s3 = new AWS.S3();
-
 
 //the presence of a populated the 'cleartext' field in config.json means that the file is in clear text
 //REMOVE the field or set it to "" if config.json is encoded
@@ -204,6 +195,15 @@ if (typeof (nconf.get('common:cleartext')) !== "undefined"  && nconf.get('common
 	console.log('common:cleartext field is in config.json. assuming file is in clear text');
 	clearText = true;
 }
+
+AWS.config.update({
+	region: getConfigVal('s3:region'),
+	httpOptions: {
+	  agent: proxy(getConfigVal('common:proxy'))
+	}
+});
+
+s3 = new AWS.S3();
 
 var colorConfigs = {};
 
