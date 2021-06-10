@@ -248,7 +248,9 @@
         "bucket": "{$AWS_BUCKET_NAME}"
       }
     },
-    "conference_max_participants": 4
+    "conference_max_participants": 4,
+    "mediapath": "location of the kms-share media folder. default: /home/ubuntu/kms-share/media"
+
   },
   "videomailss": {
     "comment1": "this is part of the signaling server configuration",    
