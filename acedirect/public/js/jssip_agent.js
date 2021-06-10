@@ -758,6 +758,9 @@ function toggle_incall_buttons(make_visible) {
 }
 
 function terminate_call() {
+	if(recording === true){
+		acekurento.stopRecording();
+	}
 	clearTimeout(outbound_timer);
 	$('#outboundCallAlert').hide();
 	mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");

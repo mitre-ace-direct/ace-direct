@@ -504,15 +504,20 @@ class WebRTCMediaSession extends Events {
   }
 
   async toggleRecording(ext, record) {
-    //var participant = this._participants.get(ext);
+    var participantMe = this._participants.get(ext);
+    //var participant = this.oneToOnePeer(ext);
     var participant = this.oneToOnePeer(ext);
+    //var participant = await this._composite.createHubPort();
     //Moved out of if since we need this globally
     var fileName;
-    if (record && participant.recorder) return true; // Already recording
-    if (!record && !participant.recorder) return true; // Already not recording
+    console.log("->->->->->->-",participantMe.isRecording);
+    if (record && participantMe.isRecording){console.log("Already Recording"); return true;} // Already recording
+    if (!record && !participantMe.isRecording){console.log("Not Already recording"); return true;} // Already not recording
+    console.log("WE ARE GOING TO TRY TO RECORD-------------------",record);
     try {
       if (record) {
         debug(`${ext} Start recording`);
+        console.log(`${ext} Start recording`);
         const date = this.getTimestampString();
         const profile = param('kurento.recording_media_profile');
         fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
@@ -524,7 +529,12 @@ class WebRTCMediaSession extends Events {
 	        uri: filePath,
           mediaProfile: profile
         });
-        await participant.endpoint.connect(recorder);
+        if(this.isMultiparty && (!this._hasMonitor || participantMe.session._isMonitoring)){
+	        var comp = await this._composite.createHubPort();
+                await comp.connect(recorder);
+        }else{
+          await participant.endpoint.connect(recorder);
+        }
 
         let timeoutRecording;
         recorder.on('UriEndpointStateChanged', evt => {
@@ -543,12 +553,14 @@ class WebRTCMediaSession extends Events {
           }
         });
         await recorder.record();
-        participant.recorder = recorder;
-        participant.recorderFile = fileName;
+        participantMe.isRecording = true;
+	participantMe.recorder = recorder;
+        participantMe.recorderFile = fileName;
         
       } else {
+        console.log(`${ext} Stopped recording`);
         var otherCallers = "";
-        var fileName = participant.recorderFile;
+        var fileName = participantMe.recorderFile;
         for (const p of this._participants.values()) {
           if(p.ext != ext){
             otherCallers += p.ext + ",";
@@ -558,15 +570,17 @@ class WebRTCMediaSession extends Events {
           otherCallers = otherCallers.slice(0,-1);
         }
         var agentNumber = ext;
-        await participant.recorder.stopAndWait();
 
-        await participant.recorder.release();
-        
+        await participantMe.recorder.stopAndWait();
+
+        await participantMe.recorder.release();
+       
+
         await RecMan.createRecording(fileName, ext, this._id, agentNumber, otherCallers);
 
         
-
-        participant.recorder = null;
+        participantMe.isRecording = false;
+        participantMe.recorder = null;
         debug(`${ext} Stopped recording`);
       }
       //return true; //??? Eric check this
