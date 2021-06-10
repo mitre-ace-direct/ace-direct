@@ -1943,39 +1943,6 @@ io.sockets.on('connection', function (socket) {
 		});
 	});
 
-	socket.on("get-recording-by-number", function(data) {
-		let filterFlag = (data.filter === "ALL"||typeof data.filter === 'undefined')?false:true;
-		let sort = (typeof data.sortBy === 'undefined')?[]:data.sortBy.split(" ");
-
-		let recording_sql_select = `SELECT fileName, agentNumber, timeStamp, participants, status, duration FROM call_recordings`;
-		let recording_sql_where = `WHERE deleted = 0 AND agentNumber = '${token.extension}' AND participants LIKE '%${data.filteredNumber}%'`;
-		let recording_sql_order = ``;
-		let recording_sql_params = [];
-
-		if(filterFlag){
-			recording_sql_where += ` and status = ?`;
-			recording_sql_params.push(data.filter);
-		}
-		if(sort.length == 2){
-			recording_sql_order = ` ORDER BY ??`;
-			recording_sql_params.push(sort[0]);
-			if(sort[1] == 'desc')
-				recording_sql_order += ` DESC`;
-		}
-
-		let recording_sql_query = `${recording_sql_select} ${recording_sql_where} ${recording_sql_order};`;
-		console.log("QUERY IS " + recording_sql_query + " : " + recording_sql_params);
-		dbConnection.query(recording_sql_query, recording_sql_params, function (err, result) {
-			if (err) {
-				logger.error("RECORDING-ERROR: " + err.code);
-				console.log("Got recording error: " + err);
-			} else {
-				console.log("GOT RESULTS " + JSON.stringify(result));
-				io.to(token.extension).emit('got-call-recordings-by-number', result);
-			}
-		});
-	});
-
 	//updates recording records when the agent changes the status
 	socket.on("recording-status-change", function (data) {
 		logger.debug('updating MySQL entry');
