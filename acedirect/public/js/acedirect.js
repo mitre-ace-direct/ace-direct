@@ -668,6 +668,8 @@ function connect_socket() {
 					updateCallRecordingTable(data);
 				}).on('changed-status', function () {
 					getVideomailRecs();
+				}).on('record-changed-status', function (data) {
+					getRecordingVideos();
 				}).on('videomail-retrieval-error', function (data) {
 					$('#videomailErrorBody').html('Unable to locate videomail with ID ' + data + '.');
 					$('#videomailErrorModal').modal('show');
@@ -2119,6 +2121,14 @@ function filterRecordNumber(){
 		recordSortFlag = "status desc";
 	}
 	recordFilter = "participants LIKE '%" + filterNumber + "%'";
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+}
+
+function getRecordingVideos(){
 	socket.emit('get-recordings', {
 		"extension": extensionMe,
 		"sortBy": recordSortFlag,

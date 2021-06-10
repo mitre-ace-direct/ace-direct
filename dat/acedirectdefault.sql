@@ -322,6 +322,24 @@ CREATE TABLE `file_uploads` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `call_recordings
+--
+
+DROP TABLE IF EXISTS `call_recordings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `call_recordings` (
+  `fileName` varchar(50) DEFAULT NULL,
+  `agentNumber` varchar(50) DEFAULT NULL,
+  `timestamp` timestamp NULL DEFAULT NULL,
+  `participants` varchar(255) DEFAULT NULL,
+  `status` varchar(255) DEFAULT NULL,
+  `duration` smallint(5) DEFAULT NULL,
+  `deleted` tinyint(4) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Dumping data for table `videomail`
 --
 

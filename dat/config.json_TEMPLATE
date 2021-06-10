@@ -191,8 +191,7 @@
   },
   "s3": {
       "region": "aws-region",
-      "bucketname": "bucketname",
-      "recordingURL": "uploadURL"
+      "bucketname": "bucketname"
   },
   "user_service": {
     "itrs_mode": "false"
@@ -245,7 +244,7 @@
       }
     },
     "conference_max_participants": 4,
-    "mediapath": "/home/ubuntu/kms-share/media/"
+    "mediapath": "/home/ubuntu/kms-share/media"
   },
   "videomailss": {
     "directory": "/tmp/videomail/",
