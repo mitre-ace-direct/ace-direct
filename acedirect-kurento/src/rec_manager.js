@@ -36,9 +36,6 @@ console.log("Using username: " + dbUser);
 console.log("Using name: " + dbName);
 console.log("Using port: " + dbPort);
 
-//AWS.config.update({region : 'us-east-1'});
-//s3 = new AWS.S3({apiVersion: '2006-03-01'});
-
 class RecordingManager extends Events {
 
   static async createRecording(filename, peer, session_id, agentNumber, otherCallers) {
@@ -51,7 +48,7 @@ class RecordingManager extends Events {
     //Custom logic to try uploading the recording to the s3 bucket
     var uploadParams = {Bucket: param('s3.bucketname'), Key: filename, Body: ""};
 
-    let fileRequest = param('s3.recordingURL') + filename;
+    let fileRequest = "http://" + param('servers.kurento_private_ip') + ":" + param('app_ports.kmsshare') + "/recordings/" + filename;
     const filepath = 'media/' + filename;
     let record = fs.createWriteStream(filepath);
     request(fileRequest).pipe(record);
