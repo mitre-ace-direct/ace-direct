@@ -515,7 +515,7 @@ class WebRTCMediaSession extends Events {
         const profile = param('kurento.recording_media_profile');
         fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
         const mediaPath = param('kurento.mediapath');
-        const filePath = `file:/${mediaPath}recordings/${fileName}`;
+        const filePath = `file:/${mediaPath}/recordings/${fileName}`;
         debug(`${ext} recording to  ${filePath}`);
 
         const recorder = await this._pipeline.create('RecorderEndpoint', {
