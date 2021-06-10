@@ -27,7 +27,7 @@ function UploadVideomail() {
 function post(callinfo) {
   console.log("Attempting to Post Videomail recording", callinfo.recordingFile, callinfo.incomingCaller)
   let fileRequest = config.kmsMediaPathURL + callinfo.recordingFile;
-  const filepath = 'media/' + callinfo.recordingFile
+  const filepath = 'media/videomails/' + callinfo.recordingFile
   let vm = fs.createWriteStream(filepath);
   request(fileRequest).pipe(vm);
 
