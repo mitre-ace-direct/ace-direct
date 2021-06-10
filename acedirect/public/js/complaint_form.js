@@ -729,7 +729,7 @@ function enterFullscreen() {
 			webcam_container.webkitRequestFullscreen();
 		}
 
-		$("#remoteView").css("object-fit", "cover");
+		//$("#remoteView").css("object-fit", "cover");
 	} else {
 
 		if (document.exitFullscreen) {
