@@ -520,7 +520,7 @@ class WebRTCMediaSession extends Events {
 
         const recorder = await this._pipeline.create('RecorderEndpoint', {
 	        uri: filePath,
-          mediaProfile: profile
+          mediaProfile: "MP4_VIDEO_ONLY" //profile; required to be able to record VRS calls that are muted
         });
         if(this.isMultiparty && (!this._hasMonitor || participant.session._isMonitoring)){
 	        let comp = await this._composite.createHubPort();
