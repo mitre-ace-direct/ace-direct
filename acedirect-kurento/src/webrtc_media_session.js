@@ -554,7 +554,7 @@ class WebRTCMediaSession extends Events {
         var otherCallers = "";
         var fileName = participant.recorderFile;
         for (const p of this._participants.values()) {
-          if(p.ext != ext){
+          if(p.ext != ext && !p.session._isMonitoring){
             otherCallers += p.ext + ",";
           }
         }
