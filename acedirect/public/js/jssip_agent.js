@@ -758,8 +758,11 @@ function toggle_incall_buttons(make_visible) {
 }
 
 function terminate_call() {
+	console.log("Recording is " + recording);
 	if(recording === true){
 		acekurento.stopRecording();
+		$('#recordIcon').attr('class', 'fa fa-circle text-red');
+		recording = false;
 	}
 	clearTimeout(outbound_timer);
 	$('#outboundCallAlert').hide();
