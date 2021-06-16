@@ -583,7 +583,6 @@ const appRouter = (app, connection, asterisk) => {
         values.push([username, password, firstName, lastName, role, phone, email,
           organization, isApproved, isActive, extensionIdParam, queueId, queue2Id]);
 
-        console.log(`values used in sqlinsert: ${values}`);
         connection.query(sqlInsert, [values], (err, results) => {
           if (err) {
             // mysql error occurred
