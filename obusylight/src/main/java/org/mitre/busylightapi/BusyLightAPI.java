@@ -37,7 +37,7 @@ public class BusyLightAPI implements HidServicesListener {
 
 	//sounds
 	public static enum Ringtone { TONE_RISING, TONE_PHONE, TONE_SIMON, TONE_ALTERNATIVE, TONE_CLASSIC, TONE_ALIEN, TONE_OFFICE, TONE_LIVEWIRE, TONE_OLD, TONE_TRON, TONE_DISCO } 
-	public static short[] ringtones = new short[]{ 0b10100011, 0b11000011,0b10010011, 0b10001011, 0b10110011, 0b10011011 , 0b10111011, 0b11101011, 0b11001011, 0b11010011, 0b10101011 };	
+	public static final short[] ringtones = new short[]{ 0b10100011, 0b11000011,0b10010011, 0b10001011, 0b10110011, 0b10011011 , 0b10111011, 0b11101011, 0b11001011, 0b11010011, 0b10101011 };
 
 	private static final int PACKET_LENGTH = 64;
 
