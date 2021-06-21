@@ -512,15 +512,14 @@ class WebRTCMediaSession extends Events {
       if (record) {
         debug(`${ext} Start recording`);
         const date = this.getTimestampString();
-        const profile = param('kurento.recording_media_profile');
-        fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
+        fileName = `rec_${ext}_${date}.mp4`;
         const mediaPath = param('kurento.mediapath');
         const filePath = `file:/${mediaPath}/recordings/${fileName}`;
         debug(`${ext} recording to  ${filePath}`);
 
         const recorder = await this._pipeline.create('RecorderEndpoint', {
 	        uri: filePath,
-          mediaProfile: "MP4_VIDEO_ONLY" //profile; required to be able to record VRS calls that are muted
+          mediaProfile: "MP4_VIDEO_ONLY" // required to be able to record VRS calls that are muted
         });
         if(this.isMultiparty && (!this._hasMonitor || participant.session._isMonitoring)){
 	        let comp = await this._composite.createHubPort();
