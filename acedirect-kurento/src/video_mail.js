@@ -103,8 +103,8 @@ class VideoMail extends Events {
 
   async _startRecording() {
     const dir = param('videomailss.directory');
-    const profile = param('videomailss.media_profile');
-    const ext = profile.toLowerCase();
+    const profile = "MP4_VIDEO_ONLY";
+    const ext = 'mp4';
     const filename = `${this._id}.${ext}`;
     
     this._recorder = new this._pipeline.create('RecorderEndpoint', {
