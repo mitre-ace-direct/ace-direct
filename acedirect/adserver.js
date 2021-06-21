@@ -3956,7 +3956,8 @@ app.get('/logout', function (req, res) {
 				maxAge: 0,
 				domain: domaintemp.substring(n1+1),
 				path: "/",
-				value: ""
+				value: "",
+				HttpOnly: true
 			});
 			req.session.destroy(function (err) {
 				if (err) {
