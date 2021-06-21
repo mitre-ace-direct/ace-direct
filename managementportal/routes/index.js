@@ -329,6 +329,7 @@ router.get('/logout', (req, res) => {
         domain: domaintemp.substring(n1 + 1),
         path: '/',
         value: '',
+        HttpOnly: true,
         secure: true
       });
       req.session.destroy((_err) => {
