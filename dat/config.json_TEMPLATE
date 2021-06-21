@@ -226,8 +226,7 @@
     "stats_interval": 10000,
     "sdes_crypto": "AES_128_CM_HMAC_SHA1_80",
     "monitoring_enabled": false,
-    "recording_all_enabled": false,
-    "recording_media_profile": "MP4",
+    "recording_all_enabled": false
     "recording_limit_length_in_sec": 30,
     "video_webrtc_max_bitrate": 1000,
     "video_webrtc_min_bitrate": 500,
@@ -251,8 +250,7 @@
     "instructions_media": [
       "/tmp/videomail/instructions/video.mp4",
       "/tmp/videomail/instructions/final.jpg"
-    ],
-    "media_profile": "MP4"
+    ]
   },
   "filesharing": {
     "virus_scan_enabled": "false"
