@@ -420,8 +420,8 @@ public class olightserver extends Application {
     try {
       server = HttpServer.create(new InetSocketAddress("127.0.0.1", port), 0);
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      // Exception when creating HttpServer object
+      System.err.println("Error creating HttpServer");
     }
 
     return server;
@@ -535,7 +535,7 @@ public class olightserver extends Application {
         tConnectStatus.setFill(javafx.scene.paint.Color.GREEN);
         tConnectStatus.setText("Running");
       } catch (Exception e) {
-        e.printStackTrace();
+        // Exception during light processing
         System.err.println("error - exception during light processing. continuing anyway...");
         if (hasLight && light != null)
           light.stopLight();
