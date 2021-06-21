@@ -328,7 +328,8 @@ router.get('/logout', (req, res) => {
         maxAge: 0,
         domain: domaintemp.substring(n1 + 1),
         path: '/',
-        value: ''
+        value: '',
+        secure: true
       });
       req.session.destroy((_err) => {
         res.redirect(req.get('referer'));
