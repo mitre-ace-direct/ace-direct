@@ -95,7 +95,7 @@ Here are the OpenAM configuration files:
 
 In `/root/iam/config/config.json`:
 
-* Set the `common:java` variable to your base Java folder.
+* Set the `common:java` variable to your base Java folder. Execute `echo $(dirname $(dirname $(readlink -f $(which javac))))` and copy just the lowest level folder name. It will look something like `java-1.8.0-openjdk-1.8.0.292.b10-1.el7_9.x86_64`.
 * You may optionally change the  `common:tomcat` version; the version in the `config.json` file may be outdated.
 
 ### Apache Tomcat configuration
@@ -288,12 +288,12 @@ Where...
 1. Update the following values:
 
    * `SERVER_URL`: **You must update this value.** Use the OpenAM **FQDN** and **SSL Port Number** that you chose for this installation, for example: `https://aceopenam.domain.com:8443`. The port number must match SSL port number in `server.xml`.
-   * `COOKIE_DOMAIN`: *You must update this value* with everything but the first part of the OpenAM FQDN, for example, `.domain.com`
-   * `DEPLOYMENT_URI`: Use the OpenAM base name here: `/ace`
-   * `BASE_DIR`: The OpenAM base name must be at the end: `/opt/tomcat/webapps/ace`
-   * `ADMIN_PWD`: 8 characters minimum.
-   * `AMLDAPUSERPASSWRD`: 8 characters minimum.
-   * `DIRECTORY_SERVER`: **You must update this vaue.** OpenAM FQDN, for example, `aceopenam.domain.com`
+   * `DEPLOYMENT_URI`: **You must update this value if you customized the base name**. Use your OpenAM base name here: `/ace`
+   * `BASE_DIR`: **You must update this value if you customized the base name**. Your OpenAM base name must be at the end: `/opt/tomcat/webapps/ace`
+   * `ADMIN_PWD`: 8 characters minimum. This is the OpenAM Admin password.
+   * `AMLDAPUSERPASSWRD`: 8 characters minimum. This is the default policy agent password.
+   * `COOKIE_DOMAIN`: **You must update this value**. Remove the first level of your OpenAM FQDN and use the remaining part, for example, `.domain.com`
+   * `DIRECTORY_SERVER`: **You must update this vaue.** Use your OpenAM FQDN, for example, `aceopenam.domain.com`.
    * `DS_DIRMGRPASSWD`: 8 characters minimum and should NOT be the same as ADMIN_PWD or AMLDAPUSERPASSWRD.
 
 ---
@@ -806,15 +806,15 @@ OpenAM is already installed and running, but it is necessary to change the OpenA
 
 Change the OpenAM password:
 
-* Assuming the new password is `password2`, admin username is `amadmin`, and the current password is in the `pwd.txt` file...
+* Assuming the new password is `password9`, admin username is `amadmin`, and the current password is in the `pwd.txt` file...
 
     ```bash
     $  # log into OpenAM server as root
     $  cd /root/iam/config/oam/SSOAdminTools-13.0.0/ace/bin
-    $  ./ssoadm set-identity-attrs -t User -e / -i amAdmin -u amadmin -f pwd.txt -a userpassword=password2
+    $  ./ssoadm set-identity-attrs -t User -e / -i amAdmin -u amadmin -f pwd.txt -a userpassword=password9
     $
     $  chmod 755 pwd.txt
-    $  echo password2 > pwd.txt
+    $  echo password9 > pwd.txt
     $  chmod 400 pwd.txt
     $
     $  # test out new password
@@ -828,7 +828,8 @@ Change the OpenAM password:
 ```bash
 "openam": {
     ...
-    "password": "password2
+    "password": "password9"
+    ...
 ```
 
 ---
