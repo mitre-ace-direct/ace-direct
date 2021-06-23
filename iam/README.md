@@ -250,9 +250,9 @@ Where...
 1. Field descriptions and default values:
 
    * `port`: desired **SSL PORT** for OpenAM. The default is port `8443`.
-   * `keystoreFile`: path where Tomcat will look for the jks keystore. This must match the `apache:keystore_dest_path` value in `/root/iam/config/config.json`.
+   * `keystoreFile`: path where tomcat will look for the jks keystore. This must match the `apache:keystore_dest_path` value in `/root/iam/config/config.json`.
    * `keystorePass`: password associated with your generated keystore; This must match the `apache:dest_keystore_pass` value in `/root/iam/config/config.json`.
-   * `keyAlias`: name associated with the Tomcat entry within the keystore; This must match the  `apache:alias` value in `/root/iam/config/config.json`
+   * `keyAlias`: name associated with the tomcat entry within the keystore; This must match the  `apache:alias` value in `/root/iam/config/config.json`
 
 ### Tomcat service configuration
 
@@ -300,7 +300,7 @@ Where...
 
 ## Automated installation
 
-With the above configuration complete, you may now begin the installation process. This *automated installation* installs and configures Tomcat and OpenAM into `/opt/tomcat`. Several Python scripts automate the installation process.
+With the above configuration complete, you may now begin the installation process. This *automated installation* installs and configures tomcat and OpenAM into `/opt/tomcat`. Several Python scripts automate the installation process.
 
 ### Assumptions
 
@@ -661,7 +661,7 @@ This error is a result of the OpenAM configuration tool attempting to create an 
 
 #### Solution 2
 
-After you install Tomcat but before you run the OpenAM configuration tool, make sure you change ownership of `/opt/tomcat` to the tomcat user. `sudo chown tomcat /opt/tomcat/`
+After you install tomcat but before you run the OpenAM configuration tool, make sure you change ownership of `/opt/tomcat` to the tomcat user. `sudo chown tomcat /opt/tomcat/`
 
 ---
 
@@ -725,21 +725,17 @@ Running the `oam_installer.py` script results in an error that says:
 
 #### Solution 7
 
-##### Previous OpenAM exists
+There are two possible solutions.
 
-This error could be caused if OpenAM was previously installed. Look in the home folder of a user that installed OpenAM previously. If you find a directory named `.openamcfg`, delete it and its contents. Then follow the [Reinstall OpenAM](#reinstall-openam) instructions above. Also see the installation log file `/opt/tomcat/webapps/ace/install.log` and the tomcat log files in  `/opt/tomcat/logs` for errors.
+##### Previous OpenAM or tomcat exists
 
-Also verify that all fields in `/root/iam/config/tomcat/server.xml` are correct. An incorrect field here can cause a `500` error.
+This error could be caused if OpenAM was previously installed. To resolve this issue:
 
-##### A tomcat users already exists
+1. Look in the home folder of a user that installed OpenAM previously. If you find a directory named `.openamcfg`, delete it and its contents.
+1. Verify that all fields in `/root/iam/config/tomcat/server.xml` are correct. An incorrect field here can cause a `500` error.
+1. Follow the [Reinstall OpenAM](#reinstall-openam) instructions above. This deletes tomcat and performs a fresh installation.
 
-Another cause of this error is existence of a `tomcat` user from a previous installation.  See the installation log file `/opt/tomcat/webapps/ace/install.log` and the tomcat log files in  `/opt/tomcat/logs` for errors. Delete that `tomcat` user and the `tomcat` folder and try again:
-
-```bash
-$  userdel -r tomcat
-$
-$  rm -rf /opt/tomcat
-```
+Also see the installation log file `/opt/tomcat/webapps/ace/install.log` and the tomcat log files in  `/opt/tomcat/logs` for errors.
 
 ##### Low disk space
 
@@ -749,7 +745,11 @@ Low disk space will prevent OpenAM from deploying. Make sure the disk has suffic
 
 #### Problem 8
 
-General debugging tip - run `tail -f /opt/tomcat/logs/catalina.out`, this will provide information about Tomcat errors.
+General tomcat errors are occuring.
+
+#### Solution 8
+
+General debugging tip - run `tail -f /opt/tomcat/logs/catalina.out`, this will provide information about tomcat errors while it is executing.
 
 ---
 
@@ -843,7 +843,7 @@ Configure the successful login URLs for agents and managers. See the _Configure 
 
 ---
 
-#### Problem 14
+#### Problem 13
 
 During OpenAM configuration, executing `ssoadm` causes the following error:
 
@@ -854,13 +854,13 @@ Logging configuration class "com.sun.identity.log.s1is.LogConfigReader" failed
 com.sun.identity.security.AMSecurityPropertiesException: AdminTokenAction: FATAL ERROR: Cannot obtain Application SSO token.
 ```
 
-#### Solution 14
+#### Solution 13
 
 Resolution: it is likely that the certificates in `/root/iam/ssl/` are expired or invalid. Make sure `cert.pem` and `key.pem` are valid, not expired, and have appropriate permissions. See Solution 10 for the resolution.
 
 ---
 
-#### Problem 15
+#### Problem 14
 
 During OpenAM configuration, executing `ssoadm` causes the following error:
 
@@ -896,13 +896,13 @@ Caused by: java.lang.IllegalStateException: CachedConnectionPool is already clos
 #
 ```
 
-#### Solution 15
+#### Solution 14
 
 Resolution: you probably issued the command too soon. The server was not ready. Wait `30` seconds and execute the command again.
 
 ---
 
-#### Problem 16
+#### Problem 15
 
 Running the `ssoadm` tool causes Java exceptions...
 
@@ -922,7 +922,7 @@ Caused by: java.lang.IllegalStateException: CachedConnectionPool is already clos
 ...
 ```
 
-#### Solution 16
+#### Solution 15
 
 The `ssoadm` tool/server may not be ready. Wait a minute or two, then try it again.
 
@@ -930,7 +930,7 @@ The `ssoadm` tool/server may not be ready. Wait a minute or two, then try it aga
 
 ---
 
-#### Problem 17
+#### Problem 16
 
 When navigating to NGINX to reach the OpenAM server, the following error is seen in the browser:
 
@@ -944,27 +944,27 @@ If you are the system administrator of this resource then you should check the e
 Faithfully yours, nginx.
 ```
 
-#### Solution 17
+#### Solution 16
 
 Make sure nginx has the correct FQDN and PORT NUMBER for the OpenAM server. Make sure nginx server can ping the private IP address of the OpenAM server. Make sure the nginx server's /etc/hosts file has an entry for the private IP address of the OpenAM server.
 
 ---
 
-#### Problem 18
+#### Problem 17
 
 Access error when accessing OpenAM or ACE Direct through the browser. You may see a double URL in the address bar.
 
-#### Solution 18
+#### Solution 17
 
 Make sure a firewall is not blocking incoming access to the OpenAM port (e.g., `8443`). For example, disable `firewalld` on the OpenAM server or add a rule to allow incoming connections to port `8443`.
 
 ---
 
-#### Problem 19
+#### Problem 18
 
 OpenAM won't start. Agent cannot reach portal (no access, double url in address bar). Java version was updated on OpenAM server.
 
-#### Solution 19
+#### Solution 18
 
 When the Java version is updated on the OpenAM server, follow these steps to configure your existing OpenAM installation to use the new Java version:
 
@@ -975,11 +975,11 @@ When the Java version is updated on the OpenAM server, follow these steps to con
 
 ---
 
-#### Problem 20
+#### Problem 19
 
 How can I add additional agents to OpenAM?
 
-#### Solution 20
+#### Solution 19
 
 1. Add the agents to `/root/iam/config/config.json`
 1. `cd /root/iam/scripts`
@@ -987,11 +987,11 @@ How can I add additional agents to OpenAM?
 
 ---
 
-#### Problem 21
+#### Problem 20
 
 When accessing links in the OpenAM admin web page, the following error occurs: `414 Request-URI Too Large`
 
-#### Solution 21
+#### Solution 20
 
 1. Go to the NGINX server.
 1. Edit `/etc/nginx/nginx.conf`
