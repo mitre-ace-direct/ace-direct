@@ -393,7 +393,7 @@ With OpenAM/Tomcat up and running, set up the OpenAM admin tools:
     $ # then execute the create_users.py script again
     ```
 
-1. Security enhancement (optional) - restrict GOTO URLs in OpenAM. This prevents a URL redirect to a different web page. Assuming the public FQDN of the NGINX server is `portal.domain.com`:
+1. Secure GOTO redirects - restrict GOTO URLs in OpenAM. This prevents a URL redirect to a different web page. It also facilitates environments that do _not_ have the Success URL configured. Assuming the public FQDN of the NGINX server is `portal.domain.com`, execute the following:
 
     ```bash
     $  cd /root/iam/config/oam/SSOAdminTools-13.0.0/ace/bin
