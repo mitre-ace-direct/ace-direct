@@ -13,6 +13,7 @@ The installation, configuration, and deployment procedures in this document are 
 1. Read the overall ACE Direct installation process in [INSTALLATION.md](../docs/installation/INSTALLATION.md).
 1. The instructions below frequently refer to the OpenAM **base name**. This value is used throughout, in files and commands. For these instructions, the default OpenAM base name is `ace`. If you decide to change this base name value, make sure you make the appropriate changes to the files and commands.
 1. OpenAM installs on a single server, for example, `aceopenam.domain.com`.
+1. The NGINX server FQDN is `portal.domain.com`.
 1. The OpenAM server is _Amazon Linux 2_. Other Linux versions may work, with or without slight modifications to the scripts and instructions.
 1. Install OpenAM as `root` in the `/root` folder.
 1. OpenAM operates behind NGINX. See [nginx/README.md](../nginx/README.md).
@@ -47,6 +48,19 @@ The installation, configuration, and deployment procedures in this document are 
   $  chown root cert.pem ; chgrp root cert.pem ; chown root key.pem ; chgrp root key.pem ; chmod 644 cert.pem key.pem
   $
   ```
+
+### Installation Script
+
+To install OpenAM using the default values, execute the installation script:
+
+```bash
+$  cd /root/iam
+$
+$  ./install_openam.sh  ace  aceopenam.domain.com  portal.domain.com  7.0.108 # last param is tomcat version
+$
+```
+
+_To customize your OpenAM installation, follow the manual instructions below. You may be able to update config. files and rerun this installation script._
 
 ### Software tools
 
