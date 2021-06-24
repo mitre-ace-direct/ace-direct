@@ -10,10 +10,12 @@
 # * Python is already installed
 
 if [ "$#" -ne 4 ]; then
-  printf "\nusage:  $0  <base name>  <FQDN>  <NGINX FQDN> <TOMCAT VERSION> \n"
+  printf "\nusage:  $0  <base name>  <OPENAM FQDN>  <NGINX FQDN>  <TOMCAT VERSION> \n"
   printf "e.g.    $0  ace  aceopenam.domain.com  portal.domain.com  7.0.108 \n\n"
   exit 99
 fi
+
+printf "\n\nInstalling OpenAM...\n\n"
 
 HOME_FOLDER="/root"
 HOME_USER="root"
@@ -34,6 +36,7 @@ done
 printf "Checking for Python...\n"
 if ! python -V >/dev/null 2>&1; then
   printf "\nerror - please install Python 2.7\n\n"
+  printf "aborting...\n\n"
   exit 99
 fi
 
@@ -52,13 +55,16 @@ JAVA_FOLDER=${arr[-1]}
 printf "Validating FQDNs...\n"
 if [[ "$FQDN" == *"_"* || "$NGINX_FQDN" == *"_"* ]]; then
   printf "\nerror - FQDN or NGINX FQDN may not contain underscores\n\n"
+  printf "aborting...\n\n"
   exit 99
 fi
 
 # check for certs and make sure they are valid
 printf "Checking certs...\n"
 if [[ ! -f ssl/cert.pem || ! -f ssl/key.pem ]]; then
-  printf "\nerror - cert.pem or key.pem not found in ssl directory\n\n"
+  printf "\n\nerror - cert.pem or key.pem not found in ssl directory\n"
+  printf "        Please make sure that cert.pem and key.pem are in ${HOME_FOLDER}/iam/ssl\n\n"
+  printf "aborting...\n\n"
   exit 99
 else
   # update permissions and ownership
@@ -239,6 +245,7 @@ if curl -k https://localhost:8443 ; then
   echo "OpenAM is running."
 else
   echo "error - OpenAM is NOT running."
+  printf "aborting...\n\n"
   exit 99
 fi
 
@@ -249,6 +256,7 @@ if sudo -E bash setup -p /opt/tomcat/webapps/${BASE_NAME} -l ./log -d ./debug --
   echo "OpenAM is license accepted."
 else
   echo "error - OpenAM license NOT accepted."
+  printf "aborting...\n\n"
   exit 99
 fi
 
@@ -275,6 +283,7 @@ if python create_users.py ; then
   echo "OpenAM agents/users created."
 else
   echo "error - OpenAM agents/users NOT created."
+  printf "aborting...\n\n"
   exit 99
 fi
 
@@ -285,6 +294,7 @@ if  ./ssoadm set-attr-defs -s validationService -t organization -u amadmin -f pw
   echo "secured GOTO redirects."
 else
   echo "error - failed to secure GOTO redirects."
+  printf "aborting...\n\n"
   exit 99
 fi
 
@@ -297,6 +307,7 @@ if service tomcat status  ; then
   echo "OpenAM status check OK."
 else
   echo "error - OpenAM status check FAILED."
+  printf "aborting...\n\n"
   exit 99
 fi
 printf "\n"

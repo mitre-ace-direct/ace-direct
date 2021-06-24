@@ -51,16 +51,23 @@ The installation, configuration, and deployment procedures in this document are 
 
 ### Installation Script
 
-To install OpenAM using the default values, execute the installation script:
+To install OpenAM using default values run the installation `install_openam.sh` script. You may execute the script multiple times if needed. Here is a sample run:
 
 ```bash
 $  cd /root/iam
 $
-$  ./install_openam.sh  ace  aceopenam.domain.com  portal.domain.com  7.0.108 # last param is tomcat version
+$  ./install_openam.sh  ace  aceopenam.domain.com  portal.domain.com  7.0.108  # last param is tomcat version
 $
 ```
 
-_To customize your OpenAM installation, follow the manual instructions below. You may be able to update config. files and rerun this installation script._
+Where...
+
+* `ace` is the OpenAM base name
+* `aceopenam.domain.com` is the FQDN of the OpenAM server
+* `portal.domain.com` is the FQDN of the NGINX server
+* `7.0.108` is the desired Tomcat version
+
+_To customize your OpenAM installation, follow the manual instructions below._
 
 ### Software tools
 
