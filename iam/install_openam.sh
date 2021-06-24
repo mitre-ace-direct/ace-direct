@@ -17,6 +17,14 @@ fi
 
 printf "\n\nInstalling OpenAM...\n\n"
 
+printf "Checking disk space...\n"
+PCT_USED=`df -k --output='pcent' / | tail -1 | sed -e 's/%//g'`
+if (( $PCT_USED > 90 )); then
+  printf "\n************************************************************************************\n"
+  printf "* WARNING: disk space is nearly full: ${PCT_USED}%% . This may cause problems with OpenAM. \n"
+  printf "************************************************************************************\n\n"
+fi
+
 HOME_FOLDER="/root"
 HOME_USER="root"
 BASE_NAME=$1
