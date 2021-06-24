@@ -2,6 +2,7 @@ const debug  = require('debug')('ace:client-session');
 const Events = require('events');
 const param = require('param');
 const ws     = require('ws');
+const redisClient = require('./redis_client');
 
 const CL_STATUS_UNDEFINED  = 'UNDEF';
 const CL_STATUS_REGISTERED = 'REGISTERED';
@@ -209,6 +210,8 @@ class ClientSession extends Events {
   async register(ext, pass, isAgent) {
     debug('[%s] Register request', this._id);
     try {
+      pass = await redisClient.get(pass) || pass;
+      redisClient.del(pass);
       const ua = await this._confm.register(ext, pass);
       this._status = CL_STATUS_REGISTERED;
       this._ua = ua;
