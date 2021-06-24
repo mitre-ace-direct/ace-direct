@@ -18,6 +18,7 @@ var session = require('express-session');
 var openamAgent = require('@forgerock/openam-agent');
 var url = require('url');
 var randomstring = require("randomstring");
+const shortid = require('shortid');
 var csrf = require('csurf');
 var cors = require('cors');
 var mysql = require('mysql');
@@ -3597,11 +3598,12 @@ function findNextAvailableExtension(callback) {
  * @param {Number} extension Incoming consumer extension number.
  * @returns {String} Asterisk password assigned to this extension.
  */
+
 function findExtensionPassword(extension, callback) {
-
-	var password = 'unknown';
-
 	logger.info('Entering findExtensionPassword() for extension: ' + extension);
+
+	let passphrase = shortid.generate();
+	let password = 'unknown';
 
 	redisClient.hget(rConsumerExtensions, Number(extension), function (err, reply) {
 		if (err) {
@@ -3610,9 +3612,10 @@ function findExtensionPassword(extension, callback) {
 			logger.info('Found a match in the consumerExtensions map');
 			var json = JSON.parse(reply);
 			password = json.secret;
-			logger.info('Found a match in the consumerExtensions map with password: ' + password);
+			redisClient.set(passphrase, password);
+    		redisClient.expire(passphrase, 5); // remove passphrase after 5 seconds.
 		}
-		return callback(password);
+		callback(passphrase);
 	});
 }
 
@@ -4009,6 +4012,10 @@ app.get('/token', function (req, res) {
 			});
 		}
 	} else if (req.session.role === 'AD Agent') {
+		let passphrase = shortid.generate();
+		redisClient.set(passphrase, req.session.extensionPassword);
+		redisClient.expire(passphrase, 5); // remove passphrase after 5 seconds.
+
 		var payload = {};
 		payload.agent_id = req.session.agent_id;
 		payload.username = req.session.username;
@@ -4028,7 +4035,7 @@ app.get('/token', function (req, res) {
 		payload.wsPort = req.session.wsPort;
 		payload.signalingServerUrl = req.session.signalingServerUrl;
 		payload.queuesComplaintNumber = req.session.queuesComplaintNumber;
-		payload.extensionPassword = req.session.extensionPassword;
+		payload.extensionPassword = passphrase;
 		payload.complaint_queue_count = complaint_queue_count;
 		payload.general_queue_count = general_queue_count;
 
