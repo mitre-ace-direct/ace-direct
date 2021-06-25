@@ -46,7 +46,8 @@
     "lint:aserver": "cd aserver && npm run lint",
     "lint:fendesk": "cd fendesk && npm run lint",
     "lint:managementportal": "cd managementportal && npm run lint",
-    "lint:userver": "cd userver && npm run lint"
+    "lint:userver": "cd userver && npm run lint",
+    "status": "./scripts/status.sh"
   },
   "author": "",
   "license": "ISC",
