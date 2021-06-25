@@ -68,20 +68,29 @@ if [[ "$FQDN" == *"_"* || "$NGINX_FQDN" == *"_"* ]]; then
 fi
 
 # check for certs and make sure they are valid
-printf "Checking certs...\n"
+printf "Looking for certs...\n"
 if [[ ! -f ssl/cert.pem || ! -f ssl/key.pem ]]; then
   printf "\n\nerror - cert.pem or key.pem not found in ssl directory\n"
   printf "        Please make sure that cert.pem and key.pem are in ${HOME_FOLDER}/iam/ssl\n\n"
   printf "aborting...\n\n"
   exit 99
 else
-  # update permissions and ownership
-  cd ssl
-  chown ${HOME_USER} cert.pem
-  chgrp ${HOME_USER} cert.pem
-  chown ${HOME_USER} key.pem
-  chgrp ${HOME_USER} key.pem
-  chmod 644 cert.pem key.pem 
+  printf "Verifying certs...\n"
+  if openssl x509 -checkend 86400 -noout -in ssl/cert.pem
+  then
+    printf "ssl/cert.pem is good!\n"
+    # update permissions and ownership
+    cd ssl
+    chown ${HOME_USER} cert.pem
+    chgrp ${HOME_USER} cert.pem
+    chown ${HOME_USER} key.pem
+    chgrp ${HOME_USER} key.pem
+    chmod 644 cert.pem key.pem     
+  else
+    printf "\nerror - ssl/cert.pem has expired or will expire within 24 hours, please acquire new certs\n\n"
+    printf "aborting...\n\n"
+    exit 99
+  fi
 fi
 
 # update environment files
