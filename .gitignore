@@ -6,6 +6,7 @@ bower_components/
 *.swp
 .env
 ~*
+itrs.log
 
 # config files
 acedirect-kurento/confs/kurento/WebRtcEndpoint.conf.ini
