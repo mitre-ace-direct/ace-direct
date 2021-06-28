@@ -532,6 +532,7 @@ function openAMOperation(openAMAgentInfo) {
  */
 router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
   const { username } = req.body;
+  const { password } = req.body;
   const firstName = req.body.first_name;
   const lastName = req.body.last_name;
   const { email } = req.body;
@@ -544,7 +545,7 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
   logger.debug(`Hit AddAgent with data: ${JSON.stringify(req.body)}`);
 
   if (validator.isUsernameValid(username)
-  && validator.isNameValid(firstName) && validator.isNameValid(lastName)
+  && validator.isNameValid(firstName) && validator.isNameValid(lastName) && validator.isPasswordComplex(password)
   && validator.isEmailValid(email) && validator.isPhoneValid(phone)) {
     getAgentInfo(username, (info) => {
       if (info.message === 'success') {
@@ -562,6 +563,7 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
         const newAgent = {
           data: [{
             username,
+            password,
             first_name: firstName,
             last_name: lastName,
             role: 'AD Agent',

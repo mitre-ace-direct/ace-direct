@@ -126,6 +126,7 @@ $(document).ready(() => {
 
     $.post('./AddAgent', {
       username: $('#inputUsername').val(),
+      password: $('#inputPassword').val(),
       first_name: $('#inputFirstname').val(),
       last_name: $('#inputLastname').val(),
       email: $('#inputEmail').val(),
