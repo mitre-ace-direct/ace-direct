@@ -193,8 +193,7 @@ router.get('/callblocking', agent.shield(cookieShield), (req, res) => {
 });
 
 /**
- *  * Calls the RESTful service running on the provider host to retrieve agent information
- *  * username and password.
+ *  * Calls the RESTful service running on the provider host to retrieve agent information.
  *  *
  *  * @param {type} username Agent username, if username is null, retrieve all agent records
  *  * @param {type} callback Returns retrieved JSON
@@ -545,8 +544,8 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
 
   logger.debug(`Hit AddAgent with data: ${JSON.stringify(req.body)}`);
 
-  if (validator.isUsernameValid(username) && validator.isPasswordComplex(password)
-  && validator.isNameValid(firstName) && validator.isNameValid(lastName)
+  if (validator.isUsernameValid(username)
+  && validator.isNameValid(firstName) && validator.isNameValid(lastName) && validator.isPasswordComplex(password)
   && validator.isEmailValid(email) && validator.isPhoneValid(phone)) {
     getAgentInfo(username, (info) => {
       if (info.message === 'success') {
@@ -635,7 +634,6 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
 router.post('/UpdateAgent', agent.shield(cookieShield), (req, res) => {
   const agentId = req.body.agent_id;
   const { username } = req.body;
-  // const { password } = req.body; // Password is not changable now.
   const firstName = req.body.first_name;
   const lastName = req.body.last_name;
   const { email } = req.body;
