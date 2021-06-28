@@ -60,7 +60,6 @@ DROP TABLE IF EXISTS `agent_data`;
 CREATE TABLE `agent_data` (
   `agent_id` int(10) NOT NULL AUTO_INCREMENT,
   `username` varchar(10) NOT NULL,
-  `password` varchar(30) NOT NULL,
   `first_name` varchar(20) NOT NULL,
   `last_name` varchar(20) NOT NULL,
   `role` varchar(50) NOT NULL,
