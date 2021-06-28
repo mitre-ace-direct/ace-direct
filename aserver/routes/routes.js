@@ -10,13 +10,12 @@ const multer = require('multer');
 
 const appRouter = (app, connection, asterisk) => {
 /**
-     * @api {get} /AgentVerify Verify an agent by username and password.
+     * @api {get} /AgentVerify Verify an agent by username.
      * @apiName AgentVerify
      * @apiGroup AgentVerify
      * @apiVersion 1.0.0
      *
      * @apiParam {String} username   username for the agent.
-     * @apiParam {String} password   password for the agent.
      *
      * @apiSuccessExample Success-Response
      *     HTTP/1.1 200 OK
@@ -44,11 +43,6 @@ const appRouter = (app, connection, asterisk) => {
      *     {
      *        'message': 'missing username'
      *     }
-     * @apiErrorExample 400 Error-Response
-     *     HTTP/1.1 400 BadRequest Bad Request Error
-     *     {
-     *        'message': 'missing password'
-     *     }
      * @apiErrorExample 404 Error-Response
      *     HTTP/1.1 404 Not Found
      *     {
@@ -70,12 +64,9 @@ const appRouter = (app, connection, asterisk) => {
     if (!req.query.username) {
       return res.status(400).send({ message: 'missing username' });
     }
-    if (!req.query.password) {
-      return res.status(400).send({ message: 'missing password' });
-    }
 
     // Query DB for agent info
-    return connection.query('SELECT ad.agent_id, ad.username, ad.first_name, ad.last_name, ad.role, ad.phone, ad.email, ad.organization, ad.is_approved, ad.is_active, ae.extension, ae.extension_secret, aq.queue_name, aq2.queue_name AS queue2_name, ad.layout, oc.channel FROM agent_data AS ad LEFT JOIN asterisk_extensions AS ae ON ad.agent_id = ae.id LEFT JOIN asterisk_queues AS aq ON aq.id = ad.queue_id LEFT JOIN asterisk_queues AS aq2 ON aq2.id = ad.queue2_id LEFT JOIN outgoing_channels AS oc ON oc.id = ae.id WHERE ad.username = ? AND BINARY ad.password = ?', [req.query.username, req.query.password], (err, rows, _fields) => {
+    return connection.query('SELECT ad.agent_id, ad.username, ad.first_name, ad.last_name, ad.role, ad.phone, ad.email, ad.organization, ad.is_approved, ad.is_active, ae.extension, ae.extension_secret, aq.queue_name, aq2.queue_name AS queue2_name, ad.layout, oc.channel FROM agent_data AS ad LEFT JOIN asterisk_extensions AS ae ON ad.agent_id = ae.id LEFT JOIN asterisk_queues AS aq ON aq.id = ad.queue_id LEFT JOIN asterisk_queues AS aq2 ON aq2.id = ad.queue2_id LEFT JOIN outgoing_channels AS oc ON oc.id = ae.id WHERE ad.username = ?', [req.query.username], (err, rows, _fields) => {
       if (err) {
         console.log(err);
         return res.status(500).send({ message: 'mysql error' });
@@ -494,7 +485,6 @@ const appRouter = (app, connection, asterisk) => {
      {
           "data": [{
               "username": "<insert username>",
-              "password": "<insert password>",
               "first_name": "<insert fname>",
               "last_name": "<insert lname>",
               "role": "<insert role>",
@@ -508,7 +498,6 @@ const appRouter = (app, connection, asterisk) => {
               "queue2_id": 0
           }, {
               "username": "<insert username>",
-              "password": "<insert password>",
               "first_name": "<insert fname>",
               "last_name": "<insert lname>",
               "role": "<insert role>",
@@ -522,7 +511,6 @@ const appRouter = (app, connection, asterisk) => {
               "queue2_id": 0
           },{
               "username": "<insert username>",
-              "password": "<insert password>",
               "first_name": "<insert fname>",
               "last_name": "<insert lname>",
               "role": "<insert role>",
@@ -540,12 +528,11 @@ const appRouter = (app, connection, asterisk) => {
      */
   app.post('/addAgents', (req, res) => {
     const agents = req.body.data;
-    const sqlInsert = 'INSERT INTO agent_data (username, password, first_name, last_name, role, phone, email, organization, is_approved, is_active, extension_id, queue_id, queue2_id) VALUES ?;';
+    const sqlInsert = 'INSERT INTO agent_data (username, first_name, last_name, role, phone, email, organization, is_approved, is_active, extension_id, queue_id, queue2_id) VALUES ?;';
     const values = [];
 
     agents.forEach((rec) => {
       const { username } = rec;
-      const { password } = rec;
       const firstName = rec.first_name;
       const lastName = rec.last_name;
       const { role } = rec;
@@ -580,7 +567,7 @@ const appRouter = (app, connection, asterisk) => {
       );
 
       extensionLookup.then((extensionIdParam) => {
-        values.push([username, password, firstName, lastName, role, phone, email,
+        values.push([username, firstName, lastName, role, phone, email,
           organization, isApproved, isActive, extensionIdParam, queueId, queue2Id]);
 
         connection.query(sqlInsert, [values], (err, results) => {

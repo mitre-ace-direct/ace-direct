@@ -25,7 +25,7 @@ From the command line, generate docs:
 ## Testing the Server in AWS (remember to escape any data params)
 
 * `curl -k --request GET "https://*hostname:port*/"`
-* `curl -k --request GET "https://*hostname:port*/agentverify/?username=<omitted>&password=<omitted>"`
+* `curl -k --request GET "https://*hostname:port*/agentverify/?username=<omitted>"`
 * `curl -k --request GET "https://*hostname:port*/getallagentrecs"`
 * `curl -k -H "Content-Type: application/json" -X POST -d '{"agent_id":25, "first_name": "Marie", "last_name": "C.", "role": "Manager", "phone": "444-444-4444", "email": "administrator@portal.com", "organization": "Organization Zulu", "is_approved": 0, "is_active": 0 }' "https://hostname:port/updateProfile"`
 
@@ -33,11 +33,11 @@ From the command line, generate docs:
 
 ## agentverify
 
-_Verify an agent ID and password._
+_Verify an agent ID._
 
 ### URL
 
-`/agentverify/?username=someuser&password=somepassword`
+`/agentverify/?username=someuser`
 
 ### Method
 
@@ -49,7 +49,6 @@ _Verify an agent ID and password._
 
 ```bash
 username=[string]
-password=[string]
 ```
 
 #### Optional
@@ -91,8 +90,6 @@ Content:
 
 Code: 400 BAD REQUEST, Content: `{"message": "missing username"}`
 
-Code: 400 BAD REQUEST, Content: `{"message": "missing password"}`
-
 Code: 404 NOT FOUND, Content: `{"message": "username number not found"}`
 
 Code: 500 INTERNAL SERVER ERROR, Content: `{"message": "mysql error"}`
@@ -101,7 +98,7 @@ Code: 501 NOT IMPLEMENTED, Content: `{"message": "records returned is not 1"}`
 
 ### Sample Call
 
-`curl -k --request GET https://hostname:port/agentverify/?username=someuser&password=somepassword`
+`curl -k --request GET https://hostname:port/agentverify/?username=someuser`
 
 ----
 
@@ -197,8 +194,6 @@ Content:
 Code: 204 NO CONTENT, Content: `{'message': 'agent_id number not found'}`
 
 Code: 400 BAD REQUEST, Content: `{'message': 'missing agent_id'}`
-
-Code: 400 BAD REQUEST, Content: `{'message': 'missing password'}`
 
 Code: 404 NOT FOUND, Content: `{'message': 'agent_id not found'}`
 
@@ -573,7 +568,6 @@ For example...
 {
   "data": [{
     "username": "user0",
-    "password": "pass0",
     "first_name": "Kevin",
     "last_name": "Spacey",
     "role": "administrator",
@@ -587,7 +581,6 @@ For example...
     "queue2_id": 1
   }, {
     "username": "user1",
-    "password": "pass1",
     "first_name": "Stephen",
     "last_name": "Baldwin",
     "role": "manager",
@@ -601,7 +594,6 @@ For example...
     "queue2_id": 3
   }, {
     "username": "user2",
-    "password": "pass2",
     "first_name": "Benicio",
     "last_name": "Del Toro",
     "role": "csr",
@@ -635,4 +627,4 @@ _Sent in Success Response._
 
 ### Sample Call addAgents
 
-`curl -k -H "Content-Type: application/json" -X POST -d '{"data":[{"username":"user0","password":"pass0","first_name":"Kevin","last_name":"Spacey","role":"administrator","phone":"000-000-0000","email":"admin0@portal.com","organization":"OrganizationAlpha","is_approved":1,"is_active":1,"extension_id":0,"queue_id":0,"queue2_id":1},{"username":"user1","password":"pass1","first_name":"Stephen","last_name":"Baldwin","role":"manager","phone":"111-111-111","email":"manager1@portal.com","organization":"OrganizationBeta","is_approved":0,"is_active":0,"extension_id":1,"queue_id":2,"queue2_id":3}]}' https://IP address:port/addAgents`
+`curl -k -H "Content-Type: application/json" -X POST -d '{"data":[{"username":"user0","first_name":"Kevin","last_name":"Spacey","role":"administrator","phone":"000-000-0000","email":"admin0@portal.com","organization":"OrganizationAlpha","is_approved":1,"is_active":1,"extension_id":0,"queue_id":0,"queue2_id":1},{"username":"user1","first_name":"Stephen","last_name":"Baldwin","role":"manager","phone":"111-111-111","email":"manager1@portal.com","organization":"OrganizationBeta","is_approved":0,"is_active":0,"extension_id":1,"queue_id":2,"queue2_id":3}]}' https://IP address:port/addAgents`
