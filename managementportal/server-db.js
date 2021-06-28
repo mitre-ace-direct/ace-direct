@@ -1899,11 +1899,9 @@ app.use((err, req, res, next) => {
 });
 
 /**
- * Calls the RESTful service running on the provider host to verify the agent
- * username and password.
+ * Calls the RESTful service running on the provider host to verify the agent.
  *
  * @param {type} username Agent username
- * @param {type} password Agent password
  * @param {type} callback Returns retrieved JSON
  * @returns {undefined} Not used
  */
