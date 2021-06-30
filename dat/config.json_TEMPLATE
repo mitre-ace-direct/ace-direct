@@ -34,6 +34,7 @@
     "acr-cdr": 9004,
     "userver": 9005,
     "aserver": 9006,
+    "videomail": 9007,    
     "sswebserver": 9009,
     "nginx": 443,
     "asterisk_ws": 443,
@@ -44,8 +45,7 @@
     "redis": 6379,
     "mongodb": 27017,
     "translation_server": 8005,
-    "kurento": 8443,    
-    "videomail": 9321,    
+    "kurento": 8443,
     "kmsshare": 3000    
   },    
   "signaling_server": {
@@ -111,6 +111,10 @@
       { "sipId": "88003", "sipPass": "password" },
       { "sipId": "88004", "sipPass": "password" },
       { "sipId": "88005", "sipPass": "password" }]
+  },
+  "s3": {
+      "region": "aws-region",
+      "bucketname": "bucketname"
   },
   "missed_calls": {
     "max_missed_calls": "3"
@@ -188,10 +192,6 @@
     "protocol": "https",
     "user_id": "user@email.com",
     "token": "userToken"
-  },
-  "s3": {
-      "region": "aws-region",
-      "bucketname": "bucketname"
   },
   "user_service": {
     "itrs_mode": "false"
