@@ -329,7 +329,7 @@ The ACE Direct application servers are Node.js servers.
     $  cd ~/ace-direct
     $
     $  # starting
-    $  pm2 start dat/process.json   # first time
+    $  pm2 start dat/process.json   # first time or clean build
     $  pm2 status  # check status of app servers
     $
     $  # other commands
