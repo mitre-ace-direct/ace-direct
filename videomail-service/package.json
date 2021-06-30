@@ -5,7 +5,11 @@
   "scripts": {
     "preinstall": "git config --global url.\"https://\".insteadOf git://",
     "postinstall": "cp mods/jssip/* node_modules/jssip/lib-es5/",
-    "start": "node ./src/server.js"
+    "start": "node ./src/server.js",
+    "clean": "rm -rf node_modules >/dev/null 2>&1 || true",
+    "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
+    "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -not -path './public/js/*' -print0 | xargs -0 eslint",
+    "build": "npm run clean && npm install"
   },
   "dependencies": {
     "aws-sdk": "^2.910.0",
@@ -32,7 +36,11 @@
     "serve-static": "^1.14.1",
     "ws": "^7.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^7.29.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4"
+  },
   "description": "built off https://github.com/agilityfeat/kurento-asterisk",
   "main": "server.js",
   "author": "",
