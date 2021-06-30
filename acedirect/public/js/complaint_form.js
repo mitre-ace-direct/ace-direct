@@ -509,7 +509,17 @@ function connect_socket() {
 					acekurento.isMonitoring = false;
 					monitorExt = null;
 					$('#end-call').attr('onclick', 'terminate_call()');
-				});
+				}).on('call-center-closed', function(data) {
+                                        if (data && data.closed) {
+                                          // closed
+                                          $('#closed-message').css('display', 'inline');
+                                          $('#callbutton').prop('disabled', true);
+                                        } else {
+                                          // open
+                                          $('#closed-message').css('display', 'none');
+                                          $('#callbutton').prop('disabled', false);
+                                        }
+                                });
 
 			} else {
 				//need to handle bad connections?
