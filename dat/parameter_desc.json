@@ -34,6 +34,7 @@
     "acr-cdr": "local application port for acr-cdr server",
     "userver": "local application port for userver",
     "aserver": "local application port for aserver",
+    "videomail": "local application port for the videomail service",    
     "sswebserver": "local application port for signaling server acedirect-kurento webserver",
     "nginx": "NGINX server port number",
     "asterisk_ws": "Asterisk websocket port",
@@ -45,7 +46,6 @@
     "mongodb": "MongoDB port number, default is 27017",
     "translation_server": "Port number of the translation server",
     "kurento": "Kurento media server port",
-    "videomail": "local application port for the videomail service",    
     "kmsshare": "kms-share application port, default is 3000"    
   },     
   "signaling_server": {
@@ -111,6 +111,10 @@
       { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" },
       { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" },
       { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" }]
+  },
+  "s3": {
+    "region": "The AWS region for the s3, example: us-east-1",
+    "bucketname": "The s3 bucketname"
   },
   "missed_calls": {
     "max_missed_calls": "Number of consecutive missed calls before forcing the agent to Away status"
@@ -188,10 +192,6 @@
     "protocol": "Use http for zendesk, https for fendesk",
     "user_id": "email address of the zendesk user; this is a placeholder value for a real Zendesk account if available",
     "token": "token of the zendesk user; this is a placeholder value for a real Zendesk account if available"
-  },
-  "s3": {
-    "region": "The AWS region for the s3, example: us-east-1",
-    "bucketname": "The s3 bucketname"
   },
   "user_service": {
     "itrs_mode": "Use ITRS to verify numbers? true|false"
