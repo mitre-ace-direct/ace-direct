@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "test": "echo 'no tests.'",
     "preinstall": "git config --global url.\"https://\".insteadOf git://",
     "postinstall": "cp mods/jssip/* node_modules/jssip/lib-es5/",
     "start": "node ./src/server.js",
