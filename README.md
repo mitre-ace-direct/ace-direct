@@ -299,6 +299,13 @@ The ACE Direct application servers are Node.js servers.
     ```
 
 1. **Edit all values in `~/ace-direct/dat/config.json` to match your environment**. Many of the default values will work as is for a default ACE Direct installation. View `~/ace-direct/dat/parameter_desc.json` for a description of each configuration variable.
+1. Ensure SSH access to external libraries. This will avoid very long build times. Edit your `~/.gitconfig` file to make sure it has this entry:
+
+    ```bash
+    [url "https://"]
+            insteadOf = git://
+    ```
+
 1. Build the application servers:
 
     ```bash
