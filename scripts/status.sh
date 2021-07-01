@@ -2,7 +2,7 @@
 
 echo "Checking servers..."
 
-STATUS="\n***************************************************\n\n  SERVER STATUS:\n\n"
+STATUS="\n***************************************************\n\n  ACE DIRECT SERVER STATUS:\n\n"
 
 CONFIG="dat/config.json"
 STUN_FQDN=`node ./acedirect/tools/parseJson.js servers:stun_fqdn ${CONFIG}`
@@ -19,6 +19,7 @@ MYSQL_PASS=`node ./acedirect/tools/parseJson.js database_servers:mysql:password 
 MYSQL_DB=`node ./acedirect/tools/parseJson.js database_servers:mysql:ad_database_name ${CONFIG}`
 MONGO_FQDN=`node ./acedirect/tools/parseJson.js servers:mongodb_fqdn ${CONFIG}`
 MONGO_PORT=`node ./acedirect/tools/parseJson.js app_ports:mongodb ${CONFIG}`
+CERT=`node ./acedirect/tools/parseJson.js common:https:certificate ${CONFIG}`
 
 RESET_COLORS='\u001b[0m'
 FG_RED='\u001b[31m'
@@ -41,15 +42,15 @@ done
 # Check MAIN
 DISK_USAGE=`ssh "${USER}@${MAIN_FQDN}" df -k --output='pcent' / | tail -1 | sed -e 's/%//g'`
 if (( $DISK_USAGE > 95 )); then
-  STATUS="${STATUS}  ${NOTOK_ICON}  ${MAIN_FQDN}  disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${MAIN_FQDN} disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
 else
-  STATUS="${STATUS}  ${OK_ICON}  ${MAIN_FQDN}  disk usage is ${DISK_USAGE}%%\n"
+  STATUS="${STATUS}  ${OK_ICON}  ${MAIN_FQDN} disk usage is ${DISK_USAGE}%%\n"
 fi
 
 # Check STUN
 if ssh "${USER}@${STUN_FQDN}" sudo netstat -tnlp | grep 3478
 then
-  STATUS="${STATUS}  ${OK_ICON}  ${STUN_FQDN} is UP.\n"
+  STATUS="${STATUS}  ${OK_ICON}  ${STUN_FQDN} is UP\n"
 else
   STATUS="${STATUS}  ${NOTOK_ICON}  ${STUN_FQDN} is ${FG_RED}DOWN${RESET_COLORS}\n"
 fi
@@ -61,7 +62,7 @@ fi
 # Check TURN 
 if ssh "${USER}@${TURN_FQDN}" sudo netstat -tnlp | grep 3478
 then
-  STATUS="${STATUS}  ${OK_ICON}  ${TURN_FQDN} is UP.\n"
+  STATUS="${STATUS}  ${OK_ICON}  ${TURN_FQDN} is UP\n"
 else
   STATUS="${STATUS}  ${NOTOK_ICON}  ${TURN_FQDN} is ${FG_RED}DOWN${RESET_COLORS}.\n"
 fi
@@ -74,7 +75,7 @@ fi
 # Check Asterisk
 if ssh "${USER}@${ASTERISK_FQDN}" sudo systemctl status asterisk
 then
-  STATUS="${STATUS}  ${OK_ICON}  ${ASTERISK_FQDN} is UP.\n"
+  STATUS="${STATUS}  ${OK_ICON}  ${ASTERISK_FQDN} is UP\n"
 else
   STATUS="${STATUS}  ${NOTOK_ICON}  ${ASTERISK_FQDN} is ${FG_RED}DOWN${RESET_COLORS}\n"
 fi
@@ -86,7 +87,7 @@ fi
 # Check REDIS
 if ssh "${USER}@${REDIS_FQDN}" sudo systemctl status redis
 then
-  STATUS="${STATUS}  ${OK_ICON}  REDIS is UP.\n"
+  STATUS="${STATUS}  ${OK_ICON}  REDIS is UP\n"
 else
   STATUS="${STATUS}  ${NOTOK_ICON}  REDIS is ${FG_RED}DOWN${RESET_COLORS}\n"
 fi
@@ -98,7 +99,7 @@ fi
 # Check NGINX
 if ssh "${USER}@${NGINX_FQDN}" sudo systemctl status nginx
 then
-  STATUS="${STATUS}  ${OK_ICON}  NGINX is UP.\n"
+  STATUS="${STATUS}  ${OK_ICON}  NGINX is UP\n"
 else
   STATUS="${STATUS}  ${NOTOK_ICON}  NGINX is ${FG_RED}DOWN${RESET_COLORS}\n"
 fi
@@ -111,15 +112,15 @@ OPENAM_STATUS=`curl -I  -k https://localhost/${OPENAM_PATH}/XUI | head -n 1|cut 
 if [[ "$OPENAM_STATUS" != "302" ]]
 then
   echo "ERROR!"
-  STATUS="${STATUS}  ${NOTOK_ICON}  openam status: ${FG}${OPENAM_STATUS}${RESET_COLORS}\n" 
+  STATUS="${STATUS}  ${NOTOK_ICON}  openam HTTP status: ${FG}${OPENAM_STATUS}${RESET_COLORS}\n" 
 else
-  STATUS="${STATUS}  ${OK_ICON}  openam status: ${OPENAM_STATUS}\n" 
+  STATUS="${STATUS}  ${OK_ICON}  openam HTTP status: ${OPENAM_STATUS}\n" 
 fi
 
 # Check KMS
 if ssh "${USER}@${KURENTO_FQDN}" sudo systemctl status kurento-media-server
 then
-  STATUS="${STATUS}  ${OK_ICON}  ${KURENTO_FQDN} is UP.\n"
+  STATUS="${STATUS}  ${OK_ICON}  ${KURENTO_FQDN} is UP\n"
 else
   STATUS="${STATUS}  ${NOTOK_ICON}  ${KURENTO_FQDN} is ${FG_RED}DOWN${RESET_COLORS}\n"
 fi
@@ -141,11 +142,21 @@ fi
 # Check MongoDB
 if mongo --eval 'db.runCommand("ping").ok' ${MONGO_FQDN}:${MONGO_PORT} --quiet
 then
-  STATUS="${STATUS}  ${OK_ICON}  mongo is UP.\n"
+  STATUS="${STATUS}  ${OK_ICON}  mongo is UP\n"
 else
   STATUS="${STATUS}  ${NOTOK_ICON}  mongo is ${FG_RED}DOWN${RESET_COLORS}\n"
 fi
 
+# Check certs
+if openssl x509 -checkend 86400 -noout -in ${CERT}
+then
+  STATUS="${STATUS}  ${OK_ICON}  local ${CERT} cert is good\n"
+else
+  STATUS="${STATUS}  ${NOTOK_ICON}  local ${CERT} cert is ${FG_RED}is expired or will expire tomorrow${RESET_COLORS}\n"
+fi
+
+
+# DONE
 STATUS="${STATUS}\n***************************************************\n\n"
 
 clear
