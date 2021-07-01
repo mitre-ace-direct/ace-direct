@@ -1,9 +1,19 @@
 var nconf = require('nconf');
 var fs = require('fs');
-var cfile = './dat/config.json';
+
+// get params
+let param = 'abc';
+let cfile = '';
+if (process.argv.length === 4) {
+  param = process.argv[2];
+  cfile = process.argv[3];
+} else {
+  console.log('\nusage: node parseJson.js  <param>  <config file path>\n');
+  process.exit(process.argv.length);
+}
+
 var content = fs.readFileSync(cfile, 'utf8');
 var myjson = JSON.parse(content);
-
 nconf.file({
   file: cfile
 });
@@ -34,11 +44,5 @@ function getConfigVal(param_name) {
   }
   return (decodedString.toString());
 }
-
-
-let param = 'abc';
-if (process.argv.length >= 3) {
-  param = process.argv[2];
-} 
 
 console.log( getConfigVal(param) );
