@@ -4,14 +4,22 @@ echo "Checking servers..."
 
 STATUS="\n***************************************************\n\n  SERVER STATUS:\n\n"
 
-STUN_FQDN=`node ./acedirect/parseJson.js servers:stun_fqdn`
-TURN_FQDN=`node ./acedirect/parseJson.js servers:turn_fqdn`
-KURENTO_FQDN=`node ./acedirect/parseJson.js servers:kurento_fqdn`
-ASTERISK_FQDN=`node ./acedirect/parseJson.js servers:asterisk_fqdn`
-MAIN_FQDN=`node ./acedirect/parseJson.js servers:main_fqdn`
-REDIS_FQDN=`node ./acedirect/parseJson.js servers:redis_fqdn`
-NGINX_FQDN=`node ./acedirect/parseJson.js servers:nginx_fqdn`
-OPENAM_PATH=`node ./acedirect/parseJson.js openam:path`
+CONFIG="dat/config.json"
+STUN_FQDN=`node ./acedirect/tools/parseJson.js servers:stun_fqdn ${CONFIG}`
+TURN_FQDN=`node ./acedirect/tools/parseJson.js servers:turn_fqdn ${CONFIG}`
+KURENTO_FQDN=`node ./acedirect/tools/parseJson.js servers:kurento_fqdn ${CONFIG}`
+ASTERISK_FQDN=`node ./acedirect/tools/parseJson.js servers:asterisk_fqdn ${CONFIG}`
+MAIN_FQDN=`node ./acedirect/tools/parseJson.js servers:main_fqdn ${CONFIG}`
+REDIS_FQDN=`node ./acedirect/tools/parseJson.js servers:redis_fqdn ${CONFIG}`
+NGINX_FQDN=`node ./acedirect/tools/parseJson.js servers:nginx_fqdn ${CONFIG}`
+OPENAM_PATH=`node ./acedirect/tools/parseJson.js openam:path ${CONFIG}`
+MYSQL_FQDN=`node ./acedirect/tools/parseJson.js servers:mysql_fqdn ${CONFIG}`
+MYSQL_USER=`node ./acedirect/tools/parseJson.js database_servers:mysql:user ${CONFIG}`
+MYSQL_PASS=`node ./acedirect/tools/parseJson.js database_servers:mysql:password ${CONFIG}`
+MYSQL_DB=`node ./acedirect/tools/parseJson.js database_servers:mysql:ad_database_name ${CONFIG}`
+MONGO_FQDN=`node ./acedirect/tools/parseJson.js servers:mongodb_fqdn ${CONFIG}`
+MONGO_PORT=`node ./acedirect/tools/parseJson.js app_ports:mongodb ${CONFIG}`
+
 RESET_COLORS='\u001b[0m'
 FG_RED='\u001b[31m'
 OK_ICON='✅'
@@ -109,7 +117,6 @@ else
 fi
 
 # Check KMS
-nm="kms"
 if ssh "${USER}@${KURENTO_FQDN}" sudo systemctl status kurento-media-server
 then
   STATUS="${STATUS}  ${OK_ICON}  ${KURENTO_FQDN} is UP.\n"
@@ -121,6 +128,23 @@ if (( $DISK_USAGE > 95 )); then
   STATUS="${STATUS}  ${NOTOK_ICON}  ${KURENTO_FQDN} disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
 fi
 
+# MySQL check
+MYSQL_RC=`node ./acedirect/tools/checkMysql.js ${MYSQL_FQDN} ${MYSQL_USER} ${MYSQL_PASS} ${MYSQL_DB}` 
+if [[ "$MYSQL_RC" != "0" ]] 
+then
+  echo "ERROR!"
+  STATUS="${STATUS}  ${NOTOK_ICON}  mysql: ${FG}${MYSQL_RC}${RESET_COLORS}\n" 
+else
+  STATUS="${STATUS}  ${OK_ICON}  mysql status: ${MYSQL_RC}\n" 
+fi
+
+# Check MongoDB
+if mongo --eval 'db.runCommand("ping").ok' ${MONGO_FQDN}:${MONGO_PORT} --quiet
+then
+  STATUS="${STATUS}  ${OK_ICON}  mongo is UP.\n"
+else
+  STATUS="${STATUS}  ${NOTOK_ICON}  mongo is ${FG_RED}DOWN${RESET_COLORS}\n"
+fi
 
 STATUS="${STATUS}\n***************************************************\n\n"
 
