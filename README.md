@@ -312,6 +312,7 @@ The ACE Direct application servers are Node.js servers.
     $  cd ~/ace-direct
     $
     $  # full build
+    $  npm run clean
     $  npm install
     $  npm run build
     $  npm run config
