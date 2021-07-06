@@ -362,6 +362,15 @@ The ACE Direct application servers are Node.js servers.
     $  # now node.js servers will start on boot
     ```
 
+1. Check ACE Direct system status:
+
+    ```bash
+    $  cd ~/ace-direct
+    $
+    $  pm2 start all  # start ACE Direct
+    $  npm run status
+    ```
+
 ---
 
 ## Busylight
