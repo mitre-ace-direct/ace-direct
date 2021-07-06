@@ -13,7 +13,7 @@
     "lint": "npm run lint:acedirect-kurento && npm run lint:acr-cdr && npm run lint:aserver && npm run lint:fendesk && npm run lint:userver && npm run lint:videomail-service",
     "config": "cd acedirect-kurento && npm run config && touch /tmp/asterisk.csr && chmod 644 /tmp/asterisk.csr",
     "build:acedirect": "cd acedirect && npm run build",
-    "build:acedirect-kurento": "cd acedirect-kurento && rm -rf node_modules && npm install && npm run build",
+    "build:acedirect-kurento": "cd acedirect-kurento && rm -rf node_modules && npm run build",
     "build:acr-cdr": "cd acr-cdr && npm run build",
     "build:aserver": "cd aserver && npm run build",
     "build:fendesk": "cd fendesk && npm run build",
