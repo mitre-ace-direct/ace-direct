@@ -55,7 +55,7 @@
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
     "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -not -path './public/js/jquery.dd.min.js'   -print0 | xargs -0 eslint",
     "start": "node ./adserver.js",
-    "build": "mkdir -p public/assets; node ./build.js"
+    "build": "npm run clean && mkdir -p public/assets && node ./build.js"
   },
   "author": "",
   "license": "ISC",
