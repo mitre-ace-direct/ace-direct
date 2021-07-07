@@ -20,6 +20,7 @@ MYSQL_DB=`node ./acedirect/tools/parseJson.js database_servers:mysql:ad_database
 MONGO_FQDN=`node ./acedirect/tools/parseJson.js servers:mongodb_fqdn ${CONFIG}`
 MONGO_PORT=`node ./acedirect/tools/parseJson.js app_ports:mongodb ${CONFIG}`
 CERT=`node ./acedirect/tools/parseJson.js common:https:certificate ${CONFIG}`
+PM2_NAMES=( $(pm2 prettylist | grep "      name:" | awk -F  "'"  '{ print $2 }' | sed 's/ /_/g') )
 
 RESET_COLORS='\u001b[0m'
 FG_RED='\u001b[31m'
@@ -35,7 +36,7 @@ for ((i = 0; i < 8; ++i)); do
     FG=${FG_RED}
   ICON=${NOTOK_ICON}
   fi
-  STATUS="${STATUS}  ${ICON}  pm2 status ${i}: ${FG}${PM2_STATUS}${RESET_COLORS}\n" 
+  STATUS="${STATUS}  ${ICON}  pm2 ${i} ${PM2_NAMES[i]}: ${FG}${PM2_STATUS}${RESET_COLORS}\n" 
 done
 
 
