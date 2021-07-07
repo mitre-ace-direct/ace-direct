@@ -1,13 +1,12 @@
 #!/bin/bash
 
-echo "Checking servers..."
-
 RESET_COLORS='\u001b[0m'
 FG_RED='\u001b[31m'
 OK_ICON='✅'
 NOTOK_ICON='❌'
-STATUS="\n***************************************************\n\n  ACE DIRECT SERVER STATUS:\n\n"
+STATUS="\n***************************************************\n  ACE DIRECT SERVER STATUS:\n"
 
+printf "Checking config.json...\n"
 CONFIG="dat/config.json"
 # Check config file
 if jsonlint ${CONFIG} >/dev/null 2>&1
@@ -41,6 +40,7 @@ CERT=`node ./acedirect/tools/parseJson.js common:https:certificate ${CONFIG}`
 PM2_NAMES=( $(pm2 prettylist | grep "      name:" | awk -F  "'"  '{ print $2 }' | sed 's/ /_/g') )
 
 
+printf "Checking node apps...\n"
 for ((i = 0; i < 8; ++i)); do
   PM2_STATUS=`pm2 show ${i} | grep status | awk '{ print $4 }' | sed 's/ //g'`
   FG=''
@@ -53,53 +53,85 @@ for ((i = 0; i < 8; ++i)); do
   STATUS="${STATUS}  ${ICON}  pm2 ${i} ${PM2_NAMES[i]}: ${FG}${PM2_STATUS}${RESET_COLORS}\n" 
 done
 
+printf "Checking main server...\n"
 # Check MAIN
-DISK_USAGE=`ssh "${USER}@${MAIN_FQDN}" df -k --output='pcent' / | tail -1 | sed -e 's/%//g'`
-if (( $DISK_USAGE > 95 )); then
-  STATUS="${STATUS}  ${NOTOK_ICON}  ${MAIN_FQDN} disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+DISK_USAGE=`ssh "${USER}@${MAIN_FQDN}" df -k --output='pcent' / 2>/dev/null | tail -1 | sed -e 's/%//g'`
+if [ -z "${DISK_USAGE}" ]
+then
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${MAIN_FQDN} ${FG_RED}unable to get disk usage${RESET_COLORS}\n"
 else
-  STATUS="${STATUS}  ${OK_ICON}  ${MAIN_FQDN} disk usage is ${DISK_USAGE}%%\n"
+  if (( $DISK_USAGE > 95 )); then
+    STATUS="${STATUS}  ${NOTOK_ICON}  ${MAIN_FQDN} disk usage is${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+  else
+    STATUS="${STATUS}  ${OK_ICON}  ${MAIN_FQDN} disk usage is${DISK_USAGE}%%\n"
+  fi
 fi
 
 # Check STUN
-if ssh "${USER}@${STUN_FQDN}" sudo netstat -tnlp | grep 3478
+printf "Checking stun server...\n"
+STUN_RET=`ssh "${USER}@${STUN_FQDN}" sudo netstat -tnlp  2>/dev/null  | grep 3478`
+if [ -z "${STUN_RET}" ]
 then
-  STATUS="${STATUS}  ${OK_ICON}  ${STUN_FQDN} is UP\n"
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${STUN_FQDN} is ${FG_RED}DOWN or UNREACHABLE${RESET_COLORS}\n"
 else
-  STATUS="${STATUS}  ${NOTOK_ICON}  ${STUN_FQDN} is ${FG_RED}DOWN${RESET_COLORS}\n"
+  STATUS="${STATUS}  ${OK_ICON}  ${STUN_FQDN} is UP\n"
 fi
-DISK_USAGE=`ssh "${USER}@${STUN_FQDN}" df -k --output='pcent' / | tail -1 | sed -e 's/%//g'`
-if (( $DISK_USAGE > 95 )); then
-  STATUS="${STATUS}  ${NOTOK_ICON}  ${STUN_FQDN}  disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+DISK_USAGE=`ssh "${USER}@${STUN_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
+if [ -z "${DISK_USAGE}" ]
+then
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${STUN_FQDN} ${FG_RED}unable to get disk usage${RESET_COLORS}\n"
+else
+  if (( $DISK_USAGE > 95 )); then
+    STATUS="${STATUS}  ${NOTOK_ICON}  ${STUN_FQDN} disk usage is${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+  else
+    STATUS="${STATUS}  ${OK_ICON}  ${STUN_FQDN} disk usage is${DISK_USAGE}%%\n"
+  fi
 fi
 
 # Check TURN 
-if ssh "${USER}@${TURN_FQDN}" sudo netstat -tnlp | grep 3478
+printf "Checking turn server...\n"
+TURN_RET=`ssh "${USER}@${TURN_FQDN}" sudo netstat -tnlp 2>/dev/null  | grep 3478`
+if [ -z "${TURN_RET}" ]
 then
-  STATUS="${STATUS}  ${OK_ICON}  ${TURN_FQDN} is UP\n"
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${TURN_FQDN} is ${FG_RED}DOWN or UNREACHABLE${RESET_COLORS}\n"
 else
-  STATUS="${STATUS}  ${NOTOK_ICON}  ${TURN_FQDN} is ${FG_RED}DOWN${RESET_COLORS}.\n"
-fi
-DISK_USAGE=`ssh "${USER}@${TURN_FQDN}" df -k --output='pcent' / | tail -1 | sed -e 's/%//g'`
-if (( $DISK_USAGE > 95 )); then
-  STATUS="${STATUS}   ${NOTOK_ICON}  ${TURN_FQDN}  disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+  STATUS="${STATUS}  ${OK_ICON}  ${TURN_FQDN} is UP\n"
 fi
 
+DISK_USAGE=`ssh "${USER}@${TURN_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
+if [ -z "${DISK_USAGE}" ]
+then
+  STATUS="${STATUS}  ${NOTOK_ICON}  $TURNN_FQDN} ${FG_RED}unable to get disk usage${RESET_COLORS}\n"
+else
+  if (( $DISK_USAGE > 95 )); then
+    STATUS="${STATUS}  ${NOTOK_ICON}  ${TURN_FQDN} disk usage is${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+  else
+    STATUS="${STATUS}  ${OK_ICON}  ${TURN_FQDN} disk usage is${DISK_USAGE}%%\n"
+  fi
+fi
 
 # Check Asterisk
-if ssh "${USER}@${ASTERISK_FQDN}" sudo systemctl status asterisk
+printf "Checking asterisk server...\n"
+if ssh "${USER}@${ASTERISK_FQDN}" sudo systemctl status asterisk  >/dev/null 2>&1
 then
   STATUS="${STATUS}  ${OK_ICON}  ${ASTERISK_FQDN} is UP\n"
 else
-  STATUS="${STATUS}  ${NOTOK_ICON}  ${ASTERISK_FQDN} is ${FG_RED}DOWN${RESET_COLORS}\n"
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${ASTERISK_FQDN} is ${FG_RED}DOWN or UNREACHABLE${RESET_COLORS}\n"
 fi
-DISK_USAGE=`ssh "${USER}@${ASTERISK_FQDN}" df -k --output='pcent' / | tail -1 | sed -e 's/%//g'`
-if (( $DISK_USAGE > 95 )); then
-  STATUS="${STATUS}  ${NOTOK_ICON}  ${ASTERISK_FQDN} disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+DISK_USAGE=`ssh "${USER}@${ASTERISK_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
+if [ -z "${DISK_USAGE}" ]
+then
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${ASTERISK_FQDN} ${FG_RED}unable to get disk usage${RESET_COLORS}\n"
+else
+  if (( $DISK_USAGE > 95 )); then
+    STATUS="${STATUS}  ${NOTOK_ICON}  ${ASTERISK_FQDN} disk usage is${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+  else
+    STATUS="${STATUS}  ${OK_ICON}  ${ASTERISK_FQDN} disk usage is${DISK_USAGE}%%\n"
+  fi
 fi
 
 # Check Asterisk AMI
-if node ./acedirect/tools/pingAsterisk.js ${CONFIG}
+if node ./acedirect/tools/pingAsterisk.js >/dev/null 2>&1 ${CONFIG}
 then
   STATUS="${STATUS}  ${OK_ICON}  ASTERISK_AMI success!\n"
 else
@@ -107,30 +139,47 @@ else
 fi
 
 # Check REDIS
-if ssh "${USER}@${REDIS_FQDN}" sudo systemctl status redis
+printf "Checking redis server...\n"
+if ssh "${USER}@${REDIS_FQDN}" sudo systemctl status redis >/dev/null 2>&1
 then
   STATUS="${STATUS}  ${OK_ICON}  REDIS is UP\n"
 else
-  STATUS="${STATUS}  ${NOTOK_ICON}  REDIS is ${FG_RED}DOWN${RESET_COLORS}\n"
+  STATUS="${STATUS}  ${NOTOK_ICON}  REDIS is ${FG_RED}DOWN or UNREACHABLE${RESET_COLORS}\n"
 fi
-DISK_USAGE=`ssh "${USER}@${REDIS_FQDN}" df -k --output='pcent' / | tail -1 | sed -e 's/%//g'`
-if (( $DISK_USAGE > 95 )); then
-  STATUS="${STATUS}  ${NOTOK_ICON}  REDIS disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+DISK_USAGE=`ssh "${USER}@${REDIS_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
+if [ -z "${DISK_USAGE}" ]
+then
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${REDIS_FQDN} ${FG_RED}unable to get disk usage${RESET_COLORS}\n"
+else
+  if (( $DISK_USAGE > 95 )); then
+    STATUS="${STATUS}  ${NOTOK_ICON}  ${REDIS_FQDN} disk usage is${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+  else
+    STATUS="${STATUS}  ${OK_ICON}  ${REDIS_FQDN} disk usage is${DISK_USAGE}%%\n"
+  fi
 fi
 
 # Check NGINX
-if ssh "${USER}@${NGINX_FQDN}" sudo systemctl status nginx
+printf "Checking nginx server...\n"
+if ssh "${USER}@${NGINX_FQDN}" sudo systemctl status nginx  >/dev/null 2>&1
 then
   STATUS="${STATUS}  ${OK_ICON}  NGINX is UP\n"
 else
-  STATUS="${STATUS}  ${NOTOK_ICON}  NGINX is ${FG_RED}DOWN${RESET_COLORS}\n"
+  STATUS="${STATUS}  ${NOTOK_ICON}  NGINX is ${FG_RED}DOWN or UNREACHABLE${RESET_COLORS}\n"
 fi
-DISK_USAGE=`ssh "${USER}@${NGINX_FQDN}" df -k --output='pcent' / | tail -1 | sed -e 's/%//g'`
-if (( $DISK_USAGE > 95 )); then
-  STATUS="${STATUS}  ${NOTOK_ICON}  ${NGINX_FQDN} disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+DISK_USAGE=`ssh "${USER}@${NGINX_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
+if [ -z "${DISK_USAGE}" ]
+then
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${NGINX_FQDN} ${FG_RED}unable to get disk usage${RESET_COLORS}\n"
+else
+  if (( $DISK_USAGE > 95 )); then
+    STATUS="${STATUS}  ${NOTOK_ICON}  ${NGINX_FQDN} disk usage is${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+  else
+    STATUS="${STATUS}  ${OK_ICON}  ${NGINX_FQDN} disk usage is${DISK_USAGE}%%\n"
+  fi
 fi
 
-OPENAM_STATUS=`curl -I  -k https://localhost/${OPENAM_PATH}/XUI | head -n 1|cut -d$' ' -f2`
+printf "Checking openam server...\n"
+OPENAM_STATUS=`curl -I  -k https://localhost/${OPENAM_PATH}/XUI 2>/dev/null  | head -n 1|cut -d$' ' -f2`
 if [[ "$OPENAM_STATUS" != "302" ]]
 then
   echo "ERROR!"
@@ -140,18 +189,27 @@ else
 fi
 
 # Check KMS
-if ssh "${USER}@${KURENTO_FQDN}" sudo systemctl status kurento-media-server
+printf "Checking kms server...\n"
+if ssh "${USER}@${KURENTO_FQDN}" sudo systemctl status kurento-media-server  >/dev/null 2>&1
 then
   STATUS="${STATUS}  ${OK_ICON}  ${KURENTO_FQDN} is UP\n"
 else
-  STATUS="${STATUS}  ${NOTOK_ICON}  ${KURENTO_FQDN} is ${FG_RED}DOWN${RESET_COLORS}\n"
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${KURENTO_FQDN} is ${FG_RED}DOWN or UNREACHABLE${RESET_COLORS}\n"
 fi
-DISK_USAGE=`ssh "${USER}@${KURENTO_FQDN}" df -k --output='pcent' / | tail -1 | sed -e 's/%//g'`
-if (( $DISK_USAGE > 95 )); then
-  STATUS="${STATUS}  ${NOTOK_ICON}  ${KURENTO_FQDN} disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+DISK_USAGE=`ssh "${USER}@${KURENTO_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
+if [ -z "${DISK_USAGE}" ]
+then
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${KURENTO_FQDN} ${FG_RED}unable to get disk usage${RESET_COLORS}\n"
+else
+  if (( $DISK_USAGE > 95 )); then
+    STATUS="${STATUS}  ${NOTOK_ICON}  ${KURENTO_FQDN} disk usage is${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
+  else
+    STATUS="${STATUS}  ${OK_ICON}  ${KURENTO_FQDN} disk usage is${DISK_USAGE}%%\n"
+  fi
 fi
 
 # MySQL check
+printf "Checking mysql server...\n"
 MYSQL_RC=`node ./acedirect/tools/checkMysql.js ${MYSQL_FQDN} ${MYSQL_USER} ${MYSQL_PASS} ${MYSQL_DB}` 
 if [[ "$MYSQL_RC" != "0" ]] 
 then
@@ -162,7 +220,8 @@ else
 fi
 
 # Check MongoDB
-if mongo --eval 'db.runCommand("ping").ok' ${MONGO_FQDN}:${MONGO_PORT} --quiet
+printf "Checking mongo server...\n"
+if mongo --eval 'db.runCommand("ping").ok' ${MONGO_FQDN}:${MONGO_PORT} --quiet >/dev/null 2>&1
 then
   STATUS="${STATUS}  ${OK_ICON}  mongo is UP\n"
 else
@@ -170,6 +229,7 @@ else
 fi
 
 # Check certs
+printf "Checking local certs...\n"
 if openssl x509 -checkend 86400 -noout -in ${CERT}
 then
   STATUS="${STATUS}  ${OK_ICON}  local ${CERT} cert is good\n"
@@ -179,9 +239,5 @@ fi
 
 
 # DONE
-STATUS="${STATUS}\n***************************************************\n\n"
-
-clear
-echo ""
+STATUS="${STATUS}***************************************************\n\n"
 printf "${STATUS}"
-echo ""
