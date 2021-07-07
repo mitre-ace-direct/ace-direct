@@ -8,6 +8,7 @@ npm run clean
 START=`date +%s`
 npm install
 npm run build
+npm run config
 END=`date +%s`
 pm2 start dat/process.json
 EQU="scale=2; (${END} - ${START})/60"
