@@ -84,6 +84,14 @@ if (( $DISK_USAGE > 95 )); then
   STATUS="${STATUS}  ${NOTOK_ICON}  ${ASTERISK_FQDN} disk usage is ${FG_RED}${DISK_USAGE}%%  ${RESET_COLORS}\n"
 fi
 
+# Check Asterisk AMI
+if node ./acedirect/tools/pingAsterisk.js ${CONFIG}
+then
+  STATUS="${STATUS}  ${OK_ICON}  ASTERISK_AMI success!\n"
+else
+  STATUS="${STATUS}  ${NOTOK_ICON}  ASTERISK_AMI ${FG_RED}FAILED!${RESET_COLORS}\n"
+fi
+
 # Check REDIS
 if ssh "${USER}@${REDIS_FQDN}" sudo systemctl status redis
 then

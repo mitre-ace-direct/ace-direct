@@ -7,6 +7,7 @@
     "@forgerock/openam-agent": "^4.0.5",
     "acorn": "^8.2.4",
     "admin-lte": "^2.4.18",
+    "asterisk-ami-client": "^1.1.5",
     "asterisk-manager": "0.1.16",
     "aws-sdk": "^2.933.0",
     "body-parser": "^1.19.0",
