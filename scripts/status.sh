@@ -2,9 +2,27 @@
 
 echo "Checking servers..."
 
+RESET_COLORS='\u001b[0m'
+FG_RED='\u001b[31m'
+OK_ICON='✅'
+NOTOK_ICON='❌'
 STATUS="\n***************************************************\n\n  ACE DIRECT SERVER STATUS:\n\n"
 
 CONFIG="dat/config.json"
+# Check config file
+if jsonlint ${CONFIG} >/dev/null 2>&1
+then
+  STATUS="${STATUS}  ${OK_ICON}  ${CONFIG} is valid\n"
+else
+  CONFIG_ERROR=`jsonlint ${CONFIG} 2>&1 | head -n1`
+  STATUS="${STATUS}  ${NOTOK_ICON}  ${CONFIG} is ${FG_RED}MALFORMED!${RESET_COLORS}\n"
+  printf "$STATUS"
+  printf "  $CONFIG_ERROR\n"
+  printf "  Aborting status check...\n\n"
+  printf "***************************************************\n\n"
+  exit 99
+fi
+
 STUN_FQDN=`node ./acedirect/tools/parseJson.js servers:stun_fqdn ${CONFIG}`
 TURN_FQDN=`node ./acedirect/tools/parseJson.js servers:turn_fqdn ${CONFIG}`
 KURENTO_FQDN=`node ./acedirect/tools/parseJson.js servers:kurento_fqdn ${CONFIG}`
@@ -22,10 +40,6 @@ MONGO_PORT=`node ./acedirect/tools/parseJson.js app_ports:mongodb ${CONFIG}`
 CERT=`node ./acedirect/tools/parseJson.js common:https:certificate ${CONFIG}`
 PM2_NAMES=( $(pm2 prettylist | grep "      name:" | awk -F  "'"  '{ print $2 }' | sed 's/ /_/g') )
 
-RESET_COLORS='\u001b[0m'
-FG_RED='\u001b[31m'
-OK_ICON='✅'
-NOTOK_ICON='❌'
 
 for ((i = 0; i < 8; ++i)); do
   PM2_STATUS=`pm2 show ${i} | grep status | awk '{ print $4 }' | sed 's/ //g'`
@@ -38,7 +52,6 @@ for ((i = 0; i < 8; ++i)); do
   fi
   STATUS="${STATUS}  ${ICON}  pm2 ${i} ${PM2_NAMES[i]}: ${FG}${PM2_STATUS}${RESET_COLORS}\n" 
 done
-
 
 # Check MAIN
 DISK_USAGE=`ssh "${USER}@${MAIN_FQDN}" df -k --output='pcent' / | tail -1 | sed -e 's/%//g'`
