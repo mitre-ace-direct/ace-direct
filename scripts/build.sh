@@ -12,7 +12,7 @@ END=`date +%s`
 pm2 start dat/process.json
 EQU="scale=2; (${END} - ${START})/60"
 RESULT=`bc <<< $EQU`
+npm run status
 echo ""
 echo "*** That took $RESULT minutes. ***"
 echo ""
-
