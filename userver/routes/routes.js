@@ -104,7 +104,21 @@ const appRouter = (app, connection, itrsMode) => {
           return res.status(404).send({ message: 'Videophone number not found', itrs_mode: itrsMode });
         }
         const arr = stdout.split(' ');
-        if (arr.length === 4 && arr[2] === 'sipuri' && arr[3].trim().length > 0) {
+
+        // parse return value from itrslookup script, simple mode
+        // 'sipuri' value must be present, followed by non-empty string value
+        let bFound = false;
+        for (let sIndex = 0; sIndex < arr.length; sIndex += 1) {
+          if (arr[sIndex] === 'sipuri') {
+            sIndex += 1;
+            if ( (sIndex < arr.length) && (arr[sIndex].trim().length > 0)) {
+              bFound = true;
+              break;
+            }
+          }
+        }
+
+        if (bFound) {
           // VERIFY SUCCESS
           console.log(`ITRS VERIFIED ${req.query.vrsnum} ? ... YES!`);
           const obj = {
