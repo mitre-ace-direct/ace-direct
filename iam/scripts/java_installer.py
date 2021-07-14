@@ -10,9 +10,20 @@ default_java_package = 'java-1.8.0-openjdk-devel.x86_64'
 configuration_file = './oam_installer.json'
 lvl = 'common'
 
+# silent mode?
+silent_mode = ''
+if len(sys.argv) > 1:
+  silent_mode = sys.argv[1]
+
 def install():
   version = get_config_value(lvl,'java')
-  ans = get_input('Do you want to install/update ' + version + ' ? [y/n] ')
+
+  ans = ''
+  if silent_mode == 'silent':
+    ans = 'y'
+  else:
+    ans = get_input('Do you want to install/update ' + version + ' ? [y/n] ')
+
   while ans != 'y' and ans != 'n':
       ans = get_input('Do you want to install/update ' + version + ' ? [y/n] ')
   if (ans == 'n'):

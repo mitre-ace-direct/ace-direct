@@ -62,6 +62,12 @@ const appRouter = (app, connection, itrsMode) => {
       return res.status(400).send({ message: 'missing video phone number' });
     }
 
+    if (/^\d{10}$/.test(req.query.vrsnum)) {
+      console.log('vrsnum is VALID');
+    } else {
+      return res.status(400).send({ message: 'Invalid phone number format.' });
+    }
+
     if (itrsMode === 'false') {
       // VERIFYING vrs num using our own database
       console.log('VERIFYING vrs num using our own database...');
@@ -89,8 +95,8 @@ const appRouter = (app, connection, itrsMode) => {
 
     // verify vrs num using the ITRS service
     console.log('VERIFYING vrs num using the ITRS service...');
-    const { exec } = execObj;
-    return exec(`sh ../scripts/itrslookup.sh ${req.query.vrsnum} simple`,
+    const { execFile } = execObj;
+    return execFile('../scripts/itrslookup.sh',  [req.query.vrsnum, 'simple'],
       (error, stdout, _stderr) => {
         if (error !== null) {
           console.log(`ERROR during itrslookup.sh; exec error: ${error}`);
@@ -98,7 +104,21 @@ const appRouter = (app, connection, itrsMode) => {
           return res.status(404).send({ message: 'Videophone number not found', itrs_mode: itrsMode });
         }
         const arr = stdout.split(' ');
-        if (arr.length === 4 && arr[2] === 'sipuri' && arr[3].trim().length > 0) {
+
+        // parse return value from itrslookup script, simple mode
+        // 'sipuri' value must be present, followed by non-empty string value
+        let bFound = false;
+        for (let sIndex = 0; sIndex < arr.length; sIndex += 1) {
+          if (arr[sIndex] === 'sipuri') {
+            sIndex += 1;
+            if ( (sIndex < arr.length) && (arr[sIndex].trim().length > 0)) {
+              bFound = true;
+              break;
+            }
+          }
+        }
+
+        if (bFound) {
           // VERIFY SUCCESS
           console.log(`ITRS VERIFIED ${req.query.vrsnum} ? ... YES!`);
           const obj = {
