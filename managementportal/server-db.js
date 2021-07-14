@@ -1,3 +1,4 @@
+
 // node modules
 let dbconn = null;
 let dbConnection = null;
@@ -196,12 +197,12 @@ function myCleanup() {
 require('./cleanup').Cleanup(myCleanup);
 
 // declare constants for various config values
-const COMMON_PRIVATE_IP = 'common:private_ip';
-const NGINX_FQDN = 'nginx:fqdn';
+const COMMON_PRIVATE_IP = 'servers:main_private_ip';
+const NGINX_FQDN = 'servers:nginx_fqdn';
 const COLOR_CONFIG_JSON_PATH = '../dat/color_config.json';
-const ASTERISK_SIP_PRIVATE_IP = 'asterisk:sip:private_ip';
-const AGENT_SERVICE_PORT = 'agent_service:port';
-const ACE_DIRECT_PORT = 'ace_direct:https_listen_port';
+const ASTERISK_SIP_PRIVATE_IP = 'servers:asterisk_private_ip';
+const AGENT_SERVICE_PORT = 'app_ports:aserver';
+const ACE_DIRECT_PORT = 'app_ports:acedirect';
 
 const app = express(); // create our app w/ express
 
@@ -230,7 +231,7 @@ const credentials = {
 // const redisAgentInfoMap = 'agentInfoMap';
 
 // Create a connection to Redis
-const redisClient = redis.createClient(getConfigVal('database_servers:redis:port'), getConfigVal('database_servers:redis:host'));
+const redisClient = redis.createClient(getConfigVal('app_ports:redis').toString(), getConfigVal('servers:redis_fqdn'));
 
 redisClient.on('error', (err) => {
   logger.error('');
@@ -272,8 +273,8 @@ if (nginxPath.length === 0) {
 }
 
 const policyAgent = new openamAgent.PolicyAgent({
-  serverUrl: `https://${getConfigVal(NGINX_FQDN)}:${getConfigVal('nginx:port')}/${getConfigVal('openam:path')}`,
-  privateIP: getConfigVal('nginx:private_ip'),
+  serverUrl: `https://${getConfigVal(NGINX_FQDN)}:${getConfigVal('app_ports:nginx')}/${getConfigVal('openam:path')}`,
+  privateIP: getConfigVal('servers:nginx_private_ip'),
   errorPage() {
     return '<html><body><h1>Access Error</h1></body></html>';
   }
@@ -328,7 +329,7 @@ if (nconf.get(NGINX_FQDN)) {
 const fqdnTrimmed = fqdn.trim(); // Remove the newline
 const fqdnUrl = `https://${fqdnTrimmed}:*`;
 
-port = parseInt(getConfigVal('management_portal:https_listen_port'), 10);
+port = parseInt(getConfigVal('app_ports:managementportal'), 10);
 
 const httpsServer = https.createServer(credentials, app);
 
@@ -338,11 +339,11 @@ const io = socketIO(httpsServer, {
 });
 
 // Pull MySQL configuration from config.json file
-const dbHost = getConfigVal('database_servers:mysql:host');
+const dbHost = getConfigVal('servers:mysql_fqdn');
 const dbUser = getConfigVal('database_servers:mysql:user');
 const dbPassword = getConfigVal('database_servers:mysql:password');
 const dbName = getConfigVal('database_servers:mysql:ad_database_name');
-const dbPort = parseInt(getConfigVal('database_servers:mysql:port'), 10);
+const dbPort = getConfigVal('app_ports:mysql');
 const vmTable = 'videomail';
 const callBlockTable = 'call_block';
 const callBlockVrsPrefix = '1';
@@ -364,15 +365,19 @@ setInterval(() => {
 }, 60000);
 
 // Pull MongoDB configuration from config.json file
-const mongodbUriEncoded = nconf.get('database_servers:mongodb:connection_uri');
+var mongodbUri = null;
+const mongodbFqdn = nconf.get('servers:mongodb_fqdn');
+if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
+	mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('app_ports:mongodb')}/${getConfigVal('database_servers:mongodb:database_name')}`;
+}
+
 const logAMIEvents = nconf.get('database_servers:mongodb:logAMIevents');
 const logStats = nconf.get('database_servers:mongodb:logStats');
 const logStatsFreq = nconf.get('database_servers:mongodb:logStatsFreq');
 let mongodb;
 
 // Connect to MongoDB
-if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
-  const mongodbUri = getConfigVal('database_servers:mongodb:connection_uri');
+if (mongodbUri) {
   // Initialize connection once
   MongoClient.connect(mongodbUri, {
     forceServerObjectId: true,
@@ -453,7 +458,7 @@ if (typeof mongodbUriEncoded !== 'undefined' && mongodbUriEncoded) {
     }
   });
 } else {
-  console.log('Missing MongoDB Connection URI in config');
+  console.log('Missing MongoDB servers:mongodb_fqdn value in dat/config.json');
 
   httpsServer.listen(port);
   console.log(`https web server listening on ${port}`);
@@ -478,7 +483,7 @@ if (!fs.existsSync(COLOR_CONFIG_JSON_PATH) || !fs.existsSync('../dat/default_col
 }
 
 logger.info(`Listen on port: ${port}`);
-const queuenames = getConfigVal('management_portal:queues');
+const queuenames = `${getConfigVal('asterisk:queues:general:name')},${getConfigVal('asterisk:queues:complaint:name')},${getConfigVal('asterisk:queues:videomail:name')}`;
 const pollInterval = parseInt(getConfigVal('management_portal:poll_interval'), 10);
 // const adUrl = `https://${getConfigVal(COMMON_PRIVATE_IP)}`;
 console.log(`port number: ${port}, poll interval:${pollInterval}`);
@@ -547,11 +552,11 @@ function checkConnection(hosts, callback) {
 function sendResourceStatus() {
   const hostMap = new Map();
   // list of resources to check for status
-  hostMap.set('ACR-CDR', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('acr_cdr:https_listen_port')}`);
-  hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('user_service:port')}`);
-  hostMap.set('ACE Direct', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('ace_direct:https_listen_port')}`);
+  hostMap.set('ACR-CDR', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acr-cdr')}`);
+  hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:userver')}`);
+  hostMap.set('ACE Direct', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acedirect')}`);
 
-  hostMap.set('Zendesk', `${getConfigVal('zendesk:protocol')}://${getConfigVal('zendesk:private_ip')}:${getConfigVal('zendesk:port')}/api/v2`);
+  hostMap.set('Zendesk', `${getConfigVal('zendesk:protocol')}://${getConfigVal('servers:zendesk_fqdn')}:${getConfigVal('app_ports:zendesk')}/api/v2`);
   hostMap.set('Agent Provider', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}`);
 
   checkConnection(hostMap, (data) => {
@@ -580,17 +585,17 @@ io.sockets.on('connection', (socket) => {
   //   const confobj = {
   //     host: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
   //     realm: getConfigVal(ASTERISK_SIP_PRIVATE_IP),
-  //     stun: `${getConfigVal('asterisk:sip:stun')}:${getConfigVal('asterisk:sip:stun_port')}`,
-  //     wsport: parseInt(getConfigVal('asterisk:sip:ws_port'), 10),
+  //     stun: `${getConfigVal('servers:stun_fqdn')}:${getConfigVal('app_ports:stun')}`,
+  //     wsport: parseInt(getConfigVal('app_ports:asterisk_ws'), 10),
   //     channel: getConfigVal('asterisk:sip:channel'),
-  //     websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('asterisk:sip:ws_port')}/ws`
+  //     websocket: `wss://${getConfigVal(ASTERISK_SIP_PRIVATE_IP)}:${getConfigVal('app_ports:asterisk_ws')}/ws`
   //   };
 
   //   socket.emit('sipconf', confobj);
 
   //   if (message === 'webuser') {
   //     const qobj = {
-  //       queues: getConfigVal('management_portal:queues')
+  //       queues: `${getConfigVal('asterisk:queues:general:name')},${getConfigVal('asterisk:queues:complaint:name')},${getConfigVal('asterisk:queues:videomail:name')}`
   //     };
   //     socket.emit('queueconf', qobj);
   //     logger.debug('Message is webuser type');
@@ -744,7 +749,7 @@ io.sockets.on('connection', (socket) => {
 
   // Socket for CDR table
   socket.on('cdrtable-get-data', (data) => {
-    let urlGetAllCdrRecs = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('acr_cdr:https_listen_port')}/getallcdrrecs`;
+    let urlGetAllCdrRecs = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acr-cdr')}/getallcdrrecs`;
     const { format } = data;
     if (data.start && data.end) {
       urlGetAllCdrRecs += `?start=${data.start}&end=${data.end}`;
@@ -1754,7 +1759,7 @@ function HandleManagerEvent(evt) {
 function InitAmi() {
   if (ami === null) {
     try {
-      ami = new AsteriskManager(parseInt(getConfigVal('asterisk:ami:port'), 10),
+      ami = new AsteriskManager(getConfigVal('app_ports:asterisk_ami').toString(),
         getConfigVal(ASTERISK_SIP_PRIVATE_IP),
         getConfigVal('asterisk:ami:id'),
         getConfigVal('asterisk:ami:passwd'), true);
@@ -1894,11 +1899,9 @@ app.use((err, req, res, next) => {
 });
 
 /**
- * Calls the RESTful service running on the provider host to verify the agent
- * username and password.
+ * Calls the RESTful service running on the provider host to verify the agent.
  *
  * @param {type} username Agent username
- * @param {type} password Agent password
  * @param {type} callback Returns retrieved JSON
  * @returns {undefined} Not used
  */

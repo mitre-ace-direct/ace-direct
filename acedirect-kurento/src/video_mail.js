@@ -29,7 +29,8 @@ class VideoMail extends Events {
   async init() {
     debug('Initializing video mail');
     try {
-      const kurento = await Kurento.getSingleton(param('kurento.url'));
+      const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento_fqdn')}:${param('app_ports.kurento')}${param('kurento.path')}`;
+      const kurento = await Kurento.getSingleton(kurentoUrl);
       this._pipeline = await kurento.create('MediaPipeline');
       await this._pipeline.setLatencyStats(true);
     } catch (error) {
@@ -102,8 +103,8 @@ class VideoMail extends Events {
 
   async _startRecording() {
     const dir = param('videomailss.directory');
-    const profile = param('videomailss.media_profile');
-    const ext = profile.toLowerCase();
+    const profile = "MP4_VIDEO_ONLY";
+    const ext = 'mp4';
     const filename = `${this._id}.${ext}`;
     
     this._recorder = new this._pipeline.create('RecorderEndpoint', {

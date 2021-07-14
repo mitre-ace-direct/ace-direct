@@ -10,7 +10,7 @@ const IceCandidate = Kurento.getComplexType('IceCandidate');
 const crypto = require('crypto');
 const util = require('./util');
 const RecMan = require('./rec_manager');
-var mysql = require('mysql2/promise');
+
 
 const PARTICIPANT_TYPE_WEBRTC = 'participant:webrtc';
 const PARTICIPANT_TYPE_RTP = 'participant:rtp';
@@ -25,41 +25,8 @@ const replaceMediaEl = async (el, oldEl, newEl) => {
 
 var kurento = null;
 
-const ASTERISK_QUEUE_EXT = param('asteriskss.ami.queue_extensions');
+const ASTERISK_QUEUE_EXT = [param('asterisk.queues.general.number'), param('asterisk.queues.complaint.number')]; // currently support two queues
 
-/**
- * Custom logic for mysql connection
- */
-
-var dbHost = param('database_servers.mysql.host');
-var dbUser = param('database_servers.mysql.user');
-var dbPassword = param('database_servers.mysql.password');
-var dbName = param('database_servers.mysql.ad_database_name');
-var dbPort = parseInt(param('database_servers.mysql.port'));
-console.log("Using host: " + dbHost);
-console.log("Using username: " + dbUser);
-console.log("Using name: " + dbName);
-console.log("Using port: " + dbPort);
-
-/**
- * Function to verify the config parameter name and
- * decode it from Base64 (if necessary).
- * @param {type} param_name of the config parameter
- * @returns {unresolved} Decoded readable string.
- */
-function getConfigVal(param_name) {
-  var val = nconf.get(param_name);
-  var decodedString = null;
-  if (typeof val !== 'undefined' && val !== null) {
-    //found value for param_name
-    decodedString = Buffer.alloc(val.length, val, 'base64');
-  } else {
-    //did not find value for param_name
-    console.log("Did not find config value " + param_name);
-    decodedString = "";
-  }
-  return (decodedString.toString());
-}
 
 class WebRTCMediaSession extends Events {
 
@@ -101,7 +68,8 @@ class WebRTCMediaSession extends Events {
 
       if (kurento == null) {
         debug('CREATING KURENTO');
-        kurento = await util.getKurentoClient(param('kurento.url'), 5000);
+        const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento_fqdn')}:${param('app_ports.kurento')}${param('kurento.path')}`;        
+        kurento = await util.getKurentoClient(kurentoUrl, 5000);
       }
 
       if (!kurento) throw new Error(`Can't create kurento client`);
@@ -166,12 +134,14 @@ class WebRTCMediaSession extends Events {
             const source = p.player || p.endpoint;
             const port = await this._composite.createHubPort();
             await source.connect(port);
-            if (p.session._isMonitoring) {
-              // only send the composite video to the monitoring agent
-              // nothing changes for the original participants
+            if (p.session) {
+              if (p.session._isMonitoring) {
+                // only send the composite video to the monitoring agent
+                // nothing changes for the original participants
 
-              p.port = port;
-              await port.connect(p.endpoint);
+                p.port = port;
+                await port.connect(p.endpoint);
+              }
             }
           } else {
             // normal multiparty call. send the composite to everyone
@@ -219,7 +189,12 @@ class WebRTCMediaSession extends Events {
     this._participants.forEach(p => {
       const { ext, type, onHold } = p;
       const isAgent = (type == "participant:webrtc") ? p.session._isAgent : false;
-      const isMonitor = (p.session._isMonitoring == true) ? true : false;
+      var isMonitor;
+      if (p.session) {
+        isMonitor = (p.session._isMonitoring == true) ? true : false;
+      } else {
+        isMonitor = false;
+      }
       simplePartList.push({ ext, type, onHold, isAgent, isMonitor });
     });
     this._participants.forEach(p => {
@@ -473,8 +448,8 @@ class WebRTCMediaSession extends Events {
 
   patchOffer(offer) {
     const sdpObj = transform.parse(offer);
-    sdpObj.origin.address = param('asteriskss.ip');
-    sdpObj.connection.ip = param('asteriskss.ip');
+    sdpObj.origin.address = param('servers.asterisk_private_ip');
+    sdpObj.connection.ip = param('servers.asterisk_private_ip');
 
     sdpObj.media.forEach(media => {
       const validPayloads = new Set(
@@ -530,25 +505,29 @@ class WebRTCMediaSession extends Events {
 
   async toggleRecording(ext, record) {
     var participant = this._participants.get(ext);
-    //Moved out of if since we need this globally
     var fileName;
-    if (record && participant.recorder) return true; // Already recording
-    if (!record && !participant.recorder) return true; // Already not recording
+    if (record && participant.isRecording) return true; // Already recording
+    if (!record && !participant.isRecording) return true; // Already not recording
     try {
       if (record) {
         debug(`${ext} Start recording`);
         const date = this.getTimestampString();
-        const profile = param('kurento.recording_media_profile');
-        fileName = `rec_${ext}_${date}.${profile.toLowerCase()}`;
-        //const filePath = `file:///tmp/${fileName}`;
-        const filePath = `file://home/ubuntu/kms-share/media/recordings/${fileName}`;
+        fileName = `rec_${ext}_${date}.mp4`;
+        const mediaPath = param('kurento.mediapath');
+        const filePath = `file:/${mediaPath}/recordings/${fileName}`;
         debug(`${ext} recording to  ${filePath}`);
 
         const recorder = await this._pipeline.create('RecorderEndpoint', {
 	        uri: filePath,
-          mediaProfile: profile
+          mediaProfile: "MP4_VIDEO_ONLY" // required to be able to record VRS calls that are muted
         });
-        await participant.endpoint.connect(recorder);
+        if(this.isMultiparty && (!this._hasMonitor || participant.session._isMonitoring)){
+	        let comp = await this._composite.createHubPort();
+          await comp.connect(recorder);
+        }else{
+          let otherPeer = this.oneToOnePeer(ext);
+          await otherPeer.endpoint.connect(recorder);
+        }
 
         let timeoutRecording;
         recorder.on('UriEndpointStateChanged', evt => {
@@ -567,14 +546,14 @@ class WebRTCMediaSession extends Events {
           }
         });
         await recorder.record();
-        participant.recorder = recorder;
+        participant.isRecording = true;
+	      participant.recorder = recorder;
         participant.recorderFile = fileName;
-        
       } else {
         var otherCallers = "";
         var fileName = participant.recorderFile;
         for (const p of this._participants.values()) {
-          if(p.ext != ext){
+          if(p.ext != ext && !p.session._isMonitoring){
             otherCallers += p.ext + ",";
           }
         }
@@ -583,38 +562,18 @@ class WebRTCMediaSession extends Events {
         }
         var agentNumber = ext;
 
-        const date = this.getTimestampString();
-        const profile = param('kurento.recording_media_profile');
-
-        const dbConnection = await mysql.createConnection({
-          host: dbHost,
-          user: dbUser,
-          password: dbPassword,
-          database: dbName,
-          port: dbPort
-        });
-
         await participant.recorder.stopAndWait();
 
         await participant.recorder.release();
+       
 
-        await RecMan.createRecording(fileName, ext, this._id);
-
-        let sqlQuery = 'INSERT INTO call_recordings (fileName, agentNumber, participants, timestamp, status) VALUES (?,?,?,NOW(),?);';
-        let params = [fileName, agentNumber, otherCallers, 'UNREAD'];
-        console.log("QUERY is " + sqlQuery);
-
-        //var [rows,fields] = await dbConnection.execute(sqlQuery, params);
-        await dbConnection.execute(sqlQuery, params);
-
-        await dbConnection.end();
+        await RecMan.createRecording(fileName, ext, this._id, agentNumber, otherCallers);
 
         
-
+        participant.isRecording = false;
         participant.recorder = null;
         debug(`${ext} Stopped recording`);
       }
-      //return true; //??? Eric check this
     } catch (ex) {
       debug(`${ext} Recording error: ${ex.message}`);
     }

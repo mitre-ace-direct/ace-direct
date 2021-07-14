@@ -36,9 +36,9 @@ class WebServer extends Events {
     app.use('/videomail', videomail);
 
     const server = https.createServer({
-      key: await readFile(param('webserver.key')),
-      cert: await readFile(param('webserver.cert')),
-      ca: await readFile(param('webserver.csr'))
+      key: await readFile(param('common.https.private_key')),
+      cert: await readFile(param('common.https.certificate')),
+      ca: await readFile(param('common.https.csr'))
     }, app);
 
     const wss = new ws.Server({
@@ -53,8 +53,8 @@ class WebServer extends Events {
       });
     });
 
-    server.listen(param('webserver.port'), () => {
-      debug('Listening on port %s', param('webserver.port'));
+    server.listen(param('app_ports.sswebserver'), () => {
+      debug('Listening on port %s', param('app_ports.sswebserver'));
     })
   }
 

@@ -13,6 +13,7 @@ The installation, configuration, and deployment procedures in this document are 
 1. Read the overall ACE Direct installation process in [INSTALLATION.md](../docs/installation/INSTALLATION.md).
 1. The instructions below frequently refer to the OpenAM **base name**. This value is used throughout, in files and commands. For these instructions, the default OpenAM base name is `ace`. If you decide to change this base name value, make sure you make the appropriate changes to the files and commands.
 1. OpenAM installs on a single server, for example, `aceopenam.domain.com`.
+1. The NGINX server FQDN is `portal.domain.com`.
 1. The OpenAM server is _Amazon Linux 2_. Other Linux versions may work, with or without slight modifications to the scripts and instructions.
 1. Install OpenAM as `root` in the `/root` folder.
 1. OpenAM operates behind NGINX. See [nginx/README.md](../nginx/README.md).
@@ -48,6 +49,26 @@ The installation, configuration, and deployment procedures in this document are 
   $
   ```
 
+### Installation Script
+
+To install OpenAM using default values run the installation `install_openam.sh` script. You may execute the script multiple times if needed. Here is a sample run:
+
+```bash
+$  cd /root/iam
+$
+$  ./install_openam.sh  ace  aceopenam.domain.com  portal.domain.com  7.0.108  # last param is tomcat version
+$
+```
+
+Where...
+
+* `ace` is the OpenAM base name
+* `aceopenam.domain.com` is the FQDN of the OpenAM server
+* `portal.domain.com` is the FQDN of the NGINX server
+* `7.0.108` is the desired Tomcat version
+
+_To customize your OpenAM installation, follow the manual instructions below._
+
 ### Software tools
 
 Install these _required_ software tools if they are not present:
@@ -72,7 +93,7 @@ OpenAM requires a few environment variables:
 * **JRE_HOME** - This is the base Java folder
 * **JAVA_OPTS** - These are Java options
 
-Set the environment variables in `/root/.bashrc` , for example:
+Set the environment variables in `/root/.bashrc` or `/root/.bash_profile` (whichever one is relevant) , for example:
 
 ```bash
 OPENAM_BASE_NAME=ace
@@ -95,8 +116,8 @@ Here are the OpenAM configuration files:
 
 In `/root/iam/config/config.json`:
 
-* Set the `common:java` variable to your base Java folder.
-* You may optionally change the  `common:tomcat` version.
+* Set the `common:java` variable to your base Java folder. Execute `echo $(dirname $(dirname $(readlink -f $(which javac))))` and copy just the lowest level folder name. It will look something like `java-1.8.0-openjdk-1.8.0.292.b10-1.el7_9.x86_64`.
+* You may optionally change the  `common:tomcat` version; the version in the `config.json` file may be outdated.
 
 ### Apache Tomcat configuration
 
@@ -250,9 +271,9 @@ Where...
 1. Field descriptions and default values:
 
    * `port`: desired **SSL PORT** for OpenAM. The default is port `8443`.
-   * `keystoreFile`: path where Tomcat will look for the jks keystore. This must match the `apache:keystore_dest_path` value in `/root/iam/config/config.json`.
+   * `keystoreFile`: path where tomcat will look for the jks keystore. This must match the `apache:keystore_dest_path` value in `/root/iam/config/config.json`.
    * `keystorePass`: password associated with your generated keystore; This must match the `apache:dest_keystore_pass` value in `/root/iam/config/config.json`.
-   * `keyAlias`: name associated with the Tomcat entry within the keystore; This must match the  `apache:alias` value in `/root/iam/config/config.json`
+   * `keyAlias`: name associated with the tomcat entry within the keystore; This must match the  `apache:alias` value in `/root/iam/config/config.json`
 
 ### Tomcat service configuration
 
@@ -288,19 +309,19 @@ Where...
 1. Update the following values:
 
    * `SERVER_URL`: **You must update this value.** Use the OpenAM **FQDN** and **SSL Port Number** that you chose for this installation, for example: `https://aceopenam.domain.com:8443`. The port number must match SSL port number in `server.xml`.
-   * `COOKIE_DOMAIN`: *You must update this value* with everything but the first part of the OpenAM FQDN, for example, `.domain.com`
-   * `DEPLOYMENT_URI`: Use the OpenAM base name here: `/ace`
-   * `BASE_DIR`: The OpenAM base name must be at the end: `/opt/tomcat/webapps/ace`
-   * `ADMIN_PWD`: 8 characters minimum.
-   * `AMLDAPUSERPASSWRD`: 8 characters minimum.
-   * `DIRECTORY_SERVER`: **You must update this vaue.** OpenAM FQDN, for example, `aceopenam.domain.com`
+   * `DEPLOYMENT_URI`: **You must update this value if you customized the base name**. Use your OpenAM base name here: `/ace`
+   * `BASE_DIR`: **You must update this value if you customized the base name**. Your OpenAM base name must be at the end: `/opt/tomcat/webapps/ace`
+   * `ADMIN_PWD`: 8 characters minimum. This is the OpenAM Admin password.
+   * `AMLDAPUSERPASSWRD`: 8 characters minimum. This is the default policy agent password.
+   * `COOKIE_DOMAIN`: **You must update this value**. Remove the first level of your OpenAM FQDN and use the remaining part, for example, `.domain.com`
+   * `DIRECTORY_SERVER`: **You must update this vaue.** Use your OpenAM FQDN, for example, `aceopenam.domain.com`.
    * `DS_DIRMGRPASSWD`: 8 characters minimum and should NOT be the same as ADMIN_PWD or AMLDAPUSERPASSWRD.
 
 ---
 
 ## Automated installation
 
-With the above configuration complete, you may now begin the installation process. This *automated installation* installs and configures Tomcat and OpenAM into `/opt/tomcat`. Several Python scripts automate the installation process.
+With the above configuration complete, you may now begin the installation process. This *automated installation* installs and configures tomcat and OpenAM into `/opt/tomcat`. Several Python scripts automate the installation process.
 
 ### Assumptions
 
@@ -393,7 +414,7 @@ With OpenAM/Tomcat up and running, set up the OpenAM admin tools:
     $ # then execute the create_users.py script again
     ```
 
-1. Security enhancement (optional) - restrict GOTO URLs in OpenAM. This prevents a URL redirect to a different web page. Assuming the public FQDN of the NGINX server is `portal.domain.com`:
+1. Secure GOTO redirects - restrict GOTO URLs in OpenAM. This prevents a URL redirect to a different web page. It also facilitates environments that do _not_ have the Success URL configured. Assuming the public FQDN of the NGINX server is `portal.domain.com`, execute the following:
 
     ```bash
     $  cd /root/iam/config/oam/SSOAdminTools-13.0.0/ace/bin
@@ -441,7 +462,7 @@ With OpenAM/Tomcat up and running, set up the OpenAM admin tools:
 
 1. **This step requires that your NGINX server is running and providing the route to OpenAM.** Configure success login URLs - each user (e.g. `dagent1`, `dagent2`, ... , `manager`, ...) should have a designated URL to go to upon successful login. This sets up the URL that agents and managers navigate to upon successful login:
 
-    * From a web browser, log into OpenAM admin: [https://portal.domain.com/ace/XUI/](https://portal.domain.com/ace/XUI/)
+    * From a web browser, log into OpenAM as an admin (see the `oam.adminid` value and `oam.admin_pwd_file` in `/root/iam/config/config.json` for the admin user and password): [https://portal.domain.com/ace/XUI/](https://portal.domain.com/ace/XUI/)
     * Click _Top Level Realm_.
     * Click _Subjects_.
     * Click an agent _User_ (e.g., `dagent1`, `dagent2`).
@@ -661,7 +682,7 @@ This error is a result of the OpenAM configuration tool attempting to create an 
 
 #### Solution 2
 
-After you install Tomcat but before you run the OpenAM configuration tool, make sure you change ownership of `/opt/tomcat` to the tomcat user. `sudo chown tomcat /opt/tomcat/`
+After you install tomcat but before you run the OpenAM configuration tool, make sure you change ownership of `/opt/tomcat` to the tomcat user. `sudo chown tomcat /opt/tomcat/`
 
 ---
 
@@ -725,21 +746,17 @@ Running the `oam_installer.py` script results in an error that says:
 
 #### Solution 7
 
-##### Previous OpenAM exists
+There are two possible solutions.
 
-This error could be caused if OpenAM was previously installed. Look in the home folder of a user that installed OpenAM previously. If you find a directory named `.openamcfg`, delete it and its contents. Then follow the [Reinstall OpenAM](#reinstall-openam) instructions above. Also see the installation log file `/opt/tomcat/webapps/ace/install.log` and the tomcat log files in  `/opt/tomcat/logs` for errors.
+##### Previous OpenAM or tomcat exists
 
-Also verify that all fields in `/root/iam/config/tomcat/server.xml` are correct. An incorrect field here can cause a `500` error.
+This error could be caused if OpenAM was previously installed. To resolve this issue:
 
-##### A tomcat users already exists
+1. Look in the home folder of a user that installed OpenAM previously. If you find a directory named `.openamcfg`, delete it and its contents.
+1. Verify that all fields in `/root/iam/config/tomcat/server.xml` are correct. An incorrect field here can cause a `500` error.
+1. Follow the [Reinstall OpenAM](#reinstall-openam) instructions above. This deletes tomcat and performs a fresh installation.
 
-Another cause of this error is existence of a `tomcat` user from a previous installation.  See the installation log file `/opt/tomcat/webapps/ace/install.log` and the tomcat log files in  `/opt/tomcat/logs` for errors. Delete that `tomcat` user and the `tomcat` folder and try again:
-
-```bash
-$  userdel -r tomcat
-$
-$  rm -rf /opt/tomcat
-```
+Also see the installation log file `/opt/tomcat/webapps/ace/install.log` and the tomcat log files in  `/opt/tomcat/logs` for errors.
 
 ##### Low disk space
 
@@ -749,7 +766,11 @@ Low disk space will prevent OpenAM from deploying. Make sure the disk has suffic
 
 #### Problem 8
 
-General debugging tip - run `tail -f /opt/tomcat/logs/catalina.out`, this will provide information about Tomcat errors.
+General tomcat errors are occuring.
+
+#### Solution 8
+
+General debugging tip - run `tail -f /opt/tomcat/logs/catalina.out`, this will provide information about tomcat errors while it is executing.
 
 ---
 
@@ -806,15 +827,15 @@ OpenAM is already installed and running, but it is necessary to change the OpenA
 
 Change the OpenAM password:
 
-* Assuming the new password is `password2`, admin username is `amadmin`, and the current password is in the `pwd.txt` file...
+* Assuming the new password is `password9`, admin username is `amadmin`, and the current password is in the `pwd.txt` file...
 
     ```bash
     $  # log into OpenAM server as root
     $  cd /root/iam/config/oam/SSOAdminTools-13.0.0/ace/bin
-    $  ./ssoadm set-identity-attrs -t User -e / -i amAdmin -u amadmin -f pwd.txt -a userpassword=password2
+    $  ./ssoadm set-identity-attrs -t User -e / -i amAdmin -u amadmin -f pwd.txt -a userpassword=password9
     $
     $  chmod 755 pwd.txt
-    $  echo password2 > pwd.txt
+    $  echo password9 > pwd.txt
     $  chmod 400 pwd.txt
     $
     $  # test out new password
@@ -828,7 +849,8 @@ Change the OpenAM password:
 ```bash
 "openam": {
     ...
-    "password": "password2
+    "password": "password9"
+    ...
 ```
 
 ---
@@ -843,7 +865,7 @@ Configure the successful login URLs for agents and managers. See the _Configure 
 
 ---
 
-#### Problem 14
+#### Problem 13
 
 During OpenAM configuration, executing `ssoadm` causes the following error:
 
@@ -854,13 +876,13 @@ Logging configuration class "com.sun.identity.log.s1is.LogConfigReader" failed
 com.sun.identity.security.AMSecurityPropertiesException: AdminTokenAction: FATAL ERROR: Cannot obtain Application SSO token.
 ```
 
-#### Solution 14
+#### Solution 13
 
-Resolution: it is likely that the certificates in `/root/iam/ssl/` are expired or invalid. Make sure `cert.pem` and `key.pem` are valid, not expired, and have appropriate permissions.
+Resolution: it is likely that the certificates in `/root/iam/ssl/` are expired or invalid. Make sure `cert.pem` and `key.pem` are valid, not expired, and have appropriate permissions. See Solution 10 for the resolution.
 
 ---
 
-#### Problem 15
+#### Problem 14
 
 During OpenAM configuration, executing `ssoadm` causes the following error:
 
@@ -896,13 +918,13 @@ Caused by: java.lang.IllegalStateException: CachedConnectionPool is already clos
 #
 ```
 
-#### Solution 15
+#### Solution 14
 
 Resolution: you probably issued the command too soon. The server was not ready. Wait `30` seconds and execute the command again.
 
 ---
 
-#### Problem 16
+#### Problem 15
 
 Running the `ssoadm` tool causes Java exceptions...
 
@@ -922,7 +944,7 @@ Caused by: java.lang.IllegalStateException: CachedConnectionPool is already clos
 ...
 ```
 
-#### Solution 16
+#### Solution 15
 
 The `ssoadm` tool/server may not be ready. Wait a minute or two, then try it again.
 
@@ -930,7 +952,7 @@ The `ssoadm` tool/server may not be ready. Wait a minute or two, then try it aga
 
 ---
 
-#### Problem 17
+#### Problem 16
 
 When navigating to NGINX to reach the OpenAM server, the following error is seen in the browser:
 
@@ -944,27 +966,27 @@ If you are the system administrator of this resource then you should check the e
 Faithfully yours, nginx.
 ```
 
-#### Solution 17
+#### Solution 16
 
 Make sure nginx has the correct FQDN and PORT NUMBER for the OpenAM server. Make sure nginx server can ping the private IP address of the OpenAM server. Make sure the nginx server's /etc/hosts file has an entry for the private IP address of the OpenAM server.
 
 ---
 
-#### Problem 18
+#### Problem 17
 
 Access error when accessing OpenAM or ACE Direct through the browser. You may see a double URL in the address bar.
 
-#### Solution 18
+#### Solution 17
 
 Make sure a firewall is not blocking incoming access to the OpenAM port (e.g., `8443`). For example, disable `firewalld` on the OpenAM server or add a rule to allow incoming connections to port `8443`.
 
 ---
 
-#### Problem 19
+#### Problem 18
 
 OpenAM won't start. Agent cannot reach portal (no access, double url in address bar). Java version was updated on OpenAM server.
 
-#### Solution 19
+#### Solution 18
 
 When the Java version is updated on the OpenAM server, follow these steps to configure your existing OpenAM installation to use the new Java version:
 
@@ -975,15 +997,27 @@ When the Java version is updated on the OpenAM server, follow these steps to con
 
 ---
 
-#### Problem 20
+#### Problem 19
 
 How can I add additional agents to OpenAM?
 
-#### Solution 20
+#### Solution 19
 
 1. Add the agents to `/root/iam/config/config.json`
 1. `cd /root/iam/scripts`
 1. `python create_users.py`
+
+---
+
+#### Problem 20
+
+When accessing links in the OpenAM admin web page, the following error occurs: `414 Request-URI Too Large`
+
+#### Solution 20
+
+1. Go to the NGINX server.
+1. Edit `/etc/nginx/nginx.conf`
+1. Update this variable and value to be: `large_client_header_buffers 4 32k;`
 
 ---
 
