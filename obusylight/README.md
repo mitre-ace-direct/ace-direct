@@ -144,6 +144,7 @@ $  mvn -version
 * Open this folder: File > Open... > obusylight
 * Terminal > New Terminal
 * From the Terminal, go to this folder: `cd obusylight`
+* Source the environment: `source ~/.bash_profile`
 * Run the project: `mvn clean javafx:run`
 * Build the executable JAR: `mvn clean install assembly:single package`
 
@@ -155,8 +156,9 @@ $
 $  ./run.sh
 $
 $ # Or...
-$  mvn clean javafx:run  # or run it this way
-$  mvn clean install assembly:single package  # build jar file
+$  source ~/.bash_profile
+$  mvn clean javafx:run  # run it this way
+$  mvn clean install assembly:single package  # build the executable jar
 ```
 
 ### Eclipse
@@ -173,6 +175,7 @@ $  mvn clean install assembly:single package  # build jar file
 ```bash
 $  cd obusylight
 $
+$  source ~/.bash_profile  # ensure environment vars
 $  java --module-path ${OPENFX_SDK}/lib --add-modules=javafx.controls -jar target/obusylight-1.0-jar-with-dependencies.jar
 ```
 

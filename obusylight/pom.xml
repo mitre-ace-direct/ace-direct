@@ -37,14 +37,14 @@
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
-      <version>1</version>
+      <version>20070829</version>
     </dependency>
 
     <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javax.ws.rs-api-jar</artifactId>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>javax.ws.rs-api</artifactId>
       <version>2.0.1</version>
-    </dependency>    
+    </dependency> 
 
   </dependencies>
 

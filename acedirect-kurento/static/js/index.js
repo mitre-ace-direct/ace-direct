@@ -256,7 +256,6 @@ window.onload = function() {
     var ext = q.get('ext');
     if(ext) {
       document.getElementById('ext').value = ext;
-      document.getElementById('password').value = ext.length === 4 ? ext : '1qaz1qaz';
     }
     var peer = q.get('peer');
     if (peer) {
