@@ -1,7 +1,7 @@
 {
     "common": {
         "java": "java-1.8.0-openjdk-devel.x86_64",
-        "tomcat" : "7.0.105"
+        "tomcat" : "7.0.108"
     },
     "apache": {
         "cert_path": "../ssl/cert.pem",

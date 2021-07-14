@@ -29,6 +29,8 @@ var videomail_status_buttons = document.getElementById("videomail-status-buttons
 var record_status_buttons = document.getElementById("record-status-buttons-footer");
 var sortFlag = "id desc";
 var filter = "ALL";
+var recordSortFlag = "timestamp desc";
+var recordFilter = "ALL";
 var telNumber;
 var playingVideomail = false;
 var acekurento;
@@ -189,22 +191,9 @@ function connect_socket() {
 
 					//get the payload from the token
 					var payload = jwt_decode(data.token);
-                                        if (!payload.signalingServerProto) {
-                                           payload.signalingServerProto = 'wss';
-                                        }
-				        var signaling_url  = payload.signalingServerProto + '://' + payload.signalingServerPublic + ':' + payload.signalingServerPort + '/signaling';
-
-                                        //see if we should override with a full NGINX route (development only)
-                                        var dev_url = payload.signalingServerDevUrl;
-                                        dev_url = dev_url.trim();
-                                        if(dev_url !== null && dev_url !== '') {
-                                          console.log('Using signaling server: ' + dev_url);
-                                          signaling_url = dev_url;
-                                        }
-
-					console.log('signaling_url: ' + signaling_url);
-
-				        acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url  });
+					var signaling_url = payload.signalingServerUrl;
+					signaling_url = signaling_url.trim();
+				    acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url  });
 
 					acekurento.remoteStream = document.getElementById('remoteView');
 					acekurento.selfStream = document.getElementById('selfView');
@@ -218,15 +207,10 @@ function connect_socket() {
 					$('#agentname-header').html(payload.first_name + " " + payload.last_name);
 					$('#agentname-headerdropdown').html(payload.first_name + " " + payload.last_name);
 					$('#agentrole-headerdropdown').html("<small>" + payload.role + "</small>");
-					$('#my_sip_uri').attr("name", "sip:" + payload.extension + "@" + payload.asteriskPublicHostname);
-					$('#signaling_server_public').attr("name", payload.signalingServerPublic);
-					$('#signaling_server_port').attr("name", payload.signalingServerPort);
 					$('#sip_password').attr("name", payload.extensionPassword);
 					$("#pc_config").attr("name", "stun:" + payload.stunServer);
 					$("#complaints-queue-num").text(payload.complaint_queue_count);
 					$("#general-queue-num").text(payload.general_queue_count);
-					signalingServerPublic = document.getElementById("signaling_server_public");
-					signalingServerPort = document.getElementById("signaling_server_port");
 
 					if (payload.queue_name === "ComplaintsQueue" || payload.queue2_name === "ComplaintsQueue") {
 						$('#sidebar-complaints').show();
@@ -266,8 +250,18 @@ function connect_socket() {
 						});
 					}, 5000);
 					socket.emit('get-recordings', {
-						"extension": extensionMe
-					})
+						"extension": extensionMe,
+						"sortBy": "timestamp desc",
+						"filter": "ALL"
+					});
+					setInterval(function () {
+						console.log("Interval recording sort");
+						socket.emit('get-recordings', {
+							"extension": extensionMe,
+							"sortBy": recordSortFlag,
+							"filter": recordFilter
+						});
+					}, 5000)
 					toggle_videomail_buttons(false);
 					toggle_recording_buttons(false);
 					console.log('Sent a get-videomail event');
@@ -670,8 +664,12 @@ function connect_socket() {
 					updateVideomailNotification(data);
 				}).on('got-call-recordings', function (data) {
 					updateCallRecordingTable(data);
+				}).on('got-call-recordings-by-number', function (data) {
+					updateCallRecordingTable(data);
 				}).on('changed-status', function () {
 					getVideomailRecs();
+				}).on('record-changed-status', function (data) {
+					getRecordingVideos();
 				}).on('videomail-retrieval-error', function (data) {
 					$('#videomailErrorBody').html('Unable to locate videomail with ID ' + data + '.');
 					$('#videomailErrorModal').modal('show');
@@ -993,8 +991,10 @@ function connect_socket() {
 					showTransferModal = true;
 					if (isColdTransfer) {
 						//we terminate the call for the original agent
-						terminate_call();
-						socket.emit('call-ended', {'agentExt': extensionMe}); //stop allowing file share between consumer and original agent
+						setTimeout(() => {
+							terminate_call();
+							socket.emit('call-ended', {'agentExt': extensionMe}); //stop allowing file share between consumer and original agent
+						}, 1200);
 					} else {
 						console.log('warm transfer success!')
 					}
@@ -1918,7 +1918,7 @@ function updateVideomailTable(data) {
 
 function updateCallRecordingTable(data){
 	$("#callRecordingTbody").html("");
-	console.log("GOT RECORDING DATA " + JSON.stringify(data));
+	//console.log("GOT RECORDING DATA " + JSON.stringify(data));
 	var table;
 	var row;
 
@@ -1930,9 +1930,9 @@ function updateCallRecordingTable(data){
 	for (var i = 0; i < data.length; i++) {
 		var recordFilename = data[i].fileName;
 		var recordConsumer = data[i].participants;
-		var recordTimestamp = data[i].timestamp;
-		var recordLength = 0; //Need logic from s# here
-		var recordStatus = "UNREAD";
+		var recordTimestamp = data[i].timeStamp;
+		var recordLength = data[i].duration;
+		var recordStatus = data[i].status;
 		table = document.getElementById("callRecordingTbody");
 		row = table.insertRow(table.length);
 		fileNameCell = row.insertCell(0);
@@ -1954,6 +1954,8 @@ $('#callRecordingTbody').on('click', 'tr', function () {
 	var tableData = $(this).children("td").map(function () {
 		return $(this).text();
 	}).get();
+	
+	$("#recordId").attr("name", tableData[0]);
 
 	if(agentStatus != 'IN_CALL'){
 		playCallRecording(tableData[0]);
@@ -1992,6 +1994,7 @@ function playCallRecording(filename){
 
 //Socket emit for changing status of a videomail
 function recording_status_change(fileName, recordStatus) {
+	console.log("Changing status with " + fileName + " " + recordStatus);
 	socket.emit('recording-status-change', {
 		"fileName": fileName,
 		"status": recordStatus
@@ -2029,6 +2032,108 @@ function toggle_recording_buttons(make_visible) {
 	console.log("Toggling record buttons");
 	if (make_visible) record_status_buttons.style.display = "block";
 	else record_status_buttons.style.display = "none";
+}
+
+//Socket emit for deleting a videomail
+function recording_deleted(id) {
+	socket.emit('recording-deleted', {
+		"fileName": id,
+		"extension": extensionMe
+	});
+}
+
+//Recording Sorting
+//Sorting the videomail table
+$('#recording-filename').on('click', function () {
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort === "asc") {
+		recordSortFlag = "fileName asc";
+	} else if (sort === "desc") {
+		recordSortFlag = "fileName desc";
+	}
+	recordFilter = "";
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+});
+
+$('#recording-date').on('click', function () {
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort === "asc") {
+		recordSortFlag = "timestamp asc";
+	} else if (sort === "desc") {
+		recordSortFlag = "timestamp desc";
+	}
+	recordFilter = "";
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+});
+
+$('#recording-length').on('click', function () {
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort === "asc") {
+		recordSortFlag = "length asc";
+	} else if (sort === "desc") {
+		recordSortFlag = "length desc";
+	}
+	recordFilter = "";
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+});
+
+$('#recording-status').on('click', function () {
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort === "asc") {
+		recordSortFlag = "status asc";
+	} else if (sort === "desc") {
+		recordSortFlag = "status desc";
+	}
+	recordFilter = "";
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+});
+
+function ShowRecordFilterModal(){
+	$('#callRecordingNumberFilter').modal({
+		backdrop: 'static',
+		keyboard: false
+	});
+}
+
+function filterRecordNumber(){
+	var filterNumber = $('#RecordNumberInput').val();
+	$('#callRecordingNumberFilter').modal('hide');
+	var sort = sortButtonToggle($(this).children("i"));
+	if (sort === "asc") {
+		recordSortFlag = "status asc";
+	} else if (sort === "desc") {
+		recordSortFlag = "status desc";
+	}
+	recordFilter = "participants LIKE '%" + filterNumber + "%'";
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
+}
+
+function getRecordingVideos(){
+	socket.emit('get-recordings', {
+		"extension": extensionMe,
+		"sortBy": recordSortFlag,
+		"filter": recordFilter
+	});
 }
 
 /**

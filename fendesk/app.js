@@ -115,11 +115,11 @@ app.use(express.static(staticFilePath));
 
 app.use(bodyParser.json({ type: 'application/vnd/api+json' }));
 
-require('./routes/routes.js')(app, fs, ip, getConfigVal('zendesk:port'), logger);
+require('./routes/routes.js')(app, fs, ip, getConfigVal('app_ports:zendesk'), logger);
 
 const httpsServer = https.createServer(credentials, app);
-const appServer = httpsServer.listen(parseInt(getConfigVal('zendesk:port'), 10));
-logger.debug('HTTPS Fendesk server running on port=%s   (Ctrl+C to Quit)', parseInt(getConfigVal('zendesk:port'), 10));
+const appServer = httpsServer.listen(parseInt(getConfigVal('app_ports:zendesk'), 10));
+logger.debug('HTTPS Fendesk server running on port=%s   (Ctrl+C to Quit)', parseInt(getConfigVal('app_ports:zendesk'), 10));
 
 // Handle Ctrl-C (graceful shutdown)
 process.on('SIGINT', () => {
