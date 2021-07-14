@@ -14,7 +14,7 @@ This document describes how to install, configure, and deploy ACE Direct.
 * On `acenode.domain.com`, modify SE Linux: `sudo setsebool -P httpd_can_network_connect 1`. You will need to do this after any reboot.
 * The only public facing server is `portal.domain.com`. All other servers only have private IP addresses on the same subnet.
 * Add all server names and private IP addresses to `/etc/hosts` on all servers.
-* *Create A records*. Connect your IP addresses to host names with _A records_ ([link](https://www.godaddy.com/help/add-an-a-record-19238)).
+* *Create A records*. Connect your IP addresses to host names with _A records_ ([link](https://www.godaddy.com/help/add-an-a-record-19238)). Create _private A records_ for all servers. The NGINX server (`portal.domain.com`) also requires a _public A record_. Some other servers require _public A records_. See the installation instructions for those servers for more details.
 * *Update provider peering lists*. For video/softphones, contact providers to update their peering lists.
 * *Acquire website certificates*
   
@@ -23,7 +23,7 @@ This document describes how to install, configure, and deploy ACE Direct.
   * Place certificates in the expected folders on all the servers: `/etc/ssl/`. Certificates must have `644` permissions.
   * For new certificates, you may need to execute `restorecon`, for example: `restorecon -R -v cert.pem`
 
-* *Internet access*. An Internet connection is required to install and update the ACE Direct software. This allows the build processes to download external software and other dependencies.
+* *Internet access*. An Internet connection is required to install, build, and update the ACE Direct software. This allows the build processes to download external software and other dependencies.
 
 ---
 
@@ -63,7 +63,7 @@ There are several components to install on `acesip.domain.com`:
 
 * Clone the `asterisk` repo, and follow the installation instructions. Additionally:
 
-  * Acquire an Asterisk certificate and copy it to `/etc/ssl/asterisk.csr` to enable the signaling server demo/test page. Then update the `common.https.csr` variable in `dat/config.json` to be `/etc/ssl/asterisk.csr`. Finally, execute: `sudo chmod 644 ~/ace-direct/dat/asterisk.csr`  . Note that the demo/test page is for development only. It is disabled in `dat/config.json` by default.
+  * Acquire an Asterisk certificate and copy it to `/etc/ssl/asterisk.csr` to enable the signaling server demo/test page. Then update the `common.https.csr` variable in `dat/config.json` to be `/etc/ssl/asterisk.csr`. Finally, execute: `sudo chmod 644 ~/ace-direct/dat/asterisk.csr`  . Note that the demo/test page is for development only. It is disabled by default.
 
 * Clone the `acequill-service` repo and follow the instructions to enable captioning and language translation.
 
@@ -368,14 +368,14 @@ The ACE Direct application servers are Node.js servers.
     $  cd ~/ace-direct
     $
     $  pm2 start all  # start ACE Direct
-    $  npm run status
+    $  npm run status  # self-test
     ```
 
 ---
 
 ## Busylight
 
-The BusyLight is an optional visual ring indicator that you can install on the Agent laptop.
+The BusyLight is an optional visual ring indicator that you can install on the _Agent laptop_.
 
 See the [./obusylight/README.md](./obusylight/README.md) for instructions on how to install the BusyLight server and device on the Agent laptop.
 
@@ -385,11 +385,11 @@ See the [./obusylight/README.md](./obusylight/README.md) for instructions on how
 
 ## Accessing the websites
 
-The URLs depend on your `~/ace-direct/dat/config.json` settings.
+The URLs depend on your `~/ace-direct/dat/config.json` settings, specifically `nginx:ad_path`, `nginx:mp_path`, `nginx:agent_route`, and `nginx:consumer_route`.
 
-Use the usernames and passwords from the `aceopenam` installation to log into the Agent and Management portals.
+Refer to the usernames and passwords from the `aceopenam` installation to log into the Agent and Management portals.
 
-Default Consumer portal numbers are `111-111-1111`, `222-222-2222`, ... `999-999-9999`.
+Default Consumer portal numbers are `111-111-1111`, `222-222-2222`, ... `999-999-9999`. However, if ITRS mode is enabled ('user_service:itrs_mode'), you will need a valid VRS phone number.
 
 The default ACE Direct URLs are:
 
@@ -422,18 +422,26 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 
   * To restart the application servers: `pm2 restart all`
 
+* Perform an ACE Direct self-test:
+
+  ```bash
+  $  cd ~/ace-direct
+  $
+  $  npm run status  # should have all green checkmarks
+  ```
+
 * Set the `common:debug_level` parameter in `/home/acedirect/ace-direct/dat/config.json` to `ALL` to see all messages in the application server log files.
 * Check the `logs` folder in each application folder for errors or warnings: `~/ace-direct/*/logs/*.log`
 * Verify that all back end servers (e.g., OpenAM, Redis, MongoDB, NGINX, MySQL, Asterisk, SIP Proxy, ...) are running.
 * Verify that there are _no firewalls_ blocking internal ports (e.g., `firewalld` on OpenAM would block access to port `8443`).
 * Does the BusyLight device respond? Try the self-test mode on the BusyLight server app.
 * Verify that the `/etc/hosts` file is configured correctly.
-* Verify that the `/etc/nginx/nginx.conf` file is configured correctly.
-* Verify that `~/ace-direct/dat/config.json` is configured correctly.
+* Verify that the NGINX `/etc/nginx/nginx.conf` file is configured correctly.
+* Verify that the global `~/ace-direct/dat/config.json` file is configured correctly.
 * Management Portal installation - for any `lodash` errors, try installing the `lodash` library globally as root: `sudo npm install lodash -g`.
 * NGINX cannot proxy to the NODE server - when using FQDNs for ACEDirect in `/etc/nginx/nginx.conf`, the FQDNs may force traffic through a proxy. To resolve this, map the FQDN to the private IP instead, using a private host zone. *Or*, simply use private IP addresses in place of FQDNs in `/etc/nginx/nginx.conf` for the ACEDirect, ManagementPortal, and ace (OpenAM) paths.
 * No CDR records in the Management Portal - Make sure Asterisk (`acesip.domain.com`) is configured to have the MySQL database credentials, CDR database name, and CDR table name (see `~/ace-direct/dat/config.json` for database credentials). Also make sure that the _ODBC C_ library is installed on `acesip.domain.com`; this library is normally installed by the automated installation script.
-* Consumer portal cannot reach Asterisk (`acesip.domain.com`); ERR_CONNECTION_REFUSED - make sure Asterisk is configured to use valid certificates.
+* Consumer portal cannot reach Asterisk (`acesip.domain.com`); `ERR_CONNECTION_REFUSED` - make sure Asterisk is configured to use valid certificates.
 * Cannot connect to portals - possibly remap the elastic IPs or try running `nslookup` on the NGINX FQDN and verify its public FQDN and public IP.
 * NGINX errors when trying to connect to portals, but all servers are up and running - make sure all servers have the **correct time, synced with each other**.
 * Rebooting servers - the reboot order is:
@@ -446,6 +454,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   * `portal` - NGINX
   * `acekms` - media server
   * `acenode` - Node.js
+
     * Set SE Linux variable: `sudo setsebool -P httpd_can_network_connect 1`
     * Start Redis: `sudo service redis start`
     * Start MongoDB
