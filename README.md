@@ -119,6 +119,7 @@ $  ./install_node.sh  # see the usage, then execute it with the correct paramete
 
       ```bash
       $  cd /home/ec2-user  # go to the ACE Direct user home folder
+      $  sudo rm -rf .nvm >/dev/null 2>&1
       $  mkdir -p .nvm
       $
       $  # install NVM
@@ -166,6 +167,7 @@ Install and configure _Redis_. For an overview, read [Redis Quick Start](https:/
     ```bash
     $  cd
     $
+    $  sudo rm -rf cd redis-stable >/dev/null 2>&1
     $  wget http://download.redis.io/redis-stable.tar.gz
     $  tar xvzf redis-stable.tar.gz
     $  cd redis-stable
@@ -178,6 +180,7 @@ Install and configure _Redis_. For an overview, read [Redis Quick Start](https:/
     $  sudo mkdir -p /var/lib/redis
     $  sudo mkdir -p /etc/redis
     $  sudo cp redis.conf /etc/redis/redis.conf  
+    $  sudo chmod 666 /etc/redis/redis.conf
     ```
 
 1. Configure Redis by editing `/etc/redis/redis.conf`. Enable and set the fields below, selecting your own value for the secret Redis password: `myRedisPassword`:
@@ -261,13 +264,16 @@ The instructions below describe how to install MySQL locally on `acenode.domain.
 1. Install MySQL Server Version `5.6.37` or a similar version and note the database root user and password:
 
     ```bash
-    $  wget http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-5.6.37-1.el7.x86_64.rpm-bundle.tar
+    $  sudo yum remove mysql mysql-server  > /dev/null 2>&1  # remove old version
     $
-    $  tar -xvf MySQL-5.6.37-1.el7.x86_64.rpm-bundle.tar
-    $  sudo yum -y install MySQL-client-5.6.37-1.el7.x86_64.rpm
-    $  sudo yum install MySQL-shared-compat-5.6.37-1.el7.x86_64.rpm
-    $  sudo yum install MySQL-server-5.6.37-1.el7.x86_64.rpm
-    $  rm MySQL*.rpm MySQL*.tar
+    $  sudo rm -rf /var/lib/mysql >/dev/null 2>&1
+    $  sudo rm -rf /etc/mysql >/dev/null 2>&1
+    $  sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
+    $  sudo yum update -y 
+    $  wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+    $  sudo yum localinstall mysql57-community-release-el7-11.noarch.rpm 
+    $  sudo yum install mysql-community-server
+    $  sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
     ```
 
 1. Enable MySQL as a service and start it on reboot:
