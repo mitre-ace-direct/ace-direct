@@ -252,9 +252,8 @@ mysql -u root -p -h localhost < acedirectdefault_NEW.sql
 rm acedirectdefault_NEW.sql
 
 printf "\nDATABASES CREATED!\n\n"
-
 printf "Remember to edit dat/config.json and update the MySQL database user passwords and REDIS auth password.\n\n"
-
-printf "SEE THE ace-direct/README.md file to complete the installation for: Application servers"
+printf "\nFINAL STEPS...\n"
+printf "SEE THE ace-direct/README.md file to complete the installation. See this section: Application servers\n\n"
 
 printf "done.\n\n"
