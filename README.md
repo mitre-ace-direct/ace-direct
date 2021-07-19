@@ -91,19 +91,34 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 `acenode` hosts the Redis, MongoDB, MySQL, and application servers. Log into `acenode.domain.com` and follow the directions below.
 
-### Setup
+## Prerequisites for acenode
 
 1. An Internet connection is required during the build process.
+1. Log into the `acenode` server.
 1. Create/identify an ACE Direct user account, for example `/home/ec2-user`. Select the `bash` shell for the user. The user must have `sudo` capabilities.
 1. Make sure Git is installed: `git --version`, otherwise, install it: `sudo yum install git -y`
 1. Make sure `cc` is present: `which cc`, othwerise, install _Development Tools_: `sudo yum groupinstall "Development Tools"`
-1. Clone this `ace-direct` repo in the home folder of the ACE Direct user (`/home/ec2-user`).
+1. Copy/clone this `ace-direct` repo to the ACE Direct user home folder: `/home/ec2-user`.
+1. The ACE Direct home user, e.g., `/home/ec2-user`, must have `sudo` privileges.
+
+### Automated acenode Installation
+
+```bash
+$  cd /home/ec2-user/ace-direct
+$
+$  ./install_node.sh  # see the usage, then execute it with the correct parameters
+```
+
+### Manual acenode Installation
+
+#### Setup
+
 1. Install _Node.js_ locally:
 
     * Amazon Linux 2 example:
 
       ```bash
-      $  cd
+      $  cd /home/ec2-user  # go to the ACE Direct user home folder
       $  mkdir -p .nvm
       $
       $  # install NVM
@@ -141,7 +156,7 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
       $  npm config set script-shell bash
       ```
 
-### Redis
+#### Redis
 
 Install and configure _Redis_. For an overview, read [Redis Quick Start](https://redis.io/topics/quickstart). Follow these instructions to install Redis on `acenode.domain.com`:
 
@@ -158,11 +173,10 @@ Install and configure _Redis_. For an overview, read [Redis Quick Start](https:/
     $  sudo make install
     $  ls /usr/local/bin/redis-server /usr/local/bin/redis-cli  # both folders should exist
     $  sudo yum install -y tcl
-    $  
-    $  # LOG FILE for REDIS
+    $
+    $  sudo mkdir -p /var/lib/redis
+    $  sudo mkdir -p /etc/redis
     $  sudo cp redis.conf /etc/redis/redis.conf  
-    $  sudo mkdir /var/lib/redis
-    $  sudo mkdir /etc/redis
     ```
 
 1. Configure Redis by editing `/etc/redis/redis.conf`. Enable and set the fields below, selecting your own value for the secret Redis password: `myRedisPassword`:
@@ -208,7 +222,7 @@ Install and configure _Redis_. For an overview, read [Redis Quick Start](https:/
     $  sudo service redis stop
     ```
 
-### MongoDB
+#### MongoDB
 
 ACE Direct uses a _MongoDB_ database for call statistics. Follow the instructions below to install ACE Direct on `acenode.domain.com`.
 
@@ -237,7 +251,7 @@ ACE Direct uses a _MongoDB_ database for call statistics. Follow the instruction
 
 1. MongoDB uses port `27017` by default.
 
-### MySQL
+#### MySQL
 
 ACE Direct uses a MySQL database for application data. Install MySQL locally on `acenode.domain.com` _or_ deploy an Amazon AWS RDS service.
 
@@ -283,7 +297,7 @@ The instructions below describe how to install MySQL locally on `acenode.domain.
 1. MySQL uses port `3306` by default.
 1. The ACE Direct database users are: `acedirect`, `asterisk`, and `media_server`.
 
-### Application servers
+#### Application servers
 
 The ACE Direct application servers are Node.js servers.
 
