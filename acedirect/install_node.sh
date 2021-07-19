@@ -47,6 +47,7 @@ echo '' >> ~/.bash_profile
 printf "Installing Node...\n"
 cd ${ACE_DIRECT_HOME}
 source ~/.bash_profile
+rm -rf .n >/dev/null 2>&1
 mkdir .n
 npm install -g n
 n 12.18.2
