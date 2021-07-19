@@ -145,19 +145,100 @@ printf "Installing MySQL as a service...\n"
 sudo systemctl start mysqld.service  # if it fails: sudo systemctl daemon-reload
 sudo systemctl status mysqld.service  # check status
 sudo systemctl enable mysqld.service  # start at boot time
-  
-# NEXT: populate DB tables
 
+# get temporary MySQL root password
+TEMP_ROOT_PWD=`sudo grep 'temporary password' /var/log/mysqld.log | tail -1 | awk '{print $NF}'`
+printf "Securing MySQL...\n\n"
+printf "Your TEMPORARY ROOT PASSWORD IS: ${TEMP_ROOT_PWD}\n\n"
+printf "Log into MySQL with the TEMPORARY ROOT PASSWORD or the most current ROOT password.\n\n"
+printf "You will now set security options and reset the ROOT PASSWORD. PLEASE REMEMBER THE ROOT PASSWORD!\n\n"
+mysql_secure_installation
 
+printf "Creating databases...\n"
+# get the MySQL acedirect user password
+ADPASS1=""
+ADPASS2=""
+while true
+do
+  printf "\nEnter a password for the MySQL acedirect user.\n"
+  printf "\nThe password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n\n"
+  read -p "Enter the new password: " -rs
+  ADPASS1=${REPLY}
+  printf "\n"
+  read -p "Please re-enter the password: " -rs
+  ADPASS2=${REPLY}
+  printf "\n"
+  if [ "$ADPASS1" == "$ADPASS2" ]; then
+    break
+  fi
+  printf "\n*** ERROR Passwords do not match! ***\n"
+done
 
+printf "SUCCESS!\n\n\n"
 
+# get the MySQL asterisk user password
+ASPASS1=""
+ASPASS2=""
+while true
+do
+  printf "\nNOW enter a password for the MySQL asterisk user.\n"
+  printf "\nThe password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n\n"
+  read -p "Enter the new password: " -rs
+  ASPASS1=${REPLY}
+  printf "\n"
+  read -p "Please re-enter the password: " -rs
+  ASPASS2=${REPLY}
+  printf "\n"
+  if [ "$ASPASS1" == "$ASPASS2" ]; then
+    break
+  fi
+  printf "\n*** ERROR Passwords do not match! ***\n"
+done
 
+printf "SUCCESS!\n\n\n"
 
+# get the extensions password
+EXPASS1=""
+EXPASS2=""
+while true
+do
+  printf "\nWhat is the Asterisk extensions password?\n"
+  printf "\nYou can find this on the Asterisk server. See the 'password=' field in the /etc/asterisk/pjsip.conf file.\n\n"
+  read -p "Enter the extensions password: " -rs
+  EXPASS1=${REPLY}
+  printf "\n"
+  read -p "Please re-enter extensions password: " -rs
+  EXPASS2=${REPLY}
+  printf "\n"
+  if [ "$EXPASS1" == "$EXPASS2" ]; then
+    break
+  fi
+  printf "\n*** ERROR Passwords do not match! ***\n"
+done
 
+cd ${ACE_DIRECT_HOME}/ace-direct/dat
+TMP1=/tmp/`date +%s`_file1.txt
+TMP2=/tmp/`date +%s`_file2.txt
+TMP3=/tmp/`date +%s`_file3.txt
+cat acedirectdefault.sql | sed -e "s/_EXTENSION_PASSWORD_/${EXPASS1}/g" > $TMP1
+cat $TMP1 | sed -e "s/_ACEDIRECT_PASSWORD_/${ADPASS1}/g" > $TMP2
+cat $TMP2 | sed -e "s/_ASTERISK_PASSWORD_/${ASPASS1}/g" > $TMP3
+cp $TMP3 acedirectdefault_NEW.sql
+rm $TMP1 $TMP2 $TMP3 >/dev/null 2>&1
+printf "\nCREATING DATABASES...\n\n"
+printf "\nPlease enter your current MySQL root password here...\n"
+mysql -u root -p -h localhost < acedirectdefault_NEW.sql
+rm acedirectdefault_NEW.sql
 
+printf "\n"
 
-
-
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  printf "Installing ACE Direct components...\n"
+else
+  printf "ABORTING...\n\n"
+  exit 1
+fi
 
 
 
