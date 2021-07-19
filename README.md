@@ -287,17 +287,26 @@ The instructions below describe how to install MySQL locally on `acenode.domain.
     $  sudo systemctl stop mysqld.service  # in case you need to stop MySQL
     ```
 
+1. With MySQL started secure the installation::
+
+    ```bash
+    $  # get the temporary root password
+    $  sudo grep 'temporary password' /var/log/mysqld.log  # get the temporary root password
+    $
+    $  mysql_secure_installation  # reset the root password (REMEMBER IT!); configure security options
+    $  
+    ```
+
 1. On `acenode.domain.com`, modify the `~/ace-direct/dat/acedirectdefault.sql` script:
 
    * Globally replace `_EXTENSION_PASSWORD_` with the _actual extension password_ from Asterisk. See the `password=` field in `/etc/asterisk/pjsip.conf` on `acesip.domain.com`.
    * Change `_ACEDIRECT_PASSWORD_` to the desired password for the `acedirect` database user.
    * Change `_ASTERISK_PASSWORD_` to the desired password for the `asterisk` database user.
-   * Change `_MEDIASERVER_PASSWORD_` to the desired password for the `media_server` database user.
 
-1. Execute the `~/ace-direct/dat/acedirectdefault.sql` script to create the ACE Direct databases and user accounts. You will need your MySQL root user and password. Here is an example, assuming a root user `admin`:
+1. Execute the `~/ace-direct/dat/acedirectdefault.sql` script to create the ACE Direct databases and user accounts. You will need your MySQL `root` user and password. Here is an example, assuming a root user `root`:
 
     ```bash
-    $  mysql -u admin -p -h localhost < acedirectdefault.sql  # you will be prompted for the password
+    $  mysql -u root -p -h localhost < acedirectdefault.sql  # you will be prompted for the password
     $
     ```
 

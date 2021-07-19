@@ -97,7 +97,6 @@ The following instructions assume a local MySQL server:
     * Globally replace `_EXTENSION_PASSWORD_` with the actual extension password from Asterisk.
     * Modify `_ACEDIRECT_PASSWORD_` with a desired password for the `acedirect` database user.
     * Modify `_ASTERISK_PASSWORD_` with a desired password for the `asterisk` database user.
-    * Modify `_MEDIASERVER_PASSWORD_` with a desired password for the `media_server` database user.
 
 1. Execute the `dat/acedirectdefault.sql` script from `acenode`, with the MySQL admin user and password. Sample execution assuming the username `admin` and a sample AWS RDS domain name:
 
