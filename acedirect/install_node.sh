@@ -29,6 +29,7 @@ fi
 # install Node.js
 printf "Installing Node.js...\n"
 cd ${ACE_DIRECT_HOME}
+sudo rm -rf .nvm >/dev/null 2>&1
 mkdir -p .nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 . ~/.nvm/nvm.sh
@@ -58,6 +59,7 @@ printf "\n"
 # install REDIS
 printf "Installing REDIS...\n"
 cd ${ACE_DIRECT_HOME}
+sudo rm -rf cd redis-stable >/dev/null 2>&1
 wget http://download.redis.io/redis-stable.tar.gz
 tar xvzf redis-stable.tar.gz
 cd redis-stable
@@ -77,11 +79,13 @@ echo 'supervised systemd' >> redis.conf
 echo "requirepass ${REDIS_AUTH}" >> redis.conf
 echo '' >> redis.conf
 sudo cp redis.conf /etc/redis/redis.conf
+sudo chmod 666 /etc/redis/redis.conf
 printf 'To enable REDIS logging, change the /etc/redis/redis.conf logfile value to:  "/var/log/redis.log"\n'
 printf "\n"
 
 # configure REDIS service
 printf "Configuring REDIS service ...\n"
+sudo rm redis.service >/dev/null 2>&1
 echo '' > redis.service
 echo '[Unit]' >> redis.service
 echo 'Description=Redis In-Memory Data Store' >> redis.service
@@ -129,10 +133,12 @@ printf "Installing MySQL...\n"
 sudo yum remove mysql mysql-server  > /dev/null 2>&1  # remove old version
 sudo rm -rf /var/lib/mysql >/dev/null 2>&1
 sudo rm -rf /etc/mysql >/dev/null 2>&1
+sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
 sudo yum update -y 
 wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
 sudo yum localinstall mysql57-community-release-el7-11.noarch.rpm 
 sudo yum install mysql-community-server
+sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
 
 # Start MySQL
 printf "Installing MySQL as a service...\n"
