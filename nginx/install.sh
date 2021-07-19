@@ -1,5 +1,39 @@
 #!/bin/bash
 
+OPENAM_FQDN=""
+ACEDIRECT_FQDN=""
+ADUSER=""
+
+usage() { echo "Usage: $0 [-u <ACE Direct user>] [-o <OpenAM FQDN>] [-a <ACE Direct FQDN>]" 1>&2; exit 1; }
+while getopts ":s:p:" o; do
+  case "${o}" in
+    u)
+      ADUSER=${OPTARG}
+      ;;
+    o)
+      OPENAM_FQDN=${OPTARG}
+      ;;
+    a)
+      ACEDIRECT_FQDN=${OPTARG}
+      ;;      
+    *)
+      usage
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${ADUSER}" ] || [ -z "${OPENAM_FQDN}" ] || [ -z "${ACEDIRECT_FQDN}" ]; then
+    usage
+    exit
+fi
+
+printf "ADUSER=${ADUSER}\n"
+printf "OPENAM_FQDN=${OPENAM_FQDN}\n"
+printf "ACEDIRECT_FQDN=${ACEDIRECT_FQDN}\n"
+
+exit
+
 RS='\u001b[0m'
 FG_RED='\u001b[31m'
 FR="\033[1000D"
