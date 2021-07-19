@@ -50,10 +50,10 @@ sudo cp nginx.conf /etc/nginx/nginx.conf
 sudo cp html/* /etc/nginx/html
 sudo cp images/* /etc/nginx/images
 
-TMP1=/tmp/`date +%s`_${SOMEUSER}_file1.txt
-TMP2=/tmp/`date +%s`_${SOMEUSER}_file2.txt
-TMP3=/tmp/`date +%s`_${SOMEUSER}_file3.txt
-sudo cat /etc/nginx/nginx.conf | sed -e "s/<SOMEUSER>/${SOMEUSER}/g" > $TMP1
+TMP1=/tmp/`date +%s`_${ADUSER}_file1.txt
+TMP2=/tmp/`date +%s`_${ADUSER}_file2.txt
+TMP3=/tmp/`date +%s`_${ADUSER}_file3.txt
+sudo cat /etc/nginx/nginx.conf | sed -e "s/<SOMEUSER>/${ADUSER}/g" > $TMP1
 sudo cat $TMP1 | sed -e "s/<OPENAM_FQDN>/${OPENAM_FQDN}/g" > $TMP2
 sudo cat $TMP2 | sed -e "s/<ACE_DIRECT_FQDN>/${ACEDIRECT_FQDN}/g" > $TMP3
 sudo cp $TMP3 /etc/nginx/nginx.conf
