@@ -107,7 +107,9 @@ sudo service redis status
 # install MongoDB
 cd ${ACE_DIRECT_HOME}
 printf "Installing MongoDB...\n"
+sudo systemctl start mongod >/dev/null 2>&1
 MONGO_CONF="/etc/yum.repos.d/mongodb-org-4.4.repo"
+sudo chmod 666 ${MONGO_CONF}
 sudo echo "" > ${MONGO_CONF}
 sudo echo '[mongodb-org-4.4]' >> ${MONGO_CONF}
 sudo echo 'name=MongoDB Repository' >> ${MONGO_CONF}
