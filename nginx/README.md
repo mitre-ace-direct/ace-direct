@@ -47,7 +47,7 @@ Full documentation for NGINX is here: [NGINX](https://www.nginx.com).
 
 * Globally replace `<OPENAM_FQDN>` with your OpenAM FQDN: `aceopenam.domain.com`
 * Globally replace `<ACE_DIRECT_FQDN>` with your application server FQDN: `acenode.domain.com`
-* Globally replace `SOMEUSER` with the ACE Direct user account name, e.g. `ec2-user`.
+* Globally replace `<SOMEUSER>` with the ACE Direct user account name, e.g. `ec2-user`.
 
 1. Copy files from the `html` folder in this repo to `/etc/nginx/html`.
 1. Copy files from the `images` folder in this repo to `/etc/nginx/images`.
