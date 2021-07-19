@@ -1,6 +1,5 @@
 #!/bin/bash
 
-CONFIG="../dat/config.json"
 RS='\u001b[0m'
 FG_RED='\u001b[31m'
 FR="\033[1000D"
@@ -11,29 +10,33 @@ read -p "Install NGINX (y/n)? " -n 1 -r
 printf "\n"
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  npm install -g jsonlint  >/dev/null # make sure jsonlint is there
 
-  # Check config file
-  if jsonlint ${CONFIG} >/dev/null 2>&1
-  then
-    printf "${FR} ${OK_ICON}\n\n"
-  else
-    CONFIG_ERROR=`jsonlint ${CONFIG} 2>&1 | head -n1`
-    printf " ${FG_RED}is malformed! ${CONFIG_ERROR}${RS}${FR} ${NOTOK_ICON}\n"
-    PASSED=false
-    printf "Aborting...\n\n"
-    printf "\n\n"
-    exit 99
-  fi
-
-  OPENAM_FQDN=`node ../acedirect/tools/parseJson.js servers:main_fqdn ${CONFIG}` # OpenAM lives on Node server
-  ACEDIRECT_FQDN=`node ../acedirect/tools/parseJson.js servers:main_fqdn ${CONFIG}`
-
+  OPENAM_FQDN=""
+  read -p "OpenAM FQDN? " -n 1 -r
   printf "\n"
-  printf "Using SOMEUSER value: ${USER}...\n"
-  printf "Using default port numbers...\n"
-  printf "Using OPENAM_FQDN: ${OPENAM_FQDN}...\n"
-  printf "Using ACEDIRECT_FQDN: ${ACEDIRECT_FQDN}...\n\n"
+
+  ACEDIRECT_FQDN=""
+  read -p "ACEDIRECT FQDN? " -n 1 -r
+  printf "\n"
+
+  SOMEUSER=${USER}
+  read -p "ACE Direct user (${SOMEUSER})? " -n 1 -r
+  printf "\n"
+  
+  printf "Using these values:\n\n"
+  printf "OpenAM FQDN: ${OPENAM_FQDN}\n"
+  printf "ACEDIRECT FQDN: ${ACEDIRECT_FQDN}\n"
+  printf "ACEDIRECT USER: ${SOMEUSER}\n\n"
+
+  read -p "Continue (y/n)? " -n 1 -r
+  printf "\n"
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    printf "continuing...\n" 
+  else
+    printf "ABORTING...\n\n"
+    exit 1
+  fi
 
   printf "Installing NGINX...\n"
   sudo yum install epel-release
@@ -50,10 +53,10 @@ then
   sudo cp html/* /etc/nginx/html
   sudo cp images/* /etc/nginx/images
 
-  TMP1=/tmp/`date +%s`_${USER}_file1.txt
-  TMP2=/tmp/`date +%s`_${USER}_file2.txt
-  TMP3=/tmp/`date +%s`_${USER}_file3.txt
-  sudo cat /etc/nginx/nginx.conf | sed -e "s/SOMEUSER/${USER}/g" > $TMP1
+  TMP1=/tmp/`date +%s`_${SOMEUSER}_file1.txt
+  TMP2=/tmp/`date +%s`_${SOMEUSER}_file2.txt
+  TMP3=/tmp/`date +%s`_${SOMEUSER}_file3.txt
+  sudo cat /etc/nginx/nginx.conf | sed -e "s/SOMEUSER/${SOMEUSER}/g" > $TMP1
   sudo cat $TMP1 | sed -e "s/<OPENAM_FQDN>/${OPENAM_FQDN}/g" > $TMP2
   sudo cat $TMP2 | sed -e "s/<ACE_DIRECT_FQDN>/${ACEDIRECT_FQDN}/g" > $TMP3
   sudo cp $TMP3 /etc/nginx/nginx.conf
