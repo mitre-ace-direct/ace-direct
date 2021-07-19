@@ -45,7 +45,7 @@ This is the NGINX server for ACE Direct. The server acts as a _reverse proxy_, h
 
 Install NGINX on `portal.domain.com`.
 
-See [./nginx/README.md](./nginx/README.md) for installation instructions.
+See [./nginx/README.md](./nginx/README.md) for installation instructions. There is an installation script there.
 
 ---
 
@@ -53,7 +53,7 @@ See [./nginx/README.md](./nginx/README.md) for installation instructions.
 
 The `aceopenam` server is the _identity and access management_ server, implemented with _OpenAM_. To install and configure `aceopenam`:
 
-Log into the `aceopenam.domain.com` server and follow the instructions in [./iam/README.md](./iam/README.md) for detailed installation and configuration instructions.
+Log into the `aceopenam.domain.com` server and follow the instructions in [./iam/README.md](./iam/README.md) for detailed installation and configuration instructions. There is an installation script there.
 
 ---
 
