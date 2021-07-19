@@ -321,6 +321,8 @@ The instructions below describe how to install MySQL locally on `acenode.domain.
 
 #### Application servers
 
+##### Configure application servers
+
 The ACE Direct application servers are Node.js servers.
 
 > :warning: **Important**: All previous installation steps must be completed before installing the application servers.
@@ -333,13 +335,22 @@ The ACE Direct application servers are Node.js servers.
     $
     ```
 
-1. **Edit all values in `~/ace-direct/dat/config.json` to match your environment**. Many of the default values will work as is for a default ACE Direct installation. View `~/ace-direct/dat/parameter_desc.json` for a description of each configuration variable. Change the `<SOMEUSER>` value to your ACE Direct home user account, e.g., `ec2-user` .
+1. **Edit all values in the  `~/ace-direct/dat/config.json` global configuration file to match your environment**.
+
+    * Review all lines in the file and make necessary edits.
+    * Many of the default values will work as-is for a default ACE Direct installation. The installation scripts in this repo assume default values.
+    * View `~/ace-direct/dat/parameter_desc.json` for a description of each configuration variable.
+    * Change the `<SOMEUSER>` value to your ACE Direct home user account on the `acenode` server, e.g., `ec2-user` .
+    * Supply FQDNs, IP addresses, etc. for the ACE Direct components that were installed in the previous steps.
+
 1. Ensure SSH access to external libraries. This will avoid very long build times. Edit your `~/.gitconfig` file to make sure it has this entry:
 
     ```bash
     [url "https://"]
             insteadOf = git://
     ```
+
+##### Build and deploy application servers
 
 1. Build the application servers:
 
@@ -352,7 +363,7 @@ The ACE Direct application servers are Node.js servers.
     $  npm run build
     $  npm run config
     $
-    $  # other commands
+    $  # other useful commands
     $  npm run test  # automated tests, make sure all Node servers are down
     $  npm run lint  # run linting tests
     $  npm run clean  # remove all external libs
@@ -405,6 +416,14 @@ The ACE Direct application servers are Node.js servers.
     $
     $  pm2 start all  # start ACE Direct
     $  npm run status  # self-test
+    ```
+
+1. Another way to build and deploy the application servers the script:
+
+    ```bash
+    $  cd ~/ace-direct
+    $
+    $  scripts/build.sh  # build and deploy
     ```
 
 ---
