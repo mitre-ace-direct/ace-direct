@@ -4,7 +4,7 @@ OPENAM_FQDN=""
 ACEDIRECT_FQDN=""
 ADUSER=""
 
-usage() { echo "Usage: $0 [-u <ACE Direct user>] [-o <OpenAM FQDN>] [-a <ACE Direct FQDN>]" 1>&2; exit 1; }
+usage() { printf "\nusage: $0 [-u <ACE Direct user>] [-o <OpenAM FQDN>] [-a <ACE Direct FQDN>]\n\n" 1>&2; exit 1; }
 while getopts ":u:o:a:" arg; do
   case "${arg}" in
     u)
@@ -24,10 +24,7 @@ done
 shift $((OPTIND-1))
 
 if [ -z "${ADUSER}" ] || [ -z "${OPENAM_FQDN}" ] || [ -z "${ACEDIRECT_FQDN}" ]; then
-    printf "\n"
-    usage
-    printf "\n\n"
-    exit
+  usage
 fi
 
 printf "Using params:\n"
