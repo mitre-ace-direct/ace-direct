@@ -255,6 +255,6 @@ printf "\nDATABASES CREATED!\n\n"
 
 printf "Remember to edit dat/config.json and update the MySQL database user passwords and REDIS auth password.\n\n"
 
-
+printf "SEE THE ace-direct/README.md file to complete the installation for: Application servers"
 
 printf "done.\n\n"
