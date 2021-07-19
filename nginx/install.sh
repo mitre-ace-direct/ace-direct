@@ -27,7 +27,7 @@ if [ -z "${ADUSER}" ] || [ -z "${OPENAM_FQDN}" ] || [ -z "${ACEDIRECT_FQDN}" ]; 
   usage
 fi
 
-printf "Using params:\n"
+printf "\nUsing params:\n"
 printf "ADUSER=${ADUSER}\n"
 printf "OPENAM_FQDN=${OPENAM_FQDN}\n"
 printf "ACEDIRECT_FQDN=${ACEDIRECT_FQDN}\n"
