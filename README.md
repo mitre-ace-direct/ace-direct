@@ -93,23 +93,27 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 ## Prerequisites for acenode
 
+Complete these prerequisite prior to installation:
+
 1. An Internet connection is required during the build process.
 1. Log into the `acenode` server.
 1. Create/identify an ACE Direct user account, for example `/home/ec2-user`. Select the `bash` shell for the user. The user must have `sudo` capabilities.
 1. Make sure Git is installed: `git --version`, otherwise, install it: `sudo yum install git -y`
 1. Make sure `cc` is present: `which cc`, othwerise, install _Development Tools_: `sudo yum groupinstall "Development Tools"`
 1. Copy/clone this `ace-direct` repo to the ACE Direct user home folder: `/home/ec2-user`.
-1. The ACE Direct home user, e.g., `/home/ec2-user`, must have `sudo` privileges.
+1. Make sure that the ACE Direct home user, e.g., `/home/ec2-user`, has `sudo` privileges.
 
 ### Automated acenode Installation
 
-This script will install several ACE Direct core components.
+This script will install several ACE Direct core components: Node.js, Redis, MongoDB, MySQL, and application databases.
 
 ```bash
 $  cd /home/ec2-user/ace-direct
 $
 $  ./install_node.sh  # see the usage, then execute it with the correct parameters
 ```
+
+After executing this script, proceed to this section to complete the installation: [Application servers](#application-servers) . Manual instructions are below.
 
 ### Manual acenode Installation
 
