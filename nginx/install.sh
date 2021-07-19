@@ -11,16 +11,16 @@ printf "\n"
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
 
-  OPENAM_FQDN=""
   read -p "OpenAM FQDN? " -n 1 -r
+  OPENAM_FQDN=${REPLY}
   printf "\n"
 
-  ACEDIRECT_FQDN=""
   read -p "ACEDIRECT FQDN? " -n 1 -r
+  ACEDIRECT_FQDN="${REPLY}"
   printf "\n"
 
-  SOMEUSER=${USER}
-  read -p "ACE Direct user (${SOMEUSER})? " -n 1 -r
+  read -p "ACE Direct user? " -n 1 -r
+  SOMEUSER=${REPLY}
   printf "\n"
   
   printf "Using these values:\n\n"
