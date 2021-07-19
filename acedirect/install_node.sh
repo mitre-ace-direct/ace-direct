@@ -26,6 +26,7 @@ fi
 printf "Installing Node.js...\n"
 cd ${ACE_DIRECT_HOME}
 sudo rm -rf .nvm >/dev/null 2>&1
+sudo rm -rf .n >/dev/null 2>&1
 mkdir -p .nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
 . ~/.nvm/nvm.sh
@@ -44,7 +45,6 @@ echo '' >> ~/.bash_profile
 printf "Installing Node...\n"
 cd ${ACE_DIRECT_HOME}
 source ~/.bash_profile
-rm -rf .n >/dev/null 2>&1
 mkdir .n
 npm install -g n
 n 12.18.2
@@ -80,9 +80,9 @@ sudo rm -rf cd redis-stable >/dev/null 2>&1
 wget http://download.redis.io/redis-stable.tar.gz
 tar xvzf redis-stable.tar.gz
 cd redis-stable
-sudo make distclean
-sudo make
-sudo make install
+sudo make distclean >/dev/null
+sudo make >/dev/null
+sudo make install >/dev/null
 ls /usr/local/bin/redis-server /usr/local/bin/redis-cli  # both folders should exist
 sudo yum install -y tcl
 sudo mkdir -p /var/lib/redis
