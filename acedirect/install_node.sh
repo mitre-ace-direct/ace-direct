@@ -125,12 +125,13 @@ sudo systemctl enable mongod  # start at boot time
 # Install MySQL
 cd ${ACE_DIRECT_HOME}
 printf "Installing MySQL...\n"
-wget http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-5.6.37-1.el7.x86_64.rpm-bundle.tar
-tar -xvf MySQL-5.6.37-1.el7.x86_64.rpm-bundle.tar
-sudo yum -y install MySQL-client-5.6.37-1.el7.x86_64.rpm
-sudo yum install MySQL-shared-compat-5.6.37-1.el7.x86_64.rpm
-sudo yum install MySQL-server-5.6.37-1.el7.x86_64.rpm
-rm MySQL*.rpm MySQL*.tar
+sudo yum remove mysql mysql-server  > /dev/null 2>&1  # remove old version
+sudo rm -rf /var/lib/mysql >/dev/null 2>&1
+sudo rm -rf /etc/mysql >/dev/null 2>&1
+sudo yum update -y 
+wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+sudo yum localinstall mysql57-community-release-el7-11.noarch.rpm 
+sudo yum install mysql-community-server
 
 # Start MySQL
 printf "Installing MySQL as a service...\n"
