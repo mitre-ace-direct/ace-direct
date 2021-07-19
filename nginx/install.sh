@@ -26,7 +26,7 @@ shift $((OPTIND-1))
 if [ -z "${ADUSER}" ] || [ -z "${OPENAM_FQDN}" ] || [ -z "${ACEDIRECT_FQDN}" ]; then
     printf "\n"
     usage
-    printf "\n"
+    printf "\n\n"
     exit
 fi
 
