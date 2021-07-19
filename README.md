@@ -311,7 +311,7 @@ The instructions below describe how to install MySQL locally on `acenode.domain.
     ```
 
 1. MySQL uses port `3306` by default.
-1. The ACE Direct database users are: `acedirect`, `asterisk`, and `media_server`.
+1. The ACE Direct database users are: `acedirect` and `asterisk`.
 
 #### Application servers
 
