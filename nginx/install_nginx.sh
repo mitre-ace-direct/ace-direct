@@ -57,7 +57,7 @@ sudo cat /etc/nginx/nginx.conf | sed -e "s/<SOMEUSER>/${ADUSER}/g" > $TMP1
 sudo cat $TMP1 | sed -e "s/<OPENAM_FQDN>/${OPENAM_FQDN}/g" > $TMP2
 sudo cat $TMP2 | sed -e "s/<ACE_DIRECT_FQDN>/${ACEDIRECT_FQDN}/g" > $TMP3
 sudo cp $TMP3 /etc/nginx/nginx.conf
-rm $TMP1 $TMP2 $TMP3
+rm $TMP1 $TMP2 $TMP3 >/dev/null 2>&1
 
 # restart NGINX
 sudo service nginx stop
