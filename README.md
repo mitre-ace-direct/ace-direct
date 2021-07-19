@@ -145,6 +145,7 @@ $  ./install_node.sh  # see the usage, then execute it with the correct paramete
       $  cd
       $
       $  source ~/.bash_profile
+      $  rm -rf .n >/dev/null 2>&1
       $  mkdir .n
       $  npm install -g n
       $  n 12.18.2
