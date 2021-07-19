@@ -103,6 +103,8 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 ### Automated acenode Installation
 
+This script will install several ACE Direct core components.
+
 ```bash
 $  cd /home/ec2-user/ace-direct
 $
