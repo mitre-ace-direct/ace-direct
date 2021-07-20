@@ -65,6 +65,12 @@ There are several components to install on `acesip.domain.com`:
 
   * Acquire an Asterisk certificate and copy it to `/etc/ssl/asterisk.csr` to enable the signaling server demo/test page. Then update the `common.https.csr` variable in `dat/config.json` to be `/etc/ssl/asterisk.csr`. Finally, execute: `sudo chmod 644 ~/ace-direct/dat/asterisk.csr`  . Note that the demo/test page is for development only. It is disabled by default.
 
+* To enable ITRS lookups in ACE Direct:
+
+  * Copy the `asterisk/scripts/itrslookup.sh` from the `asterisk` repo to `ace-direct/scripts/itrslookup.sh` in this repo.
+  * Configure the `itrslookup.sh` script for the desired providers.
+  * ITRS lookups are disabled by default in the ACE Direct consumer portal.
+
 * Clone the `acequill-service` repo and follow the instructions to enable captioning and language translation.
 
 ---
