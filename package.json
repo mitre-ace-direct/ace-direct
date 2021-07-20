@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test:acedirect && npm run test:acedirect-kurento && npm run test:acr-cdr && npm run test:aserver && npm run test:fendesk && npm run test:managementportal && npm run test:userver && npm run test:videomail-service",
-    "preinstall": "echo 'preinstall...' && npm run copygithooks && npm i -g eslint && npm i -g gulp && npm i -g bower && npm i -g pm2 && npm i -g yarn && npm install -g jsonlint",
+    "preinstall": "echo 'preinstall...' && npm run copygithooks && npm i -g eslint && npm i -g gulp && npm i -g bower && npm i -g pm2 && npm i -g yarn && npm install -g jsonlint && cp acedirect/patches/itrslookup_test.txt scripts/itrslookup.sh && chmod 755 scripts/itrslookup.sh",
     "copygithooks": "cp githooks/* .git/hooks/",
     "build": "npm run copygithooks && npm run build:acedirect && npm run build:acedirect-kurento && npm run build:acr-cdr && npm run build:aserver && npm run build:fendesk && npm run build:managementportal && npm run build:userver && npm run build:videomail-service && cat dat/ad.txt ",
     "clean": "rm -rf node_modules >/dev/null 2>&1 && npm run clean:acedirect && npm run clean:acedirect-kurento && npm run clean:acr-cdr && npm run clean:aserver && npm run clean:fendesk && npm run clean:managementportal && npm run clean:userver && npm run clean:videomail-service",
