@@ -17,13 +17,23 @@ Full documentation for NGINX is here: [NGINX](https://www.nginx.com).
   * OpenAM: `aceopenam.domain.com`
   * Application servers: `acenode.domain.com`
 
-* The default `ace-direct` installation is assumed.
+* The default `ace-direct` repo installation is assumed.
 * Valid certificates must be on `portal.domain.com`:
 
   * `/etc/ssl/cert.pem`
   * `/etc/ssl/key.pem`
 
-## Installation
+## Automated Installation
+
+Copy this repo to the target NGINX server, then:
+
+```bash
+$  cd ace-direct/nginx
+$
+$  ./install_nginx.sh  # to see the usage, then execute it with the correct parameters
+```
+
+## Manual Installation
 
 1. On the `portal.domain.com` server, execute the following:
 
@@ -47,7 +57,7 @@ Full documentation for NGINX is here: [NGINX](https://www.nginx.com).
 
 * Globally replace `<OPENAM_FQDN>` with your OpenAM FQDN: `aceopenam.domain.com`
 * Globally replace `<ACE_DIRECT_FQDN>` with your application server FQDN: `acenode.domain.com`
-* Globally replace `SOMEUSER` with the ACE Direct user account name, e.g. `ec2-user`.
+* Globally replace `<SOMEUSER>` with the ACE Direct user account name, e.g. `ec2-user`.
 
 1. Copy files from the `html` folder in this repo to `/etc/nginx/html`.
 1. Copy files from the `images` folder in this repo to `/etc/nginx/images`.
