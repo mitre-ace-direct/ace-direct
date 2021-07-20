@@ -261,10 +261,5 @@
   },
   "filesharing": {
     "virus_scan_enabled": "Virus scan will be enabled if set to 'true' but clamdscan must be set up on the machine for it to work. The default is false"
-  },
-  "awsACE": {
-    "recording_bucket": "This is the name of the s3 bucket that the call recordings are saved and pulled from.",
-    "recording_proxy": "This proxy is needed for the communication to the specific region of the bucket.",
-    "uploadURL": "This url is where the recordings are uploaded to before they are then pushed up to the bucket."
   }
 }
