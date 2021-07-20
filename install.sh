@@ -18,6 +18,8 @@ ASTERISK_FQDN=""
 ASTERISK_IP=""
 KURENTO_FQDN=""
 KURENTO_IP=""
+KEY_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:private_key`
+CERT_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:certificate`
 
 usage() {
   echo ""
@@ -279,7 +281,7 @@ nginx/install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
 
 # install OpenAM
 cd ~/ace-direct/iam
-./install_openam.sh  ace  ${OPENAM_FQDN}  ${NGINX_FQDN}  7.0.108 
+./install_openam.sh  ace  ${OPENAM_FQDN}  ${NGINX_FQDN}  7.0.108 ${KEY_PEM} ${CERT_PEM}
 
 # build AD
 cd ~/ace-direct

@@ -9,10 +9,17 @@
 # * This is the root user, /root
 # * Python is already installed
 
-if [ "$#" -ne 4 ]; then
-  printf "\nusage:  $0  <base name>  <OPENAM FQDN>  <NGINX FQDN>  <TOMCAT VERSION> \n"
+if [ "$#" -lt 4 ]; then
+  printf "\nusage:  $0  <base name>  <OPENAM FQDN>  <NGINX FQDN>  <TOMCAT VERSION> [key pem file location] [cert pem file location] \n"
   printf "e.g.    $0  ace  aceopenam.domain.com  portal.domain.com  7.0.108 \n\n"
   exit 99
+fi
+
+KEY_PEM=""
+CERT_PEM=""
+if [ "$#" -ge 6 ]; then
+  KEY_PEM=$5
+  CERT_PEM=$6
 fi
 
 printf "\n\nInstalling OpenAM...\n\n"
@@ -69,6 +76,12 @@ fi
 
 # check for certs and make sure they are valid
 printf "Looking for certs...\n"
+if [ ! -z "$KEY_PEM" ]; then
+  sudo cp $KEY_PEM ssl/key.pem
+fi
+if [ ! -z "$CERT_PEM" ]; then
+  sudo cp $CERT_PEM ssl/cert.pem
+fi
 if [[ ! -f ssl/cert.pem || ! -f ssl/key.pem ]]; then
   printf "\n\nerror - cert.pem or key.pem not found in ssl directory\n"
   printf "        Please make sure that cert.pem and key.pem are in ${HOME_FOLDER}/iam/ssl\n\n"
