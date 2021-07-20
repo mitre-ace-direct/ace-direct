@@ -1,16 +1,38 @@
 #!/bin/bash
 
 ACE_DIRECT_HOME=""
+REDIS_AUTH=""
+RDPASS1=""
+RDPASS2=""
+ADPASS1=""
+ADPASS2=""
+ASPASS1=""
+ASPASS2=""
+EXPASS1=""
+EXPASS2=""
+
 usage() {
-  printf "\nusage:  $0 [-h <ACE Direct user home folder>]\n\n" 1>&2
+  printf "\nusage:  $0 -h <ACE Direct user home folder> [-r <REDIS auth password>] [-p <ACE Direct MySQL password>] [-a <Asterisk MySQL password>] [-e <Asterisk extensions password>]\n\n" 1>&2
   printf "  e.g.  $0 -h /home/ec2-user\n\n"
   exit 1;
 }
-while getopts ":h:" arg; do
+while getopts ":h:r:p:a:e:" arg; do
   case "${arg}" in
     h)
       ACE_DIRECT_HOME=${OPTARG}
-      ;;    
+      ;;
+    r)
+      RDPASS1=${OPTARG}
+      ;;          
+    p)
+      ADPASS1=${OPTARG}
+      ;;
+    a)
+      ASPASS1=${OPTARG}
+      ;;
+    e)
+      EXPASS1=${OPTARG}
+      ;;                  
     *)
       usage
       ;;
@@ -55,11 +77,11 @@ printf "\n"
 # install REDIS
 printf "Installing REDIS...\n"
 # get the REDIS AUTH password
-REDIS_AUTH=""
-RDPASS1=""
-RDPASS2=""
 while true
 do
+  if [ ! -z "$RDPASS1" ]; then
+    break
+  fi
   printf "\n"
   read -p "Enter a REDIS AUTH password: " -rs
   RDPASS1=${REPLY}
@@ -177,10 +199,11 @@ mysql_secure_installation
 
 printf "Creating databases...\n"
 # get the MySQL acedirect user password
-ADPASS1=""
-ADPASS2=""
 while true
 do
+  if [ ! -z "$ADPASS1" ]; then
+    break
+  fi
   printf "\nEnter a password for the MySQL acedirect user.\n"
   printf "\nThe password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n\n"
   read -p "Enter the new password: " -rs
@@ -198,10 +221,11 @@ done
 printf "SUCCESS!\n\n"
 
 # get the MySQL asterisk user password
-ASPASS1=""
-ASPASS2=""
 while true
 do
+  if [ ! -z "$ASPASS1" ]; then
+    break
+  fi
   printf "\nNOW enter a password for the MySQL asterisk user.\n"
   printf "\nThe password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n\n"
   read -p "Enter the new password: " -rs
@@ -219,10 +243,11 @@ done
 printf "SUCCESS!\n\n"
 
 # get the extensions password
-EXPASS1=""
-EXPASS2=""
 while true
 do
+  if [ ! -z "$EXPASS1" ]; then
+    break
+  fi
   printf "\nWhat is the Asterisk extensions password?\n"
   printf "\nYou can find this on the Asterisk server. See the 'password=' field in the /etc/asterisk/pjsip.conf file.\n\n"
   read -p "Enter the extensions password: " -rs
