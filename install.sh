@@ -117,6 +117,89 @@ else
   exit 1
 fi
 
+# ask some questions
+
+# get the REDIS AUTH password from the user
+REDIS_AUTH=""
+RDPASS1=""
+RDPASS2=""
+while true
+do
+  printf "\n"
+  read -p "Enter a REDIS AUTH password: " -rs
+  RDPASS1=${REPLY}
+  printf "\n"
+  read -p "Please re-enter the REDIS AUTH password: " -rs
+  RDPASS2=${REPLY}
+  printf "\n"
+  if [ "$RDPASS1" == "$RDPASS2" ]; then
+    break
+  fi
+  printf "\n*** ERROR Passwords do not match! ***\n"
+done
+REDIS_AUTH=${RDPASS1}
+
+# get the MySQL acedirect user password
+ADPASS1=""
+ADPASS2=""
+while true
+do
+  printf "\nEnter a password for the MySQL acedirect user.\n"
+  printf "\nThe password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n\n"
+  read -p "Enter the new password: " -rs
+  ADPASS1=${REPLY}
+  printf "\n"
+  read -p "Please re-enter the password: " -rs
+  ADPASS2=${REPLY}
+  printf "\n"
+  if [ "$ADPASS1" == "$ADPASS2" ]; then
+    break
+  fi
+  printf "\n*** ERROR Passwords do not match! ***\n"
+done
+
+printf "SUCCESS!\n\n"
+
+# get the MySQL asterisk user password
+ASPASS1=""
+ASPASS2=""
+while true
+do
+  printf "\nNOW enter a password for the MySQL asterisk user.\n"
+  printf "\nThe password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n\n"
+  read -p "Enter the new password: " -rs
+  ASPASS1=${REPLY}
+  printf "\n"
+  read -p "Please re-enter the password: " -rs
+  ASPASS2=${REPLY}
+  printf "\n"
+  if [ "$ASPASS1" == "$ASPASS2" ]; then
+    break
+  fi
+  printf "\n*** ERROR Passwords do not match! ***\n"
+done
+
+printf "SUCCESS!\n\n"
+
+# get the extensions password
+EXPASS1=""
+EXPASS2=""
+while true
+do
+  printf "\nWhat is the Asterisk extensions password?\n"
+  printf "\nYou can find this on the Asterisk server. See the 'password=' field in the /etc/asterisk/pjsip.conf file.\n\n"
+  read -p "Enter the extensions password: " -rs
+  EXPASS1=${REPLY}
+  printf "\n"
+  read -p "Please re-enter extensions password: " -rs
+  EXPASS2=${REPLY}
+  printf "\n"
+  if [ "$EXPASS1" == "$EXPASS2" ]; then
+    break
+  fi
+  printf "\n*** ERROR Passwords do not match! ***\n"
+done
+
 # config file
 
 # back up config if it's there
@@ -140,6 +223,9 @@ python scripts/parseSingleJson.py $TMP_CONFIG1 servers:turn_fqdn $TURN_FQDN > $T
 python scripts/parseSingleJson.py $TMP_CONFIG2 servers:kurento_fqdn $KURENTO_FQDN > $TMP_CONFIG1 
 python scripts/parseSingleJson.py $TMP_CONFIG1 servers:kurento_private_ip $KURENTO_IP > $TMP_CONFIG2 
 python scripts/parseSingleJson.py $TMP_CONFIG2 signaling_server:path "/${AD_USER}/acedirect-kurento/signaling" > $TMP_CONFIG1
+python scripts/parseSingleJson.py $TMP_CONFIG1 database_servers:redis:auth $REDIS_AUTH > $TMP_CONFIG2 
+python scripts/parseSingleJson.py $TMP_CONFIG2 database_servers:mysql:password $ADPASS1 > $TMP_CONFIG1 
+
 cp $TMP_CONFIG1 dat/config.json
 rm $TMP_CONFIG1 $TMP_CONFIG2 >/dev/null 2>&1
 
@@ -192,9 +278,11 @@ acedirect/install_node.sh -h /home/${AD_USER}
 nginx/install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
 
 # install OpenAM
+cd ~/ace-direct/iam
 iam/install_openam.sh  ace  ${OPENAM_FQDN}  ${NGINX_FQDN}  7.0.108 
 
 # build AD
+cd ~/ace-direct
 scripts/build.sh
 
 INSTALL_END=`date +%s`
