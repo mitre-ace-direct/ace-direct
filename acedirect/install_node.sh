@@ -192,11 +192,11 @@ sudo systemctl enable mysqld.service  # start at boot time
 
 # get temporary MySQL root password
 TEMP_ROOT_PWD=`sudo grep 'temporary password' /var/log/mysqld.log | tail -1 | awk '{print $NF}'`
-printf "Your TEMPORARY ROOT PASSWORD IS: ${TEMP_ROOT_PWD}\n\n"
+printf "\n\nYour TEMPORARY ROOT PASSWORD IS: ${TEMP_ROOT_PWD}\n\n\n"
 
 #TODO
 printf "Securing MySQL...\n\n"
-printf "Log into MySQL with the TEMPORARY ROOT PASSWORD or the most current ROOT password.\n\n"
+printf "Log into MySQL with the TEMPORARY ROOT PASSWORD...\n\n"
 printf "You will now set security options and reset the ROOT PASSWORD. PLEASE REMEMBER THE ROOT PASSWORD!\n\n"
 mysql_secure_installation
 
@@ -279,9 +279,4 @@ printf "\nPlease enter your current MySQL root password here...\n"
 mysql -u root -p -h localhost < acedirectdefault_NEW.sql
 rm acedirectdefault_NEW.sql
 
-printf "\nDATABASES CREATED!\n\n"
-printf "Remember to edit dat/config.json and update the MySQL database user passwords and REDIS auth password.\n\n"
-printf "\nFINAL STEPS...\n"
-printf "SEE THE ace-direct/README.md file to complete the installation. See this section: Application servers\n\n"
-
-printf "done.\n\n"
+printf "done install_node.sh .\n\n"
