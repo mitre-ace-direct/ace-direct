@@ -11,6 +11,11 @@ npm run build
 npm run config
 END=`date +%s`
 pm2 start dat/process.json
+
+# start on reboot
+pm2 save
+pm2 startup
+
 EQU="scale=2; (${END} - ${START})/60"
 RESULT=`bc <<< $EQU`
 npm run status
