@@ -4,11 +4,11 @@
     "version": "ACE Direct Version number for display only.",
     "year": "The Copyright year for display only.",
     "debug_level": "Logging level: ALL TRACE DEBUG INFO WARN ERROR FATAL OFF",
-    "proxy" : "The proxy address, e.g. http://0.0.0.0:1234",
+    "proxy" : "The proxy address that allows access to AWS S3, e.g. http://0.0.0.0:1234",
     "https": {
       "certificate": "Full path to the certificate file",
       "private_key": "Full path to the private key file",
-      "csr": "full path to asterisk csr file, for signaling server demo/test page; disabled by default"
+      "csr": "full path to asterisk csr file for signaling server demo/test page; disabled by default"
     }
   },
   "servers": {
@@ -22,20 +22,20 @@
     "turn_fqdn": "Fully qualified domain name of turn server",
     "kurento_fqdn": "fully-qualified domain name of internal kurento media server, must point to private IP address",
     "kurento_private_ip": "Private IP address of the Kurento server",
-    "mysql_fqdn": "Private IP address of the local ACE Direct MySQL server OR AWS RDS FQDN OR localhost",
+    "mysql_fqdn": "Private IP address of the local ACE Direct MySQL server OR localhost OR AWS RDS FQDN",
     "redis_fqdn": "Local IP address of the Redis server on acenode.domain.com: 127.0.0.1",
     "mongodb_fqdn": "Mongo DB host; leave blank to disable logging",
-    "zendesk_fqdn": "fully-qualified domain name of commercial Zendesk server or private IP address of local Fendesk server"
+    "zendesk_fqdn": "fully-qualified domain name of commercial Zendesk server or private IP address of local Fendesk server or localhost"
   },  
   "app_ports": {
-    "acedirect": "local HTTPS listen port for ACE direct server; must match value in nginx.conf on the NGINX server",
-    "managementportal": "local HTTPS listen port for management portal server; must match value in nginx.conf on the NGINX server",
+    "acedirect": "local HTTPS listen port for ACE direct server; MUST MATCH value in /etc/nginx/nginx.conf on the NGINX server",
+    "managementportal": "local HTTPS listen port for management portal server; MUST MATCH value in /etc/nginx/nginx.conf on the NGINX server",
     "zendesk": "local application port for fendesk (or use port from commercial Zendesk instance)",
     "acr-cdr": "local application port for acr-cdr server",
     "userver": "local application port for userver",
     "aserver": "local application port for aserver",
     "videomail": "local application port for the videomail service",    
-    "sswebserver": "local application port for signaling server acedirect-kurento webserver",
+    "sswebserver": "local application port for signaling server acedirect-kurento webserver; MUST MATCH value in /etc/nginx/nginx.conf on the NGINX server",
     "nginx": "NGINX server port number",
     "asterisk_ws": "Asterisk websocket port",
     "asterisk_ami": "Asterisk AMI port",    
@@ -50,7 +50,7 @@
   },     
   "signaling_server": {
       "protocol": "wss",
-      "path": "This is the acedirect-kurento route in /etc/nginx/nginx.conf on the portal.domain.com server"
+      "path": "This is the acedirect-kurento route; MUST MATCH value in /etc/nginx/nginx.conf on the NGINX server"
   },
   "nginx": { 
     "ad_path": "customizable NGINX path for agent/consumer portals",
@@ -59,9 +59,9 @@
     "consumer_route": "customizable route for consumer portal url"
   },  
   "openam": {
-    "path": "OpenAM web path as specified in the OpenAM installation",
-    "user": "openAM admin user name from the OpenAM installation",
-    "password": "openAM admin password from the OpenAM installation"
+    "path": "OpenAM BASE NAME as specified in the OpenAM installation",
+    "user": "OpenAM admin user name from the OpenAM installation",
+    "password": "OpenAM admin password from the OpenAM installation"
   },  
   "media_server": {
     "privacy_video_url": "file location of privacy video file on the Kurento media server"
@@ -69,7 +69,7 @@
   "asterisk": {
     "sip": {  
       "protocol": "Asterisk protocol",      
-      "stun_user": "username for stun server",      
+      "stun_user": "stun server username",      
       "turn_user": "turn server username",
       "turn_cred": "turn server password",
       "channel": "default to SIP"
@@ -122,12 +122,12 @@
   "web_security": {
     "json_web_token": {
       "encoding": "Encoding scheme for the JSON web token",
-      "secret_key": "Unique string key for the JSON web token",
+      "secret_key": "CHANGE THIS to some unique UTF-8 string for your installation; string key for the JSON web token",
       "timeout": "timeout in ms: 15000",
       "handshake": "Handshake? true or false"
     },
     "session": {
-      "secret_key": "Unique string key for the session",
+      "secret_key": "CHANGE THIS to some unique UTF-8 string for your installation; string key for the session",
       "resave": "Resave? true or false",
       "save_uninitialized": "Save uninitialized? true or false",
       "secure": "Secure? true or false",
@@ -139,14 +139,14 @@
   "database_servers": {
     "mysql": {  
       "user": "Username for the ACE Direct MySQL user",
-      "password": "Password for the ACE Direct MySQL user; value for _ACEDIRECT_PASSWORD_ in MySQL configuration",
+      "password": "Password for the ACE Direct MySQL user; same value as _ACEDIRECT_PASSWORD_ in MySQL installation",
       "ad_database_name": "ACE Direct database name",
       "cdr_database_name": "Asterisk database name",
       "cdr_table_name": "Asterisk table name",
       "ssdatabase": "Signaling server db name"
     },
     "redis": {
-      "auth": "Redis authentication string; your chosen password for myRedisPassword during Redis installation"
+      "auth": "Redis authentication string; CHANGE THIS TO MATCH your myRedisPassword value during Redis installation"
     },
     "mongodb": {
       "database_name": "primary database",
@@ -174,7 +174,7 @@
     "url": "full HTTPS URL of website to redirect too at end of consumer web call"
   },
   "popticket": {
-    "url": "URL of zendesk pop ticket; omit this field to skip zendesk pop; this if for automatically populating a Zendesk ticket, assuming a Zendesk integration server is available."
+    "url": "Optional. For FCC, URL of zendesk pop ticket; omit this field to skip zendesk pop; this if for automatically populating a Zendesk ticket, assuming a Zendesk integration server is available."
   },
   "skinny_mode" : {
     "agent": "Enable skinny mode for agent portal: true or false; true shows all web page dialogs",
@@ -186,7 +186,7 @@
   }, 
   "management_portal": {
     "poll_interval" : "Poll frequency (seconds) of the Management Portal statistics",
-    "force_logout_password": "a really secure password for the remote force agent logout feature"    
+    "force_logout_password": "CHANGE THIS to a really secure password for the remote force agent logout feature"    
   },
   "zendesk": {
     "protocol": "Use http for zendesk, https for fendesk",
@@ -203,7 +203,7 @@
     "mute_all_audio": "boolean string (true/false) that enables or disables muting the agent audio at the beginning of a call"
   },
   "busylight": {
-    "enabled": "boolean string (true/false) that enables or disables the busylight in ACE Direct",
+    "enabled": "boolean string (true/false) that enables or disables the optional busylight in ACE Direct; disabled by default",
     "awayBlink": "boolean string (true/false) that enables blinking while Away, if callers are in queue"
   },
   "translation_server": {
@@ -211,7 +211,7 @@
     "enabled": "Boolean; enable/disable translation server"    
   },
   "webserver": {
-    "comment1": "this is part of the signaling server configuration",    
+    "comment1": "OPTIONAL signling server test/demo page configuration",    
     "static": "./static",
     "token": "__DEV_TOKEN__"
   },
@@ -266,5 +266,5 @@
     "recording_bucket": "This is the name of the s3 bucket that the call recordings are saved and pulled from.",
     "recording_proxy": "This proxy is needed for the communication to the specific region of the bucket.",
     "uploadURL": "This url is where the recordings are uploaded to before they are then pushed up to the bucket."
-}
+  }
 }
