@@ -279,7 +279,7 @@ nginx/install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
 
 # install OpenAM
 cd ~/ace-direct/iam
-iam/install_openam.sh  ace  ${OPENAM_FQDN}  ${NGINX_FQDN}  7.0.108 
+./install_openam.sh  ace  ${OPENAM_FQDN}  ${NGINX_FQDN}  7.0.108 
 
 # build AD
 cd ~/ace-direct
