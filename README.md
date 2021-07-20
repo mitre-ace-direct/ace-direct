@@ -97,6 +97,10 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 `acenode` hosts the Redis, MongoDB, MySQL, and application servers. Log into `acenode.domain.com` and follow the directions below.
 
+## Automatic installer for acenode
+
+_Experimental._ See the [install.sh](install.sh) file for an automated installation script. This will install install prerequisites on `acenode` and perform checks. It will install and build OpenAM, NGINX, and all Node components on `acenode`.
+
 ## Prerequisites for acenode
 
 Complete these prerequisite prior to installation:
@@ -104,6 +108,7 @@ Complete these prerequisite prior to installation:
 1. An Internet connection is required during the build process.
 1. Log into the `acenode` server.
 1. Create/identify an ACE Direct user account, for example `/home/ec2-user`. Select the `bash` shell for the user. The user must have `sudo` capabilities.
+1. Install in the home folder `/home/ec2-user`.
 1. Make sure Git is installed: `git --version`, otherwise, install it: `sudo yum install git -y`
 1. Make sure `cc` is present: `which cc`, othwerise, install _Development Tools_: `sudo yum groupinstall "Development Tools"`
 1. Copy/clone this `ace-direct` repo to the ACE Direct user home folder: `/home/ec2-user`.
