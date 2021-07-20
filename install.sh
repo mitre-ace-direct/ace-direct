@@ -1,5 +1,6 @@
 #!/bin/bash
 
+INSTALL_START=`date +%s`
 RS='\u001b[0m'
 FG_RED='\u001b[31m'
 OK_ICON='✅'
@@ -196,4 +197,9 @@ iam/install_openam.sh  ace  ${OPENAM_FQDN}  ${NGINX_FQDN}  7.0.108
 # build AD
 scripts/build.sh
 
+INSTALL_END=`date +%s`
+
+EQU="scale=2; (${INSTALL_END} - ${INSTALL_START})/60"
+RESULT=`bc <<< $EQU`
+echo "\n*** Installation took $RESULT minutes. ***\n\n"
 printf "\n\n\ndone.\n\n"
