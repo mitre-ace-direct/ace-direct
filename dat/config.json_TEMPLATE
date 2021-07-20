@@ -254,10 +254,5 @@
   },
   "filesharing": {
     "virus_scan_enabled": "false"
-  },
-  "awsACE": {
-    "recording_bucket": "Bucket-name",
-    "recording_proxy": "http://0.0.0.0:1234",
-    "uploadURL": "This url is where the recordings are uploaded to before they are then pushed up to the bucket."    
   }
 }
