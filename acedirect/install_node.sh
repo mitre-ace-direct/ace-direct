@@ -173,6 +173,7 @@ sudo systemctl enable mongod  # start at boot time
 # Install MySQL
 cd ${ACE_DIRECT_HOME}
 printf "Installing MySQL...\n"
+sudo systemctl stop mysqld.service  >/dev/null 2>&1  # stop it if it's already there
 sudo yum remove mysql mysql-server  > /dev/null 2>&1  # remove old version
 sudo rm -rf /var/lib/mysql >/dev/null 2>&1
 sudo rm -rf /etc/mysql >/dev/null 2>&1
@@ -194,10 +195,10 @@ TEMP_ROOT_PWD=`sudo grep 'temporary password' /var/log/mysqld.log | tail -1 | aw
 printf "Your TEMPORARY ROOT PASSWORD IS: ${TEMP_ROOT_PWD}\n\n"
 
 #TODO
-#printf "Securing MySQL...\n\n"
-#printf "Log into MySQL with the TEMPORARY ROOT PASSWORD or the most current ROOT password.\n\n"
-#printf "You will now set security options and reset the ROOT PASSWORD. PLEASE REMEMBER THE ROOT PASSWORD!\n\n"
-#mysql_secure_installation
+printf "Securing MySQL...\n\n"
+printf "Log into MySQL with the TEMPORARY ROOT PASSWORD or the most current ROOT password.\n\n"
+printf "You will now set security options and reset the ROOT PASSWORD. PLEASE REMEMBER THE ROOT PASSWORD!\n\n"
+mysql_secure_installation
 
 printf "Creating databases...\n"
 # get the MySQL acedirect user password
