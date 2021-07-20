@@ -8,6 +8,8 @@ bower_components/
 ~*
 itrs.log
 
+scripts/itrslookup.sh
+
 # config files
 acedirect-kurento/confs/kurento/WebRtcEndpoint.conf.ini
 acedirect-kurento/src/config/development.json
