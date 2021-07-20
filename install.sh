@@ -18,8 +18,6 @@ ASTERISK_FQDN=""
 ASTERISK_IP=""
 KURENTO_FQDN=""
 KURENTO_IP=""
-KEY_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:private_key`
-CERT_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:certificate`
 
 usage() {
   echo ""
@@ -230,6 +228,10 @@ python scripts/parseSingleJson.py $TMP_CONFIG2 database_servers:mysql:password $
 
 cp $TMP_CONFIG1 dat/config.json
 rm $TMP_CONFIG1 $TMP_CONFIG2 >/dev/null 2>&1
+
+# get pem file locations from config
+KEY_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:private_key`
+CERT_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:certificate`
 
 # check for Git
 if git --version >/dev/null 2>&1
