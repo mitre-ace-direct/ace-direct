@@ -45,7 +45,7 @@ This is the NGINX server for ACE Direct. The server acts as a _reverse proxy_, h
 
 Install NGINX on `portal.domain.com`.
 
-See [./nginx/README.md](./nginx/README.md) for installation instructions.
+See [./nginx/README.md](./nginx/README.md) for installation instructions. There is an installation script there.
 
 ---
 
@@ -53,7 +53,7 @@ See [./nginx/README.md](./nginx/README.md) for installation instructions.
 
 The `aceopenam` server is the _identity and access management_ server, implemented with _OpenAM_. To install and configure `aceopenam`:
 
-Log into the `aceopenam.domain.com` server and follow the instructions in [./iam/README.md](./iam/README.md) for detailed installation and configuration instructions.
+Log into the `aceopenam.domain.com` server and follow the instructions in [./iam/README.md](./iam/README.md) for detailed installation and configuration instructions. There is an installation script there.
 
 ---
 
@@ -64,6 +64,12 @@ There are several components to install on `acesip.domain.com`:
 * Clone the `asterisk` repo, and follow the installation instructions. Additionally:
 
   * Acquire an Asterisk certificate and copy it to `/etc/ssl/asterisk.csr` to enable the signaling server demo/test page. Then update the `common.https.csr` variable in `dat/config.json` to be `/etc/ssl/asterisk.csr`. Finally, execute: `sudo chmod 644 ~/ace-direct/dat/asterisk.csr`  . Note that the demo/test page is for development only. It is disabled by default.
+
+* To enable ITRS lookups in ACE Direct:
+
+  * Copy the `asterisk/scripts/itrslookup.sh` from the `asterisk` repo to `ace-direct/scripts/itrslookup.sh` in this repo.
+  * Configure the `itrslookup.sh` script for the desired providers.
+  * ITRS lookups are disabled by default in the ACE Direct consumer portal.
 
 * Clone the `acequill-service` repo and follow the instructions to enable captioning and language translation.
 
@@ -91,19 +97,41 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 `acenode` hosts the Redis, MongoDB, MySQL, and application servers. Log into `acenode.domain.com` and follow the directions below.
 
-### Setup
+## Prerequisites for acenode
+
+Complete these prerequisite prior to installation:
 
 1. An Internet connection is required during the build process.
+1. Log into the `acenode` server.
 1. Create/identify an ACE Direct user account, for example `/home/ec2-user`. Select the `bash` shell for the user. The user must have `sudo` capabilities.
 1. Make sure Git is installed: `git --version`, otherwise, install it: `sudo yum install git -y`
 1. Make sure `cc` is present: `which cc`, othwerise, install _Development Tools_: `sudo yum groupinstall "Development Tools"`
-1. Clone this `ace-direct` repo in the home folder of the ACE Direct user (`/home/ec2-user`).
+1. Copy/clone this `ace-direct` repo to the ACE Direct user home folder: `/home/ec2-user`.
+1. Make sure that the ACE Direct home user, e.g., `/home/ec2-user`, has `sudo` privileges.
+
+### Automated acenode Installation
+
+This script will install several ACE Direct core components: Node.js, Redis, MongoDB, MySQL, and application databases.
+
+```bash
+$  cd /home/ec2-user/ace-direct
+$
+$  ./install_node.sh  # see the usage, then execute it with the correct parameters
+```
+
+After executing this script, proceed to this section to complete the installation: [Application servers](#application-servers) . Manual instructions are below.
+
+### Manual acenode Installation
+
+#### Setup
+
 1. Install _Node.js_ locally:
 
     * Amazon Linux 2 example:
 
       ```bash
-      $  cd
+      $  cd /home/ec2-user  # go to the ACE Direct user home folder
+      $  sudo rm -rf .nvm >/dev/null 2>&1
       $  mkdir -p .nvm
       $
       $  # install NVM
@@ -130,6 +158,7 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
       $  cd
       $
       $  source ~/.bash_profile
+      $  rm -rf .n >/dev/null 2>&1
       $  mkdir .n
       $  npm install -g n
       $  n 12.18.2
@@ -141,7 +170,7 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
       $  npm config set script-shell bash
       ```
 
-### Redis
+#### Redis
 
 Install and configure _Redis_. For an overview, read [Redis Quick Start](https://redis.io/topics/quickstart). Follow these instructions to install Redis on `acenode.domain.com`:
 
@@ -150,6 +179,7 @@ Install and configure _Redis_. For an overview, read [Redis Quick Start](https:/
     ```bash
     $  cd
     $
+    $  sudo rm -rf cd redis-stable >/dev/null 2>&1
     $  wget http://download.redis.io/redis-stable.tar.gz
     $  tar xvzf redis-stable.tar.gz
     $  cd redis-stable
@@ -158,11 +188,11 @@ Install and configure _Redis_. For an overview, read [Redis Quick Start](https:/
     $  sudo make install
     $  ls /usr/local/bin/redis-server /usr/local/bin/redis-cli  # both folders should exist
     $  sudo yum install -y tcl
-    $  
-    $  # LOG FILE for REDIS
+    $
+    $  sudo mkdir -p /var/lib/redis
+    $  sudo mkdir -p /etc/redis
     $  sudo cp redis.conf /etc/redis/redis.conf  
-    $  sudo mkdir /var/lib/redis
-    $  sudo mkdir /etc/redis
+    $  sudo chmod 666 /etc/redis/redis.conf
     ```
 
 1. Configure Redis by editing `/etc/redis/redis.conf`. Enable and set the fields below, selecting your own value for the secret Redis password: `myRedisPassword`:
@@ -208,7 +238,7 @@ Install and configure _Redis_. For an overview, read [Redis Quick Start](https:/
     $  sudo service redis stop
     ```
 
-### MongoDB
+#### MongoDB
 
 ACE Direct uses a _MongoDB_ database for call statistics. Follow the instructions below to install ACE Direct on `acenode.domain.com`.
 
@@ -237,7 +267,7 @@ ACE Direct uses a _MongoDB_ database for call statistics. Follow the instruction
 
 1. MongoDB uses port `27017` by default.
 
-### MySQL
+#### MySQL
 
 ACE Direct uses a MySQL database for application data. Install MySQL locally on `acenode.domain.com` _or_ deploy an Amazon AWS RDS service.
 
@@ -246,13 +276,16 @@ The instructions below describe how to install MySQL locally on `acenode.domain.
 1. Install MySQL Server Version `5.6.37` or a similar version and note the database root user and password:
 
     ```bash
-    $  wget http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-5.6.37-1.el7.x86_64.rpm-bundle.tar
+    $  sudo yum remove mysql mysql-server  > /dev/null 2>&1  # remove old version
     $
-    $  tar -xvf MySQL-5.6.37-1.el7.x86_64.rpm-bundle.tar
-    $  sudo yum -y install MySQL-client-5.6.37-1.el7.x86_64.rpm
-    $  sudo yum install MySQL-shared-compat-5.6.37-1.el7.x86_64.rpm
-    $  sudo yum install MySQL-server-5.6.37-1.el7.x86_64.rpm
-    $  rm MySQL*.rpm MySQL*.tar
+    $  sudo rm -rf /var/lib/mysql >/dev/null 2>&1
+    $  sudo rm -rf /etc/mysql >/dev/null 2>&1
+    $  sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
+    $  sudo yum update -y 
+    $  wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+    $  sudo yum localinstall mysql57-community-release-el7-11.noarch.rpm 
+    $  sudo yum install mysql-community-server
+    $  sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
     ```
 
 1. Enable MySQL as a service and start it on reboot:
@@ -266,24 +299,35 @@ The instructions below describe how to install MySQL locally on `acenode.domain.
     $  sudo systemctl stop mysqld.service  # in case you need to stop MySQL
     ```
 
+1. With MySQL started secure the installation::
+
+    ```bash
+    $  # get the temporary root password
+    $  sudo grep 'temporary password' /var/log/mysqld.log  # get the temporary root password
+    $
+    $  mysql_secure_installation  # reset the root password (REMEMBER IT!); configure security options
+    $  
+    ```
+
 1. On `acenode.domain.com`, modify the `~/ace-direct/dat/acedirectdefault.sql` script:
 
    * Globally replace `_EXTENSION_PASSWORD_` with the _actual extension password_ from Asterisk. See the `password=` field in `/etc/asterisk/pjsip.conf` on `acesip.domain.com`.
    * Change `_ACEDIRECT_PASSWORD_` to the desired password for the `acedirect` database user.
    * Change `_ASTERISK_PASSWORD_` to the desired password for the `asterisk` database user.
-   * Change `_MEDIASERVER_PASSWORD_` to the desired password for the `media_server` database user.
 
-1. Execute the `~/ace-direct/dat/acedirectdefault.sql` script to create the ACE Direct databases and user accounts. You will need your MySQL root user and password. Here is an example, assuming a root user `admin`:
+1. Execute the `~/ace-direct/dat/acedirectdefault.sql` script to create the ACE Direct databases and user accounts. You will need your MySQL `root` user and password. Here is an example, assuming a root user `root`:
 
     ```bash
-    $  mysql -u admin -p -h localhost < acedirectdefault.sql  # you will be prompted for the password
+    $  mysql -u root -p -h localhost < acedirectdefault.sql  # you will be prompted for the password
     $
     ```
 
 1. MySQL uses port `3306` by default.
-1. The ACE Direct database users are: `acedirect`, `asterisk`, and `media_server`.
+1. The ACE Direct database users are: `acedirect` and `asterisk`.
 
-### Application servers
+#### Application servers
+
+##### Configure application servers
 
 The ACE Direct application servers are Node.js servers.
 
@@ -297,13 +341,22 @@ The ACE Direct application servers are Node.js servers.
     $
     ```
 
-1. **Edit all values in `~/ace-direct/dat/config.json` to match your environment**. Many of the default values will work as is for a default ACE Direct installation. View `~/ace-direct/dat/parameter_desc.json` for a description of each configuration variable.
+1. **Edit all values in the  `~/ace-direct/dat/config.json` global configuration file to match your environment**.
+
+    * Review all lines in the file and make necessary edits.
+    * Many of the default values will work as-is for a default ACE Direct installation. The installation scripts in this repo assume default values.
+    * View `~/ace-direct/dat/parameter_desc.json` for a description of each configuration variable.
+    * Change the `<SOMEUSER>` value to your ACE Direct home user account on the `acenode` server, e.g., `ec2-user` .
+    * Supply FQDNs, IP addresses, etc. for the ACE Direct components that were installed in the previous steps.
+
 1. Ensure SSH access to external libraries. This will avoid very long build times. Edit your `~/.gitconfig` file to make sure it has this entry:
 
     ```bash
     [url "https://"]
             insteadOf = git://
     ```
+
+##### Build and deploy application servers
 
 1. Build the application servers:
 
@@ -316,7 +369,7 @@ The ACE Direct application servers are Node.js servers.
     $  npm run build
     $  npm run config
     $
-    $  # other commands
+    $  # other useful commands
     $  npm run test  # automated tests, make sure all Node servers are down
     $  npm run lint  # run linting tests
     $  npm run clean  # remove all external libs
@@ -369,6 +422,14 @@ The ACE Direct application servers are Node.js servers.
     $
     $  pm2 start all  # start ACE Direct
     $  npm run status  # self-test
+    ```
+
+1. Another way to build and deploy the application servers the script:
+
+    ```bash
+    $  cd ~/ace-direct
+    $
+    $  scripts/build.sh  # build and deploy
     ```
 
 ---

@@ -50,7 +50,7 @@
   },    
   "signaling_server": {
     "protocol": "wss",
-    "path": "/SOMEUSER/acedirect-kurento/signaling"
+    "path": "/<SOMEUSER>/acedirect-kurento/signaling"
   },
   "nginx": {
     "ad_path": "/ACEDirect",
