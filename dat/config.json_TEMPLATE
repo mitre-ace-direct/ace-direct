@@ -4,11 +4,11 @@
     "version": "6.0",
     "year": "2021",
     "debug_level": "ERROR",
-    "proxy" : "http://0.0.0.0:1234",
+    "proxy": "http://0.0.0.0:1234",
     "https": {
       "certificate": "/etc/ssl/cert.pem",
       "private_key": "/etc/ssl/key.pem",
-      "csr": "/tmp/asterisk.csr"      
+      "csr": "/tmp/asterisk.csr"
     }
   },
   "servers": {
@@ -34,20 +34,20 @@
     "acr-cdr": 9004,
     "userver": 9005,
     "aserver": 9006,
-    "videomail": 9007,    
+    "videomail": 9007,
     "sswebserver": 9009,
     "nginx": 443,
     "asterisk_ws": 443,
-    "asterisk_ami": 5038,    
+    "asterisk_ami": 5038,
     "stun": 3478,
-    "turn": 3478,    
+    "turn": 3478,
     "mysql": 3306,
     "redis": 6379,
     "mongodb": 27017,
     "translation_server": 8005,
     "kurento": 8443,
-    "kmsshare": 3000    
-  },    
+    "kmsshare": 3000
+  },
   "signaling_server": {
     "protocol": "wss",
     "path": "/<SOMEUSER>/acedirect-kurento/signaling"
@@ -57,18 +57,18 @@
     "mp_path": "/ManagementPortal",
     "agent_route": "/agent",
     "consumer_route": "/call"
-  },  
+  },
   "openam": {
     "path": "ace",
     "user": "adminUsername",
     "password": "adminPassword"
-  },  
+  },
   "media_server": {
-      "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
-  },  
+    "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
+  },
   "asterisk": {
     "sip": {
-      "protocol": "wss",         
+      "protocol": "wss",
       "stun_user": "stunuser",
       "turn_user": "username",
       "turn_cred": "password",
@@ -90,7 +90,7 @@
       },
       "general": {
         "number": "575781",
-        "name": "GeneralQuestionsQueue"        
+        "name": "GeneralQuestionsQueue"
       },
       "videomail": {
         "number": "575795",
@@ -100,21 +100,37 @@
   },
   "videomail": {
     "max_record_secs": "90",
-    "outbound_timeout_secs": 60,    
+    "outbound_timeout_secs": 60,
     "introfile1": "onemoment2.mp4",
     "introfile2": "original_gc_raw.mp4",
     "introfile3": "FCC_IVVR_videomail_ready.mp4",
     "recordfile": "recording2.webm",
     "agents": [
-      { "sipId": "88001", "sipPass": "password" },
-      { "sipId": "88002", "sipPass": "password" },
-      { "sipId": "88003", "sipPass": "password" },
-      { "sipId": "88004", "sipPass": "password" },
-      { "sipId": "88005", "sipPass": "password" }]
+      {
+        "sipId": "88001",
+        "sipPass": "password"
+      },
+      {
+        "sipId": "88002",
+        "sipPass": "password"
+      },
+      {
+        "sipId": "88003",
+        "sipPass": "password"
+      },
+      {
+        "sipId": "88004",
+        "sipPass": "password"
+      },
+      {
+        "sipId": "88005",
+        "sipPass": "password"
+      }
+    ]
   },
   "s3": {
-      "region": "aws-region",
-      "bucketname": "bucketname"
+    "region": "aws-region",
+    "bucketname": "bucketname"
   },
   "missed_calls": {
     "max_missed_calls": "3"
@@ -162,12 +178,12 @@
     "logWebRTCStats": false,
     "logWebRTCStatsFreq": "1000",
     "logWebRTCMongo": "",
-    "fpsLow": "14.9", 
-    "fpsHigh": "25.0", 
-    "fpsMin": "0.0", 
-    "fpsMax": "30.0", 
+    "fpsLow": "14.9",
+    "fpsHigh": "25.0",
+    "fpsMin": "0.0",
+    "fpsMax": "30.0",
     "fpsOptimum": "40.0"
-  },  
+  },
   "complaint_redirect": {
     "active": "true",
     "desc": "FCC.gov",
@@ -222,7 +238,7 @@
   },
   "kurento": {
     "protocol": "wss",
-    "path": "/kurento",    
+    "path": "/kurento",
     "stats_interval": 10000,
     "sdes_crypto": "AES_128_CM_HMAC_SHA1_80",
     "monitoring_enabled": false,
