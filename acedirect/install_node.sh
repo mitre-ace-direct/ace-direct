@@ -279,7 +279,7 @@ cat $TMP1 | sed -e "s/_ACEDIRECT_PASSWORD_/${ADPASS1}/g" > $TMP2
 cat $TMP2 | sed -e "s/_ASTERISK_PASSWORD_/${ASPASS1}/g" > $TMP3
 cp $TMP3 acedirectdefault_NEW.sql
 rm $TMP1 $TMP2 $TMP3 >/dev/null 2>&1
-printf "\nCREATING DATABASES...\n\n"
+printf "Executing acedirectdefault.sql script...\n"
 printf "\nPlease enter your current MySQL root password here...\n"
 mysql -u root -p -h localhost < acedirectdefault_NEW.sql
 rm acedirectdefault_NEW.sql
