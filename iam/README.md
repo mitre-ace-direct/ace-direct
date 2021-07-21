@@ -1021,4 +1021,58 @@ When accessing links in the OpenAM admin web page, the following error occurs: `
 
 ---
 
+#### Problem 21
+
+When installing OpenAM, the following error appears in `/opt/tomcat/logs/catalina.out`:
+
+```bash
+...
+Jul 21, 2021 6:52:17 PM org.apache.catalina.core.StandardServer await
+SEVERE: StandardServer.await: create[localhost:9381]: 
+java.net.BindException: Address already in use (Bind failed)
+...
+```
+
+#### Solution 21
+
+1. The server shutdown port is unavailable. Pick a new port #.
+1. On the OpenAM server, edit `/root/iam/config/tomcat/server.xml` and change the `SHUTDOWN` port to an unused port number.
+1. Reinstall OpenAM.
+
+---
+
+#### Problem 22
+
+When installing OpenAM, the following error appears in `/opt/tomcat/logs/catalina.out`:
+
+```bash
+...
+SEVERE: Failed to start connector [Connector[AJP/1.3-8009]]
+org.apache.catalina.LifecycleException: service.getName(): "Catalina";  Protocol handler start failed
+ at org.apache.catalina.connector.Connector.startInternal(Connector.java:1065)
+ at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:183)
+...
+ at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:284)
+ at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:415)
+Caused by: java.lang.IllegalArgumentException: The AJP Connector is configured with secretRequired="true" but the secret attribute is either null or "". This combination is not valid.
+...
+```
+
+#### Solution 22
+
+1. The AJP Connector is out of sync with the secret attribute.
+1. Option 1 - AJP Connector is only needed with Apache. Comment out this section in `/root/iam/config/tomcat/server.xml` and reinstall OpenAM:
+
+    ```bash
+    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
+    ```
+
+1. Option 2 - This is `unsafe` and should only be set in internal development environments. On the OpenAM server, edit `/root/iam/config/tomcat/server.xml` and add the `secretRequired="false"` parameter. Then reinstall OpenAM:
+
+    ```bash
+    <Connector port="8009" protocol="AJP/1.3" secretRequired="false" redirectPort="8443" />
+    ```
+
+---
+
 _Fin._
