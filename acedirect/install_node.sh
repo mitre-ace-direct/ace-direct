@@ -105,7 +105,7 @@ printf "SUCCESS!\n\n"
 
 cd ${ACE_DIRECT_HOME}
 sudo rm -rf cd redis-stable >/dev/null 2>&1
-wget http://download.redis.io/redis-stable.tar.gz
+sudo -E wget http://download.redis.io/redis-stable.tar.gz
 tar xvzf redis-stable.tar.gz
 cd redis-stable
 sudo make distclean >/dev/null
@@ -185,7 +185,7 @@ sudo rm -rf /var/lib/mysql >/dev/null 2>&1
 sudo rm -rf /etc/mysql >/dev/null 2>&1
 sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
 sudo yum update -y 
-wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+sudo -E wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
 sudo yum localinstall mysql57-community-release-el7-11.noarch.rpm 
 sudo yum install mysql-community-server
 sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
