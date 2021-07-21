@@ -36,8 +36,8 @@ printf "\n"
 sudo service nginx stop >/dev/null 2>&1
 
 printf "Installing NGINX...\n"
-sudo yum install epel-release
-sudo yum install nginx
+sudo yum -y install epel-release
+sudo yum -y install nginx
 sudo systemctl start nginx  # start
 pidof nginx  # make sure it is running
 sudo systemctl enable nginx  # start on reboot
