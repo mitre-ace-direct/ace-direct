@@ -85,6 +85,8 @@ There are several components to install on `acesip.domain.com`:
 
 `acekms` is the Kurento media server. Log into `acekms.domain.com`, clone the `kurento` repo, and follow the installation instructions.
 
+Copy the `kms-share` folder from this repo to `acekms` and follow the [README.md](kms-share/README.md) to install it.
+
 ---
 
 ## strongSwan
