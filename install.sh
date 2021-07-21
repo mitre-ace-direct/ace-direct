@@ -298,7 +298,7 @@ fi
 printf "\n"
 
 # check for sudo permissions
-printf "\nChecking sudo permissions...\n"
+printf "Checking sudo permissions...\n"
 if sudo ls >/dev/null 2>&1
 then
   printf "${OK_ICON} sudo permissions good\n"
@@ -320,9 +320,8 @@ then
 else
   printf "${OK_ICON} user account matches\n" 
 fi
-printf "\n"
 
-printf "\n\nBeginning installation...\n\n"
+printf "\nBeginning installation...\n\n"
 
 # install node components
 acedirect/install_node.sh -h /home/${AD_USER} -r ${REDIS_AUTH} -p ${ADPASS1} -a ${ASPASS1} -e ${EXPASS1}
