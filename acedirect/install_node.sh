@@ -285,5 +285,6 @@ printf "Executing acedirectdefault.sql script...\n"
 printf "\nPlease enter your current MySQL root password here...\n"
 mysql -u root -p -h localhost < acedirectdefault_NEW.sql
 rm acedirectdefault_NEW.sql
+printf "Databases created.\n"
 
 printf "done install_node.sh .\n\n"
