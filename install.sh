@@ -331,13 +331,13 @@ acedirect/install_node.sh -h /home/${AD_USER} -r ${REDIS_AUTH} -p ${ADPASS1} -a 
 
 # install NGINX as root
 cd ~/ace-direct/nginx
-sudo ./install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
+sudo -E ./install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
 
 # install OpenAM as root
 cd ~/ace-direct
 sudo cp -R iam /root/. >/dev/null 2>&1
 cd ~/ace-direct/iam
-sudo ./install_openam.sh  ace  ${OPENAM_FQDN}  ${NGINX_FQDN}  7.0.108 ${KEY_PEM} ${CERT_PEM}
+sudo -E ./install_openam.sh  ace  ${OPENAM_FQDN}  ${NGINX_FQDN}  7.0.108 ${KEY_PEM} ${CERT_PEM}
 
 # build AD
 cd ~/ace-direct
