@@ -295,7 +295,7 @@ then
   printf "${OK_ICON} found cc\n"
 else
   printf "No cc, installing now...\n"
-  sudo yum groupinstall "Development Tools"
+  sudo yum -y groupinstall "Development Tools"
 fi
 printf "\n"
 

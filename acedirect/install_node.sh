@@ -182,14 +182,14 @@ printf "\n"
 cd ${ACE_DIRECT_HOME}
 printf "Installing MySQL...\n"
 sudo systemctl stop mysqld.service  >/dev/null 2>&1  # stop it if it's already there
-sudo yum remove mysql mysql-server  > /dev/null 2>&1  # remove old version
+sudo yum -y remove mysql mysql-server >/dev/null 2>&1  # remove old version
 sudo rm -rf /var/lib/mysql >/dev/null 2>&1
 sudo rm -rf /etc/mysql >/dev/null 2>&1
 sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
 sudo yum update -y 
 sudo -E wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
-sudo yum localinstall mysql57-community-release-el7-11.noarch.rpm 
-sudo yum install mysql-community-server
+sudo yum -y localinstall mysql57-community-release-el7-11.noarch.rpm 
+sudo yum -y install mysql-community-server
 sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
 
 # Start MySQL
