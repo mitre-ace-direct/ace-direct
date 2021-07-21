@@ -5,6 +5,13 @@ RS='\u001b[0m'
 FG_RED='\u001b[31m'
 OK_ICON='✅'
 NOTOK_ICON='❌'
+Q='🤔 '
+
+printf "\n"
+printf "****************************************\n"
+printf "*  ACE Direct acenode installation     *\n"
+printf "****************************************\n"
+printf "\n"
 
 AD_USER=""
 STUN_FQDN=""
@@ -18,18 +25,22 @@ ASTERISK_FQDN=""
 ASTERISK_IP=""
 KURENTO_FQDN=""
 KURENTO_IP=""
+KEY_PEM=""
+CERT_PEM=""
 
 usage() {
   echo ""
   printf "usage:\n\n"
-  echo "     $0 [-u <AD home username>] \\"
-  echo "        [-s <STUN_FQDN>] \\"
-  echo "        [-t <TURN FQDN>] \\"
-  echo "        [-o <OpenAM FQDN>] \\"  
-  echo "        [-m <Main FQDN and private IP>] \\"
-  echo "        [-n <NGINX FQDN and private IP>] \\"
-  echo "        [-k <Kurento FQDN and private IP>] \\"
-  echo "        [-a <ASTERISK FQDN and private IP>]"
+  echo "     $0 -u <AD home username> \\"
+  echo "        -s <STUN_FQDN> \\"
+  echo "        -t <TURN FQDN> \\"
+  echo "        -o <OpenAM FQDN> \\"  
+  echo "        -m <Main FQDN and private IP> \\"
+  echo "        -n <NGINX FQDN and private IP> \\"
+  echo "        -k <Kurento FQDN and private IP> \\"
+  echo "        -a <ASTERISK FQDN and private IP> \\"
+  echo "        [-c <ssl cert file path>] \\"
+  echo "        [-y <ssl key file path>]"
   echo ""
   echo "e.g."
   echo "     $0 -u ec2-user \\"
@@ -39,12 +50,14 @@ usage() {
   echo "        -m \"acenode.domain.com 1.0.0.1\" \\"
   echo "        -n \"portal.domain.com  1.0.0.2\" \\"
   echo "        -k \"acekms.domain.com  1.0.0.3\" \\"
-  echo "        -a \"acesip.domain.com  1.0.0.4\""
+  echo "        -a \"acesip.domain.com  1.0.0.4\" \\"
+  echo "        -c /etc/ssl/cert.pem \\"  
+  echo "        -y /etc/ssl/key.pem"
   echo ""
   exit 1;
 }
 
-while getopts ":u:s:t:o:m:n:k:a:" arg; do
+while getopts ":u:s:t:o:m:n:k:a:c:y:" arg; do
   case "${arg}" in
     u)
       AD_USER=${OPTARG}
@@ -85,7 +98,13 @@ while getopts ":u:s:t:o:m:n:k:a:" arg; do
       array=($OPTARG)
       ASTERISK_FQDN=${array[0]}
       ASTERISK_IP=${array[1]}        
-      ;;            
+      ;;
+    c)
+      CERT_PEM=${OPTARG}
+      ;;
+    y)
+      KEY_PEM=${OPTARG}
+      ;;                  
     *)
       usage
       ;;
@@ -97,7 +116,7 @@ if [ -z "${AD_USER}" ] || [ -z "${STUN_FQDN}" ] || [ -z "${TURN_FQDN}" ] || [ -z
   usage
 fi
 
-printf "\nUsing params:\n\n"
+printf "Your params:\n\n"
 printf "  AD USER:            ${AD_USER}\n"
 printf "  STUN_FQDN:          ${STUN_FQDN}\n"
 printf "  TURN FQDN:          ${TURN_FQDN}\n"
@@ -108,16 +127,25 @@ printf "  KURENTO FQDN , IP:  ${KURENTO_FQDN}  , ${KURENTO_IP}\n"
 printf "  ASTERISK FQDN , IP: ${ASTERISK_FQDN}  , ${ASTERISK_IP}\n"
 printf "\n"
 
-read -p "Do you wish to continue (y/n)? " -n 1 -r
+printf "This script will install the following components on acenode:\n"
+printf "\n"
+printf "Node servers\n"
+printf "Redis\n"
+printf "MongoDB\n"
+printf "MySQL\n"
+printf "OpenAM\n"
+printf "NGINX\n"
+printf "\n"
+
+read -p "${Q}Continue (y/n)? " -n 1 -r
+printf "\n"
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  printf "\n\nContinuing...\n\n"
+  printf ""
 else
-  printf "\n\nABORTING...\n\n"
+  printf "Aborting installation...\n\n"
   exit 1
 fi
-
-# ask some questions
 
 # get the REDIS AUTH password from the user
 REDIS_AUTH=""
@@ -126,16 +154,16 @@ RDPASS2=""
 while true
 do
   printf "\n"
-  read -p "Enter a REDIS AUTH password: " -rs
+  read -p "${Q}Enter a REDIS AUTH password: " -rs
   RDPASS1=${REPLY}
   printf "\n"
-  read -p "Please re-enter the REDIS AUTH password: " -rs
+  read -p "${Q}Please re-enter the REDIS AUTH password: " -rs
   RDPASS2=${REPLY}
   printf "\n"
-  if [ "$RDPASS1" == "$RDPASS2" ]; then
+  if [ "$RDPASS1" == "$RDPASS2" ] && [ ! -z "${RDPASS1}" ] ; then
     break
   fi
-  printf "\n*** ERROR Passwords do not match! ***\n"
+  printf "\n*** ERROR Passwords do not match or are empty! Please try again... ***\n"
 done
 REDIS_AUTH=${RDPASS1}
 
@@ -145,66 +173,68 @@ ADPASS2=""
 while true
 do
   printf "\nEnter a password for the MySQL acedirect user.\n"
-  printf "\nThe password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n\n"
-  read -p "Enter the new password: " -rs
+  printf "The password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n"
+  read -p "${Q}Enter the password: " -rs
   ADPASS1=${REPLY}
   printf "\n"
-  read -p "Please re-enter the password: " -rs
+  read -p "${Q}Please re-enter the password: " -rs
   ADPASS2=${REPLY}
   printf "\n"
-  if [ "$ADPASS1" == "$ADPASS2" ]; then
+  if [ "$ADPASS1" == "$ADPASS2" ] && [ ! -z "${ADPASS1}" ] ; then
     break
   fi
-  printf "\n*** ERROR Passwords do not match! ***\n"
+  printf "\n*** ERROR Passwords do not match or are empty! Please try again... ***\n"
 done
-
-printf "SUCCESS!\n\n"
+printf "\n"
 
 # get the MySQL asterisk user password
 ASPASS1=""
 ASPASS2=""
 while true
 do
-  printf "\nNOW enter a password for the MySQL asterisk user.\n"
-  printf "\nThe password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n\n"
-  read -p "Enter the new password: " -rs
+  printf "Enter a password for the MySQL asterisk user.\n"
+  printf "The password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n"
+  read -p "${Q}Enter the new password: " -rs
   ASPASS1=${REPLY}
   printf "\n"
-  read -p "Please re-enter the password: " -rs
+  read -p "${Q}Please re-enter the password: " -rs
   ASPASS2=${REPLY}
   printf "\n"
-  if [ "$ASPASS1" == "$ASPASS2" ]; then
+  if [ "$ASPASS1" == "$ASPASS2" ] && [ ! -z "${ASPASS1}" ] ; then
     break
   fi
-  printf "\n*** ERROR Passwords do not match! ***\n"
+  printf "\n*** ERROR Passwords do not match or are empty! Please try again... ***\n"
 done
-
-printf "SUCCESS!\n\n"
+printf "\n"
 
 # get the extensions password
 EXPASS1=""
 EXPASS2=""
 while true
 do
-  printf "\nWhat is the Asterisk extensions password?\n"
-  printf "\nYou can find this on the Asterisk server. See the 'password=' field in the /etc/asterisk/pjsip.conf file.\n\n"
-  read -p "Enter the extensions password: " -rs
+  printf "What is the Asterisk extensions password?\n"
+  printf "Get this from the 'password=' field in the /etc/asterisk/pjsip.conf file.\n"
+  read -p "${Q}Enter the extensions password: " -rs
   EXPASS1=${REPLY}
   printf "\n"
-  read -p "Please re-enter extensions password: " -rs
+  read -p "${Q}Please re-enter extensions password: " -rs
   EXPASS2=${REPLY}
   printf "\n"
-  if [ "$EXPASS1" == "$EXPASS2" ]; then
+  if [ "$EXPASS1" == "$EXPASS2" ] && [ ! -z "${EXPASS1}" ] ; then
     break
   fi
-  printf "\n*** ERROR Passwords do not match! ***\n"
+  printf "\n*** ERROR Passwords do not match or are empty! Please try again... ***\n"
 done
+printf "\n"
 
 # config file
 
 # back up config if it's there
-CONFIG_BKUP=dat/config_backup_`date +%s`.json
-cp dat/config.json $CONFIG_BKUP >/dev/null 2>&1
+if [ -f dat/config.json ]; then
+  CONFIG_BKUP=dat/config_backup_`date +%s`.json
+  printf "Backing up existing dat/config.json file to: ${CONFIG_BKUP} .\n"
+  cp dat/config.json $CONFIG_BKUP >/dev/null 2>&1
+fi
 
 # copy template to config
 cp dat/config.json_TEMPLATE dat/config.json
@@ -225,13 +255,27 @@ python scripts/parseSingleJson.py $TMP_CONFIG1 servers:kurento_private_ip $KUREN
 python scripts/parseSingleJson.py $TMP_CONFIG2 signaling_server:path "/${AD_USER}/acedirect-kurento/signaling" > $TMP_CONFIG1
 python scripts/parseSingleJson.py $TMP_CONFIG1 database_servers:redis:auth $REDIS_AUTH > $TMP_CONFIG2 
 python scripts/parseSingleJson.py $TMP_CONFIG2 database_servers:mysql:password $ADPASS1 > $TMP_CONFIG1 
-
 cp $TMP_CONFIG1 dat/config.json
 rm $TMP_CONFIG1 $TMP_CONFIG2 >/dev/null 2>&1
 
-# get pem file locations from config
-KEY_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:private_key`
-CERT_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:certificate`
+# get pem file locations from config if not sent on command line
+if [ ! -z "$KEY_PEM" ]; then
+  KEY_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:private_key`
+else
+  python scripts/parseSingleJson.py dat/config.json common:https:private_key ${KEY_PEM} > $TMP_CONFIG1
+  cp $TMP_CONFIG1 dat/config.json
+  rm $TMP_CONFIG1
+fi
+if [ ! -z "$CERT_PEM" ]; then
+  CERT_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:certificate`
+else
+  python scripts/parseSingleJson.py dat/config.json common:https:certificate ${CERT_PEM} > $TMP_CONFIG1
+  cp $TMP_CONFIG1 dat/config.json
+  rm $TMP_CONFIG1
+fi
+
+# BEGIN INSTALLATION
+printf "\n"
 
 # check for Git
 if git --version >/dev/null 2>&1
@@ -241,6 +285,7 @@ else
   printf "No git, installing now...\n"
   sudo yum install git -y
 fi
+printf "\n"
 
 # check for cc
 if which cc >/dev/null 2>&1
@@ -250,8 +295,10 @@ else
   printf "No cc, installing now...\n"
   sudo yum groupinstall "Development Tools"
 fi
+printf "\n"
 
 # check for sudo permissions
+printf "\nChecking sudo permissions...\n"
 if sudo ls >/dev/null 2>&1
 then
   printf "${OK_ICON} sudo permissions good\n"
@@ -259,6 +306,7 @@ else
   printf "${NOTOK_ICON} No sudo permissions! exiting...\n\n"
   exit 99
 fi
+printf "\n"
 
 # verify HOME account/folder
 set -f
@@ -272,6 +320,7 @@ then
 else
   printf "${OK_ICON} user account matches\n" 
 fi
+printf "\n"
 
 printf "\n\nBeginning installation...\n\n"
 
