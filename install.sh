@@ -287,6 +287,9 @@ else
   printf "No git, installing now...\n"
   sudo yum install git -y
 fi
+# create .gitconfig file
+echo '[url "https://"]' > ~/.gitconfig
+echo '    insteadOf = git://' >> ~/.gitconfig
 printf "\n"
 
 # check for cc

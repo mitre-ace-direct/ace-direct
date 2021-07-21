@@ -151,6 +151,7 @@ sudo cp redis.service /etc/systemd/system/redis.service
 # reload REDIS service
 sudo systemctl daemon-reload
 sudo systemctl enable redis.service
+sudo service redis stop > /dev/null 2>&1
 sudo service redis start
 sudo service redis status
 
