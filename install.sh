@@ -327,7 +327,8 @@ printf "\nBeginning installation...\n\n"
 acedirect/install_node.sh -h /home/${AD_USER} -r ${REDIS_AUTH} -p ${ADPASS1} -a ${ASPASS1} -e ${EXPASS1}
 
 # install Node.js
-nginx/install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
+cd ~/ace-direct/nginx
+sudo ./install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
 
 # install OpenAM as root
 cd ~/ace-direct
