@@ -38,7 +38,7 @@ BASE_NAME=$1
 FQDN=$2
 NGINX_FQDN=$3
 TOMCAT_VERSION=$4
-ROOT_FOLDER=`pwd`
+ROOT_FOLDER="/root"
 
 arr=(${FQDN//./ })
 CD=""
@@ -57,8 +57,9 @@ fi
 
 # install the latest Java version
 printf "Installing Java...\n"
-cd scripts
+cd ${ROOT_FOLDER}/iam/scripts
 python java_installer.py silent
+
 cd $ROOT_FOLDER
 
 JAVA_FULL_PATH=`echo $(dirname $(dirname $(readlink -f $(which javac))))`
@@ -76,6 +77,7 @@ fi
 
 # check for certs and make sure they are valid
 printf "Looking for certs...\n"
+cd ${ROOT_FOLDER}/iam
 if [ ! -z "$KEY_PEM" ]; then
   sudo cp $KEY_PEM ssl/key.pem
 fi
@@ -93,7 +95,7 @@ else
   then
     printf "ssl/cert.pem is good!\n"
     # update permissions and ownership
-    cd ssl
+    cd ${ROOT_FOLDER}/iam/ssl
     chown ${HOME_USER} cert.pem
     chgrp ${HOME_USER} cert.pem
     chown ${HOME_USER} key.pem
@@ -107,7 +109,7 @@ else
 fi
 
 # update environment files
- 
+cd ${ROOT_FOLDER}
 printf "Updating environment files...\n"
 echo '' >> ~/.bashrc
 echo '# OpenAM setup' >> ~/.bashrc
