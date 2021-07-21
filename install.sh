@@ -326,7 +326,7 @@ printf "\nBeginning installation...\n\n"
 # install node components
 acedirect/install_node.sh -h /home/${AD_USER} -r ${REDIS_AUTH} -p ${ADPASS1} -a ${ASPASS1} -e ${EXPASS1}
 
-# install Node.js
+# install NGINX as root
 cd ~/ace-direct/nginx
 sudo ./install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
 
@@ -344,5 +344,5 @@ INSTALL_END=`date +%s`
 
 EQU="scale=2; (${INSTALL_END} - ${INSTALL_START})/60"
 RESULT=`bc <<< $EQU`
-echo "\n*** Installation took $RESULT minutes. ***\n\n"
-printf "\n\n\ndone.\n\n"
+printf "\n*** Installation took $RESULT minutes. ***\n\n"
+printf "\n\ndone.\n"
