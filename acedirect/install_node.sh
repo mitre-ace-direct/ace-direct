@@ -106,7 +106,7 @@ printf "SUCCESS!\n\n"
 cd ${ACE_DIRECT_HOME}
 sudo rm -rf cd redis-stable >/dev/null 2>&1
 sudo -E wget http://download.redis.io/redis-stable.tar.gz
-tar xvzf redis-stable.tar.gz
+tar xvzf redis-stable.tar.gz >/dev/null
 cd redis-stable
 sudo make distclean >/dev/null
 sudo make >/dev/null
@@ -157,6 +157,7 @@ sudo service redis status
 cd ${ACE_DIRECT_HOME}
 sudo rm -f redis-stable.tar.gz >/dev/null 2>&1
 sudo rm -rf redis-stable >/dev/null 2>&1
+printf "\n"
 
 # install MongoDB
 cd ${ACE_DIRECT_HOME}
@@ -175,6 +176,7 @@ sudo yum install -y mongodb-org
 sudo systemctl start mongod  # if it fails: sudo systemctl daemon-reload
 sudo systemctl status mongod  # check status
 sudo systemctl enable mongod  # start at boot time
+printf "\n"
 
 # Install MySQL
 cd ${ACE_DIRECT_HOME}
