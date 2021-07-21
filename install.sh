@@ -1,5 +1,6 @@
 #!/bin/bash
 
+OLDIFS=$IFS
 INSTALL_START=`date +%s`
 RS='\u001b[0m'
 FG_RED='\u001b[31m'
@@ -115,6 +116,7 @@ shift $((OPTIND-1))
 if [ -z "${AD_USER}" ] || [ -z "${STUN_FQDN}" ] || [ -z "${TURN_FQDN}" ] || [ -z "${OPENAM_FQDN}" ] || [ -z "${MAIN_FQDN}" ] || [ -z "${MAIN_IP}" ] || [ -z "${NGINX_FQDN}" ] || [ -z "${NGINX_IP}" ] || [ -z "${ASTERISK_FQDN}" ] || [ -z "${ASTERISK_IP}" ] || [ -z "${KURENTO_FQDN}" ] || [ -z "${KURENTO_IP}" ]; then
   usage
 fi
+IFS=$OLDIFS
 
 printf "Your params:\n\n"
 printf "  AD USER:            ${AD_USER}\n"
@@ -321,6 +323,7 @@ else
   printf "${OK_ICON} user account matches\n" 
 fi
 
+IFS=$OLDIFS
 printf "\nBeginning installation...\n\n"
 
 # install node components
