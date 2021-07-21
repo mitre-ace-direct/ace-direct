@@ -1,7 +1,6 @@
 #!/bin/bash
 
 OLDIFS=$IFS
-INSTALL_START=`date +%s`
 RS='\u001b[0m'
 FG_RED='\u001b[31m'
 OK_ICON='✅'
@@ -277,6 +276,7 @@ else
 fi
 
 # BEGIN INSTALLATION
+INSTALL_START=`date +%s` # start the clock
 printf "\n"
 
 # check for Git
@@ -324,7 +324,7 @@ else
 fi
 
 IFS=$OLDIFS
-printf "\nBeginning installation...\n\n"
+printf "\nBeginning installation..."
 
 # install node components
 acedirect/install_node.sh -h /home/${AD_USER} -r ${REDIS_AUTH} -p ${ADPASS1} -a ${ASPASS1} -e ${EXPASS1}
