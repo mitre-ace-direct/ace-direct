@@ -82,6 +82,7 @@ printf "\n"
 
 # install REDIS
 printf "Installing REDIS...\n"
+sudo service redis stop >/dev/null 2>&1
 # get the REDIS AUTH password
 while true
 do
@@ -163,7 +164,7 @@ printf "\n"
 # install MongoDB
 cd ${ACE_DIRECT_HOME}
 printf "Installing MongoDB...\n"
-sudo systemctl start mongod >/dev/null 2>&1
+sudo systemctl stop mongod >/dev/null 2>&1
 MONGO_CONF="/etc/yum.repos.d/mongodb-org-4.4.repo"
 sudo chmod 666 ${MONGO_CONF}
 sudo echo "" > ${MONGO_CONF}
