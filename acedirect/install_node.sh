@@ -1,5 +1,11 @@
 #!/bin/bash
 
+RS='\u001b[0m'
+FG_RED='\u001b[31m'
+OK_ICON='✅'
+NOTOK_ICON='❌'
+Q='🤔 '
+
 ACE_DIRECT_HOME=""
 REDIS_AUTH=""
 RDPASS1=""
@@ -83,10 +89,10 @@ do
     break
   fi
   printf "\n"
-  read -p "Enter a REDIS AUTH password: " -rs
+  read -p "${Q}Enter a REDIS AUTH password: " -rs
   RDPASS1=${REPLY}
   printf "\n"
-  read -p "Please re-enter the REDIS AUTH password: " -rs
+  read -p "${Q}Please re-enter the REDIS AUTH password: " -rs
   RDPASS2=${REPLY}
   printf "\n"
   if [ "$RDPASS1" == "$RDPASS2" ]; then
@@ -192,12 +198,12 @@ sudo systemctl enable mysqld.service  # start at boot time
 
 # get temporary MySQL root password
 TEMP_ROOT_PWD=`sudo grep 'temporary password' /var/log/mysqld.log | tail -1 | awk '{print $NF}'`
-printf "\n\nYour TEMPORARY ROOT PASSWORD IS: ${TEMP_ROOT_PWD}\n\n\n"
+printf "\n\nYour TEMPORARY MySQL ROOT PASSWORD IS: ${TEMP_ROOT_PWD}\n\n"
+printf "PLEASE WRITE IT DOWN.\n"
+printf "Securing MySQL...\n"
+printf "You will now set security options and reset the ROOT PASSWORD...!\n"
+printf "Log in with your TEMPORARY MYSQL ROOT PASSWORD...\n"
 
-#TODO
-printf "Securing MySQL...\n\n"
-printf "Log into MySQL with the TEMPORARY ROOT PASSWORD...\n\n"
-printf "You will now set security options and reset the ROOT PASSWORD. PLEASE REMEMBER THE ROOT PASSWORD!\n\n"
 mysql_secure_installation
 
 printf "Creating databases...\n"
@@ -209,10 +215,10 @@ do
   fi
   printf "\nEnter a password for the MySQL acedirect user.\n"
   printf "\nThe password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n\n"
-  read -p "Enter the new password: " -rs
+  read -p "${Q}Enter the new password: " -rs
   ADPASS1=${REPLY}
   printf "\n"
-  read -p "Please re-enter the password: " -rs
+  read -p "${Q}Please re-enter the password: " -rs
   ADPASS2=${REPLY}
   printf "\n"
   if [ "$ADPASS1" == "$ADPASS2" ]; then
@@ -220,8 +226,7 @@ do
   fi
   printf "\n*** ERROR Passwords do not match! ***\n"
 done
-
-printf "SUCCESS!\n\n"
+printf "\n"
 
 # get the MySQL asterisk user password
 while true
@@ -231,10 +236,10 @@ do
   fi
   printf "\nNOW enter a password for the MySQL asterisk user.\n"
   printf "\nThe password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n\n"
-  read -p "Enter the new password: " -rs
+  read -p "${Q}Enter the new password: " -rs
   ASPASS1=${REPLY}
   printf "\n"
-  read -p "Please re-enter the password: " -rs
+  read -p "${Q}Please re-enter the password: " -rs
   ASPASS2=${REPLY}
   printf "\n"
   if [ "$ASPASS1" == "$ASPASS2" ]; then
@@ -242,8 +247,7 @@ do
   fi
   printf "\n*** ERROR Passwords do not match! ***\n"
 done
-
-printf "SUCCESS!\n\n"
+printf "\n"
 
 # get the extensions password
 while true
@@ -253,10 +257,10 @@ do
   fi
   printf "\nWhat is the Asterisk extensions password?\n"
   printf "\nYou can find this on the Asterisk server. See the 'password=' field in the /etc/asterisk/pjsip.conf file.\n\n"
-  read -p "Enter the extensions password: " -rs
+  read -p "${Q}Enter the extensions password: " -rs
   EXPASS1=${REPLY}
   printf "\n"
-  read -p "Please re-enter extensions password: " -rs
+  read -p "${Q}Please re-enter extensions password: " -rs
   EXPASS2=${REPLY}
   printf "\n"
   if [ "$EXPASS1" == "$EXPASS2" ]; then
@@ -264,6 +268,7 @@ do
   fi
   printf "\n*** ERROR Passwords do not match! ***\n"
 done
+printf "\n"
 
 cd ${ACE_DIRECT_HOME}/ace-direct/dat
 TMP1=/tmp/`date +%s`_file1.txt
