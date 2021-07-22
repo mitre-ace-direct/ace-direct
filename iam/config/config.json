@@ -54,6 +54,12 @@
                 "type": "User"
             },
             {
+                "username": "dagent1v",
+                "password": "Dagent1#",
+                "realm": "/",
+                "type": "User"
+            },            
+            {
                 "username": "manager",
                 "password": "manager1234",
                 "realm": "/",
