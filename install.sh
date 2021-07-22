@@ -218,7 +218,6 @@ while true
 do
   read -p "${Q}Enter the Asterisk AMI userid: " -r
   AMUSER=${REPLY}
-  printf "\n"
   read -p "${Q}Enter the Asterisk AMI password: " -rs
   AMPASS1=${REPLY}
   printf "\n"
