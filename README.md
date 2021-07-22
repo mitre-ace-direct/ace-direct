@@ -101,7 +101,24 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 ## Automatic installer for acenode
 
-_Experimental._ See the [install.sh](install.sh) file for an automated installation script. This will install install prerequisites on `acenode` and perform checks. It will install and build OpenAM, NGINX, and all Node components on `acenode`.
+_Experimental._ See the [install.sh](install.sh) file for an automated installation script. This will install the following on `acenode`:
+
+* Install prerequisites on `acenode`
+* Install Redis, MongoDB, MySQL, OpenAM, and Node app servers
+* Populate databases
+* Perform status checks
+
+To use it:
+
+```bash
+$  # clone this repo to the ACE Direct user account (e.g., /home/ec2-user) on the acenode server
+$
+$  cd /home/ec2-user/ace-direct
+$  ./install.sh  # see the usage, then run with the required parameters
+.
+.
+.
+```
 
 ## Prerequisites for acenode
 
