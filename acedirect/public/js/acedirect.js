@@ -1899,11 +1899,8 @@ function updateVideomailTable(data) {
 		receivedCell.innerHTML = vidReceived;
 		durationCell.innerHTML = vidDuration;
 
-		if ($('#user-status').text() == 'Away'){
-			callbackCell.innerHTML = '<button class=\"demo-btn\" onclick="outbound_call(\'' + data[i].callbacknumber + '\')"><i class="fa fa-phone-square"></i></button>';
-		} else{
-			callbackCell.innerHTML = '<button><i class="fa fa-phone-square"></i></button>';
-		}
+		callbackCell.innerHTML = '<button class=\"demo-btn\" onclick="outbound_call(\'' + data[i].callbacknumber + '\')"><i class="fa fa-phone-square"></i></button>';
+		
 
 		if (vidStatus === 'UNREAD')
 			statusCell.innerHTML = '<span style="font-weight:bold">' + vidStatus + '</span>';
@@ -1966,7 +1963,6 @@ function playCallRecording(filename){
 	//Start by removing the persist camera and sending agent to away
 	disable_persist_view();
 	document.getElementById("persistCameraCheck").disabled = true;
-	pauseQueues();
 
 	remoteView.removeAttribute("poster");
 	console.log("Assigning file");
@@ -2356,7 +2352,6 @@ function playVideomail(id, duration, vidStatus) {
 	disable_persist_view();
 	document.getElementById("persistCameraCheck").disabled = true;
 	playingVideomail = true;
-	pauseQueues();
 
 	//console.log('Playing video mail with id ' + id);
 	//remoteView.removeAttribute("autoplay");
@@ -3065,6 +3060,9 @@ function transferResponse(isAccepted) {
 
 //Check if status needs to be changed
 $('#accept-btn').click(function () {
+	if($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#shortcuts-tab').hasClass('active')) {
+		$('#mail-btn').trigger('click');
+	}
 	$('#user-status').text('In Call');
 	changeStatusIcon(in_call_color, "in-call", in_call_blinking);
 	changeStatusLight('IN_CALL');
