@@ -251,6 +251,32 @@ do
 done
 printf "\n"
 
+# get the turn user, turn password, stun user
+printf "Please supply the STUN server user, TURN server user and password...\n"
+printf "Retrieve these values from your TURN and STUN installations...\n"
+STUNUSER=
+TURNUSER=""
+TURNPASS1=""
+TURNPASS2=""
+while true
+do
+  read -p "${Q}Enter the STUN user: " -r
+  STUNUSER=${REPLY}
+  read -p "${Q}Enter the TURN user: " -r
+  TURNUSER=${REPLY}  
+  read -p "${Q}Enter the TURN password: " -rs
+  TURNPASS1=${REPLY}
+  printf "\n"
+  read -p "${Q}Re-enter the TURN password: " -rs
+  TURNPASS2=${REPLY}
+  printf "\n"
+  if [ "$TURNPASS1" == "$TURNPASS2" ] && [ ! -z "${TURNPASS1}" ]  && [ ! -z "${STUNUSER}" ] && [ ! -z "${TURNUSER}" ] ; then
+    break
+  fi
+  printf "\n*** ERROR Passwords do not match or some fields are empty! Please try again... ***\n"
+done
+printf "\n"
+
 # config file
 
 # back up config if it's there
@@ -281,8 +307,11 @@ python scripts/parseSingleJson.py $TMP_CONFIG1 database_servers:redis:auth $REDI
 python scripts/parseSingleJson.py $TMP_CONFIG2 database_servers:mysql:password $ADPASS1 > $TMP_CONFIG1 
 python scripts/parseSingleJson.py $TMP_CONFIG1 asterisk:ami:passwd $AMPASS1 > $TMP_CONFIG2 
 python scripts/parseSingleJson.py $TMP_CONFIG2 asterisk:ami:id $AMUSER > $TMP_CONFIG1
+python scripts/parseSingleJson.py $TMP_CONFIG1 asterisk:sip:stun_user $STUNUSER > $TMP_CONFIG2 
+python scripts/parseSingleJson.py $TMP_CONFIG2 asterisk:sip:turn_user $TURNUSER > $TMP_CONFIG1 
+python scripts/parseSingleJson.py $TMP_CONFIG1 asterisk:sip:turn_cred $TURNPASS1 > $TMP_CONFIG2 
+cp $TMP_CONFIG2 dat/config.json
 
-cp $TMP_CONFIG1 dat/config.json
 rm $TMP_CONFIG1 $TMP_CONFIG2 >/dev/null 2>&1
 
 # get pem file locations from config if not sent on command line
