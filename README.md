@@ -99,7 +99,9 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 `acenode` hosts the Redis, MongoDB, MySQL, and application servers. Log into `acenode.domain.com` and follow the directions below.
 
-## Automatic installer for acenode
+### Automatic installer for acenode
+
+> :warning: **This installer assumes that you already installed:**: Asterisk, STUN, TURN, Kurento, and Kamailio.
 
 _Experimental._ See the [install.sh](install.sh) file for an automated installation script. This will install the following on `acenode`:
 
@@ -120,7 +122,28 @@ $  ./install.sh  # see the usage, then run with the required parameters
 .
 ```
 
-## Prerequisites for acenode
+For example...
+
+```bash
+$  ./install.sh -u ec2-user \
+     -s acestun.domain.com \
+     -t aceturn.domain.com \
+     -o acenode.domain.com \
+     -m "acenode.domain.com 1.0.0.1" \
+     -n "acenode.domain.com 1.0.0.1" \
+     -k "acekms.domain.com  1.0.0.2" \
+     -a "acesip.domain.com  1.0.0.3" \
+     -c /etc/ssl/cert.pem \
+     -y /etc/ssl/key.pem
+```
+
+After executing this script, try to access the portals. See [Accessing the websites](#accessing-the-websites) .
+
+### Manual installation of acenode
+
+Here are detailed installation instructions, if you do not use the overall installer above.
+
+#### Prerequisites for acenode
 
 Complete these prerequisite prior to installation:
 
@@ -132,22 +155,6 @@ Complete these prerequisite prior to installation:
 1. Make sure `cc` is present: `which cc`, othwerise, install _Development Tools_: `sudo yum groupinstall "Development Tools"`
 1. Copy/clone this `ace-direct` repo to the ACE Direct user home folder: `/home/ec2-user`.
 1. Make sure that the ACE Direct home user, e.g., `/home/ec2-user`, has `sudo` privileges.
-
-### Automated acenode Installation
-
-This script will install several ACE Direct core components: Node.js, Redis, MongoDB, MySQL, and application databases.
-
-```bash
-$  cd /home/ec2-user/ace-direct
-$
-$  ./install_node.sh  # see the usage, then execute it with the correct parameters
-```
-
-After executing this script, try to access the portals. See [Accessing the websites](#accessing-the-websites) .
-
-Manual instructions are below.
-
-### Manual acenode Installation
 
 #### Setup
 
