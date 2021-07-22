@@ -208,7 +208,31 @@ do
 done
 printf "\n"
 
-# get the extensions password
+# get the Asterisk AMI userid and password
+printf "Please supply the Asterisk AMI userid and password...\n"
+printf "You can find this on the Asterisk server in /etc/asterisk/manager.conf...\n"
+AMUSER=""
+AMPASS1=""
+AMPASS2=""
+while true
+do
+  read -p "${Q}Enter the Asterisk AMI userid: " -r
+  AMUSER=${REPLY}
+  printf "\n"
+  read -p "${Q}Enter the Asterisk AMI password: " -rs
+  AMPASS1=${REPLY}
+  printf "\n"
+  read -p "${Q}Re-enter the Asterisk AMI password: " -rs
+  AMPASS2=${REPLY}
+  printf "\n"
+  if [ "$AMPASS1" == "$AMPASS2" ] && [ ! -z "${AMPASS1}" ]  && [ ! -z "${AMUSER}" ] ; then
+    break
+  fi
+  printf "\n*** ERROR Passwords do not match or some fields are empty! Please try again... ***\n"
+done
+printf "\n"
+
+# get the Asterisk extensions password
 EXPASS1=""
 EXPASS2=""
 while true
@@ -256,6 +280,9 @@ python scripts/parseSingleJson.py $TMP_CONFIG1 servers:kurento_private_ip $KUREN
 python scripts/parseSingleJson.py $TMP_CONFIG2 signaling_server:path "/${AD_USER}/acedirect-kurento/signaling" > $TMP_CONFIG1
 python scripts/parseSingleJson.py $TMP_CONFIG1 database_servers:redis:auth $REDIS_AUTH > $TMP_CONFIG2 
 python scripts/parseSingleJson.py $TMP_CONFIG2 database_servers:mysql:password $ADPASS1 > $TMP_CONFIG1 
+python scripts/parseSingleJson.py $TMP_CONFIG1 asterisk:ami:passwd $AMPASS1 > $TMP_CONFIG2 
+python scripts/parseSingleJson.py $TMP_CONFIG2 asterisk:ami:id $AMUSER > $TMP_CONFIG1
+
 cp $TMP_CONFIG1 dat/config.json
 rm $TMP_CONFIG1 $TMP_CONFIG2 >/dev/null 2>&1
 
