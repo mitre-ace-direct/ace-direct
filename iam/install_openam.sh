@@ -101,10 +101,10 @@ if [ -z "${ADMIN_PASSWORD}" ]; then
   while true
   do
     printf "\n"
-    read -p "${Q}Enter a REDIS AUTH password: " -rs
+    read -p "${Q}Enter an OpenAM admin password: " -rs
     APASS1=${REPLY}
     printf "\n"
-    read -p "${Q}Please re-enter the REDIS AUTH password: " -rs
+    read -p "${Q}Please re-enter the OpenAM admin password: " -rs
     APASS2=${REPLY}
     printf "\n"
     if [ "$APASS1" == "$APASS2" ] && [ ! -z "${APASS1}" ] ; then
