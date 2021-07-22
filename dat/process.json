@@ -1,78 +1,78 @@
 {
-  "apps": [{
-    "name": "ACE Direct",
-    "script": "adserver.js",
-    "cwd": "./acedirect",
-    "restart_delay": 5000,
-    "autorestart": false,
-    "out_file": "./logs/pm2-adserver.log",
-    "error_file": "./logs/pm2-adserver-error.log"
-
-  },
-  {
-    "name":"Management Dashboard",
-    "script": "server-db.js",
-    "cwd": "./managementportal",
-    "restart_delay": 5000,
-    "autorestart": false,
-    "out_file": "./logs/pm2-server-db.log",
-    "error_file": "./logs/pm2-server-db-error.log"
-  },
-  {
-    "name":"Fendesk",
-    "script": "app.js",
-    "cwd": "./fendesk",
-    "restart_delay": 5000,
-    "autorestart": false,
-    "out_file": "./logs/pm2-fendesk.log",
-    "error_file": "./logs/pm2-fendesk-error.log"
-  },
-  {
-    "name":"CDR",
-    "script": "app.js",
-    "cwd": "./acr-cdr",
-    "restart_delay": 5000,
-    "autorestart": false,
-    "out_file": "./logs/pm2-app.log",
-    "error_file": "./logs/pm2-app-error.log"
-  },
-  {
-    "name":"ASERVER",
-    "script": "app.js",
-    "cwd": "./aserver",
-    "restart_delay": 5000,
-    "autorestart": false,
-    "out_file": "./logs/pm2-app.log",
-    "error_file": "./logs/pm2-app-error.log"
-  },
-  {
-    "name":"USERVER",
-    "script": "app.js",
-    "cwd": "./userver",
-    "restart_delay": 5000,
-    "autorestart": false,
-    "out_file": "./logs/pm2-app.log",
-    "error_file": "./logs/pm2-app-error.log"
-  },
-  {
-    "name":"Signaling Server",
-    "script": "src/index.js",
-    "cwd": "./acedirect-kurento",
-    "restart_delay": 5000,
-    "autorestart": false,
-    "out_file": "./logs/pm2-server-db.log",
-    "error_file": "./logs/pm2-server-db-error.log",
-    "log_date_format": "YYYY-MM-DD HH:mm Z"
-  },
-  {
-    "name":"Videomail Server",
-    "script": "src/server.js",
-    "cwd": "./videomail-service",
-    "restart_delay": 5000,
-    "autorestart": false,
-    "out_file": "./logs/pm2-server-db.log",
-    "error_file": "./logs/pm2-server-db-error.log",
-    "log_date_format": "YYYY-MM-DD HH:mm Z"
-  }
-]
+  "apps": [
+    {
+      "name": "acedirect",
+      "script": "adserver.js",
+      "cwd": "./acedirect",
+      "restart_delay": 5000,
+      "autorestart": false,
+      "out_file": "./logs/pm2-adserver.log",
+      "error_file": "./logs/pm2-adserver-error.log"
+    },
+    {
+      "name": "managementportal",
+      "script": "server-db.js",
+      "cwd": "./managementportal",
+      "restart_delay": 5000,
+      "autorestart": false,
+      "out_file": "./logs/pm2-server-db.log",
+      "error_file": "./logs/pm2-server-db-error.log"
+    },
+    {
+      "name": "fendesk",
+      "script": "app.js",
+      "cwd": "./fendesk",
+      "restart_delay": 5000,
+      "autorestart": false,
+      "out_file": "./logs/pm2-fendesk.log",
+      "error_file": "./logs/pm2-fendesk-error.log"
+    },
+    {
+      "name": "acr-cdr",
+      "script": "app.js",
+      "cwd": "./acr-cdr",
+      "restart_delay": 5000,
+      "autorestart": false,
+      "out_file": "./logs/pm2-app.log",
+      "error_file": "./logs/pm2-app-error.log"
+    },
+    {
+      "name": "aserver",
+      "script": "app.js",
+      "cwd": "./aserver",
+      "restart_delay": 5000,
+      "autorestart": false,
+      "out_file": "./logs/pm2-app.log",
+      "error_file": "./logs/pm2-app-error.log"
+    },
+    {
+      "name": "userver",
+      "script": "app.js",
+      "cwd": "./userver",
+      "restart_delay": 5000,
+      "autorestart": false,
+      "out_file": "./logs/pm2-app.log",
+      "error_file": "./logs/pm2-app-error.log"
+    },
+    {
+      "name": "acedirect-kurento",
+      "script": "src/index.js",
+      "cwd": "./acedirect-kurento",
+      "restart_delay": 5000,
+      "autorestart": false,
+      "out_file": "./logs/pm2-server-db.log",
+      "error_file": "./logs/pm2-server-db-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "name": "videomail-service",
+      "script": "src/server.js",
+      "cwd": "./videomail-service",
+      "restart_delay": 5000,
+      "autorestart": false,
+      "out_file": "./logs/pm2-server-db.log",
+      "error_file": "./logs/pm2-server-db-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    }
+  ]
 }
