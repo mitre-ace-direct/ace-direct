@@ -294,7 +294,6 @@ if [ -z "${OPENAM_USER}" ]; then
   do
     read -p "${Q}Enter an OpenAM Admin username: " -r
     OPENAM_USER=${REPLY}
-    printf "\n"
     if [ ! -z "${OPENAM_USER}" ] ; then
       break
     fi
@@ -356,7 +355,13 @@ python scripts/parseSingleJson.py $TMP_CONFIG1 asterisk:sip:stun_user $STUNUSER 
 python scripts/parseSingleJson.py $TMP_CONFIG2 asterisk:sip:turn_user $TURNUSER > $TMP_CONFIG1 
 python scripts/parseSingleJson.py $TMP_CONFIG1 asterisk:sip:turn_cred $TURNPASS1 > $TMP_CONFIG2 
 python scripts/parseSingleJson.py $TMP_CONFIG2 asterisk:extensions:secret $EXPASS1 > $TMP_CONFIG1 
-cp $TMP_CONFIG1 dat/config.json
+python scripts/parseArrayJson.py $TMP_CONFIG1 videomail:agents 0 sipPass $EXPASS1 > $TMP_CONFIG2 
+python scripts/parseArrayJson.py $TMP_CONFIG2 videomail:agents 1 sipPass $EXPASS1 > $TMP_CONFIG1 
+python scripts/parseArrayJson.py $TMP_CONFIG1 videomail:agents 2 sipPass $EXPASS1 > $TMP_CONFIG2 
+python scripts/parseArrayJson.py $TMP_CONFIG2 videomail:agents 3 sipPass $EXPASS1 > $TMP_CONFIG1 
+python scripts/parseArrayJson.py $TMP_CONFIG1 videomail:agents 4 sipPass $EXPASS1 > $TMP_CONFIG2 
+
+cp $TMP_CONFIG2 dat/config.json
 
 rm $TMP_CONFIG1 $TMP_CONFIG2 >/dev/null 2>&1
 
