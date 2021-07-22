@@ -9,17 +9,111 @@
 # * This is the root user, /root
 # * Python is already installed
 
-if [ "$#" -lt 4 ]; then
-  printf "\nusage:  $0  <base name>  <OPENAM FQDN>  <NGINX FQDN>  <TOMCAT VERSION> [key pem file location] [cert pem file location] \n"
-  printf "e.g.    $0  ace  aceopenam.domain.com  portal.domain.com  7.0.108 \n\n"
-  exit 99
-fi
+OLDIFS=$IFS
+RS='\u001b[0m'
+FG_RED='\u001b[31m'
+OK_ICON='✅'
+NOTOK_ICON='❌'
+Q='🤔 '
 
+BASE_NAME=""
+FQDN=""
+NGINX_FQDN=""
+TOMCAT_VERSION=""
+ADMIN_USER=""
+ADMIN_PASSWORD=""
 KEY_PEM=""
 CERT_PEM=""
-if [ "$#" -ge 6 ]; then
-  KEY_PEM=$5
-  CERT_PEM=$6
+usage() {
+  echo ""
+  printf "usage:\n\n"
+  echo "     $0 -b <base name> \\"
+  echo "        -o <OpenAM FQDN> \\"
+  echo "        -n <NGINX FQDN> \\"
+  echo "        -t <Tomcat version> \\"  
+  echo "        [ -a <Admin user> ] \\"
+  echo "        [ -p <Admin password> ] \\"
+  echo "        [ -k <full path key pem file> ] \\"
+  echo "        [ -c <full path cert pem file> ]"    
+  echo ""
+  echo "e.g."
+  echo "     $0 -b ace \\"
+  echo "        -o aceopenam.domain.com \\"
+  echo "        -n portal.domain.com \\"
+  echo "        -t 7.0.108"  
+  echo ""
+  exit 1;
+}
+while getopts ":b:o:n:t:a:p:k:c:" arg; do
+  case "${arg}" in
+    b)
+      BASE_NAME=${OPTARG}
+      ;;
+    o)
+      FQDN=${OPTARG}
+      ;;          
+    n)
+      NGINX_FQDN=${OPTARG}
+      ;;
+    t)
+      TOMCAT_VERSION=${OPTARG}
+      ;;
+    a)
+      ADMIN_USER=${OPTARG}
+      ;;     
+    p)
+      ADMIN_PASSWORD=${OPTARG}
+      ;;     
+    k)
+      KEY_PEM=${OPTARG}
+      ;;     
+    c)
+      CERT_PEM=${OPTARG}
+      ;;                          
+    *)
+      usage
+      ;;
+  esac
+done
+shift $((OPTIND-1))
+
+if [ -z "${BASE_NAME}" ] || [ -z "${FQDN}" ] || [ -z "${NGINX_FQDN}" ] || [ -z "${TOMCAT_VERSION}" ]; then
+  usage
+fi
+
+if [ -z "${ADMIN_USER}" ]; then
+  while true
+  do
+    read -p "${Q}Enter an OpenAM Admin username: " -r
+    ADMIN_USER=${REPLY}
+    printf "\n"
+    if [ ! -z "${ADMIN_USER}" ] ; then
+      break
+    fi
+    printf "\n*** ERROR OpenAM Admin userame is blank. Please try again... ***\n"
+  done
+  printf "\n"
+fi
+
+if [ -z "${ADMIN_PASSWORD}" ]; then
+  APASS1=""
+  APASS2=""
+  while true
+  do
+    printf "\n"
+    read -p "${Q}Enter a REDIS AUTH password: " -rs
+    APASS1=${REPLY}
+    printf "\n"
+    read -p "${Q}Please re-enter the REDIS AUTH password: " -rs
+    APASS2=${REPLY}
+    printf "\n"
+    if [ "$APASS1" == "$APASS2" ] && [ ! -z "${APASS1}" ] ; then
+      ADMIN_PASSWORD=${APASS1}
+      break
+    fi
+    printf "\n*** ERROR Passwords do not match or are empty! Please try again... ***\n"
+  done
+  printf "\n"
 fi
 
 printf "\n\nInstalling OpenAM...\n\n"
@@ -34,10 +128,6 @@ fi
 
 HOME_FOLDER="/root"
 HOME_USER="root"
-BASE_NAME=$1
-FQDN=$2
-NGINX_FQDN=$3
-TOMCAT_VERSION=$4
 ROOT_FOLDER="/root"
 
 arr=(${FQDN//./ })
@@ -237,6 +327,7 @@ re2='^[[:space:]]*DEPLOYMENT_URI='
 re3='^[[:space:]]*BASE_DIR='
 re4='^[[:space:]]*COOKIE_DOMAIN='
 re5='^[[:space:]]*DIRECTORY_SERVER='
+re6='^[[:space:]]*ADMIN_PWD='
 echo "" > $tmpfile
 while IFS= read -r line; do
   if [[ $line =~ $re1 ]] ;
@@ -259,6 +350,10 @@ while IFS= read -r line; do
   then
     # update directory server
     printf "DIRECTORY_SERVER=${FQDN}\n" >> $tmpfile
+  elif [[ $line =~ $re6 ]] ;
+  then
+    # update openam admin password
+    printf "ADMIN_PWD=${ADMIN_PASSWORD}\n" >> $tmpfile    
   else
     printf "$line\n" >> $tmpfile
   fi
@@ -304,7 +399,7 @@ chmod 755 ${HOME_FOLDER}/iam/config/oam/SSOAdminTools-13.0.0/${BASE_NAME}/bin/ss
 # verify ssoadm
 printf "verifying ssoadm...\n"
 cd  ${HOME_FOLDER}/iam/config/oam/SSOAdminTools-13.0.0/${BASE_NAME}/bin
-echo password1 > pwd.txt
+echo ${ADMIN_PASSWORD} > pwd.txt
 chmod 400 pwd.txt
 ./ssoadm list-servers -u amadmin -f pwd.txt >/dev/null 2>&1   # optional?
 
