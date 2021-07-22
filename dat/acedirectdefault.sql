@@ -125,7 +125,7 @@ CREATE TABLE `asterisk_operating_status` (
   `start` varchar(8) DEFAULT '00:00',
   `end` varchar(8) DEFAULT '24:00',
   `force_off_hours` tinyint(1) DEFAULT '0',
-  `business_mode` int(1) DEFAULT NULL,
+  `business_mode` int(1) DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
