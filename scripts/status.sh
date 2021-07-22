@@ -308,7 +308,7 @@ printf "\n"
 if ${PASSED}; then
    echo " 👍  All tests passed!"
 else
-   echo " 👎  ${FG_RED}Some tests failed!${RS}"
+   printf " 👎  ${FG_RED}Some tests failed!${RS}\n"
 fi
 printf "\n"
 
