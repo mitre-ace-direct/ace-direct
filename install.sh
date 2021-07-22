@@ -396,7 +396,7 @@ sudo -E ./install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
 cd ~/ace-direct
 sudo cp -R iam /root/. >/dev/null 2>&1
 cd ~/ace-direct/iam
-sudo -E ./install_openam.sh  ace  ${OPENAM_FQDN}  ${NGINX_FQDN}  7.0.108 ${KEY_PEM} ${CERT_PEM}
+sudo -E ./install_openam.sh  -b ace  -o ${OPENAM_FQDN}  -n ${NGINX_FQDN}  -t 7.0.108 -k ${KEY_PEM} -c ${CERT_PEM}
 
 # build AD
 cd ~/ace-direct
