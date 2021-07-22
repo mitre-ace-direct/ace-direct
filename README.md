@@ -143,7 +143,9 @@ $
 $  ./install_node.sh  # see the usage, then execute it with the correct parameters
 ```
 
-After executing this script, proceed to this section to complete the installation: [Application servers](#application-servers) . Manual instructions are below.
+After executing this script, try to access the portals. See [Accessing the websites](#accessing-the-websites) .
+
+Manual instructions are below.
 
 ### Manual acenode Installation
 
@@ -472,7 +474,7 @@ See the [./obusylight/README.md](./obusylight/README.md) for instructions on how
 
 The URLs depend on your `~/ace-direct/dat/config.json` settings, specifically `nginx:ad_path`, `nginx:mp_path`, `nginx:agent_route`, and `nginx:consumer_route`.
 
-Refer to the usernames and passwords from the `aceopenam` installation to log into the Agent and Management portals.
+Refer to the Agent/Manager usernames and passwords from the `aceopenam` installation to log into the Agent and Management portals.
 
 Default Consumer portal numbers are `111-111-1111`, `222-222-2222`, ... `999-999-9999`. However, if ITRS mode is enabled ('user_service:itrs_mode'), you will need a valid VRS phone number.
 

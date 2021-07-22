@@ -300,7 +300,6 @@ if [ -z "${OPENAM_USER}" ]; then
     fi
     printf "\n*** ERROR OpenAM Admin userame is blank. Please try again... ***\n"
   done
-  printf "\n"
 fi
 
 if [ -z "${OPENAM_PASS}" ]; then
@@ -308,7 +307,6 @@ if [ -z "${OPENAM_PASS}" ]; then
   APASS2=""
   while true
   do
-    printf "\n"
     read -p "${Q}Enter an OpenAM admin password: " -rs
     APASS1=${REPLY}
     printf "\n"
