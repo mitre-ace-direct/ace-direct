@@ -509,7 +509,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 
   * To restart the application servers: `pm2 restart all`
 
-* Perform an ACE Direct self-test:
+* Perform an ACE Direct self-test on the `acenode` server:
 
   ```bash
   $  cd ~/ace-direct
@@ -558,6 +558,18 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   $  npm run config
   $
   $  pm2 restart all  # restart all application servers
+  ```
+
+* The Node builds on `acenode` are taking too long - see instructions above for creating the `~/.gitconfig` file.
+* A node server is failing to build or start - the `package-lock.json` file may be outdated. Delete the file and rebuild. For example, for `videomail-service`:
+
+  ```bash
+  $  cd ~/ace-direct/videomail-service
+  $
+  $  rm package-lock.json
+  $  npm run build
+  ...
+  $  pm2 restart all  # restart the node servers
   ```
 
 ---
