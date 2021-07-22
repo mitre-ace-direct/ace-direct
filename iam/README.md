@@ -392,7 +392,7 @@ With OpenAM/Tomcat up and running, set up the OpenAM admin tools:
     $  cd  /root/iam/config/oam/SSOAdminTools-13.0.0/ace/bin
     $
     $  # get value of ADMIN_PWD in /root/iam/config/oam/config.properties. add it to pwd.txt
-    $  echo password1 > pwd.txt  # assuming the default OpenAM Admin password
+    $  echo password1 > pwd.txt  # default OpenAM password for reference only
     $  chmod 400 pwd.txt  # change permissions
     $
     $  # run ssoadm to verify it
