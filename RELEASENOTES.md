@@ -2,7 +2,7 @@
 
 ![ACE Direct](images/adsmall.png)
 
-## Release v6.0, mm/dd/yyyy
+## Release v6.0, 07/23/2021
 
 * _Call Monitoring_ – The Agent portal now allows for an Agent to passively monitor an ongoing call between another Agent and a consumer.
 * _Call Transfers_ – The Agent portal now supports the transferring of calls between Agents.
