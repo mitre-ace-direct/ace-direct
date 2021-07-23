@@ -366,20 +366,38 @@ cp $TMP_CONFIG2 dat/config.json
 rm $TMP_CONFIG1 $TMP_CONFIG2 >/dev/null 2>&1
 
 # get pem file locations from config if not sent on command line
-if [ ! -z "$KEY_PEM" ]; then
+if [ -z "$KEY_PEM" ]; then
   KEY_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:private_key`
 else
   python scripts/parseSingleJson.py dat/config.json common:https:private_key ${KEY_PEM} > $TMP_CONFIG1
   cp $TMP_CONFIG1 dat/config.json
   rm $TMP_CONFIG1
 fi
-if [ ! -z "$CERT_PEM" ]; then
+if [ -z "$CERT_PEM" ]; then
   CERT_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:certificate`
 else
   python scripts/parseSingleJson.py dat/config.json common:https:certificate ${CERT_PEM} > $TMP_CONFIG1
   cp $TMP_CONFIG1 dat/config.json
   rm $TMP_CONFIG1
 fi
+
+# validate certs
+printf "validatig certs...\n"
+if [[ ! -f ${KEY_PEM} || ! -f ${CERT_PEM} ]]; then
+  printf "${NOTOK_ICON} error - One or both cert files are missing...\n\n"
+  exit 99
+else
+  printf "Verifying certs...\n"
+  if openssl x509 -checkend 86400 -noout -in ${CERT_PEM}
+  then
+    printf "${CERT_PEM} is good!\n"  
+  else
+    printf "\n\n"
+    printf "${NOTOK_ICON} error - ${CERT_PEM} has expired or will expire within 24 hours, please acquire new certs\n\n\n"
+    exit 99
+  fi
+fi
+
 
 # BEGIN INSTALLATION
 INSTALL_START=`date +%s` # start the clock
