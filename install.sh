@@ -462,7 +462,7 @@ else
 fi
 
 IFS=$OLDIFS
-printf "\nBeginning installation..."
+printf "\nBeginning installation...\n\n"
 
 read -p "${Q}Install core node components (y/n)? " -n 1 -r
 printf "\n"
