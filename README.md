@@ -109,6 +109,7 @@ The automatic installer script is [install.sh](install.sh). This script will per
 
 * Install prerequisites
 * Install Redis, MongoDB, MySQL, OpenAM, NGINX, and Node app servers
+* Install OpenAM and NGINX
 * Populate databases
 * Deploy ACE Direct
 * Perform status checks

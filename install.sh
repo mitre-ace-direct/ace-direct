@@ -158,6 +158,17 @@ else
   exit 1
 fi
 
+# make sure ace-direct repo was cloned in home folder
+if cd ~/ace-direct >/dev/null 2>&1
+then
+  printf "Found ~/ace-direct folder ${OK_ICON}\n"
+else
+  printf "${FG_RED} error - ace-direct folder must be in the home folder: ~/ace-direct ${RS} ${NOTOK_ICON}\n"
+  printf "Please clone the ace-direct repo to the home folder (e.g., /home/ec2-user/ace-direct).\n"
+  printf "Exiting...\n"
+  exit 1
+fi
+
 # get the REDIS AUTH password from the user
 REDIS_AUTH=""
 RDPASS1=""
@@ -453,25 +464,45 @@ fi
 IFS=$OLDIFS
 printf "\nBeginning installation..."
 
-# install node components
-acedirect/install_node.sh -h /home/${AD_USER} -r ${REDIS_AUTH} -p ${ADPASS1} -a ${ASPASS1} -e ${EXPASS1}
+read -p "${Q}Install core node components (y/n)? " -n 1 -r
+printf "\n"
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  # install node components
+  acedirect/install_node.sh -h /home/${AD_USER} -r ${REDIS_AUTH} -p ${ADPASS1} -a ${ASPASS1} -e ${EXPASS1}
+fi
 
-# install NGINX as root
-cd ~/ace-direct/nginx
-sudo -E ./install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
+read -p "${Q}Install NGINX (y/n)? " -n 1 -r
+printf "\n"
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  # install NGINX as root
+  cd ~/ace-direct/nginx
+  sudo -E ./install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
+fi
 
-# install OpenAM as root
-cd ~/ace-direct
-sudo cp -R iam /root/. >/dev/null 2>&1
-cd ~/ace-direct/iam
-sudo -E ./install_openam.sh  -b ace  -o ${OPENAM_FQDN}  -n ${NGINX_FQDN}  -t 7.0.108 -k ${KEY_PEM} -c ${CERT_PEM} -a ${OPENAM_USER} -p ${OPENAM_PASS}
+read -p "${Q}Install OpenAM (y/n)? " -n 1 -r
+printf "\n"
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  # install OpenAM as root
+  cd ~/ace-direct
+  sudo cp -R iam /root/. >/dev/null 2>&1
+  cd ~/ace-direct/iam
+  sudo -E ./install_openam.sh  -b ace  -o ${OPENAM_FQDN}  -n ${NGINX_FQDN}  -t 7.0.108 -k ${KEY_PEM} -c ${CERT_PEM} -a ${OPENAM_USER} -p ${OPENAM_PASS}
+fi
 
-# build AD
-cd ~/ace-direct
-scripts/build.sh
+read -p "${Q}Build ace-direct (y/n)? " -n 1 -r
+printf "\n"
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  # build AD
+  cd ~/ace-direct
+  scripts/build.sh
+fi
 
+# done
 INSTALL_END=`date +%s`
-
 EQU="scale=2; (${INSTALL_END} - ${INSTALL_START})/60"
 RESULT=`bc <<< $EQU`
 printf "\n*** Installation took $RESULT minutes. ***\n\n"
