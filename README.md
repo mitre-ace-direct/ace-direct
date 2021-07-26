@@ -477,6 +477,14 @@ See the [./obusylight/README.md](./obusylight/README.md) for instructions on how
 
 ---
 
+## Enterprise Service Bus
+
+The enterprise service bus (esb) is an optional component. Use it to integrate with your existing CRM systems. See the [esb/README.md](esb/README.md) file for more information.
+
+---
+
+:checkered_flag: **This completes ACE Direct installation, configuration, and deployment**.
+
 ## Accessing the websites
 
 The URLs depend on your `~/ace-direct/dat/config.json` settings, specifically `nginx:ad_path`, `nginx:mp_path`, `nginx:agent_route`, and `nginx:consumer_route`.
