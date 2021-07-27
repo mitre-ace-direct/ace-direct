@@ -769,6 +769,9 @@ function terminate_call() {
 	mute_audio_button.setAttribute("onclick", "javascript: mute_audio();");
 	mute_audio_icon.classList.add("fa-microphone");
 	mute_audio_icon.classList.remove("fa-microphone-slash");
+	if(false && !acekurento.isMultiparty){ //placeholder for transfer hangups.
+		acekurento.callTransfer("hangup", true);
+	}
 	acekurento.stop(false);
 	remove_video();
 	// mute_captions();
@@ -915,12 +918,19 @@ function removeElement(elementId) {
 //mutes self audio so remote cannot hear you
 function mute_audio() {
 	if (acekurento !== null) {
-		console.log('MUTING AUDIO');
-		acekurento.enableDisableTrack(false, true); //mute audio
-		mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
-		mute_audio_icon.classList.add("fa-microphone-slash");
-		mute_audio_icon.classList.remove("fa-microphone");
-		isMuted = true;
+		try {
+			console.log('MUTING AUDIO');
+			let a = acekurento.mediaStream();
+			console.log(a.getAudioTracks()[0].enabled)
+			acekurento.enableDisableTrack(false, true); //mute audio
+			mute_audio_button.setAttribute("onclick", "javascript: unmute_audio();");
+			mute_audio_icon.classList.add("fa-microphone-slash");
+			mute_audio_icon.classList.remove("fa-microphone");
+			isMuted = true;
+		} catch {
+			console.log("Mute broken trying again");
+			setTimeout(function(){mute_audio();},1000);
+		}
 	}
 }
 
