@@ -88,10 +88,14 @@ class ConfManager extends Events {
   }
 
   async callTransfer(caller, session, ext, isBlind) {
-    const calleePeer = this._index.getByExt(ext);
-    calleePeer._warmTransfer = !isBlind;
     const jssip_session = this._jssipRTCSessions.get(caller._ext);
-    jssip_session.refer(calleePeer._ext);
+    if (ext == "hangup") {
+      jssip_session.refer("hangup");
+    } else {
+      const calleePeer = this._index.getByExt(ext);
+      calleePeer._warmTransfer = !isBlind;
+      jssip_session.refer(calleePeer._ext);
+    }
     return true;
   }
 
