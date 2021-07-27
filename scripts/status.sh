@@ -61,7 +61,8 @@ for ((i = 0; i < 8; ++i)); do
   fi
 done
 
-printf "${IND}main server disk usage ${MAIN_FQDN}..."
+printf "${IND}main server ${MAIN_FQDN}...${FR} ${OK_ICON}\n"
+printf "${IND}main server disk usage..."
 # Check MAIN
 DISK_USAGE=`ssh "${USER}@${MAIN_FQDN}" df -k --output='pcent' / 2>/dev/null | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
@@ -87,7 +88,7 @@ then
 else
   printf "${FR} ${OK_ICON}\n"
 fi
-printf "${IND}stun disk usage ${STUN_FQDN}..."
+printf "${IND}stun disk usage..."
 DISK_USAGE=`ssh "${USER}@${STUN_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -113,7 +114,7 @@ else
   printf "${FR} ${OK_ICON}\n"
 fi
 
-printf "${IND}turn server disk usage ${TURN_FQDN}..."
+printf "${IND}turn server disk usage..."
 DISK_USAGE=`ssh "${USER}@${TURN_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -137,7 +138,7 @@ else
   printf "   ${FG_RED}service is down or unreachable${RS}${FR} ${NOTOK_ICON}\n"
   PASSED=false
 fi
-printf "${IND}asterisk server disk usage ${ASTERISK_FQDN}..."
+printf "${IND}asterisk server disk usage..."
 DISK_USAGE=`ssh "${USER}@${ASTERISK_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -153,7 +154,7 @@ else
 fi
 
 # Check Asterisk AMI
-printf "${IND}asterisk AMI ${ASTERISK_FQDN}..."
+printf "${IND}asterisk AMI..."
 if node ./acedirect/tools/pingAsterisk.js >/dev/null 2>&1 ${CONFIG}
 then
   printf "${FR} ${OK_ICON}\n"
@@ -171,7 +172,7 @@ else
   printf "   ${FG_RED}service is down or unreachable${RS}${FR} ${NOTOK_ICON}\n"
   PASSED=false
 fi
-printf "${IND}redis server disk space ${REDIS_FQDN}..."
+printf "${IND}redis server disk usage..."
 DISK_USAGE=`ssh "${USER}@${REDIS_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -195,7 +196,7 @@ else
   printf "   ${FG_RED}service is down or unreachable${RS}${FR} ${NOTOK_ICON}\n"
   PASSED=false
 fi
-printf "${IND}nginx server disk usage ${NGINX_FQDN}..."
+printf "${IND}nginx server disk usage..."
 DISK_USAGE=`ssh "${USER}@${NGINX_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -210,41 +211,11 @@ else
   fi
 fi
 
-printf "${IND}openam server ${OPENAM_PATH}..."
+printf "${IND}openam server path ${OPENAM_PATH}..."
 OPENAM_STATUS=`curl -I  -k https://localhost/${OPENAM_PATH}/XUI 2>/dev/null  | head -n 1|cut -d$' ' -f2`
 if [[ "$OPENAM_STATUS" != "302" ]]
 then
   printf "  ${FG_RED}HTTP status: ${OPENAM_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
-  PASSED=false
-else
-  printf "${FR} ${OK_ICON}\n" 
-fi
-
-printf "${IND}Agent URL ${URL_AGENT}..."
-URL_STATUS=`curl -I  -k ${URL_AGENT} 2>/dev/null  | head -n 1|cut -d$' ' -f2`
-if [ "$URL_STATUS" != "200" ] && [ "$URL_STATUS" != "301" ] && [ "$URL_STATUS" != "302" ];
-then
-  printf "  ${FG_RED}HTTP status: ${URL_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
-  PASSED=false
-else
-  printf "${FR} ${OK_ICON}\n" 
-fi
-
-printf "${IND}Consumer URL ${URL_CONSUMER}..."
-URL_STATUS=`curl -I  -k ${URL_CONSUMER} 2>/dev/null  | head -n 1|cut -d$' ' -f2`
-if [ "$URL_STATUS" != "200" ] && [ "$URL_STATUS" != "301" ] && [ "$URL_STATUS" != "302" ];
-then
-  printf "  ${FG_RED}HTTP status: ${URL_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
-  PASSED=false
-else
-  printf "${FR} ${OK_ICON}\n" 
-fi
-
-printf "${IND}Manager URL ${URL_MANAGER}..."
-URL_STATUS=`curl -I  -k ${URL_MANAGER} 2>/dev/null  | head -n 1|cut -d$' ' -f2`
-if [ "$URL_STATUS" != "200" ] && [ "$URL_STATUS" != "301" ] && [ "$URL_STATUS" != "302" ];
-then
-  printf "  ${FG_RED}HTTP status: ${URL_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
   PASSED=false
 else
   printf "${FR} ${OK_ICON}\n" 
@@ -259,7 +230,7 @@ else
   printf "   ${FG_RED}service is down or unreachable${RS}${FR} ${NOTOK_ICON}\n"
   PASSED=false
 fi
-printf "${IND}kms server disk usage ${KURENTO_FQDN}..."
+printf "${IND}kms server disk usage..."
 DISK_USAGE=`ssh "${USER}@${KURENTO_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -304,12 +275,42 @@ else
   printf "   ${FG_RED}invalid, expiring soon, or not found${RS}${FR} ${NOTOK_ICON}\n"
   PASSED=false
 fi
+
+printf "${IND}Agent URL ${URL_AGENT}..."
+URL_STATUS=`curl -I  -k ${URL_AGENT} 2>/dev/null  | head -n 1|cut -d$' ' -f2`
+if [ "$URL_STATUS" != "200" ] && [ "$URL_STATUS" != "301" ] && [ "$URL_STATUS" != "302" ];
+then
+  printf "  ${FG_RED}HTTP status: ${URL_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
+  PASSED=false
+else
+  printf "${FR} ${OK_ICON}\n" 
+fi
+
+printf "${IND}Consumer URL ${URL_CONSUMER}..."
+URL_STATUS=`curl -I  -k ${URL_CONSUMER} 2>/dev/null  | head -n 1|cut -d$' ' -f2`
+if [ "$URL_STATUS" != "200" ] && [ "$URL_STATUS" != "301" ] && [ "$URL_STATUS" != "302" ];
+then
+  printf "  ${FG_RED}HTTP status: ${URL_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
+  PASSED=false
+else
+  printf "${FR} ${OK_ICON}\n" 
+fi
+
+printf "${IND}Manager URL ${URL_MANAGER}..."
+URL_STATUS=`curl -I  -k ${URL_MANAGER} 2>/dev/null  | head -n 1|cut -d$' ' -f2`
+if [ "$URL_STATUS" != "200" ] && [ "$URL_STATUS" != "301" ] && [ "$URL_STATUS" != "302" ];
+then
+  printf "  ${FG_RED}HTTP status: ${URL_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
+  PASSED=false
+else
+  printf "${FR} ${OK_ICON}\n" 
+fi
 printf "\n"
+
+# final status result
 if ${PASSED}; then
    echo " 👍  All tests passed!"
 else
    printf " 👎  ${FG_RED}Some tests failed!${RS}\n"
 fi
 printf "\n"
-
-
