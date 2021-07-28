@@ -11,7 +11,6 @@ var bodyParser = require('body-parser');
 var socketioJwt = require('socketio-jwt');
 var zendeskApi = require('node-zendesk');
 var https = require('https');
-var cio = require('socket.io-client');
 var redis = require("redis");
 var cookieParser = require('cookie-parser'); // the session is stored in a cookie, so we use this to parse it
 var session = require('express-session');
