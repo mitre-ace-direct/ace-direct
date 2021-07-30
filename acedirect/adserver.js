@@ -237,7 +237,6 @@ var queuesComplaintNumber = getConfigVal('asterisk:queues:complaint:number');
 
 //global vars that don't need to be read every time
 var jwtKey = getConfigVal('web_security:json_web_token:secret_key');
-var jwtEnc = getConfigVal('web_security:json_web_token:encoding');
 
 //NGINX path parameter
 var nginxPath = getConfigVal('nginx:ad_path');
@@ -629,7 +628,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // Validates the token, if valid go to connection.
 // If token is not valid, no connection will be established.
 io.use(socketioJwt.authorize({
-	secret: ((jwtEnc == 'base64') ? Buffer.alloc(jwtKey.length, jwtKey , jwtEnc ): jwtKey),
+	secret: jwtKey,
 	timeout: parseInt(getConfigVal('web_security:json_web_token:timeout')), // seconds to send the authentication message
 	handshake: getConfigVal('web_security:json_web_token:handshake')
 }));
@@ -3794,10 +3793,6 @@ function createToken() {
 	});
 }
 
-var ctoken = jwt.sign({
-	tokenname: "servertoken"
-}, Buffer.alloc(jwtKey.length, jwtKey , jwtEnc  ));
-
 // Allow cross-origin requests to be received from Management Portal
 // Used for the force logout functionality since we need to send a POST request from MP to acedirect outlining what user(s) to forcefully logout
 app.use(function (err, req, res, next) {
@@ -3994,7 +3989,7 @@ app.get('/token', function (req, res) {
                     vrs.data[0].startTimeUTC = startTimeUTC; //hh:mm in UTC
                     vrs.data[0].endTimeUTC = endTimeUTC; //hh:mm in UTC
 
-					var token = jwt.sign(vrs.data[0], Buffer.alloc(jwtKey.length, jwtKey , jwtEnc  ), {
+					var token = jwt.sign(vrs.data[0], jwtKey, {
 						expiresIn: "2000"
 					});
 					res.status(200).json({
@@ -4062,7 +4057,7 @@ app.get('/token', function (req, res) {
 		redisClient.hset(rAgentInfoMap, payload.username, JSON.stringify(agentInfo));
 		sendAgentStatusList(payload.username, "AWAY");
 
-		var token = jwt.sign(payload, Buffer.alloc(jwtKey.length, jwtKey  , jwtEnc  ), {
+		var token = jwt.sign(payload, jwtKey, {
 			expiresIn: "2000"
 		});
 		res.status(200).json({
