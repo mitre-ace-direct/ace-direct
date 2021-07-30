@@ -1373,7 +1373,7 @@ io.sockets.on('connection', function (socket) {
 		logger.info(socket.request.connection._peername);
 
 		//Removes user from statusMap
-		if ("username" in token) {
+		if ("agent_id" in token) {
 			logout(token);
 		}
 
@@ -3145,7 +3145,8 @@ function logout(token) {
 	if (token.username !== null) {
 		redisClient.hdel(rStatusMap, token.username);
 		redisClient.hdel(rAgentInfoMap, token.username);
-		redisClient.hset(rTokenMap, token.lightcode, "OFFLINE");
+		if(token.lightcode)
+			redisClient.hset(rTokenMap, token.lightcode, "OFFLINE");
 
 		sendAgentStatusList();
 
