@@ -398,7 +398,7 @@ class ConfManager extends Events {
 
           session.sendInfo('application/media_control+xml', body)
 
-          const ms = param('asterisk.sip_media_request_interval');
+          const ms = param('asteriskss.sip_media_request_interval');
           if (ms) {
             pfuInt = setInterval(() => { session.sendInfo('application/media_control+xml', body) }, ms);
           }
