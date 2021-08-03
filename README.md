@@ -593,6 +593,17 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   $  pm2 restart all  # restart the node servers
   ```
 
+* The Node builds on `acenode` are failing - verify the `npm` version and try updating it:
+
+  ```bash
+  $  npm -v
+  7.19.1
+  $
+  $  # to update to 7.19.1 (for example):
+  $  npm install -g npm@7.19.1
+  $
+  ```
+
 ---
 
 _fin._
