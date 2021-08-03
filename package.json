@@ -65,7 +65,7 @@
   },
   "dependencies": {
     "asterisk-ami-client": "^1.1.5",
-    "aws-sdk": "^2.865.0",
+    "aws-sdk": "^2.959.0",
     "get-video-duration": "^3.0.2",
     "mysql2": "^2.2.5"
   }
