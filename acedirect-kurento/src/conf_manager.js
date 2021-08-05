@@ -1,14 +1,13 @@
-const debug     = require('debug')('ace:conf-man');
-const Events    = require('events');
-const NodeWS    = require('jssip-node-websocket');
-const SIP       = require('jssip');
-const param     = require('param');
-const RTCCall   = require('./webrtc_media_session');
-//const VideoMail = require('./video_mail');
-const models    = require('./dal/models');
+const debug = require('debug')('ace:conf-man');
+const Events = require('events');
+const NodeWS = require('jssip-node-websocket');
+const SIP = require('jssip');
+const param = require('param');
+const RTCCall = require('./webrtc_media_session');
+// const VideoMail = require('./video_mail');
+const models = require('./dal/models');
 
 class ConfManager extends Events {
-
   constructor(ix) {
     super();
     this._index = ix;
@@ -82,7 +81,7 @@ class ConfManager extends Events {
       peer._isMonitoring = true;
       session._hasMonitor = true;
     }
- 
+
     await session.addWebrtcPeer(peer, webrtcOffer);
     return true;
   }
@@ -149,7 +148,7 @@ class ConfManager extends Events {
 
     const callee = this._index.getByExt(calleeExt);
     const caller = this._index.getByExt(callerExt);
-    if(callee && callee.busy && !callee._warmTransfer) {
+    if (callee && callee.busy && !callee._warmTransfer) {
       /*
       debug('Callee is busy, videomail...');
       const videomail = new VideoMail();
@@ -248,7 +247,7 @@ class ConfManager extends Events {
             "username": `${param('asterisk.sip.turn_user')}`,
             "credential": `${param('asterisk.sip.turn_cred')}`
           }
-        ];        
+        ];
         session.answer({
           rtcAnswerConstraints: rtpAnswer,
           pcConfig: {
@@ -268,7 +267,7 @@ class ConfManager extends Events {
       );
       return;
     }
-    //warm transfer allows skip videomail queue once, if skipped get back to normal
+    // warm transfer allows skip videomail queue once, if skipped get back to normal
     if (callee._warmTransfer) callee._warmTransfer = false;
   }
 
@@ -355,7 +354,7 @@ class ConfManager extends Events {
           "username": `${param('asterisk.sip.turn_user')}`,
           "credential": `${param('asterisk.sip.turn_cred')}`
         }
-      ];       
+      ];
       const session = caller.ua.call(calleeExt, {
         eventHandlers: this.callEventHandlers(caller.ext, calleeExt),
         mediaConstraints: { audio: true, video: true },
@@ -379,8 +378,6 @@ class ConfManager extends Events {
           call.leave(calleeExt);
         }
       });
-
-
 
       session.on('confirmed', evt => {
         this._calls.set(calleeExt, call);
@@ -406,9 +403,6 @@ class ConfManager extends Events {
         // end
       });
 
-
-
-
       session.on('accepted', evt => {
         this._calls.set(calleeExt, call);
 
@@ -417,7 +411,6 @@ class ConfManager extends Events {
           clearInterval(pfuInt)
         })
         call.handleRtpAnswer(calleeExt, evt.response.body, session);
-
       });
     }
     return call;
