@@ -104,14 +104,14 @@ $(document).ready(() => {
     }
   });
 
-  $('#btnAddAgent').on('click', (event) => {
-    $('#btnAddAgent').prop("disabled", true);
+  $('#btnAddAgent').on('click', (_event) => {
+    $('#btnAddAgent').prop('disabled', true);
     /* check if both password inputs match */
     const pass = $('#inputPassword').val();
     const pass2 = $('#inputPassword2').val();
     if (pass !== pass2) {
       $('#passwordMatchError').attr('hidden', false);
-      $('#btnAddAgent').prop("disabled", false);
+      $('#btnAddAgent').prop('disabled', false);
       return;
     }
     const org = $('#inputOrganization').val().trim();
@@ -119,7 +119,7 @@ $(document).ready(() => {
       $('#errorMessage').text(' Add agent - fields missing');
       $('#actionError').attr('hidden', false);
       $('#actionError').show();
-      $('#btnAddAgent').prop("disabled", false);
+      $('#btnAddAgent').prop('disabled', false);
       return;
     }
     $('#passwordMatchError').attr('hidden', true);
@@ -140,14 +140,14 @@ $(document).ready(() => {
       if (data.result === 'success') {
         // console.log('Saved!!!!');
         $('#actionError').attr('hidden', true);
-        $('#btnAddAgent').prop("disabled", false);
+        $('#btnAddAgent').prop('disabled', false);
         window.location.reload();
       } else {
         console.log(`POST failed: ${JSON.stringify(data)}`);
         $('#errorMessage').text(' Add agent');
         $('#actionError').attr('hidden', false);
         $('#actionError').show();
-        $('#btnAddAgent').prop("disabled", false);
+        $('#btnAddAgent').prop('disabled', false);
       }
     });
   });
@@ -158,15 +158,15 @@ $(document).ready(() => {
     $('#confirm-delete').modal();
   });
 
-  $('#btnUpdateAgent').on('click', (event) => {
-    $('#btnUpdateAgent').prop("disabled", true);
+  $('#btnUpdateAgent').on('click', (_event) => {
+    $('#btnUpdateAgent').prop('disabled', true);
 
     const org = $('#inputOrganization').val().trim();
     if (!org || org.length === 0) {
       $('#errorMessage').text(' Update agent');
       $('#actionError').attr('hidden', false);
       $('#actionError').show();
-      $('#btnUpdateAgent').prop("disabled", false);
+      $('#btnUpdateAgent').prop('disabled', false);
       return;
     }
 
@@ -186,14 +186,14 @@ $(document).ready(() => {
       if (data.result === 'success') {
         // console.log(`POST succ: ${JSON.stringify(data)}`);
         $('#actionError').attr('hidden', true);
-        $('#btnUpdateAgent').prop("disabled", false);
+        $('#btnUpdateAgent').prop('disabled', false);
         window.location.reload();
       } else {
         // console.log(`POST failed: ${JSON.stringify(data)}`);
         $('#errorMessage').text(' Update agent');
-        $('#actionError').attr('hidden', false); 
+        $('#actionError').attr('hidden', false);
         $('#actionError').show();
-        $('#btnUpdateAgent').prop("disabled", false);
+        $('#btnUpdateAgent').prop('disabled', false);
       }
     });
   });

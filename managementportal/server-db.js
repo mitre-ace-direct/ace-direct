@@ -1,4 +1,3 @@
-
 // node modules
 let dbconn = null;
 let dbConnection = null;
@@ -24,7 +23,7 @@ const socketIO = require('socket.io');
 // additional helpers/utility functions
 const { getConfigVal } = require('./helpers/utility');
 const logger = require('./helpers/logger');
-const metrics = require('./controllers/metrics');
+// const metrics = require('./controllers/metrics');
 const report = require('./controllers/report');
 const { setRgbValues } = require('./helpers/utility');
 const validator = require('./utils/validator');
@@ -365,10 +364,22 @@ setInterval(() => {
 }, 60000);
 
 // Pull MongoDB configuration from config.json file
-var mongodbUri = null;
+let mongodbUri = null;
 const mongodbFqdn = nconf.get('servers:mongodb_fqdn');
+const mongodbTlsCaFile = nconf.get('database_servers:mongodb:tlsCAFile');
+let mongodbTls = '';
+if (mongodbTlsCaFile.length > 0) {
+  mongodbTls = '?tls=true';
+}
+
+const mongodbCappedCollection = nconf.get('database_servers:mongodb:cappedCollection');
+let cappedCollectionOptions = {};
+if (mongodbCappedCollection) {
+  cappedCollectionOptions = { capped: true, size: 1000000, max: 5000 };
+}
+
 if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
-	mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('app_ports:mongodb')}/${getConfigVal('database_servers:mongodb:database_name')}`;
+  mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('app_ports:mongodb')}/${getConfigVal('database_servers:mongodb:database_name')}${mongodbTls}`;
 }
 
 const logAMIEvents = nconf.get('database_servers:mongodb:logAMIevents');
@@ -376,14 +387,20 @@ const logStats = nconf.get('database_servers:mongodb:logStats');
 const logStatsFreq = nconf.get('database_servers:mongodb:logStatsFreq');
 let mongodb;
 
+const mongoOptions = {
+  forceServerObjectId: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+};
+
+if (mongodbTlsCaFile.length > 0) {
+  mongoOptions.tlsCAFile = mongodbTlsCaFile;
+}
+
 // Connect to MongoDB
 if (mongodbUri) {
   // Initialize connection once
-  MongoClient.connect(mongodbUri, {
-    forceServerObjectId: true,
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-  }, (errConnect, database) => {
+  MongoClient.connect(mongodbUri, mongoOptions, (errConnect, database) => {
     if (errConnect) {
       logger.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
       console.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
@@ -412,7 +429,7 @@ if (mongodbUri) {
         console.log(`try to find events collection, colEvents length: ${collections.length}`);
         if (collections.length === 0) { // "stats" collection does not exist
           console.log('Creating new events colleciton in MongoDB');
-          mongodb.createCollection('events', { capped: true, size: 1000000, max: 5000 }, (err, _result) => {
+          mongodb.createCollection('events', cappedCollectionOptions, (err, _result) => {
             if (err) throw err;
             console.log('Collection events is created capped size 100000, max 5000 entries');
             colEvents = mongodb.collection('events');
@@ -439,7 +456,7 @@ if (mongodbUri) {
         console.log(`try to find stats collection, colStats length: ${collections.length}`);
         if (collections.length === 0) { // "stats" collection does not exist
           console.log('Creating new stats colleciton in MongoDB');
-          mongodb.createCollection('callstats', { capped: true, size: 1000000, max: 5000 }, (err, _result) => {
+          mongodb.createCollection('callstats', cappedCollectionOptions, (err, _result) => {
             if (err) {
               console.log(`Error creating collection for callstats in Mongo: ${err}`);
               logger.debug(`Error creating collection for callstats in Mongo: ${err}`);
@@ -563,11 +580,11 @@ function sendResourceStatus() {
     io.to('my room').emit('resource-status', data);
   });
 
-  const metricsStartDate = 1497916801000;
-  const metricsEndDate = 1498003200000;
-  metrics.createMetrics(mongodb, metricsStartDate, metricsEndDate, (data) => {
-    io.to('my room').emit('metrics', data);
-  });
+  // const metricsStartDate = 1497916801000;
+  // const metricsEndDate = 1498003200000;
+  // metrics.createMetrics(mongodb, metricsStartDate, metricsEndDate, (data) => {
+  //   io.to('my room').emit('metrics', data);
+  // });
 }
 
 io.sockets.on('connection', (socket) => {
@@ -595,7 +612,9 @@ io.sockets.on('connection', (socket) => {
 
   //   if (message === 'webuser') {
   //     const qobj = {
-  //       queues: `${getConfigVal('asterisk:queues:general:name')},${getConfigVal('asterisk:queues:complaint:name')},${getConfigVal('asterisk:queues:videomail:name')}`
+  //       queues: `${getConfigVal('asterisk:queues:general:name')},
+  // ${getConfigVal('asterisk:queues:complaint:name')},
+  // ${getConfigVal('asterisk:queues:videomail:name')}`
   //     };
   //     socket.emit('queueconf', qobj);
   //     logger.debug('Message is webuser type');
@@ -841,18 +860,18 @@ io.sockets.on('connection', (socket) => {
       });
   });
 
-  socket.on('metrics-get-data', (data) => {
-    if (data.start && data.end) {
-      // Set start and end internally
-      // Eventually store them in redis.
-      const metricsStartDate = new Date(data.start);
-      const metricsEndDate = new Date(data.end);
-      metrics.createMetrics(mongodb, metricsStartDate.getTime(),
-        metricsEndDate.getTime(), (metricsToEmit) => {
-          io.to('my room').emit('metrics', metricsToEmit);
-        });
-    }
-  });
+  // socket.on('metrics-get-data', (data) => {
+  //   if (data.start && data.end) {
+  //     // Set start and end internally
+  //     // Eventually store them in redis.
+  //     const metricsStartDate = new Date(data.start);
+  //     const metricsEndDate = new Date(data.end);
+  //     metrics.createMetrics(mongodb, metricsStartDate.getTime(),
+  //       metricsEndDate.getTime(), (metricsToEmit) => {
+  //         io.to('my room').emit('metrics', metricsToEmit);
+  //       });
+  //   }
+  // });
 
   // ######################################
   // Retrieval of videomail records from the database
