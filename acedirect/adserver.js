@@ -1,4 +1,3 @@
-
 var express = require('express');
 var asteriskManager = require('asterisk-manager');
 var nconf = require('nconf');
@@ -28,7 +27,6 @@ var proxy = require('proxy-agent');
 
 //Credentials needed for Call Recordings
 var AWS = require('aws-sdk');
-
 
 // Clam AV
 const NodeClam = require('clamscan');
@@ -471,16 +469,41 @@ dbConnection.connect(function(err) {
 // Pull MongoDB configuration from config.json file
 var mongodbUri = null;
 const mongodbFqdn = nconf.get('servers:mongodb_fqdn');
-if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
-	mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('app_ports:mongodb')}/${getConfigVal('database_servers:mongodb:database_name')}`;
+const mongodbTlsCaFile = nconf.get('database_servers:mongodb:tlsCAFile');
+
+let mongodbTls = '';
+if (mongodbTlsCaFile.length > 0) {
+  mongodbTls = '?tls=true';
 }
+
+const mongodbCappedCollection = nconf.get('database_servers:mongodb:cappedCollection');
+let cappedCollectionOptions = {};
+if (mongodbCappedCollection) {
+  cappedCollectionOptions = { capped: true, size: 1000000, max: 5000 };
+}
+
+if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
+	mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('app_ports:mongodb')}/${getConfigVal('database_servers:mongodb:database_name')}${mongodbTls}`;
+}
+
+const mongoOptions = {
+  forceServerObjectId: true,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  retryWrites: false
+};
+
+if (mongodbTlsCaFile.length > 0) {
+  mongoOptions.tlsCAFile = mongodbTlsCaFile;
+}
+
 var logCallData = nconf.get('database_servers:mongodb:logCallData');
 var mongodb;
 var colCallData = null;
 //Connect to MongoDB
 if (mongodbUri) {
 	// Initialize connection once
-	MongoClient.connect(mongodbUri, {forceServerObjectId:true, useNewUrlParser: true, useUnifiedTopology: true}, function (err, database) {
+	MongoClient.connect(mongodbUri, mongoOptions, function (err, database) {
 		if (err) {
 			logger.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
 			console.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
@@ -508,7 +531,7 @@ if (mongodbUri) {
 				console.log("try to find calldata collection, colCallData length: " + collections.length);
 				if (collections.length == 0) {	// "stats" collection does not exist
 					console.log("Creating new calldata colleciton in MongoDB");
-					mongodb.createCollection("calldata",{capped: true, size:1000000, max:5000}, function(err, result) {
+					mongodb.createCollection("calldata", cappedCollectionOptions, function(err, result) {
 						if (err) throw err;
         					console.log("Collection calldata is created capped size 100000, max 5000 entries");
 						colCallData = mongodb.collection('calldata');
@@ -987,7 +1010,7 @@ io.sockets.on('connection', function (socket) {
 		mongodb.listCollections({name: token.username + 'callHistory'}).toArray((err, collections) => {
 			if (collections.length == 0) {	// "stats" collection does not exist
 				console.log("Creating new " + token.username + "callHistory colleciton in MongoDB");
-				mongodb.createCollection(token.username + "callHistory",{capped: true, size:1000000, max:5000}, function(err, result) {
+				mongodb.createCollection(token.username + "callHistory", cappedCollectionOptions, function(err, result) {
 					if (err) throw err;
 						console.log("Collection " + token.username + "callHistory is created capped size 100000, max 5000 entries");
 					colCallHistory = mongodb.collection(token.username + 'callHistory');
@@ -1015,7 +1038,7 @@ io.sockets.on('connection', function (socket) {
 		mongodb.listCollections({name: token.username + 'callHistory'}).toArray((err, collections) => {
 			if (collections.length == 0) {
 				console.log("Creating new " + token.username + "callHistory colleciton in MongoDB");
-				mongodb.createCollection(token.username + "callHistory",{capped: true, size:1000000, max:5000}, function(err, result) {
+				mongodb.createCollection(token.username + "callHistory", cappedCollectionOptions, function(err, result) {
 					if (err) throw err;
 						console.log("Collection callHistory is created capped size 100000, max 5000 entries");
 					colCallHistory = mongodb.collection(token.username + 'callHistory');
@@ -2127,7 +2150,7 @@ io.sockets.on('connection', function (socket) {
 							} else {
 								console.log('received translation', data);
 								console.log(languageFrom, languageTo, translationUrl);
-								
+
 								// fixme will this be wrong if multiple clients/agents?
 								socket.emit('caption-translated', {
 									'transcript' : data.translation,
@@ -4280,10 +4303,10 @@ app.get('/getVideomail', agent.shield(cookieShield),function (req, res) {
 });
 
 /**
- * Get the specific recording 
+ * Get the specific recording
  */
 app.get('/getRecording', agent.shield(cookieShield), function(req, res) {
-	
+
 	console.log("USING " + req.query.fileName);
 	var file = s3.getObject({Bucket: getConfigVal('s3:bucketname'), Key: req.query.fileName});
 

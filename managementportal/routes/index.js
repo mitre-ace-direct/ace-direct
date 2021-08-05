@@ -1,4 +1,3 @@
-
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const openamAgent = require('@forgerock/openam-agent');
@@ -545,7 +544,8 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
   logger.debug(`Hit AddAgent with data: ${JSON.stringify(req.body)}`);
 
   if (validator.isUsernameValid(username)
-  && validator.isNameValid(firstName) && validator.isNameValid(lastName) && validator.isPasswordComplex(password)
+  && validator.isNameValid(firstName) && validator.isNameValid(lastName)
+  && validator.isPasswordComplex(password)
   && validator.isEmailValid(email) && validator.isPhoneValid(phone)) {
     getAgentInfo(username, (info) => {
       if (info.message === 'success') {
