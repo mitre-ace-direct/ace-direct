@@ -166,6 +166,8 @@
     },
     "mongodb": {
       "database_name": "test",
+      "tlsCAFile": "",
+      "cappedCollection": true,
       "caption_database_name": "caption_db",
       "caption_collection_name": "captions",
       "logAMIevents": false,
