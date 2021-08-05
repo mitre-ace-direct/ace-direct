@@ -25,6 +25,7 @@ const { getConfigVal } = require('./helpers/utility');
 const logger = require('./helpers/logger');
 // const metrics = require('./controllers/metrics');
 const report = require('./controllers/report');
+const webrtcstats = require('./controllers/webrtcstats');
 const { setRgbValues } = require('./helpers/utility');
 const validator = require('./utils/validator');
 
@@ -858,6 +859,42 @@ io.sockets.on('connection', (socket) => {
           io.to(socket.id).emit('vrsreporttable-data', reportdata);
         }
       });
+  });
+
+  // Sockets for WebRtcStats
+  socket.on('webrtcstats-get-agents-data', () => {
+    webrtcstats.getAgents(mongodb, (agentsdata) => {
+      io.to(socket.id).emit('webrtcstats-agents-data', agentsdata);
+    });
+  });
+
+  socket.on('webrtcstats-get-calls-data', (data) => {
+    const reportStartDate = new Date(data.start);
+    const reportEndDate = new Date(data.end);
+    const { timezone } = data;
+    const { username } = data;
+    console.log('In get agents');
+
+    webrtcstats.getCalls(mongodb, reportStartDate.getTime(),
+      reportEndDate.getTime(), timezone, username, (agentsdata) => {
+        io.to(socket.id).emit('webrtcstats-calls-data', agentsdata);
+      });
+  });
+
+  socket.on('webrtcstats-get-data', (data) => {
+    const reportStartDate = new Date(data.start);
+    const reportEndDate = new Date(data.end);
+    const { timezone } = data;
+    const { username } = data;
+    const { charts } = data;
+    const { callId } = data;
+
+    charts.forEach((chartName) => {
+      webrtcstats.getCallDetails(mongodb, reportStartDate.getTime(),
+        reportEndDate.getTime(), timezone, username, callId, chartName, (reportdata) => {
+          io.to(socket.id).emit('webrtcstats-data', reportdata);
+        });
+    });
   });
 
   // socket.on('metrics-get-data', (data) => {
