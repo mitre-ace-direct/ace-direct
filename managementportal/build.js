@@ -72,6 +72,7 @@ const JS = [
   // datatables.net
   'datatables.net/js/jquery.dataTables.min.js',
   // jquery-flot
+  'flot/lib/jquery.event.drag.js',
   'flot/lib/globalize.js',
   'flot/source/jquery.flot.js',
   'flot/source/jquery.canvaswrapper.js',
@@ -80,6 +81,7 @@ const JS = [
   'flot/source/jquery.flot.time.js',
   'flot/source/jquery.flot.pie.js',
   'flot/source/jquery.flot.resize.js',
+  'flot/source/jquery.flot.selection.js',
   'flot/source/jquery.flot.saturated.js',
   'flot/source/jquery.flot.browser.js',
   'flot/source/jquery.flot.drawSeries.js',
