@@ -604,6 +604,8 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   $
   ```
 
+* All services appear to be working, but calls are not queuing - The signaling server (`acedirect-kurento`) may have trouble connecting to Asterisk. There will be reconnect messages in the signaling server. Asterisk may have a successful status, but it is responsive. Try restarting the Asterisk service: `sudo service asterisk restart`.
+
 ---
 
 _fin._
