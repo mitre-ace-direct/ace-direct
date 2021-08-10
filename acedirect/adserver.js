@@ -1405,7 +1405,6 @@ io.sockets.on('connection', function (socket) {
             var val = JSON.parse(reply);
             val.inuse = false;
             redisClient.hset(rConsumerExtensions, Number(ext), JSON.stringify(val));
-            redisClient.hset(rTokenMap, token.lightcode, "OFFLINE");
             redisClient.hdel(rExtensionToVrs, Number(ext));
             redisClient.hdel(rExtensionToVrs, Number(token.vrs));
             redisClient.hdel(rExtensionToLanguage, Number(ext));
