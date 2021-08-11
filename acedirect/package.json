@@ -9,6 +9,7 @@
     "admin-lte": "^2.4.18",
     "asterisk-ami-client": "^1.1.5",
     "asterisk-manager": "^0.2.0",
+    "aws-sdk": "^2.965.0",
     "body-parser": "^1.19.0",
     "bootstrap-toggle": "^2.2.2",
     "clamscan": "^1.4.2",
@@ -41,9 +42,9 @@
   },
   "devDependencies": {
     "bootstrap": "^3.4.1",
-    "eslint": "^7.25.0",
+    "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1"
+    "eslint-plugin-import": "^2.24.0"
   },
   "scripts": {
     "test": "echo \"No tests available\" && exit 0",
