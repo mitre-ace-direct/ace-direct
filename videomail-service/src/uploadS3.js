@@ -9,6 +9,7 @@ const uploadAPI = config.uploadServer + '/UploadVideomail';
 const { getVideoDurationInSeconds } = require('get-video-duration');
 const AWS = require('aws-sdk');
 const proxy = require('proxy-agent');
+const execSync = require('child_process').execSync;
 
 AWS.config.update({
   region: config.awsRegion,
@@ -55,43 +56,49 @@ function post(callinfo) {
 
         videomailFile.on('end', function () {
           console.log("file has ended, upload the file", callinfo.incomingCaller)
-          getVideoDurationInSeconds(filepath).then((duration) => {
-            fs.readFile(filepath, function (err, fileData) {
-              var uploadParams = { Bucket: config.awsS3Bucket, Key: callinfo.recordingFile, Body: "" };
-              console.log("uploadParams",JSON.stringify(uploadParams))
-              uploadParams.Body = fileData;
-              s3.upload(uploadParams, function (err) {
-                if (err) {
-                  console.log("Error!:", err);
-                  return
-                }
-                try {
-                  fs.unlinkSync(filepath)
-                } catch (err) {
-                  console.error(err)
-                }
-
-
-                request({
-                  method: 'POST',
-                  url: uploadAPI,
-                  rejectUnauthorized: false,
-                  form: { 
-                    ext: callinfo.ext, 
-                    duration: Math.floor(duration), 
-                    phoneNumber: callinfo.incomingCaller, 
-                    filename: callinfo.recordingFile 
-                  },
-                }, function (error, response, data) {
-                  if (error) {
-                    console.log("Error", error);
-                    console.log("Could not upload:", new Date(), callinfo.incomingCaller, callinfo.recordingFile);
-                  } else {
-                    console.log("Successful video upload:", new Date(), callinfo.incomingCaller, callinfo.recordingFile);
+          fs.readFile(filepath, function (err, fileData) {
+            let mimeType = execSync('file --mime-type -b "' + filepath + '"').toString().trim();
+            if (mimeType === 'video/mp4') {
+              getVideoDurationInSeconds(filepath).then((duration) => {
+                var uploadParams = { Bucket: config.awsS3Bucket, Key: callinfo.recordingFile, Body: "" };
+                console.log("uploadParams", JSON.stringify(uploadParams))
+                uploadParams.Body = fileData;
+                s3.upload(uploadParams, function (err) {
+                  if (err) {
+                    console.log("Error!:", err);
+                    return
                   }
+                  try {
+                    fs.unlinkSync(filepath)
+                  } catch (err) {
+                    console.error(err)
+                  }
+
+
+                  request({
+                    method: 'POST',
+                    url: uploadAPI,
+                    rejectUnauthorized: false,
+                    form: {
+                      ext: callinfo.ext,
+                      duration: Math.floor(duration),
+                      phoneNumber: callinfo.incomingCaller,
+                      filename: callinfo.recordingFile
+                    },
+                  }, function (error, response, data) {
+                    if (error) {
+                      console.log("Error", error);
+                      console.log("Could not upload:", new Date(), callinfo.incomingCaller, callinfo.recordingFile);
+                    } else {
+                      console.log("Successful video upload:", new Date(), callinfo.incomingCaller, callinfo.recordingFile);
+                    }
+                  });
                 });
               });
-            });
+            } else {
+              console.log("File is not a video.")
+              return;
+            }
           });
         });
       }
