@@ -18,7 +18,7 @@ var hold_button = document.getElementById('hold-call');
 var screenShareEnabled = false;
 var debug = true; // console logs event info if true
 var jssip_debug = true; // enables debugging logs from jssip library 
-//if true NOTE: may have to refresh a lot to update change
+// if true NOTE: may have to refresh a lot to update change
 var incomingCall = null;
 var recording = false;
 var outbound_timer = null;
@@ -37,26 +37,26 @@ var monitorCaptions = false;
 function register_jssip() {
   // Events
   var eventHandlers = {
-    'connected': function (e) {
+    connected: function (e) {
       console.log('--- WV: Connected ---\n');
       console.log('True for connected' + e.stream);
     },
-    'sipConfirmed': function (e) {
+    sipConfirmed: function (e) {
       console.log('--- WV: sipConfirmed ---\n');
-      //TRY REINVITE
-      //console.log('\n\nHERE TRY sipReinvite()...');
-      //acekurento.sipReinvite();
+      // TRY REINVITE
+      // console.log('\n\nHERE TRY sipReinvite()...');
+      // acekurento.sipReinvite();
 
-      //TRY SIPUPDATE
-      //console.log('\n\nHERE TRY sipUpdate()...');
-      //acekurento.sipUpdate();
+      // TRY SIPUPDATE
+      // console.log('\n\nHERE TRY sipUpdate()...');
+      // acekurento.sipUpdate();
 
-      //TRY ICERESTART
-      //console.log('\n\nHERE TRY iceRestart()...');
-      //acekurento.iceRestart();
+      // TRY ICERESTART
+      // console.log('\n\nHERE TRY iceRestart()...');
+      // acekurento.iceRestart();
       console.log('--- WV: after new calls ---\n');
     },
-    'newMessage': function (e) {
+    newMessage: function (e) {
       console.log('--- WV: New Message---\n');
       try {
         var transcripts = JSON.parse(e.msg);
@@ -96,9 +96,8 @@ function register_jssip() {
       } catch (err) {
         console.log(err);
       }
-
     },
-    'participantsUpdate': function (e) {
+    participantsUpdate: function (e) {
       console.log('--- WV: Participants Update ---\n');
       console.log('--- WV: ' + JSON.stringify(e));
       var participants = [];
@@ -122,13 +121,13 @@ function register_jssip() {
           isMonitorInSession = true;
         } else if (participants[i].isAgent) {
           acekurento.activeAgentList.push(participants[i]);
-        } else if(participants[i].type === 'participant:webrtc'){
+        } else if(participants[i].type === 'participant:webrtc') {
           // webrtc consumer. enable chat and file share
           isConsumerInSession = true;
           consumerType = 'webrtc';
           enable_chat_buttons();
-          socket.emit('begin-file-share', {'vrs': $('#callerPhone').val(), 'agentExt': extensionMe});
-        }  else if (participants[i].type === 'participant:rtp'){
+          socket.emit('begin-file-share', { vrs: $('#callerPhone').val(), agentExt: extensionMe });
+        }  else if (participants[i].type === 'participant:rtp') {
           // provider consumer. disable chat and file share
           isConsumerInSession = true;
           consumerType = 'provider';
@@ -143,7 +142,7 @@ function register_jssip() {
       if (!isConsumerInSession && isMonitoring) {
         // catch provider hangups
         setTimeout(() => {
-          stopMonitoringCall()
+          stopMonitoringCall();
         }, 500);
       }
 
@@ -226,24 +225,23 @@ function register_jssip() {
         }
         multipartyTransition = false;
       }
-
     },
-    'registerResponse': function (error) {
+    registerResponse: function (error) {
       console.log('--- WV: Register response:', error || 'Success ---');
       if (!error) {
       }
     },
-    'pausedQueue': function (e) {
+    pausedQueue: function (e) {
       console.log('--- WV: Paused Agent Member in Queue ---\n');
     },
-    'unpausedQueue': function (e) {
+    unpausedQueue: function (e) {
       console.log('--- WV: Unpaused Agent Member in Queue ---\n');
     },
-    'callResponse': function (e) {
+    callResponse: function (e) {
       console.log('--- WV: Call response ---\n', e);
       console.log('True for callResponse ' + e.stream);
     },
-    'incomingCall': function (call) {
+    incomingCall: function (call) {
       console.log('--- WV: Incoming call ---\n');
 
       incomingCall = call;
@@ -267,23 +265,23 @@ function register_jssip() {
         });
       } */
     },
-    'progress': function (e) {
+    progress: function (e) {
       console.log('--- WV: Calling... ---\n');
     },
-    'startedRecording': function (e) {
+    startedRecording: function (e) {
       console.log('--- WV: Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
       if (e.success) {
       }
     },
-    'stoppedRecording': function (e) {
+    stoppedRecording: function (e) {
       console.log('--- WV: Stopped Recording:', (e.success) ? 'Success ---' : 'Error ---');
       if (e.success) {
       }
     },
-    'failed': function (e) {
+    failed: function (e) {
       console.log('--- WV: Failed ---\n' + e);
     },
-    'restartCallResponse': function (e) {
+    restartCallResponse: function (e) {
       console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e));
       if (selfStream.srcObject) {
         selfStream.srcObject.getVideoTracks()[0].onended = function () {
@@ -312,10 +310,10 @@ function register_jssip() {
 
       if (beingMonitored) {
         // bring the monitor back to the session
-        socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+        socket.emit('reinvite-monitor', { monitorExt: monitorExt });
       }
     },
-    'ended': function (e) {
+    ended: function (e) {
       screenShareEnabled = false;
       if (multipartyTransition) {
         terminate_call();
@@ -354,14 +352,14 @@ function register_jssip() {
         }
         console.log('REASON: ' + e.reason);
         clearScreen();
-        if (e.reason != undefined && e.reason.includes('failed')) {
+        if (e.reason !== undefined && e.reason.includes('failed')) {
           // show modal saying why call failed
           // reason seems to be undefined when agent hangs up or consumer declines call
           $('#outboundFailedBody').html(e.reason);
           $('#modalOutboundFailed').modal({
             backdrop: 'static',
             keyboard: false,
-          })
+          });
 
         }
         /* for(var i = 0; i < acekurento.activeAgentList.length; i++){
@@ -406,12 +404,12 @@ function register_jssip() {
         $('#mute-audio').show();
       }
     },
-    'inviteResponse': function (e) {
+    inviteResponse: function (e) {
       console.log('--- WV: inviteResponse ---\n' + JSON.stringify(e));
-      if ((e.success && beingMonitored && e.ext != monitorExt && !reinviteMonitorMultipartyTransition) || (reinviteMonitorMultipartyInvite && e.ext != monitorExt)){
+      if ((e.success && beingMonitored && e.ext !== monitorExt && !reinviteMonitorMultipartyTransition) || (reinviteMonitorMultipartyInvite && e.ext !== monitorExt)){
         // reinvite the monitor back after the new agent joins
         setTimeout(() => {
-          socket.emit('reinvite-monitor', { 'monitorExt': monitorExt });
+          socket.emit('reinvite-monitor', { monitorExt: monitorExt });
           reinviteMonitorMultipartyInvite = false;
         }, 1000);
       } else if (e.ext === monitorExt && reinviteMonitorMultipartyTransition) {
@@ -487,7 +485,7 @@ function start_call(other_sip_uri) {
 
   $('#remoteView')[0].onplay = function () {
     $('#modalOutboundCall').modal('hide');
-    console.log('ANSWER -- Option 1: add onplay event to the remoteVideo after acekurento.call. Good: fires after video stream starts. Bad: in the case of 1 way video this may not fire.')
+    console.log('ANSWER -- Option 1: add onplay event to the remoteVideo after acekurento.call. Good: fires after video stream starts. Bad: in the case of 1 way video this may not fire.');
     clearTimeout(outbound_timer);
     if (document.getElementById('muteAudio').checked === true) {
       mute_audio();
@@ -510,7 +508,7 @@ function toggleSelfview(duration) {
 
 var calibrating = false;
 function calibrateVideo(duration) {
-  console.log('Calibrate Video')
+  console.log('Calibrate Video');
   let mediaStream = acekurento.mediaStream();
 
   if (!calibrating && mediaStream.getVideoTracks()[0] && mediaStream.getVideoTracks()[0].enabled) {
@@ -523,7 +521,7 @@ function calibrateVideo(duration) {
   }
 }
 
-//answers an incoming call
+// answers an incoming call
 function accept_call() {
   if (!captionsMuted()) {
     show_captions();
@@ -569,7 +567,7 @@ function accept_call() {
         mute_audio();
       }
 
-      if (transitionAgent && transitionAgent !== extensionMe){
+      if (transitionAgent && transitionAgent !== extensionMe) {
         // invite the transition agent back to the call
         multipartyinvite(transitionAgent);
       }
@@ -591,7 +589,9 @@ function accept_call() {
       }
       try {
         calibrateVideo(2000);
-      } catch(e) {}
+      } catch(e) {
+
+      }
 
       $('#multipartyTransitionModal').modal('hide');
     }, 1000);
@@ -677,7 +677,8 @@ function disable_persist_view() {
   toggle_incall_buttons(false);
 }
 
-// starts the local streaming video. Works with some older browsers, if it is incompatible it logs an error message, 
+// starts the local streaming video. Works with some older browsers, 
+// if it is incompatible it logs an error message, 
 // and the selfStream html box stays hidden
 function start_self_video() {
   if (isMonitoring) {
@@ -735,7 +736,7 @@ function start_self_video() {
       /* var senders = currentSession.connection.getSenders();
       var tracks = stream.getTracks();
       var videoTrack = stream.getVideoTracks()[0];
-      var audioTrack = stream.getAudioTracks()[0];*/
+      var audioTrack = stream.getAudioTracks()[0]; */
 
       backupStream = stream;
 
@@ -770,7 +771,7 @@ function terminate_call() {
   mute_audio_button.setAttribute('onclick', 'javascript: mute_audio();');
   mute_audio_icon.classList.add('fa-microphone');
   mute_audio_icon.classList.remove('fa-microphone-slash');
-  if(false && !acekurento.isMultiparty){ // placeholder for transfer hangups.
+  if (false && !acekurento.isMultiparty) { // placeholder for transfer hangups.
     acekurento.callTransfer('hangup', true);
   }
   acekurento.stop(false);
@@ -931,7 +932,7 @@ function mute_audio() {
       isMuted = true;
     } catch {
       console.log('Mute broken trying again');
-      setTimeout(function(){mute_audio();},1000);
+      setTimeout(function() {mute_audio();},1000);
     }
   }
 }
@@ -1000,14 +1001,14 @@ function enable_video_privacy() {
       if(!acekurento.isMultiparty) {
         multipartyCaptionsEnd();
       }
-      socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite': true});
+      socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
       setTimeout(() => {
         console.log('Enabling video privacy with monitor in session');
         acekurento.enableDisableTrack(false, false); //mute video
         hide_video_icon.style.display = 'block';
         hide_video_button.setAttribute('onclick', 'javascript: disable_video_privacy();');
         acekurento.privateMode(true, privacy_video_url);
-        socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+        socket.emit('reinvite-monitor', { monitorExt: monitorExt });
       }, 500);
     } else {
       console.log('Enabling video privacy');
@@ -1025,20 +1026,20 @@ function disable_video_privacy() {
       if(!acekurento.isMultiparty) {
         multipartyCaptionsEnd();
       }
-      socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite': true});
+      socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
       setTimeout(() => {
         console.log('Disabling video privacy with monitor in session');
         mirrorMode('selfView', true);
-        acekurento.enableDisableTrack(true, false); //unmute video
+        acekurento.enableDisableTrack(true, false); // unmute video
         hide_video_icon.style.display = 'none';
         hide_video_button.setAttribute('onclick', 'javascript: enable_video_privacy();');
         acekurento.privateMode(false);
-        socket.emit('reinvite-monitor', {'monitorExt': monitorExt});
+        socket.emit('reinvite-monitor', { monitorExt: monitorExt });
       }, 500);
     } else {
       console.log('Disabling video privacy');
       mirrorMode('selfView', true);
-      acekurento.enableDisableTrack(true, false); //unmute video
+      acekurento.enableDisableTrack(true, false); // unmute video
       hide_video_icon.style.display = 'none';
       hide_video_button.setAttribute('onclick', 'javascript: enable_video_privacy();');
       acekurento.privateMode(false);
@@ -1050,7 +1051,7 @@ function disable_video_privacy() {
 function start_video_calibration() {
   if (acekurento !== null) {
     console.log('Start video calibration');
-    acekurento.enableDisableTrack(false, false); //mute video
+    acekurento.enableDisableTrack(false, false); // mute video
     acekurento.privateMode(true, calibrate_video_url);
   }
 }
@@ -1059,7 +1060,7 @@ function end_video_calibration() {
   if (acekurento !== null) {
     console.log('End video calibration');
     mirrorMode('selfView', true);
-    acekurento.enableDisableTrack(true, false); //unmute video
+    acekurento.enableDisableTrack(true, false); // unmute video
     acekurento.privateMode(false);
   }
 }
@@ -1077,7 +1078,7 @@ function hold() {
   }
 }
 
-//resumes session
+// resumes session
 function unhold() {
   if (currentSession) {
     currentSession.unhold();
@@ -1092,24 +1093,24 @@ function unhold() {
 // @ return request_lines.join(' ') the edited request
 function edit_request(request) {
   console.log('EDITING REQUEST');
-  var video_section = false; //if we've reached the 'm=video' section. Don't want to add H264 to the audio section
-  var added_new_codec = false; //if we've added the new codec. If we reach the end and havent added it, we append it to the end of the file (possibly in the wrong order)
+  var video_section = false; // if we've reached the 'm=video' section. Don't want to add H264 to the audio section
+  var added_new_codec = false; // if we've added the new codec. If we reach the end and havent added it, we append it to the end of the file (possibly in the wrong order)
 
   if (request !== undefined) {
     var request_lines = request.split('\n');
     for (var i = 0; i < request_lines.length; i++) {
       if (request_lines[i].includes('m=video')) {
-        request_lines[i] = request_lines[i].replace(' 126', ''); //getting rid of other h264
-        request_lines[i] = request_lines[i].replace(' 99', ''); //getting rid of other h264
-        request_lines[i] = request_lines[i].replace(' 97', ''); //getting rid of 97 so we don't have it twice
-        request_lines[i] = request_lines[i] + ' 97'; //adding h264 97
+        request_lines[i] = request_lines[i].replace(' 126', ''); // getting rid of other h264
+        request_lines[i] = request_lines[i].replace(' 99', ''); // getting rid of other h264
+        request_lines[i] = request_lines[i].replace(' 97', ''); // getting rid of 97 so we don't have it twice
+        request_lines[i] = request_lines[i] + ' 97'; // adding h264 97
         video_section = true;
       }
 
-      //getting rid of h264
+      // getting rid of h264
       if (request_lines[i].includes('H264/90000')) {
         request_lines.splice(i, 1);
-        i--; //preventing wrong index because line was deleted
+        i--; // preventing wrong index because line was deleted
       }
       if ((request_lines[i].includes('a=rtcp-fb:99')) || (request_lines[i].includes('a=rtcp-fb:126')) || (request_lines[i].includes('a=rtcp-fb:97'))) {
         request_lines.splice(i, 1);
@@ -1120,11 +1121,11 @@ function edit_request(request) {
         i--;
       }
 
-      //adding h264 97
+      // adding h264 97
       if (video_section) {
-        //we want to add the lines in the correct order. 'a=fmtp' lines should be added where all the other 'a=fmtp' lines are
+        // we want to add the lines in the correct order. 'a=fmtp' lines should be added where all the other 'a=fmtp' lines are
         if (request_lines[i].includes('a=fmtp')) {
-          //we want to add the new line at the end of all the 'a=fmtp' lines
+          // we want to add the new line at the end of all the 'a=fmtp' lines
           if (request_lines[i + 1].includes('a=fmtp') == false) {
             request_lines[i] = request_lines[i] + '\na=fmtp:97 profile-level-id=42e01f;level-asymmetry-allowed=1';
             added_new_codec = true;
@@ -1137,7 +1138,7 @@ function edit_request(request) {
           }
         }
         if (request_lines[i].includes('a=rtpmap')) {
-          if (request_lines[i + 1].includes('a=rtpmap') == false) {
+          if (request_lines[i + 1].includes('a=rtpmap') === false) {
             request_lines[i] = request_lines[i] + '\na=rtpmap:97 H264/90000';
             added_new_codec = true;
           }
@@ -1208,9 +1209,9 @@ function exitFullscreen() {
   }
 }
 
-//New 4.0 feature functions
+// New 4.0 feature functions
 function shareScreen() {
-  if (agentStatus == 'IN_CALL' && !isMonitoring) {
+  if (agentStatus === 'IN_CALL' && !isMonitoring) {
     if (beingMonitored) {
       // kick the monitor from the session before screensharing
       if(!acekurento.isMultiparty) {
@@ -1229,8 +1230,8 @@ function shareScreen() {
   }
 }
 
-//Scripts for capturing chrome screenshare button has been clicked.
-//this.getUserMedia.addEventListener('ended', () => console.log('screenshare has ended'));
+// Scripts for capturing chrome screenshare button has been clicked.
+// this.getUserMedia.addEventListener('ended', () => console.log('screenshare has ended'));
 /*if(acekurento != null){
   acekurento.remoteStream.srcObject.getVideoTracks()[0].addEventListener('ended', () => console.log('Third party call has ended'));
 }*/
@@ -1260,14 +1261,14 @@ function multipartyinvite(extension) {
     if(!acekurento.isMultiparty) {
       multipartyCaptionsEnd();
     }
-    socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true});
+    socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
 
     setTimeout(() => {
       acekurento.invitePeer(extension.toString(), false);
       socket.emit('multiparty-invite', {
         extensions: extension.toString(),
         callerNumber: extensionMe,
-        'vrs':$('#callerPhone').val()
+        vrs: $('#callerPhone').val()
       });
     }, 500);
   } else {
@@ -1275,7 +1276,7 @@ function multipartyinvite(extension) {
     socket.emit('multiparty-invite', {
       extensions: extension.toString(),
       callerNumber: extensionMe,
-      'vrs':$('#callerPhone').val()
+      vrs: $('#callerPhone').val()
     });
   }
   /*if(agentStatus == 'IN_CALL'){
@@ -1290,36 +1291,36 @@ function multipartyinvite(extension) {
 function multipartyHangup() {
   if (beingMonitored) {
     // remove the monitor
-    socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':false});
+    socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: false});
     monitorExt = null;
     beingMonitored = false;
     acekurento.isMonitoring = false;
   } else if (isMonitorInSession && !beingMonitored) {
     // a monitor is in the session
     // but not monitoring the agent hanging up
-    if (hostAgent == extensionMe) {
+    if (hostAgent === extensionMe) {
       if(!acekurento.isMultiparty) {
         multipartyCaptionsEnd();
       }
-      socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true, 'multipartyHangup': true, 'multipartyTransition':true});
+      socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true, multipartyHangup: true, multipartyTransition: true });
     } else {
-      if(!acekurento.isMultiparty) {
+      if (!acekurento.isMultiparty) {
         multipartyCaptionsEnd();
       }
-      socket.emit('force-monitor-leave', {'monitorExt': monitorExt, 'reinvite':true, 'multipartyHangup': true, 'multipartyTransition': false});
+      socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true, multipartyHangup: true, multipartyTransition: false });
     }
     
     monitorExt = null;
     acekurento.isMonitoring = false;
   }
   
-  if (acekurento.isMultiparty && hostAgent == extensionMe) {
+  if (acekurento.isMultiparty && hostAgent === extensionMe) {
     // host agent is leaving call
     // refer the session to the other agent in the call
     var tempAgent = backupHostAgent;
     multipartyCaptionsEnd();
 
-    socket.emit('multiparty-hangup', {'newHost' :backupHostAgent, 'transitionAgent':transitionExt, 'vrs': $('#callerPhone').val()});
+    socket.emit('multiparty-hangup', { newHost :backupHostAgent, transitionAgent: transitionExt, vrs: $('#callerPhone').val() });
 
     setTimeout(() => {
       acekurento.callTransfer(tempAgent.toString(), false);
@@ -1354,7 +1355,7 @@ function getTransferType(ext) {
  * @param {boolean} isCold 
  */
 function sendTransferInvite(isCold) {
-  if (agentStatus == 'IN_CALL') {
+  if (agentStatus === 'IN_CALL') {
     transferExt = $('#transferExtension').val();
     showAlert('info', 'Call transfer initiated. Waiting for response...');
 
@@ -1365,15 +1366,15 @@ function sendTransferInvite(isCold) {
     }
 
     socket.emit('transferCallInvite', {
-      'transferExt': transferExt, 
-      'originalExt': extensionMe, 
-      'vrs': $('#callerPhone').val()
+      transferExt: transferExt, 
+      originalExt: extensionMe, 
+      vrs: $('#callerPhone').val()
     });
   }
 }
 
 function recordScreen() {
-  if (recording == false) {
+  if (recording === false) {
     console.log('Recording screen');
     acekurento.startRecording();
     showAlert('info', 'This video is now being recorded.  You can click this button again to stop the recording.');
@@ -1405,9 +1406,9 @@ function changeCaption(id) {
   var value = id.split('-')[1];
   var target = id.split('-')[0];
 
-  if (target == 'bg') {
+  if (target === 'bg') {
     var alpha = $('#opacity-slider-agent').val();
-    if (alpha == 0) {
+    if (alpha === 0) {
       alpha = 1;
       $('#opacity-slider-agent').val(1);
     }
@@ -1424,7 +1425,7 @@ function changeCaption(id) {
         break;
     }
     document.documentElement.style.setProperty('--caption-bg-color', color);
-  } else if (target == 'font') {
+  } else if (target ==='font') {
     document.documentElement.style.setProperty('--caption-font-color', value);
   } else {
     document.documentElement.style.setProperty('--caption-font-size', id + 'rem');
@@ -1517,7 +1518,7 @@ function updateCaptions(transcripts) {
 
 function updateCaptionsMultiparty(transcripts) {
   var tDiv = document.getElementById(transcripts.msgid);
-  if(!tDiv){//prevents duplicate captions
+  if (!tDiv) { // prevents duplicate captions
     var temp = document.createElement('div');
     temp.id = transcripts.msgid;
     temp.innerHTML = createCaptionHtml(transcripts.displayname, transcripts);
@@ -1582,7 +1583,7 @@ function multipartyCaptionsStart() {
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
   recognition.onresult = function (event) {
-    if(!isMuted && event && event.results && (event.results.length > 0)){
+    if (!isMuted && event && event.results && (event.results.length > 0)) {
       var lastResult = event.results.length - 1;
       console.log('sending multiparty-caption-agent caption:', event.results[lastResult][0].transcript, extensionMe);
       socket.emit('multiparty-caption-agent', {

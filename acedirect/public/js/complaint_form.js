@@ -118,11 +118,11 @@ function connect_socket() {
     success: function (data) {
       console.log(JSON.stringify(data));
       if (data.message === 'success') {
-          socket = io.connect('https://' + window.location.host, {
-            path: nginxPath + '/socket.io',
-            query: 'token=' + data.token,
-            forceNew: true
-          });
+        socket = io.connect('https://' + window.location.host, {
+          path: nginxPath + '/socket.io',
+          query: 'token=' + data.token,
+          forceNew: true
+        });
 
         // update the version and year in the footer
         socket.on('adversion', function (data) {
@@ -144,16 +144,15 @@ function connect_socket() {
           if (!isOpen) { // after hours processing; if after hours, then show this modal
             // $("#afterHoursModal").modal({ backdrop: "static" });
             // $("#afterHoursModal").modal("show");
-            console.log('after hours modal suppressed. isOpen: ' + isOpen); 
+            console.log('after hours modal suppressed. isOpen: ' + isOpen);
           }
 
           // get the start/end time strings for the after hours dialog
           var tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
-          startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); //start time in UTC
-          endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); //end time in UTC
+          startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); // start time in UTC
+          endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); // end time in UTC
           $('#ah-start-time').text(startTimeUTC);
           $('#ah-end-time').text(endTimeUTC + ' ' + tz);
-
 
           socket.emit('register-client', {
             hello: 'hello'
@@ -179,7 +178,7 @@ function connect_socket() {
           if (data.message === 'success') {
             globalData = data;
             $('#outOfExtensionsModal').modal('hide');
-            var extension = data.extension; //returned extension to use for WebRTC
+            var extension = data.extension; // returned extension to use for WebRTC
             exten = data.extension;
             $('#display_name').val(data.extension);
 
@@ -191,7 +190,7 @@ function connect_socket() {
             }
             else {
               asterisk_sip_uri = 'sip:' + data.queues_complaint_number + '@' + data.asterisk_public_hostname;
-              asterisk_sip_uri = data.queues_complaint_number; //TODO: what is this doing?
+              asterisk_sip_uri = data.queues_complaint_number; // TODO: what is this doing?
             }
 
             console.log(`Asterisk sip URI = ${asterisk_sip_uri}`);
@@ -224,56 +223,56 @@ function connect_socket() {
               signaling_url = globalData.signaling_server_url;
               signaling_url = signaling_url.trim();
 
-              acekurento = new ACEKurento({acekurentoSignalingUrl: signaling_url });
+              acekurento = new ACEKurento({ acekurentoSignalingUrl: signaling_url });
 
               acekurento.remoteStream = document.getElementById('remoteView');
               acekurento.selfStream = document.getElementById('selfView');
 
               var eventHandlers = {
-                'connected': function (e) {
-                    console.log('--- WV: Connected ---\n');
-                    register_jssip(data.extension, data.password); //register with the given extension
-                    start_call(asterisk_sip_uri); //calling asterisk to get into the queue
-                  },
-                'registerResponse': function (error) {
-                    console.log('--- WV: Register response:', error || 'Success ---');
-                    if(!error) {
-                    }
+                connected: function (e) {
+                  console.log('--- WV: Connected ---\n');
+                  register_jssip(data.extension, data.password); // register with the given extension
+                  start_call(asterisk_sip_uri); // calling asterisk to get into the queue
                 },
-                'accepted' : function (e) {
+                registerResponse: function (error) {
+                  console.log('--- WV: Register response:', error || 'Success ---');
+                  if (!error) {
+                  }
+                },
+                accepted: function (e) {
                   $('#remoteView').removeClass('mirror-mode'); 
                 },
-                'pausedQueue': function (e) {
-                    console.log('--- WV: Paused Agent Member in Queue ---\n');
+                pausedQueue: function (e) {
+                  console.log('--- WV: Paused Agent Member in Queue ---\n');
                 },
-                'unpausedQueue': function (e) {
-                    console.log('--- WV: Unpaused Agent Member in Queue ---\n');
+                unpausedQueue: function (e) {
+                  console.log('--- WV: Unpaused Agent Member in Queue ---\n');
                 },
-                'callResponse': function (e) {
-                    console.log('--- WV: Call response ---\n', e);
+                callResponse: function (e) {
+                  console.log('--- WV: Call response ---\n', e);
                 },
-                'incomingCall': function (call) {
-                    console.log('--- WV: Incoming call ---\n');
+                incomingCall: function (call) {
+                  console.log('--- WV: Incoming call ---\n');
                 },
-                'progress': function(e) {
-                    console.log('--- WV: Calling... ---\n');
+                progress: function (e) {
+                  console.log('--- WV: Calling... ---\n');
                 },
-                'startedRecording': function (e) {
-                    console.log('--- WV: Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
-                    if (e.success) {
-                    }
+                startedRecording: function (e) {
+                  console.log('--- WV: Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
+                  if (e.success) {
+                  }
                 },
-                'stoppedRecording': function (e) {
+                stoppedRecording: function (e) {
                   console.log('--- WV: Stopped Recording:', (e.success) ? 'Success ---' : 'Error ---');
                   if (e.success) {
                   }
                 },
-                'failed': function(e) {
+                failed: function (e) {
                   console.log('--- WV: Failed ---\n' + e);
                 },
-                'ended': function(e) {
+                ended: function (e) {
                   console.log('--- WV: Call ended ---\n');
-                  //terminate_call();
+                  // terminate_call();
                 }
               };
               acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
@@ -303,16 +302,16 @@ function connect_socket() {
           console.log('Selected language is ' + localLanguage);
           // var localLanguage = 'es';
           data['toLanguage'] = localLanguage;
-          if(localLanguage === data.fromLanguage){
+          if (localLanguage === data.fromLanguage) {
             newChatMessage(data);
-          }else{
+          } else {
             socket.emit('translate', data);
           }
-        }).on('chat-message-new-translated', function (data){
+        }).on('chat-message-new-translated', function (data) {
           newChatMessage(data);
           console.log('translated', data);
-        }).on('translate-language-error', function (error){
-          console.error('Translation error:', error)
+        }).on('translate-language-error', function (error) {
+          console.error('Translation error:', error);
         }).on('typing', function (data) {
           if ($('#displayname').val() !== data.displayname) {
             /* there's still some weird spacing between agent messages on the first call */
