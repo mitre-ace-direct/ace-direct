@@ -12,7 +12,8 @@ const hideVideoIcon = document.getElementById('mute-camera-off-icon');
 const holdButton = document.getElementById('hold-call');
 let maxRecordingSeconds = 90;
 let callTerminated = false;
-const privacyVideoUrl = window.location.origin + '/' + nginxPath + '/media/videoPrivacy.webm';
+// const privacyVideoUrl = window.location.origin + '/' + nginxPath + '/media/videoPrivacy.webm';
+const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm`;
 let monitorExt;
 
 // VIDEOMAIL recording progress bar
@@ -45,8 +46,8 @@ function startRecordProgress() {
       seconds += 1;
       secremain -= 1;
       percentage = (seconds / maxRecordingSeconds) * 100;
-      $('#record-progress-bar').css('width', percentage.toFixed(0) + '%');
-      $('#secsremain').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + secremain + ' seconds remaining');
+      $('#record-progress-bar').css('width', `${percentage.toFixed(0)}%`);
+      $('#secsremain').html(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${secremain} seconds remaining`);
       $('#recordicon').show();
     }
   }
@@ -83,14 +84,14 @@ function register_jssip(myExtension, myPassword) {
   console.log('Registering...');
 
   var eventHandlers = {
-    'connected': function (e) {
+    connected: function (e) {
       console.log('--- WV: Connected ---\n' + e);
       callTerminated = false;
     },
-    'accepted': function (e) {
+    accepted: function (e) {
       console.log('--- WV: UA accepted ---\n' + e);
     },
-    'newMessage': function (e) {
+    newMessage: function (e) {
       console.log('--- WV: New Message ---\n');
       let consumerLanguage = sessionStorage.consumerLanguage;
 
@@ -100,7 +101,7 @@ function register_jssip(myExtension, myPassword) {
         if (e.msg === 'STARTRECORDING') {
           startRecordProgress();
           enable_video_privacy();
-          setTimeout(function(){
+          setTimeout(function() {
             disable_video_privacy();
           }, 1000);
         } else {
@@ -113,47 +114,47 @@ function register_jssip(myExtension, myPassword) {
               callerNumber: myExtension
             });
             // acedirect.js is listening for 'caption-translated' and will call 
-            //updateConsumerCaptions directly with the translation
+            // updateConsumerCaptions directly with the translation
           }
         }
       } catch (err) {
         console.log(err);
       }
     },
-    'registerResponse': function (error) {
+    registerResponse: function (error) {
       console.log('--- WV: Register response:', error || 'Success ---');
       if (!error) {
       }
     },
-    'pausedQueue': function (e) {
+    pausedQueue: function (e) {
       console.log('--- WV: Paused Agent Member in Queue ---\n' + e);
     },
-    'unpausedQueue': function (e) {
+    unpausedQueue: function (e) {
       console.log('--- WV: Unpaused Agent Member in Queue ---\n' + e);
     },
-    'callResponse': function (e) {
+    callResponse: function (e) {
       console.log('--- WV: Call response ---\n', e);
     },
-    'incomingCall': function (call) {
+    incomingCall: function (call) {
       console.log('--- WV: Incoming call ---\n' + call);
     },
-    'progress': function (e) {
+    progress: function (e) {
       console.log('--- WV: Calling... ---\n' + e);
     },
-    'startedRecording': function (e) {
+    startedRecording: function (e) {
       console.log('--- WV: Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
       if (e.success) {
       }
     },
-    'stoppedRecording': function (e) {
+    stoppedRecording: function (e) {
       console.log('--- WV: Stopped Recording:', (e.success) ? 'Success ---' : 'Error ---');
       if (e.success) {
       }
     },
-    'failed': function(e) {
+    failed: function(e) {
       console.log('--- WV: Failed ---\n' + e);
     },
-    'restartCallResponse': function (e) {
+    restartCallResponse: function (e) {
       console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e));
       if (selfStream && selfStream.srcObject) {
         selfStream.srcObject.getVideoTracks()[0].onended = function () {
@@ -162,7 +163,7 @@ function register_jssip(myExtension, myPassword) {
 
           if (monitorExt) {
             // force monitor to leave the session first
-            socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite:true });
+            socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
 
             setTimeout(() => {
               screenShareEnabled = false;
@@ -187,7 +188,7 @@ function register_jssip(myExtension, myPassword) {
         socket.emit('reinvite-monitor', { monitorExt: monitorExt });
       }
     },
-    'ended': function(e) {
+    ended: function(e) {
       console.log('--- WV: Call ended ---\n');
 
       $('#startScreenshare').hide();
@@ -202,7 +203,7 @@ function register_jssip(myExtension, myPassword) {
       $('#end-call').attr('onclick', 'terminate_call()');
 
     },
-    'participantsUpdate': function(e) {
+    participantsUpdate: function(e) {
       console.log('--- WV: Participants Update ---\n');
       console.log('--- WV: ' + JSON.stringify(e));
       console.log('--- WV: e.participants.length: ' + e.participants.length);
@@ -259,7 +260,8 @@ function toggleSelfview() {
   }, 3000);
 }
 
-// starts the local streaming video. Works with some older browsers, if it is incompatible it logs an error message, 
+// starts the local streaming video. Works with some older browsers,
+// if it is incompatible it logs an error message, 
 // and the selfStream html box stays hidden
 function start_self_video() {
   // not needed?
@@ -439,7 +441,7 @@ function mute_audio() {
     muteAudioButton.setAttribute('onclick', 'javascript: unmute_audio();');
     muteAudioIcon.classList.add('fa-microphone-slash');
     muteAudioIcon.classList.remove('fa-microphone');
-    console.log('here mute2')
+    console.log('here mute2');
   }
 }
 
@@ -590,7 +592,7 @@ function changeCaption(id) {
   // change css variable value
   if (target === 'bg'){
     var alpha = $('#opacity-slider-consumer').val();
-    if ( alpha === 0 ) {
+    if (alpha === 0 ) {
       alpha = 1;
       $('#opacity-slider-consumer').val(1);
     }
@@ -625,10 +627,9 @@ $('#opacity-slider-consumer').on('change mousemove', function() {
   if (current === '') {
     current = 'rgba(128,128,128,0';
   }
-  var color = current.substring(0,current.lastIndexOf(',')+1) + alpha + ')';
+  var color = current.substring(0, current.lastIndexOf(',') + 1) + alpha + ')';
   document.documentElement.style.setProperty('--caption-bg-color', color);
 });
-
 
 function createCaptionHtml(displayName, transcripts) {
   console.log(displayName, transcripts);
@@ -636,7 +637,7 @@ function createCaptionHtml(displayName, transcripts) {
   if (!transcripts.final) {
     caption += '...';
   }
-  let timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
+  let timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   return '<span class="timestamp">' + timestamp + '</span><strong>' + displayName + ':</strong> ' + caption;
 }
 
