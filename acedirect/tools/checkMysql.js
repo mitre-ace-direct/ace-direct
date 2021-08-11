@@ -18,35 +18,30 @@ if (process.argv.length === 6) {
 }
 
 // Create MySQL connection and connect to it
-let connection = mysql.createConnection({
+const connection = mysql.createConnection({
   host: mysqlFqdn,
   user: mysqlUser,
   password: mysqlPass,
   database: mysqlDb
 });
 
-const connectToMysql = () => {
-  return new Promise(function(resolve, reject) {
-    connection.connect(function(err) {
-      if (err) {
-        reject(new Error('connect error'));
-      }
-      resolve(0);
-    });
+const connectToMysql = () => new Promise((resolve, reject) => {
+  connection.connect((err) => {
+    if (err) {
+      reject(new Error('connect error'));
+    }
+    resolve(0);
   });
-};
+});
 
-const disconnectFromMysql = () => {
-  return new Promise(function(resolve, reject) {
-    connection.end(function(err) {
-      if (err) {
-        reject(new Error('disconnect error'));
-      }
-      resolve(0); 
-    });
+const disconnectFromMysql = () => new Promise((resolve, reject) => {
+  connection.end((err) => {
+    if (err) {
+      reject(new Error('disconnect error'));
+    }
+    resolve(0);
   });
-};
-
+});
 
 const go = async () => {
   let connectRc = 99;
@@ -69,7 +64,6 @@ const go = async () => {
   } else {
     console.log(99);
   }
-}
+};
 
 go();
-
