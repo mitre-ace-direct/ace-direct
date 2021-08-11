@@ -1,5 +1,5 @@
-var nconf = require('nconf');
-var fs = require('fs');
+const nconf = require('nconf');
+const fs = require('fs');
 
 // get params
 let param = 'abc';
@@ -12,14 +12,14 @@ if (process.argv.length === 4) {
   process.exit(process.argv.length);
 }
 
-var content = fs.readFileSync(cfile, 'utf8');
-var myjson = JSON.parse(content);
+const content = fs.readFileSync(cfile, 'utf8');
+const myjson = JSON.parse(content);
 nconf.file({
   file: cfile
 });
 
-var clearText = false;
-if (typeof (nconf.get('common:cleartext')) !== "undefined"  && nconf.get('common:cleartext') !== ""   ) {
+let clearText = false;
+if (typeof (nconf.get('common:cleartext')) !== 'undefined' && nconf.get('common:cleartext') !== '') {
   clearText = true;
 }
 
@@ -29,14 +29,14 @@ if (typeof (nconf.get('common:cleartext')) !== "undefined"  && nconf.get('common
  * @param {type} param_name of the config parameter
  * @returns {unresolved} Decoded readable string.
  */
-function getConfigVal(param_name) {
-  var val = nconf.get(param_name);
-  var decodedString = null;
+function getConfigVal(paramName) {
+  const val = nconf.get(paramName);
+  let decodedString = null;
   if (typeof val !== 'undefined' && val !== null) {
-    //found value for param_name
+    // found value for paramName
     if (clearText) {
       decodedString = val;
-    } else {``
+    } else {
       decodedString = Buffer.alloc(val.length, val, 'base64');
     }
   } else {
@@ -45,4 +45,4 @@ function getConfigVal(param_name) {
   return (decodedString.toString());
 }
 
-console.log( getConfigVal(param) );
+console.log(getConfigVal(param));
