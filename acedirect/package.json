@@ -42,9 +42,9 @@
   },
   "devDependencies": {
     "bootstrap": "^3.4.1",
-    "eslint": "^7.25.0",
+    "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.22.1"
+    "eslint-plugin-import": "^2.24.0"
   },
   "scripts": {
     "test": "echo \"No tests available\" && exit 0",
