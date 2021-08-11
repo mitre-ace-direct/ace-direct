@@ -900,6 +900,27 @@ function (_EventEmitter) {
 
 function onTransportConnecting(data) {
   this.emit('connecting', data);
+
+  let reconnectAttempts = this._transport.recover_attempts;
+  if (reconnectAttempts > 10) {
+    const errStr1 = `*** ERROR - too many reconnect attempts to Asterisk. Attempts: ${reconnectAttempts}.`;
+    const errStr2 = `***       - Try restarting the Asterisk service and the signaling server.`;
+    const errStr3 = `***       - exiting...\n`;
+    debugerror(errStr1);
+    debugerror(errStr2);
+    debugerror(errStr3);
+    console.error();
+    console.error(errStr1);
+    console.error(errStr2);
+    console.error(errStr3);
+    console.error();
+    process.exit(1)
+  } else if (reconnectAttempts > 0) { 
+    const warnStr = `*** WARNING - reconnecting to Asterisk. Attempt # ${reconnectAttempts}....`;
+    debug(warnStr);
+    console.log(warnStr);
+  }
+
 } // Transport connected event.
 
 
