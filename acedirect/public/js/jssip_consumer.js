@@ -81,7 +81,7 @@ function stopRecordProgress() {
 // setup for the call. creates and starts the User Agent (UA) and registers event handlers
 // This uses the new ACE Kurento object rather than JsSIP
 function register_jssip(myExtension, myPassword) {
-  console.log(`Registering...`);
+  console.log('Registering...');
 
   var eventHandlers = {
     connected: function (e) {
@@ -92,7 +92,7 @@ function register_jssip(myExtension, myPassword) {
       console.log(`--- WV: UA accepted ---\n${e}`);
     },
     newMessage: function (e) {
-      console.log(`--- WV: New Message ---\n`);
+      console.log('--- WV: New Message ---\n');
       let consumerLanguage = sessionStorage.consumerLanguage;
 
       console.log(`Consumer's selected language is ${consumerLanguage}`);
