@@ -12,7 +12,8 @@ const hideVideoIcon = document.getElementById('mute-camera-off-icon');
 const holdButton = document.getElementById('hold-call');
 let maxRecordingSeconds = 90;
 let callTerminated = false;
-const privacyVideoUrl = window.location.origin + '/' + nginxPath + '/media/videoPrivacy.webm';
+// const privacyVideoUrl = window.location.origin + '/' + nginxPath + '/media/videoPrivacy.webm';
+const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm`;
 let monitorExt;
 
 // VIDEOMAIL recording progress bar
@@ -45,8 +46,8 @@ function startRecordProgress() {
       seconds += 1;
       secremain -= 1;
       percentage = (seconds / maxRecordingSeconds) * 100;
-      $('#record-progress-bar').css('width', percentage.toFixed(0) + '%');
-      $('#secsremain').html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + secremain + ' seconds remaining');
+      $('#record-progress-bar').css('width', `${percentage.toFixed(0)}%`);
+      $('#secsremain').html(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${secremain} seconds remaining`);
       $('#recordicon').show();
     }
   }
@@ -68,7 +69,7 @@ function stopRecordProgress() {
     $('#vmsent').show();
     if (complaintRedirectActive || isOpen) {
       $('#redirecttag').attr('href', complaintRedirectUrl);
-      $('#redirectdesc').text('Redirecting to ' + complaintRedirectDesc + ' ...');
+      $('#redirectdesc').text(`Redirecting to ${complaintRedirectDesc} ...`);
       $('#callEndedModal').modal('show');
       setTimeout(function () {
         window.location = complaintRedirectUrl;
@@ -83,24 +84,24 @@ function register_jssip(myExtension, myPassword) {
   console.log('Registering...');
 
   var eventHandlers = {
-    'connected': function (e) {
-      console.log('--- WV: Connected ---\n' + e);
+    connected: function (e) {
+      console.log(`--- WV: Connected ---\n${e}`);
       callTerminated = false;
     },
-    'accepted': function (e) {
-      console.log('--- WV: UA accepted ---\n' + e);
+    accepted: function (e) {
+      console.log(`--- WV: UA accepted ---\n${e}`);
     },
-    'newMessage': function (e) {
+    newMessage: function (e) {
       console.log('--- WV: New Message ---\n');
       let consumerLanguage = sessionStorage.consumerLanguage;
 
-      console.log("Consumer's selected language is " + consumerLanguage);
+      console.log(`Consumer's selected language is ${consumerLanguage}`);
 
       try {
         if (e.msg === 'STARTRECORDING') {
           startRecordProgress();
           enable_video_privacy();
-          setTimeout(function(){
+          setTimeout(function () {
             disable_video_privacy();
           }, 1000);
         } else {
@@ -112,49 +113,49 @@ function register_jssip(myExtension, myPassword) {
               transcripts: transcripts,
               callerNumber: myExtension
             });
-            // acedirect.js is listening for 'caption-translated' and will call 
-            //updateConsumerCaptions directly with the translation
+            // acedirect.js is listening for 'caption-translated' and will call
+            // updateConsumerCaptions directly with the translation
           }
         }
       } catch (err) {
         console.log(err);
       }
     },
-    'registerResponse': function (error) {
+    registerResponse: function (error) {
       console.log('--- WV: Register response:', error || 'Success ---');
       if (!error) {
       }
     },
-    'pausedQueue': function (e) {
-      console.log('--- WV: Paused Agent Member in Queue ---\n' + e);
+    pausedQueue: function (e) {
+      console.log(`--- WV: Paused Agent Member in Queue ---\n${e}`);
     },
-    'unpausedQueue': function (e) {
-      console.log('--- WV: Unpaused Agent Member in Queue ---\n' + e);
+    unpausedQueue: function (e) {
+      console.log(`--- WV: Unpaused Agent Member in Queue ---\n${e}`);
     },
-    'callResponse': function (e) {
-      console.log('--- WV: Call response ---\n', e);
+    callResponse: function (e) {
+      console.log(`--- WV: Call response ---\n${e}`);
     },
-    'incomingCall': function (call) {
-      console.log('--- WV: Incoming call ---\n' + call);
+    incomingCall: function (call) {
+      console.log(`--- WV: Incoming call ---\n${call}`);
     },
-    'progress': function (e) {
-      console.log('--- WV: Calling... ---\n' + e);
+    progress: function (e) {
+      console.log(`--- WV: Calling... ---\n${e}`);
     },
-    'startedRecording': function (e) {
+    startedRecording: function (e) {
       console.log('--- WV: Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
       if (e.success) {
       }
     },
-    'stoppedRecording': function (e) {
+    stoppedRecording: function (e) {
       console.log('--- WV: Stopped Recording:', (e.success) ? 'Success ---' : 'Error ---');
       if (e.success) {
       }
     },
-    'failed': function(e) {
-      console.log('--- WV: Failed ---\n' + e);
+    failed: function(e) {
+      console.log(`--- WV: Failed ---\n${e}`);
     },
-    'restartCallResponse': function (e) {
-      console.log('--- WV: restartCallResponse ---\n' + JSON.stringify(e));
+    restartCallResponse: function (e) {
+      console.log(`--- WV: restartCallResponse ---\n${JSON.stringify(e)}`);
       if (selfStream && selfStream.srcObject) {
         selfStream.srcObject.getVideoTracks()[0].onended = function () {
           console.log('screensharing ended self');
@@ -162,7 +163,7 @@ function register_jssip(myExtension, myPassword) {
 
           if (monitorExt) {
             // force monitor to leave the session first
-            socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite:true });
+            socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
 
             setTimeout(() => {
               screenShareEnabled = false;
@@ -187,7 +188,7 @@ function register_jssip(myExtension, myPassword) {
         socket.emit('reinvite-monitor', { monitorExt: monitorExt });
       }
     },
-    'ended': function(e) {
+    ended: function (e) {
       console.log('--- WV: Call ended ---\n');
 
       $('#startScreenshare').hide();
@@ -202,13 +203,13 @@ function register_jssip(myExtension, myPassword) {
       $('#end-call').attr('onclick', 'terminate_call()');
 
     },
-    'participantsUpdate': function(e) {
+    participantsUpdate: function (e) {
       console.log('--- WV: Participants Update ---\n');
-      console.log('--- WV: ' + JSON.stringify(e));
-      console.log('--- WV: e.participants.length: ' + e.participants.length);
+      console.log(`--- WV: ${JSON.stringify(e)}`);
+      console.log(`--- WV: e.participants.length: ${e.participants.length}`);
       var partCount = e.participants.filter(t => t.type === 'participant:webrtc').length;
 
-      console.log('--- WV: partCount: ' + partCount);
+      console.log(`--- WV: partCount: ${partCount}`);
 
       for (var i = 0; i < e.participants.length; i += 1) {
         if (e.participants[i].isMonitor) {
@@ -237,7 +238,7 @@ function register_jssip(myExtension, myPassword) {
 * Use acekurento object to make the call. Not sure about the extension
 */
 function start_call(otherSipUri, myExtension) {
-  console.log('start_call: ' + otherSipUri);
+  console.log(`start_call: ${otherSipUri}`);
   selfStream.removeAttribute('hidden');
   if (!captionsMuted()) {
     show_captions();
@@ -259,7 +260,8 @@ function toggleSelfview() {
   }, 3000);
 }
 
-// starts the local streaming video. Works with some older browsers, if it is incompatible it logs an error message, 
+// starts the local streaming video. Works with some older browsers,
+// if it is incompatible it logs an error message,
 // and the selfStream html box stays hidden
 function start_self_video() {
   // not needed?
@@ -285,7 +287,6 @@ function transfer_to_videomail() {
     $('#callbutton').prop('disabled', true);
     $('#userformbtn').prop('disabled', true);
     $('#videomailbutton').prop('disabled', true);
-
   }
 }
 
@@ -439,7 +440,7 @@ function mute_audio() {
     muteAudioButton.setAttribute('onclick', 'javascript: unmute_audio();');
     muteAudioIcon.classList.add('fa-microphone-slash');
     muteAudioIcon.classList.remove('fa-microphone');
-    console.log('here mute2')
+    console.log('here mute2');
   }
 }
 
@@ -452,7 +453,6 @@ function unmute_audio() {
     muteAudioIcon.classList.remove('fa-microphone-slash');
   }
 }
-
 
 function show_captions() {
   $('#consumer-webcam').css('height', '70%');
@@ -588,29 +588,29 @@ function changeCaption(id) {
   var target = id.split('-')[0];
 
   // change css variable value
-  if (target === 'bg'){
+  if (target === 'bg') {
     var alpha = $('#opacity-slider-consumer').val();
-    if ( alpha === 0 ) {
+    if (alpha === 0 ) {
       alpha = 1;
       $('#opacity-slider-consumer').val(1);
     }
     var color;
     switch (value) {
       case 'black':
-        color = 'rgba(0,0,0,' + alpha + ')';
+        color = `rgba(0,0,0,${alpha})`;
         break;
       case 'grey':
-        color = 'rgba(128,128,128,' + alpha + ')';
+        color = `rgba(128,128,128,${alpha})`;
         break;
       case 'white':
-        color = 'rgba(255,255,255,' + alpha + ')';
+        color = `rgba(255,255,255,${alpha})`;
         break;
     }
     document.documentElement.style.setProperty('--caption-bg-color', color);
   } else if (target === 'font') {
     document.documentElement.style.setProperty('--caption-font-color', value);
   } else {
-    document.documentElement.style.setProperty('--caption-font-size', id + 'rem');
+    document.documentElement.style.setProperty('--caption-font-size', `${id}rem`);
   }
 }
 
@@ -619,16 +619,15 @@ $('#bg-transparent').click(function () {
   $('#opacity-slider-consumer').trigger('mousemove');
 });
 
-$('#opacity-slider-consumer').on('change mousemove', function() {
+$('#opacity-slider-consumer').on('change mousemove', function () {
   var alpha = $(this).val();
   var current = document.documentElement.style.getPropertyValue('--caption-bg-color');
   if (current === '') {
     current = 'rgba(128,128,128,0';
   }
-  var color = current.substring(0,current.lastIndexOf(',')+1) + alpha + ')';
+  var color = `${current.substring(0, current.lastIndexOf(',') + 1)}${alpha})`;
   document.documentElement.style.setProperty('--caption-bg-color', color);
 });
-
 
 function createCaptionHtml(displayName, transcripts) {
   console.log(displayName, transcripts);
@@ -636,8 +635,8 @@ function createCaptionHtml(displayName, transcripts) {
   if (!transcripts.final) {
     caption += '...';
   }
-  let timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute:'2-digit' });
-  return '<span class="timestamp">' + timestamp + '</span><strong>' + displayName + ':</strong> ' + caption;
+  let timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  return `<span class="timestamp">${timestamp}</span><strong>${displayName}:</strong> ${caption}`;
 }
 
 function updateConsumerCaptions(transcripts) {
@@ -645,7 +644,7 @@ function updateConsumerCaptions(transcripts) {
   console.log('consumer uc: ', transcripts);
 
   var tDiv = document.getElementById(transcripts.msgid);
-  const displayName = 'CSR ' + $('#agent-name').text();
+  const displayName = `CSR ${$('#agent-name').text()}`;
   let caption = createCaptionHtml(displayName, transcripts);
   if (!tDiv) {
     const temp = document.createElement('div');
@@ -662,7 +661,7 @@ function updateConsumerCaptions(transcripts) {
 
       // var captionBubble = '<div><b>' +transcripts.timestamp + ':</b>&nbsp;'+transcripts.transcript+'<br/><div>';
       // $(captionBubble).appendTo($('#caption-messages'));
-      $('#caption-messages').append('<div class=\'agent-scripts\'><div class=\'direct-chat-text\'>' + transcripts.transcript + '</div></div>');
+      $('#caption-messages').append(`<div class=\'agent-scripts\'><div class=\'direct-chat-text\'>${transcripts.transcript}</div></div>`);
       $('#caption-messages').scrollTop($('#caption-messages')[0].scrollHeight);
     }
   }
@@ -672,7 +671,7 @@ function updateConsumerCaptions(transcripts) {
 sessionStorage.consumerLanguage = 'en';
 
 /* global setPreferredLanguage */
-/* eslint no-undef: "error"*/
+/* eslint no-undef: "error" */
 function setPreferredLanguage() {
   sessionStorage.consumerLanguage = $('#language-select').val();
   let flag = 'us';
@@ -724,7 +723,7 @@ function setPreferredLanguage() {
       language = 'English';
   }
 
-  $('#preferred-language-span').html('').html("Preferred language is <img src='images/flags/" + flag + ".png'> " + language);
+  $('#preferred-language-span').html('').html(`Preferred language is <img src='images/flags/${flag}.png'> ${language}`);
 }
 
 // function getAgentColor(displayName) {
