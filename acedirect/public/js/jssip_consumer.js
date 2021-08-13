@@ -10,6 +10,7 @@ const muteCaptionsOffIcon = document.getElementById('mute-captions-off-icon');
 const transcriptOverlay = document.getElementById('transcriptoverlay');
 const hideVideoIcon = document.getElementById('mute-camera-off-icon');
 const holdButton = document.getElementById('hold-call');
+// Eslint wants this to be a const but it is edited in complaint_form
 let maxRecordingSeconds = 90;
 let callTerminated = false;
 // const privacyVideoUrl = window.location.origin + '/' + nginxPath + '/media/videoPrivacy.webm';
@@ -19,36 +20,53 @@ let monitorExt;
 // VIDEOMAIL recording progress bar
 let recordId = null;
 
-function startRecordProgress() {
-  let secremain = maxRecordingSeconds;
-  let seconds = 0;
-  let percentage;
+// Adds an element to the document
+function addElement(parentId, elementTag, elementId, html) {
+  const p = document.getElementById(parentId);
+  const newElement = document.createElement(elementTag);
+  newElement.setAttribute('id', elementId);
+  newElement.setAttribute('class', elementId);
+  newElement.innerHTML = html;
+  p.appendChild(newElement);
+}
 
-  if ($('#record-progress-bar').css('display') === 'none') {
-    return;
-  }
-  if (recordId) {
-    return;
-  }
-  $('#vmsent').hide();
-  $('#vmwait').hide();
-  $('#callbutton').prop('disabled', true);
-  $('#videomailbutton').prop('disabled', true);
-  $('#userformbtn').prop('disabled', true);
-  recordId = setInterval(myFunc, 1000);
-  seconds = 0;
+// Removes an element from the document
+function removeElement(elementId) {
+  const element = document.getElementById(elementId);
+  element.parentNode.removeChild(element);
+}
 
-  function myFunc() {
-    if (seconds >= maxRecordingSeconds) {
-      terminate_call();
-      stopRecordProgress();
-    } else {
-      seconds += 1;
-      secremain -= 1;
-      percentage = (seconds / maxRecordingSeconds) * 100;
-      $('#record-progress-bar').css('width', `${percentage.toFixed(0)}%`);
-      $('#secsremain').html(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${secremain} seconds remaining`);
-      $('#recordicon').show();
+function showCaptions() {
+  $('#consumer-webcam').css('height', '70%');
+  $('#consumer-captions').show();
+  $('#consumer-divider').show();
+}
+
+function hideCaptions() {
+  $('#consumer-webcam').css('height', '100%');
+  $('#consumer-captions').hide();
+  $('#consumer-divider').hide();
+}
+
+// toggles showing the call option buttons at the bottom of the video window (ie end call, mute, etc).
+// The buttons themselves are in acedirect and the complaint_form, this simply un-hides them
+// @param make_visible: boolean whether or not to show the call option buttons
+function toggleIncallButtons(makeVisible) {
+  if (makeVisible) callOptionButtons.style.display = 'block';
+  else callOptionButtons.style.display = 'none';
+}
+
+// Used to exit fullscreen if active when call is teminated
+function exitFullscreen() {
+  if (document.fullscreen) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
     }
   }
 }
@@ -71,283 +89,69 @@ function stopRecordProgress() {
       $('#redirecttag').attr('href', complaintRedirectUrl);
       $('#redirectdesc').text(`Redirecting to ${complaintRedirectDesc} ...`);
       $('#callEndedModal').modal('show');
-      setTimeout(function () {
+      setTimeout(() => {
         window.location = complaintRedirectUrl;
       }, 5000);
     }
   }
 }
 
-// setup for the call. creates and starts the User Agent (UA) and registers event handlers
-// This uses the new ACE Kurento object rather than JsSIP
-function register_jssip(myExtension, myPassword) {
-  console.log('Registering...');
-
-  var eventHandlers = {
-    connected: function (e) {
-      console.log(`--- WV: Connected ---\n${e}`);
-      callTerminated = false;
-    },
-    accepted: function (e) {
-      console.log(`--- WV: UA accepted ---\n${e}`);
-    },
-    newMessage: function (e) {
-      console.log('--- WV: New Message ---\n');
-      let consumerLanguage = sessionStorage.consumerLanguage;
-
-      console.log(`Consumer's selected language is ${consumerLanguage}`);
-
-      try {
-        if (e.msg === 'STARTRECORDING') {
-          startRecordProgress();
-          enable_video_privacy();
-          setTimeout(function () {
-            disable_video_privacy();
-          }, 1000);
-        } else {
-          const transcripts = JSON.parse(e.msg);
-          if (transcripts.transcript && !acekurento.isMultiparty) {
-            // Acedirect will skip translation service if languages are the same
-            console.log('sending caption:', transcripts.transcript, myExtension);
-            socket.emit('translate-caption', {
-              transcripts: transcripts,
-              callerNumber: myExtension
-            });
-            // acedirect.js is listening for 'caption-translated' and will call
-            // updateConsumerCaptions directly with the translation
-          }
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    registerResponse: function (error) {
-      console.log('--- WV: Register response:', error || 'Success ---');
-      if (!error) {
-      }
-    },
-    pausedQueue: function (e) {
-      console.log(`--- WV: Paused Agent Member in Queue ---\n${e}`);
-    },
-    unpausedQueue: function (e) {
-      console.log(`--- WV: Unpaused Agent Member in Queue ---\n${e}`);
-    },
-    callResponse: function (e) {
-      console.log(`--- WV: Call response ---\n${e}`);
-    },
-    incomingCall: function (call) {
-      console.log(`--- WV: Incoming call ---\n${call}`);
-    },
-    progress: function (e) {
-      console.log(`--- WV: Calling... ---\n${e}`);
-    },
-    startedRecording: function (e) {
-      console.log('--- WV: Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
-      if (e.success) {
-      }
-    },
-    stoppedRecording: function (e) {
-      console.log('--- WV: Stopped Recording:', (e.success) ? 'Success ---' : 'Error ---');
-      if (e.success) {
-      }
-    },
-    failed: function(e) {
-      console.log(`--- WV: Failed ---\n${e}`);
-    },
-    restartCallResponse: function (e) {
-      console.log(`--- WV: restartCallResponse ---\n${JSON.stringify(e)}`);
-      if (selfStream && selfStream.srcObject) {
-        selfStream.srcObject.getVideoTracks()[0].onended = function () {
-          console.log('screensharing ended self');
-          $('#startScreenshare').hide();
-
-          if (monitorExt) {
-            // force monitor to leave the session first
-            socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
-
-            setTimeout(() => {
-              screenShareEnabled = false;
-              if (acekurento) acekurento.screenshare(false);
-            }, 500);
-          } else {
-            if (acekurento) {
-              acekurento.screenshare(false);
-            }
-          }
-        };
-      }
-      if (remoteStream && remoteStream.srcObject) {
-        remoteStream.srcObject.getVideoTracks()[0].onended = function () {
-          console.log('screensharing ended remote');
-          $('#startScreenshare').hide();
-        };
-      }
-
-      if (monitorExt) {
-        // bring the monitor back to the session
+function enableVideoPrivacy() {
+  if (acekurento !== null) {
+    if (acekurento.isMonitoring) {
+      socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
+      setTimeout(() => {
+        selfStream.classList.remove('mirror-mode');
+        acekurento.enableDisableTrack(false, false); // mute video
+        hideVideoButton.setAttribute('onclick', 'javascript: disableVideoPrivacy();');
+        hideVideoIcon.style.display = 'block';
+        acekurento.privateMode(true, privacyVideoUrl);
         socket.emit('reinvite-monitor', { monitorExt: monitorExt });
-      }
-    },
-    ended: function (e) {
-      console.log('--- WV: Call ended ---\n');
-
-      $('#startScreenshare').hide();
-
-      terminate_call();
-      clearScreen();
-      disable_chat_buttons();
-      enable_initial_buttons();
-      $('#start-call-buttons').show();
-      $('#agent-name-box').hide();
-      $('#agent-name').text('');
-      $('#end-call').attr('onclick', 'terminate_call()');
-
-    },
-    participantsUpdate: function (e) {
-      console.log('--- WV: Participants Update ---\n');
-      console.log(`--- WV: ${JSON.stringify(e)}`);
-      console.log(`--- WV: e.participants.length: ${e.participants.length}`);
-      var partCount = e.participants.filter(t => t.type === 'participant:webrtc').length;
-
-      console.log(`--- WV: partCount: ${partCount}`);
-
-      for (var i = 0; i < e.participants.length; i += 1) {
-        if (e.participants[i].isMonitor) {
-          monitorExt = e.participants[i].ext;
-        }
-      }
-
-      if (partCount >= 2 || videomailflag) {
-        console.log('--- WV: CONNECTED');
-        $('#queueModal').modal('hide');
-
-        toggle_incall_buttons(true);
-        start_self_video();
-        $('#start-call-buttons').hide();
-      }
-
+      }, 500);
+    } else {
+      selfStream.classList.remove('mirror-mode');
+      acekurento.enableDisableTrack(false, false); // mute video
+      hideVideoButton.setAttribute('onclick', 'javascript: disableVideoPrivacy();');
+      hideVideoIcon.style.display = 'block';
+      acekurento.privateMode(true, privacyVideoUrl);
     }
-
-  };
-  acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
-  acekurento.register(myExtension, myPassword, false);
-}
-
-// makes a call
-/*
-* Use acekurento object to make the call. Not sure about the extension
-*/
-function start_call(otherSipUri, myExtension) {
-  console.log(`start_call: ${otherSipUri}`);
-  selfStream.removeAttribute('hidden');
-  if (!captionsMuted()) {
-    show_captions();
   }
-
-  $('#screenshareButton').removeAttr('disabled');
-  $('#fileInput').removeAttr('disabled');
-  $('#shareFileConsumer').removeAttr('disabled');
-  // acekurento.call(globalData.queues_complaint_number, false);
-  acekurento.call(otherSipUri, false);
 }
 
-function toggleSelfview() {
-  setTimeout(function () {
-    hide_video();
-    setTimeout(function () {
-      unhide_video();
-    }, 1000);
-  }, 3000);
+function disableVideoPrivacy() {
+  if (acekurento !== null) {
+    if (acekurento.isMonitoring) {
+      socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
+      setTimeout(() => {
+        selfStream.classList.add('mirror-mode');
+        acekurento.enableDisableTrack(true, false); // unmute video
+        hideVideoButton.setAttribute('onclick', 'javascript: enableVideoPrivacy();');
+        hideVideoIcon.style.display = 'none';
+        acekurento.privateMode(false);
+        hideVideoIcon.style.display = 'none';
+        socket.emit('reinvite-monitor', { monitorExt: monitorExt });
+      }, 500);
+    } else {
+      selfStream.classList.add('mirror-mode');
+      acekurento.enableDisableTrack(true, false); // unmute video
+      hideVideoButton.setAttribute('onclick', 'javascript: enableVideoPrivacy();');
+      hideVideoIcon.style.display = 'none';
+      acekurento.privateMode(false);
+      hideVideoIcon.style.display = 'none';
+    }
+  }
 }
 
 // starts the local streaming video. Works with some older browsers,
 // if it is incompatible it logs an error message,
 // and the selfStream html box stays hidden
-function start_self_video() {
+function startSelfVideo() {
   // not needed?
-}
-
-// toggles showing the call option buttons at the bottom of the video window (ie end call, mute, etc).
-// The buttons themselves are in acedirect and the complaint_form, this simply un-hides them
-// @param make_visible: boolean whether or not to show the call option buttons
-function toggle_incall_buttons(make_visible) {
-  if (make_visible) callOptionButtons.style.display = 'block';
-  else callOptionButtons.style.display = 'none';
-}
-
-function transfer_to_videomail() {
-  if (currentSession) {
-    currentSession.sendDTMF(1);
-
-    $('#vmwait').show();
-    swap_video();
-    $('#vmsent').hide();
-    videomailflag = true;
-    $('#record-progress-bar').show();
-    $('#callbutton').prop('disabled', true);
-    $('#userformbtn').prop('disabled', true);
-    $('#videomailbutton').prop('disabled', true);
-  }
-}
-
-function monitorHangup() {
-  socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: false });
-  setTimeout(() => {
-    terminate_call();
-  }, 500);
-}
-
-// handles cleanup from jssip call. removes the session if it is active and removes video.
-function terminate_call() {
-  if (acekurento !== null) {
-    acekurento.stop(false);
-    acekurento = null;
-  }
-  callTerminated = true;
-  monitorExt = null;
-
-  document.getElementById('screenshareButton').disabled = true;
-  $('#screenshareButton').prop('disabled', true);
-  $('#fileInput').prop('disabled', true);
-  $('#shareFileConsumer').prop('disabled', true);
-  $('#screenshareButtonGroup').hide();
-  clearScreen();
-  remove_video();
-  disable_chat_buttons();
-  enable_initial_buttons();
-  $('#start-call-buttons').show();
-  $('#agent-name-box').hide();
-  $('#agent-name').text('');
-  exitFullscreen();
-  $('#transcriptoverlay').html('');
-  hide_captions();
-
-  // reset the incall mute button
-  muteAudioButton.setAttribute('onclick', 'javascript: mute_audio();');
-  muteAudioIcon.classList.add('fa-microphone');
-  muteAudioIcon.classList.remove('fa-microphone-slash');
-
-  // remove file sharing
-  socket.emit('call-ended', { agentExt: '' });
-
-  stopRecordProgress();
-}
-
-// terminates the call (if present) and unregisters the ua
-function unregister_jssip() {
-  terminate_call();
-  if (ua) {
-    ua.unregister();
-    ua.terminateSessions();
-    ua.stop();
-  }
-  localStorage.clear();
-  sessionStorage.clear();
 }
 
 // removes both the remote and self video streams and replaces it with default image.
 // stops allowing camera to be active. also hides callOptionsButtons.
-function remove_video() {
+function removeVideo() {
   selfStream.setAttribute('hidden', true);
   selfStream.pause();
   remoteStream.pause();
@@ -355,7 +159,7 @@ function remove_video() {
   remoteView.src = '';
 
   console.log('Disabling video privacy button');
-  hideVideoButton.setAttribute('onclick', 'javascript: enable_video_privacy();');
+  hideVideoButton.setAttribute('onclick', 'javascript: enableVideoPrivacy();');
   hideVideoIcon.style.display = 'none';
 
   // stops remote track
@@ -395,16 +199,292 @@ function remove_video() {
   remoteStream = document.getElementById('remoteView');
   selfStream = document.getElementById('selfView');
 
-  toggle_incall_buttons(false);
+  toggleIncallButtons(false);
   if (acekurento !== null) {
     acekurento.remoteStream = document.getElementById('remoteView');
     acekurento.selfStream = document.getElementById('selfView');
   }
 }
 
+// handles cleanup from jssip call. removes the session if it is active and removes video.
+function terminateCall() {
+  if (acekurento !== null) {
+    acekurento.stop(false);
+    acekurento = null;
+  }
+  callTerminated = true;
+  monitorExt = null;
+
+  document.getElementById('screenshareButton').disabled = true;
+  $('#screenshareButton').prop('disabled', true);
+  $('#fileInput').prop('disabled', true);
+  $('#shareFileConsumer').prop('disabled', true);
+  $('#screenshareButtonGroup').hide();
+  clearScreen();
+  removeVideo();
+  disable_chat_buttons();
+  enable_initial_buttons();
+  $('#start-call-buttons').show();
+  $('#agent-name-box').hide();
+  $('#agent-name').text('');
+  exitFullscreen();
+  $('#transcriptoverlay').html('');
+  hideCaptions();
+
+  // reset the incall mute button
+  muteAudioButton.setAttribute('onclick', 'javascript: muteAudio();');
+  muteAudioIcon.classList.add('fa-microphone');
+  muteAudioIcon.classList.remove('fa-microphone-slash');
+
+  // remove file sharing
+  socket.emit('call-ended', { agentExt: '' });
+
+  stopRecordProgress();
+}
+
+function startRecordProgress() {
+  let secremain = maxRecordingSeconds;
+  let seconds = 0;
+  let percentage;
+
+  if ($('#record-progress-bar').css('display') === 'none') {
+    return;
+  }
+  if (recordId) {
+    return;
+  }
+  $('#vmsent').hide();
+  $('#vmwait').hide();
+  $('#callbutton').prop('disabled', true);
+  $('#videomailbutton').prop('disabled', true);
+  $('#userformbtn').prop('disabled', true);
+  recordId = setInterval(myFunc, 1000);
+  seconds = 0;
+
+  function myFunc() {
+    if (seconds >= maxRecordingSeconds) {
+      terminateCall();
+      stopRecordProgress();
+    } else {
+      seconds += 1;
+      secremain -= 1;
+      percentage = (seconds / maxRecordingSeconds) * 100;
+      $('#record-progress-bar').css('width', `${percentage.toFixed(0)}%`);
+      $('#secsremain').html(`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${secremain} seconds remaining`);
+      $('#recordicon').show();
+    }
+  }
+}
+
+// setup for the call. creates and starts the User Agent (UA) and registers event handlers
+// This uses the new ACE Kurento object rather than JsSIP
+function registerJssip(myExtension, myPassword) {
+  const eventHandlers = {
+    connected: (e) => {
+      console.log(`--- WV: Connected ---\n${e}`);
+      callTerminated = false;
+    },
+    accepted: (e) => {
+      console.log(`--- WV: UA accepted ---\n${e}`);
+    },
+    newMessage: (e) => {
+      console.log('--- WV: New Message ---\n');
+      const consumerLanguage = sessionStorage.consumerLanguage;
+
+      console.log(`Consumer's selected language is ${consumerLanguage}`);
+
+      try {
+        if (e.msg === 'STARTRECORDING') {
+          startRecordProgress();
+          enableVideoPrivacy();
+          setTimeout(() => {
+            disableVideoPrivacy();
+          }, 1000);
+        } else {
+          const transcripts = JSON.parse(e.msg);
+          if (transcripts.transcript && !acekurento.isMultiparty) {
+            // Acedirect will skip translation service if languages are the same
+            console.log('sending caption:', transcripts.transcript, myExtension);
+            socket.emit('translate-caption', {
+              transcripts: transcripts,
+              callerNumber: myExtension
+            });
+            // acedirect.js is listening for 'caption-translated' and will call
+            // updateConsumerCaptions directly with the translation
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    registerResponse: (error) => {
+      console.log('--- WV: Register response:', error || 'Success ---');
+      if (!error) {
+        // empty
+      }
+    },
+    pausedQueue: (e) => {
+      console.log(`--- WV: Paused Agent Member in Queue ---\n${e}`);
+    },
+    unpausedQueue: (e) => {
+      console.log(`--- WV: Unpaused Agent Member in Queue ---\n${e}`);
+    },
+    callResponse: (e) => {
+      console.log(`--- WV: Call response ---\n${e}`);
+    },
+    incomingCall: (call) => {
+      console.log(`--- WV: Incoming call ---\n${call}`);
+    },
+    progress: (e) => {
+      console.log(`--- WV: Calling... ---\n${e}`);
+    },
+    startedRecording: (e) => {
+      console.log('--- WV: Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
+      if (e.success) {
+        // empty
+      }
+    },
+    stoppedRecording: (e) => {
+      console.log('--- WV: Stopped Recording:', (e.success) ? 'Success ---' : 'Error ---');
+      if (e.success) {
+        // empty
+      }
+    },
+    failed: (e) => {
+      console.log(`--- WV: Failed ---\n${e}`);
+    },
+    restartCallResponse: (e) => {
+      console.log(`--- WV: restartCallResponse ---\n${JSON.stringify(e)}`);
+      if (selfStream && selfStream.srcObject) {
+        selfStream.srcObject.getVideoTracks()[0].onended = () => {
+          console.log('screensharing ended self');
+          $('#startScreenshare').hide();
+
+          if (monitorExt) {
+            // force monitor to leave the session first
+            socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
+
+            setTimeout(() => {
+              screenShareEnabled = false;
+              if (acekurento) acekurento.screenshare(false);
+            }, 500);
+          } else {
+            if (acekurento) {
+              acekurento.screenshare(false);
+            }
+          }
+        };
+      }
+      if (remoteStream && remoteStream.srcObject) {
+        remoteStream.srcObject.getVideoTracks()[0].onended = () => {
+          console.log('screensharing ended remote');
+          $('#startScreenshare').hide();
+        };
+      }
+
+      if (monitorExt) {
+        // bring the monitor back to the session
+        socket.emit('reinvite-monitor', { monitorExt: monitorExt });
+      }
+    },
+    ended: (e) => {
+      console.log(`--- WV: Call ended ---\n${e}`);
+
+      $('#startScreenshare').hide();
+
+      terminateCall();
+      clearScreen();
+      disable_chat_buttons();
+      enable_initial_buttons();
+      $('#start-call-buttons').show();
+      $('#agent-name-box').hide();
+      $('#agent-name').text('');
+      $('#end-call').attr('onclick', 'terminateCall()');
+    },
+    participantsUpdate: (e) => {
+      const partCount = e.participants.filter((t) => t.type === 'participant:webrtc').length;
+      console.log('--- WV: Participants Update ---\n');
+      console.log(`--- WV: ${JSON.stringify(e)}`);
+      console.log(`--- WV: e.participants.length: ${e.participants.length}`);
+
+      console.log(`--- WV: partCount: ${partCount}`);
+
+      for (let i = 0; i < e.participants.length; i += 1) {
+        if (e.participants[i].isMonitor) {
+          monitorExt = e.participants[i].ext;
+        }
+      }
+
+      if (partCount >= 2 || videomailflag) {
+        console.log('--- WV: CONNECTED');
+        $('#queueModal').modal('hide');
+
+        toggleIncallButtons(true);
+        startSelfVideo();
+        $('#start-call-buttons').hide();
+      }
+    }
+  };
+  console.log('Registering...');
+  acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
+  acekurento.register(myExtension, myPassword, false);
+}
+
+// makes a call
+/*
+* Use acekurento object to make the call. Not sure about the extension
+*/
+function startCall(otherSipUri) {
+  console.log(`startCall: ${otherSipUri}`);
+  selfStream.removeAttribute('hidden');
+  if (!captionsMuted()) {
+    showCaptions();
+  }
+
+  $('#screenshareButton').removeAttr('disabled');
+  $('#fileInput').removeAttr('disabled');
+  $('#shareFileConsumer').removeAttr('disabled');
+  // acekurento.call(globalData.queues_complaint_number, false);
+  acekurento.call(otherSipUri, false);
+}
+
+function transferToVideomail() {
+  if (currentSession) {
+    currentSession.sendDTMF(1);
+
+    $('#vmwait').show();
+    swapVideo();
+    $('#vmsent').hide();
+    videomailflag = true;
+    $('#record-progress-bar').show();
+    $('#callbutton').prop('disabled', true);
+    $('#userformbtn').prop('disabled', true);
+    $('#videomailbutton').prop('disabled', true);
+  }
+}
+
+function monitorHangup() {
+  socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: false });
+  setTimeout(() => {
+    terminateCall();
+  }, 500);
+}
+
+// terminates the call (if present) and unregisters the ua
+function unregisterJssip() {
+  terminateCall();
+  if (ua) {
+    ua.unregister();
+    ua.terminateSessions();
+    ua.stop();
+  }
+  localStorage.clear();
+  sessionStorage.clear();
+}
+
 // swaps remote and local videos for videomail recording
 // puts Consumer's own video in the big video
-function swap_video() {
+function swapVideo() {
   // local becomes remote and remote becomes local
   $('#remoteView').attr('id', 'tempView');
   $('#selfView').attr('id', 'remoteView');
@@ -416,28 +496,12 @@ function swap_video() {
   $('#selfView').attr('hidden', true);
 }
 
-// Adds an element to the document
-function addElement(parentId, elementTag, elementId, html) {
-  var p = document.getElementById(parentId);
-  var newElement = document.createElement(elementTag);
-  newElement.setAttribute('id', elementId);
-  newElement.setAttribute('class', elementId);
-  newElement.innerHTML = html;
-  p.appendChild(newElement);
-}
-
-// Removes an element from the document
-function removeElement(elementId) {
-  var element = document.getElementById(elementId);
-  element.parentNode.removeChild(element);
-}
-
 // mutes self audio so remote cannot hear you
-function mute_audio() {
+function muteAudio() {
   console.log('here mute');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, true); // mute audio
-    muteAudioButton.setAttribute('onclick', 'javascript: unmute_audio();');
+    muteAudioButton.setAttribute('onclick', 'javascript: unmuteAudio();');
     muteAudioIcon.classList.add('fa-microphone-slash');
     muteAudioIcon.classList.remove('fa-microphone');
     console.log('here mute2');
@@ -445,25 +509,13 @@ function mute_audio() {
 }
 
 // unmutes self audio so remote can hear you
-function unmute_audio() {
+function unmuteAudio() {
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, true); // unmute audio
-    muteAudioButton.setAttribute('onclick', 'javascript: mute_audio();');
+    muteAudioButton.setAttribute('onclick', 'javascript: muteAudio();');
     muteAudioIcon.classList.add('fa-microphone');
     muteAudioIcon.classList.remove('fa-microphone-slash');
   }
-}
-
-function show_captions() {
-  $('#consumer-webcam').css('height', '70%');
-  $('#consumer-captions').show();
-  $('#consumer-divider').show();
-}
-
-function hide_captions() {
-  $('#consumer-webcam').css('height', '100%');
-  $('#consumer-captions').hide();
-  $('#consumer-divider').hide();
 }
 
 function captionsMuted() {
@@ -471,20 +523,20 @@ function captionsMuted() {
 }
 
 // hide/unhide captions
-function toggle_captions() {
+function toggleCaptions() {
   if (!captionsMuted()) {
     muteCaptionsOffIcon.style.display = 'block';
     transcriptOverlay.style.display = 'none';
-    hide_captions();
+    hideCaptions();
   } else {
     muteCaptionsOffIcon.style.display = 'none';
     transcriptOverlay.style.display = 'block';
-    show_captions();
+    showCaptions();
   }
 }
 
 // hides self video so remote cannot see you
-function hide_video() {
+function hideVideo() {
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, false); // mute video
     selfStream.setAttribute('hidden', true);
@@ -492,64 +544,28 @@ function hide_video() {
 }
 
 // unhides self video so remote can see you
-function unhide_video() {
+function unhideVideo() {
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, false); // unmute video
     selfStream.removeAttribute('hidden');
   }
 }
 
-function enable_video_privacy() {
-  if (acekurento !== null) {
-    if (acekurento.isMonitoring) {
-      socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
-      setTimeout(() => {
-        selfStream.classList.remove('mirror-mode');
-        acekurento.enableDisableTrack(false, false); // mute video
-        hideVideoButton.setAttribute('onclick', 'javascript: disable_video_privacy();');
-        hideVideoIcon.style.display = 'block';
-        acekurento.privateMode(true, privacyVideoUrl);
-        socket.emit('reinvite-monitor', { monitorExt: monitorExt });
-      }, 500);
-    } else {
-      selfStream.classList.remove('mirror-mode');
-      acekurento.enableDisableTrack(false, false); // mute video
-      hideVideoButton.setAttribute('onclick', 'javascript: disable_video_privacy();');
-      hideVideoIcon.style.display = 'block';
-      acekurento.privateMode(true, privacyVideoUrl);
-    }
-  }
+function toggleSelfview() {
+  setTimeout(() => {
+    hideVideo();
+    setTimeout(() => {
+      unhideVideo();
+    }, 1000);
+  }, 3000);
 }
 
-function disable_video_privacy() {
-  if (acekurento !== null) {
-    if (acekurento.isMonitoring) {
-      socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
-      setTimeout(() => {
-        selfStream.classList.add('mirror-mode');
-        acekurento.enableDisableTrack(true, false); // unmute video
-        hideVideoButton.setAttribute('onclick', 'javascript: enable_video_privacy();');
-        hideVideoIcon.style.display = 'none';
-        acekurento.privateMode(false);
-        hideVideoIcon.style.display = 'none';
-        socket.emit('reinvite-monitor', { monitorExt: monitorExt });
-      }, 500);
-    } else {
-      selfStream.classList.add('mirror-mode');
-      acekurento.enableDisableTrack(true, false); // unmute video
-      hideVideoButton.setAttribute('onclick', 'javascript: enable_video_privacy();');
-      hideVideoIcon.style.display = 'none';
-      acekurento.privateMode(false);
-      hideVideoIcon.style.display = 'none';
-    }
-  }
-}
 // times out and ends call after 30 or so seconds.
 // agent gets event 'ended' with cause 'RTP Timeout'.
 // puts session on hold
 function hold() {
   if (currentSession) {
-    var options = {
+    const options = {
       useUpdate: true
     };
     currentSession.hold(options);
@@ -567,34 +583,19 @@ function unhold() {
   }
 }
 
-// Used to exit fullscreen if active when call is teminated
-function exitFullscreen() {
-  if (document.fullscreen) {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-      document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    }
-  }
-}
-
 // Change the style of the video captions
 function changeCaption(id) {
-  var value = id.split('-')[1];
-  var target = id.split('-')[0];
+  const value = id.split('-')[1];
+  const target = id.split('-')[0];
+  let alpha = $('#opacity-slider-consumer').val();
+  let color;
 
   // change css variable value
   if (target === 'bg') {
-    var alpha = $('#opacity-slider-consumer').val();
     if (alpha === 0 ) {
       alpha = 1;
       $('#opacity-slider-consumer').val(1);
     }
-    var color;
     switch (value) {
       case 'black':
         color = `rgba(0,0,0,${alpha})`;
@@ -614,18 +615,18 @@ function changeCaption(id) {
   }
 }
 
-$('#bg-transparent').click(function () {
+$('#bg-transparent').click(() => {
   $('#opacity-slider-consumer').val(0);
   $('#opacity-slider-consumer').trigger('mousemove');
 });
 
-$('#opacity-slider-consumer').on('change mousemove', function () {
-  var alpha = $(this).val();
-  var current = document.documentElement.style.getPropertyValue('--caption-bg-color');
+$('#opacity-slider-consumer').on('change mousemove', () => {
+  const alpha = $(this).val();
+  let current = document.documentElement.style.getPropertyValue('--caption-bg-color');
+  const color = `${current.substring(0, current.lastIndexOf(',') + 1)}${alpha})`;
   if (current === '') {
     current = 'rgba(128,128,128,0';
   }
-  var color = `${current.substring(0, current.lastIndexOf(',') + 1)}${alpha})`;
   document.documentElement.style.setProperty('--caption-bg-color', color);
 });
 
@@ -635,17 +636,17 @@ function createCaptionHtml(displayName, transcripts) {
   if (!transcripts.final) {
     caption += '...';
   }
-  let timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   return `<span class="timestamp">${timestamp}</span><strong>${displayName}:</strong> ${caption}`;
 }
 
 function updateConsumerCaptions(transcripts) {
+  const tDiv = document.getElementById(transcripts.msgid);
+  const displayName = `CSR ${$('#agent-name').text()}`;
+  let caption = createCaptionHtml(displayName, transcripts);
   console.log('--- WV: transcripts.transcript ---\n');
   console.log('consumer uc: ', transcripts);
 
-  var tDiv = document.getElementById(transcripts.msgid);
-  const displayName = `CSR ${$('#agent-name').text()}`;
-  let caption = createCaptionHtml(displayName, transcripts);
   if (!tDiv) {
     const temp = document.createElement('div');
     temp.id = transcripts.msgid;
@@ -661,7 +662,7 @@ function updateConsumerCaptions(transcripts) {
 
       // var captionBubble = '<div><b>' +transcripts.timestamp + ':</b>&nbsp;'+transcripts.transcript+'<br/><div>';
       // $(captionBubble).appendTo($('#caption-messages'));
-      $('#caption-messages').append(`<div class=\'agent-scripts\'><div class=\'direct-chat-text\'>${transcripts.transcript}</div></div>`);
+      $('#caption-messages').append(`<div class='agent-scripts'><div class='direct-chat-text'>${transcripts.transcript}</div></div>`);
       $('#caption-messages').scrollTop($('#caption-messages')[0].scrollHeight);
     }
   }
