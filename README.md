@@ -454,7 +454,7 @@ The ACE Direct application servers are Node.js servers.
     $  # now node.js servers will start on boot
     ```
 
-1. Check ACE Direct system status:
+1. Check ACE Direct system status (requires `ssh` access from `acenode.domain.com` to the other servers):
 
     ```bash
     $  cd ~/ace-direct
