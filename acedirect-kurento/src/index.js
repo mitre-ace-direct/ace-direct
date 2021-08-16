@@ -1,10 +1,10 @@
 require('dotenv').config();
-const WebServer    = require('./web_frontend');
+const WebServer = require('./web_frontend');
 const SessionIndex = require('./session_index');
-const ConfManager  = require('./conf_manager');
-const AmiManager   = require('./ami_manager');
-const param        = require('param');
-const debug        = require('debug')('ace:main');
+const ConfManager = require('./conf_manager');
+const AmiManager = require('./ami_manager');
+const param = require('param');
+const debug = require('debug')('ace:main');
 
 async function main() {
   try {
@@ -24,4 +24,4 @@ async function main() {
   }
 }
 
-main(process.argv.splice(2))
+main(process.argv.splice(2));
