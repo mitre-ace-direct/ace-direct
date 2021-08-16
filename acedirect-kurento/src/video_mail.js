@@ -1,15 +1,15 @@
-const debug     = require('debug')('ace:video-mail');
-const Events    = require('events');
-const param     = require('param');
-const uuid      = require('uuid');
-const models    = require('./dal/models');
-const Kurento   = require('kurento-client');
-const SDES      = Kurento.getComplexType('SDES');
-const crypto    = require('crypto');
-const util      = require('util');
+const debug = require('debug')('ace:video-mail');
+const Events = require('events');
+const param = require('param');
+const uuid = require('uuid');
+const models = require('./dal/models');
+const Kurento = require('kurento-client');
+
+const SDES = Kurento.getComplexType('SDES');
+const crypto = require('crypto');
+const util = require('util');
 
 class VideoMail extends Events {
-
   constructor() {
     super();
     this._id = uuid.v4();
@@ -57,10 +57,10 @@ class VideoMail extends Events {
     const files = param('videomailss.instructions_media');
     for (const file of files) {
       const times = file.endsWith('png') || file.endsWith('jpg') ? 5 : 1;
-      try { 
+      try {
         await this._playFile(file, times);
-        if(!this._instructions) return;
-      } catch(err) {
+        if (!this._instructions) return;
+      } catch (err) {
         debug(`Can't play ${file}: ${err.message}`);
       }
     }
@@ -72,7 +72,7 @@ class VideoMail extends Events {
       uri
     });
     this._player.connect(this._rtp);
-    while(times > 0) {
+    while (times > 0) {
       debug('Playing %s for %s', file, this._peer.ext);
       await this._playFilePromise(this._player);
       if (!this._instructions) break;
@@ -80,7 +80,7 @@ class VideoMail extends Events {
     }
     this._player.disconnect(this._rtp);
   }
-  
+
   _playFilePromise(player) {
     return new Promise((success, failure) => {
       player.play();
@@ -90,7 +90,7 @@ class VideoMail extends Events {
   }
 
   async handleDTMF(dtmf) {
-    if(dtmf.tone === '1') {
+    if (dtmf.tone === '1') {
       this._player && this._player.stop();
       this._instructions = false;
       const files = param('videomailss.instructions_media');
@@ -106,7 +106,7 @@ class VideoMail extends Events {
     const profile = "MP4_VIDEO_ONLY";
     const ext = 'mp4';
     const filename = `${this._id}.${ext}`;
-    
+
     this._recorder = new this._pipeline.create('RecorderEndpoint', {
       uri: `file://${dir}/${filename}`,
       mediaProfile: profile.toUpperCase()
@@ -125,7 +125,7 @@ class VideoMail extends Events {
   finish() {
     if (this._finished) return;
     this._finished = true;
-    if(this._recorder) {
+    if (this._recorder) {
       this._recorder.stopAndWait(() => {
         this._pipeline.release();
         this.emit('finished');
