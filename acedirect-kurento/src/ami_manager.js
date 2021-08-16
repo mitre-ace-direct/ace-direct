@@ -1,11 +1,10 @@
-const debug   = require('debug')('ace:ami-man');
-const Events  = require('events');
-const param   = require('param');
-const util    =  require('util');
-const astm    = require('asterisk-manager');
+const debug = require('debug')('ace:ami-man');
+const Events = require('events');
+const param = require('param');
+const util = require('util');
+const astm = require('asterisk-manager');
 
 class AmiManager extends Events {
-
   constructor(ami) {
     super();
     this.ami = ami;
@@ -16,7 +15,6 @@ class AmiManager extends Events {
    * @returns {nothing} Not used
    */
   async init_ami() {
-
     let ami = null;
     const id = param('asterisk.ami.id');
     const port = param('app_ports.asterisk_ami').toString();
@@ -29,18 +27,17 @@ class AmiManager extends Events {
       ami.keepConnected();
 
       // Define event handlers here
-      //add only the manager ami events we care about
+      // add only the manager ami events we care about
       ami.on('dialend', handle_manager_event);
       ami.on('hangup', handle_manager_event);
       ami.on('attendedtransfer', handle_manager_event);
       ami.on('newstate', handle_manager_event);
-      ami.on('queuecallerabandon',handle_manager_event);
-      ami.on('queuecallerjoin',handle_manager_event);
-      ami.on('queuecallerleave',handle_manager_event);
+      ami.on('queuecallerabandon', handle_manager_event);
+      ami.on('queuecallerjoin', handle_manager_event);
+      ami.on('queuecallerleave', handle_manager_event);
 
-      //handle the response
+      // handle the response
       ami.on('response', handle_manager_event);
-
     } catch (exp) {
       debug('Init AMI error:');
       debug(exp);
@@ -59,7 +56,6 @@ class AmiManager extends Events {
       debug('Received an AMI event: ' + util.inspect(evt, false, null));
       //  TODO SOME HANDLE AMI EVENTS
     }
-
   }
 
   /*
@@ -75,12 +71,12 @@ class AmiManager extends Events {
         "ActionId": "1000",
         "Interface": "PJSIP/" + ext,
         "Paused": "true",
-        "Queue": queue,
+        "Queue": queue
       }, function (err, res) {
         return res;
       });
     }
-  };
+  }
 
   /*
    * Handler catches and we are pausing queue
@@ -104,7 +100,7 @@ class AmiManager extends Events {
         cb(res);
       });
     }
-  };
+  }
 
   /*
    * Handler catches and we are unpausing queue
@@ -128,7 +124,7 @@ class AmiManager extends Events {
         cb(res);
       });
     }
-  };
+  }
 
   /*
    * Queue remove from queue
@@ -143,12 +139,12 @@ class AmiManager extends Events {
         "ActionId": "1000",
         "Interface": "PJSIP/" + ext,
         "Paused": "true",
-        "Queue": queue,
+        "Queue": queue
       }, function (err, res) {
         return res;
       });
     }
-  };
+  }
 }
 
 module.exports = AmiManager;
