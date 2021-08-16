@@ -1,20 +1,19 @@
-const express   = require('express');
-const https     = require('https');
-const ws        = require('ws');
-const debug     = require('debug')('ace:web');
-const param     = require('param');
-const path      = require('path');
-const fs        = require('fs');
-const util      = require('util');
-const Events    = require('events');
-const session   = require('./session_handler');
+const express = require('express');
+const https = require('https');
+const ws = require('ws');
+const debug = require('debug')('ace:web');
+const param = require('param');
+const path = require('path');
+const fs = require('fs');
+const util = require('util');
+const Events = require('events');
+const session = require('./session_handler');
 const recording = require('./recording_handler');
 const videomail = require('./videomail_handler');
 
 const readFile = util.promisify(fs.readFile);
 
 class WebServer extends Events {
-
   async start() {
     debug('Starting webserver ...');
     const app = express();
@@ -25,7 +24,7 @@ class WebServer extends Events {
     app.use(this.cors);
     app.use(this.authentication);
 
-    app.get('/test', async (req,res) => {
+    app.get('/test', async (req, res) => {
       res.status(200).send('Server is up!');
     });
 
@@ -48,14 +47,14 @@ class WebServer extends Events {
 
     wss.on('connection', (socket, request) => {
       this.emit('connection', {
-        socket, 
+        socket,
         request
       });
     });
 
     server.listen(param('app_ports.sswebserver'), () => {
       debug('Listening on port %s', param('app_ports.sswebserver'));
-    })
+    });
   }
 
   cors(req, res, next) {
@@ -72,6 +71,5 @@ class WebServer extends Events {
     }
   }
 }
-
 
 module.exports = WebServer;
