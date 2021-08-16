@@ -1,5 +1,5 @@
 const Kurento = require('kurento-client');
-const debug   = require('debug')('ace:utils');
+const debug = require('debug')('ace:utils');
 
 function getKurentoClient(uri, timeout) {
   return new Promise(accept => {
@@ -15,10 +15,9 @@ function getKurentoClient(uri, timeout) {
       }
       debug(`Kurento client created`);
       accept(client);
-    })
+    });
   });
 }
-
 
 module.exports = {
   getKurentoClient
