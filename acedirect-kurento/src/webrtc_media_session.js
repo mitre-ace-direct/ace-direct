@@ -5,12 +5,12 @@ const uuid = require('uuid');
 const Kurento = require('kurento-client');
 const transform = require('sdp-transform');
 const models = require('./dal/models');
+
 const SDES = Kurento.getComplexType('SDES');
 const IceCandidate = Kurento.getComplexType('IceCandidate');
 const crypto = require('crypto');
 const util = require('./util');
 const RecMan = require('./rec_manager');
-
 
 const PARTICIPANT_TYPE_WEBRTC = 'participant:webrtc';
 const PARTICIPANT_TYPE_RTP = 'participant:rtp';
@@ -27,9 +27,7 @@ var kurento = null;
 
 const ASTERISK_QUEUE_EXT = [param('asterisk.queues.general.number'), param('asterisk.queues.complaint.number')]; // currently support two queues
 
-
 class WebRTCMediaSession extends Events {
-
   constructor(videoCodec = 'H264') {
     super();
     this._id = uuid.v4();
@@ -65,10 +63,9 @@ class WebRTCMediaSession extends Events {
   async init() {
     debug('Initializing WebRTC session');
     try {
-
       if (kurento == null) {
         debug('CREATING KURENTO');
-        const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento_fqdn')}:${param('app_ports.kurento')}${param('kurento.path')}`;        
+        const kurentoUrl = `${param('kurento.protocol')}://${param('servers.kurento_fqdn')}:${param('app_ports.kurento')}${param('kurento.path')}`;
         kurento = await util.getKurentoClient(kurentoUrl, 5000);
       }
 
@@ -195,7 +192,9 @@ class WebRTCMediaSession extends Events {
       } else {
         isMonitor = false;
       }
-      simplePartList.push({ ext, type, onHold, isAgent, isMonitor });
+      simplePartList.push({
+        ext, type, onHold, isAgent, isMonitor
+      });
     });
     this._participants.forEach(p => {
       if (p.type === PARTICIPANT_TYPE_WEBRTC && p.session
@@ -240,7 +239,7 @@ class WebRTCMediaSession extends Events {
       // Peer already existed but was RTP
       p.extra = oldPartic.endpoint;
       await p.endpoint.connect(p.extra, 'AUDIO');
-      debug('Peer (%s) already existed as (%s). Connecting audio', peer.ext, oldPartic.type)
+      debug('Peer (%s) already existed as (%s). Connecting audio', peer.ext, oldPartic.type);
     }
     return webrtc;
   }
@@ -256,10 +255,10 @@ class WebRTCMediaSession extends Events {
     } : undefined);
     await rtp.addTag('PARTICIPANT_TYPE', PARTICIPANT_TYPE_RTP);
     rtp.on('MediaFlowInStateChange', evt => {
-      debug('\nRTP MediaFlowInStateChange (%s)\n', evt.state)
+      debug('\nRTP MediaFlowInStateChange (%s)\n', evt.state);
     });
     rtp.on('MediaFlowOutStateChange', evt => {
-      debug('\nRTP MediaFlowOutStateChange (%s)\n', evt.state)
+      debug('\nRTP MediaFlowOutStateChange (%s)\n', evt.state);
     });
     return rtp;
   }
@@ -306,7 +305,7 @@ class WebRTCMediaSession extends Events {
       }
       debug(`${ext} left the session ${this.sid}`);
       debug(`${this._participants.size} participants in session`);
-      debug(this._participants)
+      debug(this._participants);
     }
     if (virtual || disableFinishCall) return;
 
@@ -360,7 +359,7 @@ class WebRTCMediaSession extends Events {
           if (error) {
             debug('Error fetching stats', error.message);
           } else {
-            models.WebrtcStat.persistStats(this.id, media.toLowerCase(), peer, stats)
+            models.WebrtcStat.persistStats(this.id, media.toLowerCase(), peer, stats);
           }
         });
       }, interval);
@@ -457,21 +456,19 @@ class WebRTCMediaSession extends Events {
           if (x.codec.toUpperCase() === this._videoCodec || this.isDefaultValidCodec(x.codec.toUpperCase())) return true;
           debug(`Session [%s] Ignoring codec: %s`, this.id, x.codec);
           return false;
-        }).map(x =>
-          x.payload
-        ));
+        }).map(x => x.payload)
+      );
       if (this._videoCodec === 'H264' && media.fmtp.length == 0 && this._h264Config) {
         for (var it = validPayloads.values(), val = null; val = it.next().value;) {
           if (this._lastWebrtcFmtp && this._lastWebrtcFmtp != 'webrtc') {
-            media.fmtp.push({ payload: val, config: this._lastWebrtcFmtp })
+            media.fmtp.push({ payload: val, config: this._lastWebrtcFmtp });
             this._lastWebrtcFmtp = null;
           } else {
-            media.fmtp.push({ payload: val, config: this._h264Config }) //use config value for 
+            media.fmtp.push({ payload: val, config: this._h264Config }); // use config value for
           }
         }
       }
     });
-
 
     return transform.write(sdpObj);
   }
@@ -518,13 +515,13 @@ class WebRTCMediaSession extends Events {
         debug(`${ext} recording to  ${filePath}`);
 
         const recorder = await this._pipeline.create('RecorderEndpoint', {
-	        uri: filePath,
+          uri: filePath,
           mediaProfile: "MP4_VIDEO_ONLY" // required to be able to record VRS calls that are muted
         });
-        if(this.isMultiparty && (!this._hasMonitor || participant.session._isMonitoring)){
-	        let comp = await this._composite.createHubPort();
+        if (this.isMultiparty && (!this._hasMonitor || participant.session._isMonitoring)) {
+          let comp = await this._composite.createHubPort();
           await comp.connect(recorder);
-        }else{
+        } else {
           let otherPeer = this.oneToOnePeer(ext);
           await otherPeer.endpoint.connect(recorder);
         }
@@ -547,29 +544,27 @@ class WebRTCMediaSession extends Events {
         });
         await recorder.record();
         participant.isRecording = true;
-	      participant.recorder = recorder;
+        participant.recorder = recorder;
         participant.recorderFile = fileName;
       } else {
         var otherCallers = "";
         var fileName = participant.recorderFile;
         for (const p of this._participants.values()) {
-          if(p.ext != ext && !p.session._isMonitoring){
+          if (p.ext != ext && !p.session._isMonitoring) {
             otherCallers += p.ext + ",";
           }
         }
-        if(otherCallers.length > 0){
-          otherCallers = otherCallers.slice(0,-1);
+        if (otherCallers.length > 0) {
+          otherCallers = otherCallers.slice(0, -1);
         }
         var agentNumber = ext;
 
         await participant.recorder.stopAndWait();
 
         await participant.recorder.release();
-       
 
         await RecMan.createRecording(fileName, ext, this._id, agentNumber, otherCallers);
 
-        
         participant.isRecording = false;
         participant.recorder = null;
         debug(`${ext} Stopped recording`);
@@ -595,7 +590,7 @@ class WebRTCMediaSession extends Events {
       throw new Error(`No participant registered for ${ext}`);
     }
     const rtp = await this._createRtpEndpoint();
-    if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0){
+    if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0) {
       // disconnect asterisk queue finding extension
       await this.leave(ext, true);
       const other = this.oneToOnePeer(ext);
@@ -605,7 +600,7 @@ class WebRTCMediaSession extends Events {
       await replaceMediaEl(p.port, p.endpoint, rtp);
     } else {
       const other = this.oneToOnePeer(ext);
-      await replaceMediaEl(other.endpoint, p.endpoint, rtp)
+      await replaceMediaEl(other.endpoint, p.endpoint, rtp);
     }
     const answer = await rtp.processOffer(offer);
     await p.endpoint.release();
@@ -613,7 +608,7 @@ class WebRTCMediaSession extends Events {
     return answer;
   }
 
-  // This should only happen when there's only one peer 
+  // This should only happen when there's only one peer
   // and the callee can't be reached
   async onFailed(ext, reason) {
     this._participants.forEach(p => {
@@ -648,8 +643,8 @@ class WebRTCMediaSession extends Events {
 
     if (this.isMultiparty) {
       if (p.port) {
-      await p.endpoint.disconnect(p.port);
-      await player.connect(p.port);
+        await p.endpoint.disconnect(p.port);
+        await player.connect(p.port);
       }
     } else {
       const other = this.oneToOnePeer(ext);
@@ -672,8 +667,8 @@ class WebRTCMediaSession extends Events {
 
     if (this.isMultiparty) {
       if (p.port) {
-      await player.disconnect(p.port);
-      await p.endpoint.connect(p.port);
+        await player.disconnect(p.port);
+        await p.endpoint.connect(p.port);
       }
     } else {
       const other = this.oneToOnePeer(ext);
@@ -702,9 +697,9 @@ class WebRTCMediaSession extends Events {
   getTimestampString() {
     var time = new Date();
     var year = time.getFullYear();
-    var month = time.getMonth() + 1; //Incremented because of indexing at 0
+    var month = time.getMonth() + 1; // Incremented because of indexing at 0
     var day = time.getDate();
-    var hours = time.getHours() + 1; //Incremented because of indexing at 0
+    var hours = time.getHours() + 1; // Incremented because of indexing at 0
     var minutes = time.getMinutes();
     var seconds = time.getSeconds();
     return `${year}${month < 10 ? '0' : ''}${month}${day < 10 ? '0' : ''}${day}_${hours < 10 ? '0' : ''}${hours}${minutes < 10 ? '0' : ''}${minutes}${seconds < 10 ? '0' : ''}${seconds}`;
@@ -719,7 +714,7 @@ class WebRTCMediaSession extends Events {
     if (codec === 'RTX' || codec === 'RED' || codec === 'FEC' || codec === 'ULPFEC') {
       return true;
     }
-    return false
+    return false;
   }
 
   /**
@@ -742,31 +737,30 @@ class WebRTCMediaSession extends Events {
             if (x.codec.toUpperCase() === this._videoCodec || this.isDefaultValidCodec(x.codec.toUpperCase())) return true;
             debug(`Session [%s] Ignoring codec: %s`, this.id, x.codec);
             return false;
-          }).map(x =>
-            x.payload
-          ));
+          }).map(x => x.payload)
+        );
         const specifiedCodecPayloads = new Set(
           media.rtp.filter(x => {
             if (x.codec.toUpperCase() === this._videoCodec) return true;
             return false;
-          }).map(x =>
-            x.payload
-          ));
+          }).map(x => x.payload)
+        );
         debug(`Session [%s] Valid payloads after filter: %s`, this.id, validPayloads.size);
         media.rtp = media.rtp.filter(x => validPayloads.has(x.payload));
         media.fmtp = media.fmtp.filter(x => validPayloads.has(x.payload));
         media.rtcpFb = media.rtcpFb ? media.rtcpFb.filter(x => validPayloads.has(x.payload)) : media.rtcpFb;
         media.payloads = Array.from(validPayloads).join(' ');
-        if (this._videoCodec === 'H264' && this._lastWebrtcFmtp == 'webrtc') { //Try to get the agent fmtp line from webrtc add peer
+        if (this._videoCodec === 'H264' && this._lastWebrtcFmtp == 'webrtc') { // Try to get the agent fmtp line from webrtc add peer
           if (media.fmtp.length > 0) {
             for (let i = 0; i < media.rtp.length; i++) {
               if (media.rtp[i].codec === 'H264') {
-                this._lastWebrtcFmtp = media.fmtp[i].config
+                this._lastWebrtcFmtp = media.fmtp[i].config;
                 break;
               }
             }
-            if (this._lastWebrtcFmtp == 'webrtc') // no h264 fmtp found. set flag to null
+            if (this._lastWebrtcFmtp == 'webrtc') { // no h264 fmtp found. set flag to null
               this._lastWebrtcFmtp = null;
+            }
           } else {
             this._lastWebrtcFmtp = null;
           }
@@ -778,8 +772,7 @@ class WebRTCMediaSession extends Events {
         }
       }
     });
-    if (customCodec)
-      this._videoCodec = auxCodec;
+    if (customCodec) this._videoCodec = auxCodec;
 
     return transform.write(sdpObj);
   }
