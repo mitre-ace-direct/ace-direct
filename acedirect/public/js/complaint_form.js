@@ -207,16 +207,16 @@ function connect_socket() {
             $('#sip_password').attr('name', data.password);
             $('#pc_config').attr('name', 'stun:' + data.stun_server);
 
-            // register_jssip(data.extension, data.password); //register with the given extension
+            // registerJssip(data.extension, data.password); //register with the given extension
 
             console.log('asterisk_sip_uri: ' + asterisk_sip_uri);
 
-            // register_jssip(data.extension, data.password); //register with the given extension
+            // registerJssip(data.extension, data.password); //register with the given extension
 
             // TO DO - This needs to be a string representation of the extension (e.g. '575791')
-            // start_call(asterisk_sip_uri); //calling asterisk to get into the queue
+            // startCall(asterisk_sip_uri); //calling asterisk to get into the queue
             // Original
-            // start_call(asterisk_sip_uri); //calling asterisk to get into the queue
+            // startCall(asterisk_sip_uri); //calling asterisk to get into the queue
 
             // add ace kurento signal handling so we can get params, then call once we have a wv connection
             if (acekurento === null) {
@@ -231,8 +231,8 @@ function connect_socket() {
               var eventHandlers = {
                 connected: function (e) {
                   console.log('--- WV: Connected ---\n');
-                  register_jssip(data.extension, data.password); // register with the given extension
-                  start_call(asterisk_sip_uri); // calling asterisk to get into the queue
+                  registerJssip(data.extension, data.password); // register with the given extension
+                  startCall(asterisk_sip_uri); // calling asterisk to get into the queue
                 },
                 registerResponse: function (error) {
                   console.log('--- WV: Register response:', error || 'Success ---');
@@ -272,7 +272,7 @@ function connect_socket() {
                 },
                 ended: function (e) {
                   console.log('--- WV: Call ended ---\n');
-                  // terminate_call();
+                  // terminateCall();
                 }
               };
               acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
@@ -326,7 +326,7 @@ function connect_socket() {
           }
         }).on('disconnect', function () {
           console.log('disconnected');
-          unregister_jssip();
+          unregisterJssip();
         }).on('unauthorized', function (error) {
           if (error.data.type === 'UnauthorizedError' || error.data.code === 'invalid_token') {
             logout('Session has expired');
@@ -504,7 +504,7 @@ function connect_socket() {
         }).on('consumer-stop-monitor', function () {
           acekurento.isMonitoring = false;
           monitorExt = null;
-          $('#end-call').attr('onclick', 'terminate_call()');
+          $('#end-call').attr('onclick', 'terminateCall()');
         }).on('call-center-closed', function (data) {
           if (data && data.closed) {
             // closed
@@ -563,11 +563,11 @@ function initiateCall() {
 function startRecordingVideomail(switchQueueFlag) {
   if (switchQueueFlag) {
     $('#videomailModal').modal('hide');
-    transfer_to_videomail();
+    transferToVideomail();
   } else {
     $('#videomailModal').modal('hide');
     // $('#vmwait').show();
-    // swap_video();
+    // swapVideo();
     $('#vmsent').hide();
     videomailflag = true;
     $('#record-progress-bar').show();
@@ -803,7 +803,7 @@ $('#startScreenshare').prop('disabled', true).click(function(){
 
 function exit_queue() {
   $('#queueModal').modal('hide');
-  terminate_call();
+  terminateCall();
   clearScreen();
 }
 
