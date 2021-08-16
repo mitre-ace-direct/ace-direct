@@ -1,6 +1,6 @@
 const express = require('express');
-const debug   = require('debug')('ace:recording-handler');
-const RecMan  = require('./rec_manager');
+const debug = require('debug')('ace:recording-handler');
+const RecMan = require('./rec_manager');
 
 const router = express.Router();
 
@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
     res.json(recordings);
   } catch (ex) {
     debug('Error on /recording/', ex.message);
-    res.status(500).json({error: 'An error occurred'});
+    res.status(500).json({ error: 'An error occurred' });
   }
 });
 
