@@ -1,7 +1,6 @@
 const S3 = require('aws-sdk/clients/s3');
 const param = require('param');
 
-
 /**
  * Defines a S3 client.
  *
@@ -94,8 +93,8 @@ class S3Client {
   s3GetObject(s3GetObjectParams) {
     return new Promise((resolve, reject) => {
       this.s3.getObject(
-      s3GetObjectParams,
-      this.getHandlerForS3GetObjectResponse(resolve, reject)
+        s3GetObjectParams,
+        this.getHandlerForS3GetObjectResponse(resolve, reject)
       );
     });
   }
@@ -145,12 +144,11 @@ class S3Client {
     return new Promise((resolve, reject) => {
       const deleteParams = this.getS3ParamsForDeleteObject({ id });
       this.s3.deleteObject(
-      deleteParams,
-      this.getHandlerForS3DeleteResponse(resolve, reject)
+        deleteParams,
+        this.getHandlerForS3DeleteResponse(resolve, reject)
       );
     });
   }
-
 
   /**
    * Upload a file to S3.
@@ -162,8 +160,8 @@ class S3Client {
   s3Upload(s3UploadParams) {
     return new Promise((resolve, reject) => {
       this.s3.upload(
-      s3UploadParams,
-      this.getHandlerForS3UploadResponse(resolve, reject)
+        s3UploadParams,
+        this.getHandlerForS3UploadResponse(resolve, reject)
       );
     });
   }
