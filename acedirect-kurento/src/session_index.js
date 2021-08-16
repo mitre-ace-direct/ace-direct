@@ -1,10 +1,9 @@
-const uuid          = require('uuid');
-const debug         = require('debug')('ace:session-ix');
-const Events        = require('events');
+const uuid = require('uuid');
+const debug = require('debug')('ace:session-ix');
+const Events = require('events');
 const ClientSession = require('./client_session');
 
 class SessionIndex extends Events {
-
   constructor() {
     super();
     this._index = new Map();
