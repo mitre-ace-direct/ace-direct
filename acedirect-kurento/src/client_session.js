@@ -1,26 +1,25 @@
-const debug  = require('debug')('ace:client-session');
+const debug = require('debug')('ace:client-session');
 const Events = require('events');
 const param = require('param');
-const ws     = require('ws');
+const ws = require('ws');
 const redisClient = require('./redis_client');
 
-const CL_STATUS_UNDEFINED  = 'UNDEF';
+const CL_STATUS_UNDEFINED = 'UNDEF';
 const CL_STATUS_REGISTERED = 'REGISTERED';
-const CL_STATUS_BUSY       = 'BUSY';
+const CL_STATUS_BUSY = 'BUSY';
 
 class ClientSession extends Events {
-
   constructor(id, socket, confm, ami) {
     super();
-    this._id      = id;
-    this._socket  = socket;
-    this._confm   = confm;
-    this._status  = CL_STATUS_UNDEFINED;
-    this._ext     = null;
+    this._id = id;
+    this._socket = socket;
+    this._confm = confm;
+    this._status = CL_STATUS_UNDEFINED;
+    this._ext = null;
     this._session = null;
-    this._queue   = [];
-    this._ami     = ami;
-    this._asteriskQueueNames = [ param('asterisk.queues.general.name'), param('asterisk.queues.complaint.name') ]; // currently support these two queues
+    this._queue = [];
+    this._ami = ami;
+    this._asteriskQueueNames = [param('asterisk.queues.general.name'), param('asterisk.queues.complaint.name')]; // currently support these two queues
     this._isMemberQueue = false;
     this._isAgent = null;
     this._sipIntervalTimeout = null;
@@ -144,7 +143,7 @@ class ClientSession extends Events {
       success
     });
   }
-  
+
   async invitePeer(ext, isMonitor) {
     let success = false;
     if (this._session) {
@@ -201,7 +200,7 @@ class ClientSession extends Events {
       candidates.forEach(c => {
         this._session.handleIce(this._ext, c);
       });
-    } catch(error) {
+    } catch (error) {
       debug('[%s] Couldn\'t connect call', error);
       console.error(error);
     }
@@ -221,25 +220,24 @@ class ClientSession extends Events {
       this._send({ id: 'registerResponse' });
       debug('[%s] Registered as %s', this._id, ext);
 
-      if(!this._isMemberQueue && isAgent && this._ami
+      if (!this._isMemberQueue && isAgent && this._ami
           && this._asteriskQueueNames && this._asteriskQueueNames.length) {
         // add user to asterisk queue
         let res = null;
         this._asteriskQueueNames.forEach(async queueName => {
           res = await this._ami.queueAdd(ext, queueName);
-          if(res)
-            this._isMemberQueue = true;
+          if (res) this._isMemberQueue = true;
         });
       }
-    } catch(error) {
-      const message = error.message || 
-        (error.response && error.response.reason_phrase) || 
-        'Unknown error';
+    } catch (error) {
+      const message = error.message
+      || (error.response && error.response.reason_phrase)
+      || 'Unknown error';
       this._send({ id: 'registerResponse', error: message });
       debug('[%s] Error while registering:', this._id, message);
     }
   }
-  
+
   async call(target, offer, skipQueue) {
     if (this._status !== CL_STATUS_REGISTERED) {
       debug('[%s] Can\'t start call while status is %s', this._id, this._status);
@@ -251,13 +249,13 @@ class ClientSession extends Events {
       const candidates = this._queue.splice(0);
       candidates.forEach(c => {
         this._session.handleIce(this._ext, c);
-      })
-    } catch(error) {
+      });
+    } catch (error) {
       debug('[%s] Couldn\'t connect call to %s', this._id, error);
       console.error(error);
     }
   }
-  
+
   handleHangup(removeFromQueue) {
     debug('[%s] Hangup/Stop request', this._id);
     if (this._session) {
@@ -266,18 +264,17 @@ class ClientSession extends Events {
         let amires = null;
         this._asteriskQueueNames.forEach(async queueName => {
           amires = await this._ami.queueRemove(this._ext, queueName);
-          if (amires)
-            this._isMemberQueue = false
+          if (amires) this._isMemberQueue = false;
         });
       }
-      if(this._isMonitoring) {
+      if (this._isMonitoring) {
         this._session._hasMonitor = false;
         this._isMonitoring = false;
       }
       this._status = CL_STATUS_REGISTERED;
       let sid = this._session.id;
       let ext = this._ext;
-      if(this._ua) {
+      if (this._ua) {
         this._ua.terminateSessions();
       }
       clearInterval(this._sipIntervalTimeout);
@@ -294,14 +291,13 @@ class ClientSession extends Events {
       let amires = null;
       this._asteriskQueueNames.forEach(async queueName => {
         amires = await this._ami.queueRemove(this._ext, queueName);
-        if(amires)
-          this._isMemberQueue = false;
+        if (amires) this._isMemberQueue = false;
       });
     }
-    if(this._ua) {
+    if (this._ua) {
       this._ua.stop();
     }
-    if(this._session) {
+    if (this._session) {
       const session = this._session;
       this._session = null;
       session.leave(this._ext);
@@ -319,7 +315,7 @@ class ClientSession extends Events {
   sendIce(candidate) {
     this._send({ id: 'ice', candidate });
   }
-  
+
   sendSdp(sdp) {
     this._send({ id: 'sdp', sdp });
   }
@@ -341,7 +337,7 @@ class ClientSession extends Events {
       caller,
       isWarmTransfer: this._warmTransfer
     });
-    return new Promise( success => {
+    return new Promise(success => {
       const handler = async (payload) => {
         const msg = JSON.parse(payload);
         if (msg.id === 'accept' && msg.caller === caller) {
@@ -366,14 +362,13 @@ class ClientSession extends Events {
         const candidates = this._queue.splice(0);
         candidates.forEach(c => {
           this._session.handleIce(this._ext, c);
-        })
+        });
       });
 
       setTimeout(() => {
         // success(null);
         this._socket.removeEventListener('message', handler);
       }, 10000);
-
     });
   }
 
@@ -412,7 +407,7 @@ class ClientSession extends Events {
         try {
           let that = this;
           this._ami.unpauseQueue(this._ext, queueName, function (r) {
-            that._send({id: 'unpausedQueue'});
+            that._send({ id: 'unpausedQueue' });
           });
         } catch (e) {
           debug(e);
@@ -423,7 +418,7 @@ class ClientSession extends Events {
 
   async handleHold(onHold) {
     let success = false;
-    if(this._session) {
+    if (this._session) {
       await this._confm.hold(this._ext, onHold);
       success = await this._session.hold(this._ext, onHold);
     }
@@ -446,15 +441,15 @@ class ClientSession extends Events {
   }
 
   async handlePrivateMode(enabled, url) {
-    if(!this._session) return;
-    if(enabled) {
+    if (!this._session) return;
+    if (enabled) {
       this._session.enablePrivateMode(this._ext, url);
     } else {
       this._session.disablePrivateMode(this._ext);
     }
   }
 
-  async handleSipInfo(){
+  async handleSipInfo() {
     const jssip_session = this._confm._jssipRTCSessions.get(this._ext);
     let body = `<?xml version="1.0" encoding="utf-8" ?>
   <media_control>
@@ -465,7 +460,7 @@ class ClientSession extends Events {
     </vc_primitive>
   </media_control>`;
 
-    return jssip_session.sendInfo('application/media_control+xml', body)
+    return jssip_session.sendInfo('application/media_control+xml', body);
   }
 
   async requestKeyframeAndSleep() {
@@ -480,7 +475,7 @@ class ClientSession extends Events {
             debug(`${e}\nClearing picture_fast_update SIP INFO interval`);
             clearInterval(this._sipIntervalTimeout);
           });
-          resolve
+          resolve;
         }, ms);
       });
     }
