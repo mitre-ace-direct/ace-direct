@@ -1,4 +1,4 @@
-describe("ACEKurento oncall outbound", function() {
+describe("ACEKurento oncall outbound", function () {
   var acekurento;
   var ext = '1000';
   var WSSpy;
@@ -17,34 +17,34 @@ describe("ACEKurento oncall outbound", function() {
     }
   };
 
-  beforeEach(function(done) {
+  beforeEach(function (done) {
     var realWS = WebSocket;
-    WSSpy = spyOn(window, "WebSocket").and.callFake(function(url,protocols){
-      return new realWS(url,protocols);
+    WSSpy = spyOn(window, "WebSocket").and.callFake(function (url, protocols) {
+      return new realWS(url, protocols);
     });
-    acekurento = new ACEKurento({acekurentoSignalingUrl: address});
+    acekurento = new ACEKurento({ acekurentoSignalingUrl: address });
     spyOn(console, 'log');
-    setTimeout(function() {
+    setTimeout(function () {
       console.info('rendering time...');
       acekurento.call(uri, true);
-      done()
+      done();
     }, 1000);
   });
 
-  it("should know when the call is in progress", function() {
+  it("should know when the call is in progress", function () {
     expect(acekurento.callState).toEqual(PROCESSING_CALL);
   });
 
-  it("should not be possible to call while on call", function() {
+  it("should not be possible to call while on call", function () {
     acekurento.call(uri, true);
     expect(console.log).toHaveBeenCalledWith("You are already on a call");
   });
 
   describe("stop", function () {
     it("should set call state to ended", function (done) {
-      setTimeout(function() {
+      setTimeout(function () {
         acekurento.stop(true);
-        console.log(acekurento.callState)
+        console.log(acekurento.callState);
         expect(acekurento.callState).toEqual(NO_CALL);
         done();
       }, 500);
