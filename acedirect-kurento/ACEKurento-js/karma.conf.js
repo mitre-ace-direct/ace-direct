@@ -1,4 +1,4 @@
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
 
     // base path, that will be used to resolve files and exclude
@@ -18,8 +18,8 @@ module.exports = function(config) {
     },
 
     coverageReporter: {
-      type : 'html',
-      dir : 'coverage/'
+      type: 'html',
+      dir: 'coverage/'
     },
 
     port: 8000,
@@ -36,7 +36,7 @@ module.exports = function(config) {
     customLaunchers: {
       Chrome_without_security: {
         base: 'Chrome',
-        flags: ['--disable-web-security','--allow-running-insecure-content']
+        flags: ['--disable-web-security', '--allow-running-insecure-content']
       },
       Firefox_autoaccept_media: {
         base: 'Firefox',
