@@ -1,14 +1,14 @@
-module.exports = function(grunt) {
+module.exports = function (grunt) {
   require('jit-grunt')(grunt);
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
       options: {
-        banner: '/*!\n' +
-        ' * @license ACEDirect v<%= pkg.version %>\n' +
-        ' * Copyright <%= grunt.template.today("yyyy") %> ACEDirect. All Rights Reserved.\n' +
-        ' */\n'
+        banner: '/*!\n'
+        + ' * @license ACEDirect v<%= pkg.version %>\n'
+        + ' * Copyright <%= grunt.template.today("yyyy") %> ACEDirect. All Rights Reserved.\n'
+        + ' */\n'
       },
 
       ACEKurento: {
@@ -21,9 +21,8 @@ module.exports = function(grunt) {
     },
     uglify: {
       options: {
-        preserveComments: function(node, comment) {
-          if (/@(preserve|license|cc_on)/.test(comment.value))
-            return true;
+        preserveComments: function (node, comment) {
+          if (/@(preserve|license|cc_on)/.test(comment.value)) return true;
         },
         sourceMap: true
       },
@@ -52,20 +51,20 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', ["karma"]);
 
-  grunt.registerTask('clear-version', 'Reset version variable in process.env', function() {
+  grunt.registerTask('clear-version', 'Reset version variable in process.env', function () {
     delete process.env.version;
   });
 
-  grunt.registerTask('build-version', 'Generates a version of ACEKurento.js library', function(type) {
+  grunt.registerTask('build-version', 'Generates a version of ACEKurento.js library', function (type) {
     var pkg = grunt.config.data.pkg;
     var version = pkg.version.split('.');
 
     var major = version[0],
-    minor = version[1];
+      minor = version[1];
 
     switch (type) {
       case 'major':
-        process.env.version = major
+        process.env.version = major;
         break;
       case 'minor':
         process.env.version = major + '.' + minor;
@@ -79,4 +78,4 @@ module.exports = function(grunt) {
 
   grunt.registerTask('build-js', ['concat:ACEKurento', 'uglify:ACEKurento']);
   grunt.registerTask('default', ['build-js']);
-}
+};
