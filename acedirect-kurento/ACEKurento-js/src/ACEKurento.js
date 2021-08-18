@@ -44,13 +44,12 @@ function ACEKurento(config) {
 
   /** @member {Object} */
   var acekurento = acekurento || {};
-  
+
   // extend.js
   // Written by Andrew Dupont, optimized by Addy Osmani
   function extend(destination, source) {
-
     var toString = Object.prototype.toString,
-    objTest = toString.call({});
+      objTest = toString.call({});
 
     for (var property in source) {
       if (source[property] && objTest === toString.call(source[property])) {
@@ -61,7 +60,6 @@ function ACEKurento(config) {
       }
     }
     return destination;
-
   }
 
   /**
@@ -96,13 +94,13 @@ function ACEKurento(config) {
      * PeerConnection function, returns pc
      */
     pc: function () {
-      return webRtcPeer.peerConnection
+      return webRtcPeer.peerConnection;
     },
     /**
      * Media Stream function, a interface represents a stream of local media content
      */
     mediaStream: function () {
-      return webRtcPeer.localVideo.srcObject
+      return webRtcPeer.localVideo.srcObject;
     },
     /**
      * Call id for current session
@@ -248,7 +246,7 @@ function ACEKurento(config) {
        * newMessage Event
        * @event {Function} newMessage
        */
-      'newMessage': function (e) {},
+      'newMessage': function (e) {}
     },
     /**
      * Connect and call, loopback stream to Kurento
@@ -265,7 +263,7 @@ function ACEKurento(config) {
           audio: this.enableVideo,
           video: this.enableAudio
         }
-      }
+      };
       console.log('create webRtcPeer ...');
       webRtcPeer = kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options, function (error) {
         if (error) {
@@ -368,7 +366,6 @@ function ACEKurento(config) {
      * Accepts an incoming call
      */
     acceptCall: function (message) {
-      
       setCallState(PROCESSING_CALL);
 
       var options = {
@@ -379,7 +376,7 @@ function ACEKurento(config) {
           audio: this.enableAudio,
           video: this.enableVideo
         }
-      }
+      };
 
       webRtcPeer = kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options, function (error) {
         if (error) {
@@ -431,7 +428,7 @@ function ACEKurento(config) {
         var message = {
           id: 'stop',
           removeFromQueue: removeFromQueue
-        }
+        };
         sendMessage(message);
       }
     },
@@ -481,7 +478,7 @@ function ACEKurento(config) {
         console.info('Created SDP offer');
         // offer = mangleSdpToAddSimulcast(offer);
         return pc.setLocalDescription(offer);
-      }).catch( function (e) {
+      }).catch(function (e) {
         console.error(e);
       });
     },
@@ -498,7 +495,7 @@ function ACEKurento(config) {
           audio: this.enableVideo,
           video: this.enableAudio
         }
-      }
+      };
       console.log('create webRtcPeer ...');
       webRtcPeer = kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options, function (error) {
         if (error) {
@@ -534,7 +531,7 @@ function ACEKurento(config) {
           audio: this.enableVideo,
           video: this.enableAudio
         }
-      }
+      };
       console.log('create webRtcPeer ...');
       webRtcPeer = kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options, function (error) {
         if (error) {
@@ -646,7 +643,7 @@ function ACEKurento(config) {
       var mediaStream = this.mediaStream();
       console.log("Set " + (isAudio ? "AUDIO" : "VIDEO") + " " + (isActive ? "ON" : "OFF"));
 
-      if(isAudio) {
+      if (isAudio) {
         mediaStream.getAudioTracks()[0].enabled = !(mediaStream.getAudioTracks()[0].enabled);
       } else {
         mediaStream.getVideoTracks()[0].enabled = !(mediaStream.getVideoTracks()[0].enabled);
@@ -668,7 +665,7 @@ function ACEKurento(config) {
           audio: this.enableVideo,
           video: this.enableAudio
         }
-      }
+      };
       console.log('create webRtcPeer ...');
       webRtcPeer = kurentoUtils.WebRtcPeer.WebRtcPeerSendrecv(options, function (error) {
         if (error) {
@@ -729,7 +726,7 @@ function ACEKurento(config) {
 
   window.onbeforeunload = function () {
     ws.close();
-  }
+  };
 
   ws.onmessage = function (message) {
     try {
@@ -751,7 +748,7 @@ function ACEKurento(config) {
         // acekurento.event.trigger("callResponse", message);
         break;
       case 'incomingCall':
-        handleIncomingCall(message)
+        handleIncomingCall(message);
         // acekurento.event.trigger("incomingCall", message);
         break;
       case 'sdp':
@@ -814,7 +811,7 @@ function ACEKurento(config) {
       default:
         console.error('Unrecognized message', message);
     }
-  }
+  };
 
   function registerResponse(message) {
     if (!message.error) {
@@ -830,7 +827,7 @@ function ACEKurento(config) {
     if (message.response != 'accepted') {
       console.info('Call not accepted by peer. Closing call');
       var errorMessage = message.message ? message.message
-      : 'Unknown reason for call rejection.';
+        : 'Unknown reason for call rejection.';
       console.log(errorMessage);
       stop();
     } else {
@@ -853,10 +850,10 @@ function ACEKurento(config) {
 
     acekurento.eventHandlers.incomingCall({
       from: message.caller,
-      accept: function() {
-        acekurento.acceptCall(message)
+      accept: function () {
+        acekurento.acceptCall(message);
       },
-      reject: function() {
+      reject: function () {
         acekurento.declineCall(message);
       }
     });
@@ -874,7 +871,7 @@ function ACEKurento(config) {
     var message = {
       id: 'ice',
       candidate: candidate
-    }
+    };
     sendMessage(message);
   }
 
