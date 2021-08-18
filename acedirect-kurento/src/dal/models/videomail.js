@@ -1,4 +1,5 @@
 'use strict';
+
 module.exports = (sequelize, DataTypes) => {
   const VideoMail = sequelize.define('VideoMail', {
     peer: DataTypes.STRING,
