@@ -1,19 +1,18 @@
 const nconf = require('nconf');
-const fs = require('fs');
+// const fs = require('fs');
 
 // get params
 let param = 'abc';
 let cfile = '';
 if (process.argv.length === 4) {
-  param = process.argv[2];
-  cfile = process.argv[3];
+  [, , param, cfile] = process.argv;
 } else {
   console.log('\nusage: node parseJson.js  <param>  <config file path>\n');
   process.exit(process.argv.length);
 }
 
-const content = fs.readFileSync(cfile, 'utf8');
-const myjson = JSON.parse(content);
+// const content = fs.readFileSync(cfile, 'utf8');
+// const myjson = JSON.parse(content);
 nconf.file({
   file: cfile
 });
