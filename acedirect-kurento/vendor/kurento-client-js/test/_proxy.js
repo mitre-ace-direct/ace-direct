@@ -33,34 +33,34 @@ function proxy(data) {
     var type = params.type;
 
     switch (type) {
-    case 'PlayerEndpoint':
-    case 'ZBarFilter':
-      {
-        var constructorParams = params.constructorParams;
-        var pipeline_id = constructorParams.mediaPipeline;
+      case 'PlayerEndpoint':
+      case 'ZBarFilter':
+        {
+          var constructorParams = params.constructorParams;
+          var pipeline_id = constructorParams.mediaPipeline;
 
-        var pipeline = objects[pipeline_id];
-        if (pipeline == undefined) {
-          error = {
-            message: "Unknown pipeline: " + pipeline_id
+          var pipeline = objects[pipeline_id];
+          if (pipeline == undefined) {
+            error = {
+              message: "Unknown pipeline: " + pipeline_id
+            };
+            break;
           };
-          break;
         };
-      };
 
-    case 'MediaPipeline':
-      {
-        objects[id] = type;
-        result = {
-          value: id
+      case 'MediaPipeline':
+        {
+          objects[id] = type;
+          result = {
+            value: id
+          };
+        }
+        break;
+
+      default:
+        error = {
+          message: "Unknown type: " + type
         };
-      }
-      break;
-
-    default:
-      error = {
-        message: "Unknown type: " + type
-      };
     }
   };
 
@@ -78,55 +78,55 @@ function proxy(data) {
 
     else
       switch (method) {
-      case 'invoke':
-        {
-          var operation = params.operation;
+        case 'invoke':
+          {
+            var operation = params.operation;
 
-          switch (operation) {
-          case 'connect':
-          case 'play':
-            result = {};
+            switch (operation) {
+              case 'connect':
+              case 'play':
+                result = {};
 
-          default:
-            error = {
-              message: "Unknown operation: " + operation
+              default:
+                error = {
+                  message: "Unknown operation: " + operation
+                };
             };
           };
-        };
-        break;
+          break;
 
-      case 'release':
-        {
-          result = {};
-        };
-        break;
-
-      case 'subscribe':
-        {
-          var type = params.type;
-
-          switch (type) {
-          case 'CodeFound':
+        case 'release':
+          {
             result = {};
+          };
+          break;
 
-          default:
-            error = {
-              message: "Unknown event type: " + type
+        case 'subscribe':
+          {
+            var type = params.type;
+
+            switch (type) {
+              case 'CodeFound':
+                result = {};
+
+              default:
+                error = {
+                  message: "Unknown event type: " + type
+                };
             };
           };
-        };
-        break;
+          break;
 
-      case 'unsubscribe':
-        {
-          result = {};
-        };
-        break;
+        case 'unsubscribe':
+          {
+            result = {};
+          };
+          break;
 
-      default:
-        error = {
-          message: "Unknown method: " + method
-        };
+        default:
+          error = {
+            message: "Unknown method: " + method
+          };
       };
   }
 
