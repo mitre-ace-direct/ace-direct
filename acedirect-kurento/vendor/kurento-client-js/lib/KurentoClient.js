@@ -29,7 +29,7 @@ var JsonRPC = RpcBuilder.packers.JsonRPC;
 
 var promiseCallback = require('promisecallback');
 
-var disguise = require('./disguise')
+var disguise = require('./disguise');
 var createPromise = require('./createPromise');
 var MediaObjectCreator = require('./MediaObjectCreator');
 var TransactionsManager = require('./TransactionsManager');
@@ -40,10 +40,10 @@ var transactionOperation = TransactionsManager.transactionOperation;
 
 var MediaObject = require('kurento-client-core').abstracts.MediaObject;
 
-const MEDIA_OBJECT_TYPE_NOT_FOUND = 40100
-const MEDIA_OBJECT_NOT_FOUND = 40101
-const MEDIA_OBJECT_METHOD_NOT_FOUND = 40105
-const INVALID_SESSION = 40007
+const MEDIA_OBJECT_TYPE_NOT_FOUND = 40100;
+const MEDIA_OBJECT_NOT_FOUND = 40101;
+const MEDIA_OBJECT_METHOD_NOT_FOUND = 40105;
+const INVALID_SESSION = 40007;
 
 const BASE_TIMEOUT = 20000;
 
@@ -82,9 +82,9 @@ function findIndex(list, predicate) {
 function serializeParams(params) {
   for (var key in params) {
     var param = params[key];
-    if (param instanceof MediaObject || (param && (params.object !==
-        undefined ||
-        params.hub !== undefined || params.sink !== undefined))) {
+    if (param instanceof MediaObject || (param && (params.object
+        !== undefined
+        || params.hub !== undefined || params.sink !== undefined))) {
       if (param && param.id != null) {
         params[key] = param.id;
       }
@@ -104,13 +104,13 @@ function serializeOperation(operation, index) {
   var params = operation.params;
 
   switch (operation.method) {
-  case 'create':
-    params.constructorParams = serializeParams(params.constructorParams);
-    break;
+    case 'create':
+      params.constructorParams = serializeParams(params.constructorParams);
+      break;
 
-  default:
-    params = serializeParams(params);
-    params.operationParams = serializeParams(params.operationParams);
+    default:
+      params = serializeParams(params);
+      params.operationParams = serializeParams(params.operationParams);
   };
 
   operation.jsonrpc = "2.0";
@@ -157,7 +157,7 @@ function deferred(mediaObject, params, prevRpc, callback) {
 function noop(error, result) {
   if (error) console.trace(error);
 
-  return result
+  return result;
 };
 
 /**
@@ -209,12 +209,11 @@ function KurentoClient(ws_uri, options, callback) {
 
   options = options || {};
 
-  var failAfter = options.failAfter
-  if (failAfter == undefined) failAfter = Infinity
+  var failAfter = options.failAfter;
+  if (failAfter == undefined) failAfter = Infinity;
 
-  if (options.enableTransactions === undefined) options.enableTransactions =
-    true
-  if (options.strict === undefined) options.strict = true
+  if (options.enableTransactions === undefined) options.enableTransactions = true;
+  if (options.strict === undefined) options.strict = true;
 
   options.request_timeout = options.request_timeout || BASE_TIMEOUT;
   options.response_timeout = options.response_timeout || BASE_TIMEOUT;
@@ -233,16 +232,16 @@ function KurentoClient(ws_uri, options, callback) {
       return console.warn("Unknown object id '" + id + "'", message);
 
     switch (method) {
-    case 'onEvent':
-      object.emit(params.type, params.data);
-      break;
+      case 'onEvent':
+        object.emit(params.type, params.data);
+        break;
 
-      //      case 'onError':
-      //        object.emit('error', params.error);
-      //      break;
+        //      case 'onError':
+        //        object.emit('error', params.error);
+        //      break;
 
-    default:
-      console.warn("Unknown message type '" + method + "'");
+      default:
+        console.warn("Unknown message type '" + method + "'");
     };
   };
 
@@ -276,8 +275,8 @@ function KurentoClient(ws_uri, options, callback) {
   });
 
   // Select what transactions mechanism to use
-  var encodeTransaction = options.enableTransactions ? commitTransactional :
-    commitSerial;
+  var encodeTransaction = options.enableTransactions ? commitTransactional
+    : commitSerial;
 
   // Transactional API
 
@@ -288,30 +287,32 @@ function KurentoClient(ws_uri, options, callback) {
         operations: operations
       };
 
-      encodeTransaction(params, callback)
+      encodeTransaction(params, callback);
     });
 
   this.beginTransaction = transactionsManager.beginTransaction.bind(
-    transactionsManager);
+    transactionsManager
+  );
   this.endTransaction = transactionsManager.endTransaction.bind(
-    transactionsManager);
+    transactionsManager
+  );
   this.transaction = transactionsManager.transaction.bind(transactionsManager);
 
   Object.defineProperty(this, 'sessionId', {
     configurable: true
-  })
+  });
   this.on('disconnect', function () {
     onDisconnected();
     Object.defineProperty(this, 'sessionId', {
       configurable: false,
       get: function () {
-        throw new SyntaxError('Client has been disconnected')
+        throw new SyntaxError('Client has been disconnected');
       }
-    })
+    });
 
     for (var id in objects)
-      objects[id].emit('release')
-  })
+      objects[id].emit('release');
+  });
 
   // Emit events
 
@@ -334,30 +335,30 @@ function KurentoClient(ws_uri, options, callback) {
   // Encode commands
 
   function send(request) {
-    var method = request.method
-    var params = request.params
-    var callback = request.callback
-    var stack = request.stack
+    var method = request.method;
+    var params = request.params;
+    var callback = request.callback;
+    var stack = request.stack;
 
-    var requestTimestamp = Date.now()
+    var requestTimestamp = Date.now();
 
     rpc.encode(method, params, function (error, result) {
       if (error) {
-        var responseTimestamp = Date.now()
+        var responseTimestamp = Date.now();
 
-        var constructor = Error
+        var constructor = Error;
         switch (error.code) {
-        case MEDIA_OBJECT_TYPE_NOT_FOUND:
-          constructor = TypeError
-          break
+          case MEDIA_OBJECT_TYPE_NOT_FOUND:
+            constructor = TypeError;
+            break;
 
-        case MEDIA_OBJECT_NOT_FOUND:
-          constructor = ReferenceError
-          break
+          case MEDIA_OBJECT_NOT_FOUND:
+            constructor = ReferenceError;
+            break;
 
-        case MEDIA_OBJECT_METHOD_NOT_FOUND:
-          constructor = SyntaxError
-          break
+          case MEDIA_OBJECT_METHOD_NOT_FOUND:
+            constructor = SyntaxError;
+            break;
         }
 
         error = extend(new constructor(error.message || error), error);
@@ -375,13 +376,13 @@ function KurentoClient(ws_uri, options, callback) {
               error.stack.split('\n').slice(2)
             ).join('\n')
           }
-        })
-      } else if ((self.sessionId !== result.sessionId) && (result.value !==
-          'pong'))
+        });
+      } else if ((self.sessionId !== result.sessionId) && (result.value
+          !== 'pong'))
         Object.defineProperty(self, 'sessionId', {
           configurable: true,
           value: result.sessionId
-        })
+        });
 
       callback(error, result);
     });
@@ -393,7 +394,8 @@ function KurentoClient(ws_uri, options, callback) {
     var operation_response = this.value[index];
     if (operation_response == undefined)
       return callback(new Error(
-        'Command not executed in the server'));
+        'Command not executed in the server'
+      ));
 
     var error = operation_response.error;
     var result = operation_response.result;
@@ -402,30 +404,30 @@ function KurentoClient(ws_uri, options, callback) {
     if (result) id = result.value;
 
     switch (operation.method) {
-    case 'create':
-      var mediaObject = operation.params.object;
+      case 'create':
+        var mediaObject = operation.params.object;
 
-      if (error) {
-        mediaObject.emit('_id', error);
-        return callback(error)
-      }
+        if (error) {
+          mediaObject.emit('_id', error);
+          return callback(error);
+        }
 
-      callback(null, registerObject(mediaObject, id));
-      break;
+        callback(null, registerObject(mediaObject, id));
+        break;
 
-    default:
-      callback(error, result);
+      default:
+        callback(error, result);
     }
   }
 
   function sendImplicitTransaction(operations) {
     function callback(error, result) {
-      if (error) return console.error('Implicit transaction failed')
+      if (error) return console.error('Implicit transaction failed');
 
-      operations.forEach(operationResponse, result)
+      operations.forEach(operationResponse, result);
     }
 
-    operations.forEach(serializeOperation)
+    operations.forEach(serializeOperation);
 
     var request = {
       method: 'transaction',
@@ -433,78 +435,78 @@ function KurentoClient(ws_uri, options, callback) {
         operations: operations
       },
       callback: callback
-    }
-    send(request)
+    };
+    send(request);
   }
 
-  var queueEncode = []
+  var queueEncode = [];
 
   function sendQueueEncode() {
-    var request = queueEncode.shift()
+    var request = queueEncode.shift();
 
     // We have several pending requests, create an "implicit" transaction
     if (queueEncode.length) {
       // Send (implicit) transactions from previous iteration
       while (request && request.method === 'transaction') {
-        send(request)
-        request = queueEncode.shift()
+        send(request);
+        request = queueEncode.shift();
       }
 
       // Encode and queue transactions from current iteration to exec on next one
-      var operations = []
+      var operations = [];
 
       while (request) {
         if (request.method === 'transaction') {
           if (operations.length) {
-            sendImplicitTransaction(operations)
-            operations = []
+            sendImplicitTransaction(operations);
+            operations = [];
           }
 
-          send(request)
+          send(request);
         } else
-          operations.push(request)
+          operations.push(request);
 
-        request = queueEncode.shift()
+        request = queueEncode.shift();
       }
 
       // Encode and queue remaining operations for next iteration
-      if (operations.length) sendImplicitTransaction(operations)
+      if (operations.length) sendImplicitTransaction(operations);
     }
 
     // We have only one pending request, send it directly
     else
-      send(request)
+      send(request);
   }
 
   function encode(method, params, callback) {
-    var stack = (new Error).stack
+    var stack = (new Error).stack;
 
-    params.sessionId = self.sessionId
+    params.sessionId = self.sessionId;
 
     self.then(function () {
-        if (options.useImplicitTransactions && !queueEncode.length)
-          async.setImmediate(sendQueueEncode)
+      if (options.useImplicitTransactions && !queueEncode.length)
+        async.setImmediate(sendQueueEncode);
 
-        var request = {
-          method: method,
-          params: params,
-          callback: callback
-        }
-        Object.defineProperty(request, 'stack', {
-          value: stack
-        })
+      var request = {
+        method: method,
+        params: params,
+        callback: callback
+      };
+      Object.defineProperty(request, 'stack', {
+        value: stack
+      });
 
-        if (options.useImplicitTransactions)
-          queueEncode.push(request)
-        else
-          send(request)
-      },
-      callback)
+      if (options.useImplicitTransactions)
+        queueEncode.push(request);
+      else
+        send(request);
+    },
+    callback);
   }
 
   function encodeCreate(transaction, params, callback) {
     if (transaction)
-      return transactionOperation.call(transaction, 'create', params, callback)
+      return transactionOperation.call(transaction, 'create', params, callback);
 
     if (transactionsManager.length)
       return transactionOperation.call(transactionsManager, 'create',
@@ -529,13 +531,13 @@ function KurentoClient(ws_uri, options, callback) {
     }
 
     return deferred(null, params.constructorParams, null, function (error) {
-        if (error) throw error;
+      if (error) throw error;
 
-        params.constructorParams = serializeParams(params.constructorParams);
+      params.constructorParams = serializeParams(params.constructorParams);
 
-        return encode('create', params, callback2);
-      })
-      .catch(callback)
+      return encode('create', params, callback2);
+    })
+      .catch(callback);
   };
 
   /**
@@ -552,7 +554,7 @@ function KurentoClient(ws_uri, options, callback) {
       error.method = method;
       error.params = params;
 
-      return setTimeout(callback, 0, error)
+      return setTimeout(callback, 0, error);
     };
 
     for (var key in params.operationParams) {
@@ -563,7 +565,7 @@ function KurentoClient(ws_uri, options, callback) {
         error.method = method;
         error.params = params;
 
-        return setTimeout(callback, 0, error)
+        return setTimeout(callback, 0, error);
       };
     }
 
@@ -579,16 +581,16 @@ function KurentoClient(ws_uri, options, callback) {
       };
 
       prevRpc = deferred(params.object, params.operationParams, prevRpc,
-          function (error) {
-            if (error) throw error
+        function (error) {
+          if (error) throw error;
 
-            params = serializeParams(params);
-            params.operationParams = serializeParams(params
-              .operationParams);
+          params = serializeParams(params);
+          params.operationParams = serializeParams(params
+            .operationParams);
 
-            return encode(method, params, callback2);
-          })
-        .catch(reject)
+          return encode(method, params, callback2);
+        })
+        .catch(reject);
     });
 
     prevRpc_result = promiseCallback(promise, callback);
@@ -631,7 +633,7 @@ function KurentoClient(ws_uri, options, callback) {
         promises.push(param);
       }
 
-      return param
+      return param;
     }
 
     // Fix references to uninitialized MediaObjects
@@ -639,36 +641,36 @@ function KurentoClient(ws_uri, options, callback) {
       var params = operation.params;
 
       switch (operation.method) {
-      case 'create':
-        var constructorParams = params.constructorParams;
-        for (var key in constructorParams)
-          constructorParams[key] = checkId(operation, constructorParams[
-            key]);
-        break;
+        case 'create':
+          var constructorParams = params.constructorParams;
+          for (var key in constructorParams)
+            constructorParams[key] = checkId(operation, constructorParams[
+              key]);
+          break;
 
-      default:
-        params.object = checkId(operation, params.object);
+        default:
+          params.object = checkId(operation, params.object);
 
-        var operationParams = params.operationParams;
-        for (var key in operationParams)
-          operationParams[key] = checkId(operation, operationParams[key]);
+          var operationParams = params.operationParams;
+          for (var key in operationParams)
+            operationParams[key] = checkId(operation, operationParams[key]);
       };
     });
 
     function callback2(error, result) {
       if (error) return callback(error);
 
-      operations.forEach(operationResponse, result)
+      operations.forEach(operationResponse, result);
 
       callback(null, result);
     };
 
     Promise.all(promises).then(function () {
-        operations.forEach(serializeOperation)
+      operations.forEach(serializeOperation);
 
-        encode('transaction', params, callback2);
-      },
-      callback);
+      encode('transaction', params, callback2);
+    },
+    callback);
   }
 
   /**
@@ -685,7 +687,7 @@ function KurentoClient(ws_uri, options, callback) {
     var operations = params.operations;
 
     async.each(operations, function (operation) {
-        switch (operation.method) {
+      switch (operation.method) {
         case 'create':
           encodeCreate(undefined, operation.params, operation.callback);
           break;
@@ -697,9 +699,9 @@ function KurentoClient(ws_uri, options, callback) {
         default:
           encodeRpc(undefined, operation.method, operation.params,
             operation.callback);
-        }
-      },
-      callback)
+      }
+    },
+    callback);
   }
 
   /**
@@ -739,7 +741,7 @@ function KurentoClient(ws_uri, options, callback) {
    * @return {external:Promise}
    */
   this.getMediaobjectById = function (id, callback) {
-    return disguise(createPromise(id, describe, callback), this)
+    return disguise(createPromise(id, describe, callback), this);
   };
   /**
    * @callback module:kurentoClient.KurentoClient~getMediaobjectByIdCallback
@@ -760,7 +762,7 @@ function KurentoClient(ws_uri, options, callback) {
    */
   function describe(id, callback) {
     if (id == undefined)
-      return callback(new TypeError("'id' can't be null or undefined"))
+      return callback(new TypeError("'id' can't be null or undefined"));
 
     var mediaObject = objects[id];
     if (mediaObject) return callback(null, mediaObject);
@@ -786,9 +788,9 @@ function KurentoClient(ws_uri, options, callback) {
    */
   Object.defineProperty(this, '_resetCache', {
     value: function () {
-      objects = {}
+      objects = {};
     }
-  })
+  });
 
   /**
    * Create a new instance of a MediaObject
@@ -810,7 +812,7 @@ function KurentoClient(ws_uri, options, callback) {
    */
 
   function connect(callback) {
-    callback = (callback || noop).bind(this)
+    callback = (callback || noop).bind(this);
 
     //
     // Ping
@@ -851,15 +853,16 @@ function KurentoClient(ws_uri, options, callback) {
                   enabledPings = false;
                   updateNotReconnectIfLessThan();
                   console.log(
-                    "Server did not respond to ping message " +
-                    pingNum + ".");
+                    "Server did not respond to ping message "
+                    + pingNum + "."
+                  );
                   clearInterval(pingInterval);
                   pingPongStarted = false;
                 }
               }
-            }
+            };
           }(pingNextNum))
-        }
+        };
         send(request);
       } else {
         console.log("Trying to send ping, but ping is not enabled");
@@ -873,50 +876,50 @@ function KurentoClient(ws_uri, options, callback) {
     var closed = false;
     var reconnected = false;
     var re = reconnect({
-        // all options are optional
-        // initialDelay: 1e3,
-        // maxDelay: 30e3,
-        // type: 'fibonacci',      // available: fibonacci, exponential
-        // randomisationFactor: 0,
-        // immediate: false
-        failAfter: failAfter
-      }, function (ws_stream) {
-        if (closed)
-          ws_stream.writable = false;
+      // all options are optional
+      // initialDelay: 1e3,
+      // maxDelay: 30e3,
+      // type: 'fibonacci',      // available: fibonacci, exponential
+      // randomisationFactor: 0,
+      // immediate: false
+      failAfter: failAfter
+    }, function (ws_stream) {
+      if (closed)
+        ws_stream.writable = false;
 
-        rpc.transport = ws_stream;
-        enablePing();
-        if (reconnected) {
-          var params = {
-            sessionId: self.sessionId
-          };
-          var request = {
-            method: 'connect',
-            params: params,
-            callback: function (error, response) {
-              if (error) {
-                if (error.code === INVALID_SESSION) {
-                  console.log("Invalid Session")
-                  objects = {}
-                  onReconnected(false);
-                }
-              } else {
-                onReconnected(true);
+      rpc.transport = ws_stream;
+      enablePing();
+      if (reconnected) {
+        var params = {
+          sessionId: self.sessionId
+        };
+        var request = {
+          method: 'connect',
+          params: params,
+          callback: function (error, response) {
+            if (error) {
+              if (error.code === INVALID_SESSION) {
+                console.log("Invalid Session");
+                objects = {};
+                onReconnected(false);
               }
+            } else {
+              onReconnected(true);
             }
           }
-          send(request);
-        } else {
-          onConnected();
-        }
-      })
+        };
+        send(request);
+      } else {
+        onConnected();
+      }
+    })
       .connect(ws_uri);
 
     Object.defineProperty(this, '_re', {
       get: function () {
-        return re
+        return re;
       }
-    })
+    });
 
     /**
      * @function module:kurentoClient.KurentoClient#close
@@ -937,7 +940,7 @@ function KurentoClient(ws_uri, options, callback) {
       }
 
       reconnected = true;
-    })
+    });
 
     //
     // Promise interface ("thenable")
@@ -953,11 +956,11 @@ function KurentoClient(ws_uri, options, callback) {
      */
     this.then = function (onFulfilled, onRejected) {
       if (re.connected)
-        var promise = Promise.resolve(disguise.unthenable(this))
+        var promise = Promise.resolve(disguise.unthenable(this));
       else if (!re.reconnect)
-        var promise = Promise.reject(new Error('Connection error'))
+        var promise = Promise.reject(new Error('Connection error'));
       else {
-        var self = this
+        var self = this;
 
         var promise = new Promise(function (resolve, reject) {
           function success() {
@@ -975,19 +978,18 @@ function KurentoClient(ws_uri, options, callback) {
           re.once('connection', success);
           re.once('fail', failure);
         });
-
       }
 
-      promise = promise.then(onFulfilled ? onFulfilled.bind(this) :
-        function (result) {
-          return Promise.resolve(result)
+      promise = promise.then(onFulfilled ? onFulfilled.bind(this)
+        : function (result) {
+          return Promise.resolve(result);
         },
-        onRejected ? onRejected.bind(this) :
-        function (error) {
-          return Promise.reject(error)
+      onRejected ? onRejected.bind(this)
+        : function (error) {
+          return Promise.reject(error);
         });
 
-      return disguise(promise, this)
+      return disguise(promise, this);
     };
 
     /**
@@ -1001,41 +1003,43 @@ function KurentoClient(ws_uri, options, callback) {
 
     // Check for available modules in the Kurento Media Server
 
-    var thenable = this
+    var thenable = this;
     if (options.strict)
       thenable = this.getServerManager()
-      .then(function (serverManager) {
-        return serverManager.getInfo()
-      })
-      .then(function (info) {
-        var serverModules = info.modules.map(function (module) {
-          return module.name
+        .then(function (serverManager) {
+          return serverManager.getInfo();
         })
+        .then(function (info) {
+          var serverModules = info.modules.map(function (module) {
+            return module.name;
+          });
 
-        var notInstalled = KurentoClient.register.modules.filter(
-          function (module) {
-            return serverModules.indexOf(module) < 0
-          })
+          var notInstalled = KurentoClient.register.modules.filter(
+            function (module) {
+              return serverModules.indexOf(module) < 0;
+            }
+          );
 
-        var length = notInstalled.length
-        if (length) {
-          if (length === 1)
-            var message = "Module '" + notInstalled[0] +
-              "' is not installed in the Kurento Media Server"
-          else
-            var message = "Modules '" + notInstalled.slice(0, -1).join(
-                "', '") +
-              "' and '" + notInstalled[length - 1] +
-              "' are not installed in the Kurento Media Server"
+          var length = notInstalled.length;
+          if (length) {
+            if (length === 1)
+              var message = "Module '" + notInstalled[0]
+              + "' is not installed in the Kurento Media Server";
+            else
+              var message = "Modules '" + notInstalled.slice(0, -1).join(
+                "', '"
+              )
+              + "' and '" + notInstalled[length - 1]
+              + "' are not installed in the Kurento Media Server";
 
-          var error = new SyntaxError(message)
-          error.modules = notInstalled
+            var error = new SyntaxError(message);
+            error.modules = notInstalled;
 
-          return Promise.reject(error)
-        }
+            return Promise.reject(error);
+          }
 
-        return Promise.resolve(self)
-      })
+          return Promise.resolve(self);
+        });
 
     promiseCallback(thenable, callback);
   };
@@ -1064,17 +1068,17 @@ inherits(KurentoClient, EventEmitter);
 KurentoClient.prototype.connect = function (media, callback) {
   if (!(media instanceof Array)) {
     media = Array.prototype.slice.call(arguments, 0);
-    callback = (typeof media[media.length - 1] === 'function') ? media.pop() :
-      undefined;
+    callback = (typeof media[media.length - 1] === 'function') ? media.pop()
+      : undefined;
   }
 
-  callback = (callback || noop).bind(this)
+  callback = (callback || noop).bind(this);
 
   // Check if we have enought media components
   if (media.length < 2)
     throw new SyntaxError("Need at least two media elements to connect");
 
-  return media[0].connect(media.slice(1), callback)
+  return media[0].connect(media.slice(1), callback);
 };
 /**
  * @callback module:kurentoClient.KurentoClient~connectCallback
@@ -1091,7 +1095,7 @@ KurentoClient.prototype.connect = function (media, callback) {
  * @return {external:Promise}
  */
 KurentoClient.prototype.getServerManager = function (callback) {
-  return this.getMediaobjectById('manager_ServerManager', callback)
+  return this.getMediaobjectById('manager_ServerManager', callback);
 };
 /**
  * @callback module:kurentoClient.KurentoClient~getServerManagerCallback
@@ -1118,7 +1122,7 @@ var singletons = {};
  * @return {external:Promise}
  */
 KurentoClient.getSingleton = function (ws_uri, options, callback) {
-  var client = singletons[ws_uri]
+  var client = singletons[ws_uri];
   if (!client) {
     // Fix optional parameters
     if (options instanceof Function) {
@@ -1129,15 +1133,15 @@ KurentoClient.getSingleton = function (ws_uri, options, callback) {
     client = KurentoClient(ws_uri, options, function (error, client) {
       if (error) return callback(error);
 
-      singletons[ws_uri] = client
+      singletons[ws_uri] = client;
       client.on('disconnect', function () {
-        delete singletons[ws_uri]
-      })
+        delete singletons[ws_uri];
+      });
     });
   }
 
-  return disguise(promiseCallback(client, callback), client)
-}
+  return disguise(promiseCallback(client, callback), client);
+};
 
 /**
  * Get a complexType across the qualified name
@@ -1149,7 +1153,7 @@ KurentoClient.getSingleton = function (ws_uri, options, callback) {
  * @return {module:core/complexType}
  */
 KurentoClient.getComplexType = function (complexType) {
-  return KurentoClient.register.complexTypes[complexType]
+  return KurentoClient.register.complexTypes[complexType];
 };
 
 // Export KurentoClient
