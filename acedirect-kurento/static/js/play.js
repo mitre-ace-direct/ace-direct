@@ -1,23 +1,22 @@
-window.addEventListener('load', function(event) {
-  console = new Console()
+window.addEventListener('load', function (event) {
+  console = new Console();
 });
 
-window.onload = function(){
+window.onload = function () {
   var playButtonv1 = document.getElementById('play');
   var playButtonv2 = document.getElementById('play2');
   var playButtonBoth = document.getElementById('play-both');
   playButtonv1.addEventListener('click', startPlaying);
   playButtonv2.addEventListener('click', startPlaying2);
   playButtonBoth.addEventListener('click', playBoth);
-}
+};
 
 function playBoth() {
   startPlaying();
   startPlaying2();
 }
 
-function startPlaying()
-{
+function startPlaying() {
   console.log("Start playing");
   var videoPlayer = document.getElementById('videoOutput');
   showSpinner(videoPlayer);
@@ -29,7 +28,7 @@ function startPlaying()
   xhr.addEventListener("readystatechange", function () {
     if (this.readyState === 4) {
       let response = JSON.parse(this.responseText);
-      console.log(response)
+      console.log(response);
       console.log(response[response.length - 1].url);
       hideSpinner(videoPlayer);
       videoPlayer.src = response[response.length - 1].url;
@@ -41,8 +40,7 @@ function startPlaying()
   xhr.send(data);
 }
 
-function startPlaying2()
-{
+function startPlaying2() {
   console.log("Start playing");
 
   var videoPlayer2 = document.getElementById('videoOutput2');
@@ -78,7 +76,7 @@ function startPlaying2()
 }
 
 function onError(error) {
-  if(error) console.log(error);
+  if (error) console.log(error);
 }
 
 function showSpinner() {
@@ -99,7 +97,7 @@ function hideSpinner() {
 /**
  * Lightbox utility (to display media pipeline image in a modal dialog)
  */
-$(document).delegate('*[data-toggle="lightbox"]', 'click', function(event) {
+$(document).delegate('*[data-toggle="lightbox"]', 'click', function (event) {
   event.preventDefault();
   $(this).ekkoLightbox();
 });
