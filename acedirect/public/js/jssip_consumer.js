@@ -222,8 +222,8 @@ function terminateCall() {
   $('#screenshareButtonGroup').hide();
   clearScreen();
   removeVideo();
-  disable_chat_buttons();
-  enable_initial_buttons();
+  disableChatButtons();
+  enableInitialButtons();
   $('#start-call-buttons').show();
   $('#agent-name-box').hide();
   $('#agent-name').text('');
@@ -394,8 +394,8 @@ function registerJssip(myExtension, myPassword) {
 
       terminateCall();
       clearScreen();
-      disable_chat_buttons();
-      enable_initial_buttons();
+      disableChatButtons();
+      enableInitialButtons();
       $('#start-call-buttons').show();
       $('#agent-name-box').hide();
       $('#agent-name').text('');
