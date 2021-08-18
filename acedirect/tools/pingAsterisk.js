@@ -1,21 +1,21 @@
 const AmiClient = require('asterisk-ami-client');
 
 const nconf = require('nconf');
-const fs = require('fs');
-const asteriskManager = require('asterisk-manager');
+// const fs = require('fs');
+// const asteriskManager = require('asterisk-manager');
 
 const client = new AmiClient();
 
 let cfile = '';
 if (process.argv.length === 3) {
-  cfile = process.argv[2];
+  [, , cfile] = process.argv;
 } else {
   console.log('\nusage: node pingAsterisk.js  <config file path>\n');
   process.exit(process.argv.length);
 }
 
-const content = fs.readFileSync(cfile, 'utf8');
-const myjson = JSON.parse(content);
+// const content = fs.readFileSync(cfile, 'utf8');
+// const myjson = JSON.parse(content);
 nconf.file({
   file: cfile
 });
