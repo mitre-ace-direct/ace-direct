@@ -72,7 +72,7 @@ var C = {
  */
 
 module.exports =
-/*#__PURE__*/
+/* #__PURE__ */
 function (_EventEmitter) {
   _inherits(UA, _EventEmitter);
 
@@ -119,7 +119,6 @@ function (_EventEmitter) {
       throw new TypeError('Not enough arguments');
     } // Load configuration.
 
-
     try {
       _this._loadConfig(configuration);
     } catch (e) {
@@ -127,7 +126,6 @@ function (_EventEmitter) {
       _this._error = C.CONFIGURATION_ERROR;
       throw e;
     } // Initialize registrator.
-
 
     _this._registrator = new Registrator(_assertThisInitialized(_assertThisInitialized(_this)));
     return _this;
@@ -158,7 +156,6 @@ function (_EventEmitter) {
           this._transport.disconnect();
         } // Reconnect.
 
-
         this._status = C.STATUS_INIT;
 
         this._transport.connect();
@@ -167,7 +164,6 @@ function (_EventEmitter) {
       } else {
         debug('ERROR: connection is down, Auto-Recovery system is trying to reconnect');
       } // Set dynamic configuration.
-
 
       this._dynConfiguration.register = this._configuration.register;
     }
@@ -293,9 +289,7 @@ function (_EventEmitter) {
         return;
       } // Close registrator.
 
-
       this._registrator.close(); // If there are session wait a bit so CANCEL/BYE can be sent and their responses received.
-
 
       var num_sessions = Object.keys(this._sessions).length; // Run  _terminate_ on every Session.
 
@@ -309,11 +303,12 @@ function (_EventEmitter) {
         }
       } // Run  _close_ on every applicant.
 
-
       for (var applicant in this._applicants) {
-        if (Object.prototype.hasOwnProperty.call(this._applicants, applicant)) try {
-          this._applicants[applicant].close();
-        } catch (error) {}
+        if (Object.prototype.hasOwnProperty.call(this._applicants, applicant)) {
+          try {
+            this._applicants[applicant].close();
+          } catch (error) {}
+        }
       }
 
       this._status = C.STATUS_USER_CLOSED;
@@ -369,35 +364,35 @@ function (_EventEmitter) {
     value: function set(parameter, value) {
       switch (parameter) {
         case 'password':
-          {
-            this._configuration.password = String(value);
-            break;
-          }
+        {
+          this._configuration.password = String(value);
+          break;
+        }
 
         case 'realm':
-          {
-            this._configuration.realm = String(value);
-            break;
-          }
+        {
+          this._configuration.realm = String(value);
+          break;
+        }
 
         case 'ha1':
-          {
-            this._configuration.ha1 = String(value); // Delete the plain SIP password.
+        {
+          this._configuration.ha1 = String(value); // Delete the plain SIP password.
 
-            this._configuration.password = null;
-            break;
-          }
+          this._configuration.password = null;
+          break;
+        }
 
         case 'display_name':
-          {
-            if (Grammar.parse("\"".concat(value, "\""), 'display_name') === -1) {
-              debugerror('set() | wrong "display_name"');
-              return false;
-            }
-
-            this._configuration.display_name = value;
-            break;
+        {
+          if (Grammar.parse("\"".concat(value, "\""), 'display_name') === -1) {
+            debugerror('set() | wrong "display_name"');
+            return false;
           }
+
+          this._configuration.display_name = value;
+          break;
+        }
 
         default:
           debugerror('set() | cannot set "%s" parameter in runtime', parameter);
@@ -538,17 +533,14 @@ function (_EventEmitter) {
         return;
       } // Check request URI scheme.
 
-
       if (request.ruri.scheme === JsSIP_C.SIPS) {
         request.reply_sl(416);
         return;
       } // Check transaction.
 
-
       if (Transactions.checkTransaction(this, request)) {
         return;
       } // Create the server transaction.
-
 
       if (method === JsSIP_C.INVITE) {
         /* eslint-disable no-new */
@@ -564,7 +556,6 @@ function (_EventEmitter) {
        * received within a dialog (for example, an OPTIONS request).
        * They are processed as if they had been received outside the dialog.
        */
-
 
       if (method === JsSIP_C.OPTIONS) {
         request.reply(200);
@@ -591,26 +582,26 @@ function (_EventEmitter) {
         switch (method) {
           case JsSIP_C.INVITE:
             // if (window.RTCPeerConnection) {
-              // TODO
-              if (request.hasHeader('replaces')) {
-                var replaces = request.replaces;
-                dialog = this._findDialog(replaces.call_id, replaces.from_tag, replaces.to_tag);
+            // TODO
+            if (request.hasHeader('replaces')) {
+              var replaces = request.replaces;
+              dialog = this._findDialog(replaces.call_id, replaces.from_tag, replaces.to_tag);
 
-                if (dialog) {
-                  session = dialog.owner;
+              if (dialog) {
+                session = dialog.owner;
 
-                  if (!session.isEnded()) {
-                    session.receiveRequest(request);
-                  } else {
-                    request.reply(603);
-                  }
+                if (!session.isEnded()) {
+                  session.receiveRequest(request);
                 } else {
-                  request.reply(481);
+                  request.reply(603);
                 }
               } else {
-                session = new RTCSession(this);
-                session.init_incoming(request);
+                request.reply(481);
               }
+            } else {
+              session = new RTCSession(this);
+              session.init_incoming(request);
+            }
             // } else {
             //   debugerror('INVITE received but WebRTC is not supported');
             //   request.reply(488);
@@ -647,29 +638,29 @@ function (_EventEmitter) {
         }
       } // In-dialog request.
       else {
-          dialog = this._findDialog(request.call_id, request.from_tag, request.to_tag);
+        dialog = this._findDialog(request.call_id, request.from_tag, request.to_tag);
 
-          if (dialog) {
-            dialog.receiveRequest(request);
-          } else if (method === JsSIP_C.NOTIFY) {
-            session = this._findSession(request);
+        if (dialog) {
+          dialog.receiveRequest(request);
+        } else if (method === JsSIP_C.NOTIFY) {
+          session = this._findSession(request);
 
-            if (session) {
-              session.receiveRequest(request);
-            } else {
-              debug('received NOTIFY request for a non existent subscription');
-              request.reply(481, 'Subscription does not exist');
-            }
+          if (session) {
+            session.receiveRequest(request);
+          } else {
+            debug('received NOTIFY request for a non existent subscription');
+            request.reply(481, 'Subscription does not exist');
           }
-          /* RFC3261 12.2.2
+        }
+        /* RFC3261 12.2.2
            * Request with to tag, but no matching dialog found.
            * Exception: ACK for an Invite request for which a dialog has not
            * been created.
            */
-          else if (method !== JsSIP_C.ACK) {
-              request.reply(481);
-            }
+        else if (method !== JsSIP_C.ACK) {
+          request.reply(481);
         }
+      }
     } // =================
     // Utils.
     // =================
@@ -682,8 +673,8 @@ function (_EventEmitter) {
     key: "_findSession",
     value: function _findSession(_ref) {
       var call_id = _ref.call_id,
-          from_tag = _ref.from_tag,
-          to_tag = _ref.to_tag;
+        from_tag = _ref.from_tag,
+        to_tag = _ref.to_tag;
       var sessionIDa = call_id + from_tag;
       var sessionA = this._sessions[sessionIDa];
       var sessionIDb = call_id + to_tag;
@@ -731,16 +722,13 @@ function (_EventEmitter) {
       } // Post Configuration Process.
       // Allow passing 0 number as display_name.
 
-
       if (this._configuration.display_name === 0) {
         this._configuration.display_name = '0';
       } // Instance-id for GRUU.
 
-
       if (!this._configuration.instance_id) {
         this._configuration.instance_id = Utils.newUUID();
       } // Jssip_id instance parameter. Static random tag of length 5.
-
 
       this._configuration.jssip_id = Utils.createRandomToken(5); // String containing this._configuration.uri without scheme and user.
 
@@ -765,7 +753,6 @@ function (_EventEmitter) {
         throw new Exceptions.ConfigurationError('sockets', this._configuration.sockets);
       } // Remove sockets instance from configuration object.
 
-
       delete this._configuration.sockets; // Check whether authorization_user is explicitly defined.
       // Take 'this._configuration.uri.user' value if not.
 
@@ -773,7 +760,6 @@ function (_EventEmitter) {
         this._configuration.authorization_user = this._configuration.uri.user;
       } // If no 'registrar_server' is set use the 'uri' value without user portion and
       // without URI params/headers.
-
 
       if (!this._configuration.registrar_server) {
         var registrar_server = this._configuration.uri.clone();
@@ -784,17 +770,16 @@ function (_EventEmitter) {
         this._configuration.registrar_server = registrar_server;
       } // User no_answer_timeout.
 
-
       this._configuration.no_answer_timeout *= 1000; // Via Host.
 
       if (this._configuration.contact_uri) {
         this._configuration.via_host = this._configuration.contact_uri.host;
       } // Contact URI.
       else {
-          this._configuration.contact_uri = new URI('sip', Utils.createRandomToken(8), this._configuration.via_host, null, {
-            transport: 'ws'
-          });
-        }
+        this._configuration.contact_uri = new URI('sip', Utils.createRandomToken(8), this._configuration.via_host, null, {
+          transport: 'ws'
+        });
+      }
 
       this._contact = {
         pub_gruu: null,
@@ -897,7 +882,6 @@ function (_EventEmitter) {
  */
 // Transport connecting event.
 
-
 function onTransportConnecting(data) {
   this.emit('connecting', data);
 
@@ -914,15 +898,13 @@ function onTransportConnecting(data) {
     console.error(errStr2);
     console.error(errStr3);
     console.error();
-    process.exit(1)
-  } else if (reconnectAttempts > 0) { 
+    process.exit(1);
+  } else if (reconnectAttempts > 0) {
     const warnStr = `*** WARNING - reconnecting to Asterisk. Attempt # ${reconnectAttempts}....`;
     debug(warnStr);
     console.log(warnStr);
   }
-
 } // Transport connected event.
-
 
 function onTransportConnect(data) {
   if (this._status === C.STATUS_USER_CLOSED) {
@@ -937,7 +919,6 @@ function onTransportConnect(data) {
     this._registrator.register();
   }
 } // Transport disconnected event.
-
 
 function onTransportDisconnect(data) {
   // Run _onTransportError_ callback on every client transaction using _transport_.
@@ -963,7 +944,6 @@ function onTransportDisconnect(data) {
   }
 } // Transport data event.
 
-
 function onTransportData(data) {
   var transport = data.transport;
   var message = data.message;
@@ -976,7 +956,6 @@ function onTransportData(data) {
   if (this._status === C.STATUS_USER_CLOSED && message instanceof SIPMessage.IncomingRequest) {
     return;
   } // Do some sanity check.
-
 
   if (!sanityCheck(message, this, transport)) {
     return;
