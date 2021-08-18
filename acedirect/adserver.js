@@ -2101,7 +2101,7 @@ io.sockets.on('connection', (socket) => {
                 languageFrom = language;
                 console.log('language from for user', fromNumber, languageFrom);
                 if (!languageFrom) {
-                  languageFrom = 'en-US'; // default English
+                  languageFrom = 'en'; // default English
                 }
 
                 resolve();
@@ -2117,7 +2117,7 @@ io.sockets.on('connection', (socket) => {
               else {
                 languageTo = language;
                 if (!languageTo) {
-                  languageTo = 'en-US'; // default English
+                  languageTo = 'en'; // default English
                 }
                 resolve();
               }
