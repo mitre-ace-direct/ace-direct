@@ -5,10 +5,10 @@ var turnServerFqdn;
 var turnServerPort;
 var turnServerUser;
 var turnServerPass;
-window.onload = function() {
+window.onload = function () {
   console = new Console();
   // setRegisterState(NOT_REGISTERED);
-  acekurento = new ACEKurento({acekurentoSignalingUrl: 'wss://' + window.location.host + '/signaling'});
+  acekurento = new ACEKurento({ acekurentoSignalingUrl: 'wss://' + window.location.host + '/signaling' });
   var drag = new Draggabilly(document.getElementById('videoSmall'));
   var incomingCall = null;
   var peerOnHold = false;
@@ -24,7 +24,7 @@ window.onload = function() {
 
   document.getElementById('ext').focus();
 
-  document.getElementById('register').addEventListener('click', function() {
+  document.getElementById('register').addEventListener('click', function () {
     stunServerFqdn = document.getElementById("stun-server-fqdn").value;
     stunServerPort = document.getElementById("stun-server-port").value;
     turnServerFqdn = document.getElementById("turn-server-fqdn").value;
@@ -33,7 +33,7 @@ window.onload = function() {
     turnServerPass = document.getElementById("turn-server-password").value;
     acekurento.register(document.getElementById('ext').value, document.getElementById('password').value, document.getElementById('isAgent').checked);
   });
-  document.getElementById('loopback').addEventListener('click', function() {
+  document.getElementById('loopback').addEventListener('click', function () {
     stunServerFqdn = document.getElementById("stun-server-fqdn").value;
     stunServerPort = document.getElementById("stun-server-port").value;
     turnServerFqdn = document.getElementById("turn-server-fqdn").value;
@@ -43,22 +43,22 @@ window.onload = function() {
     // generate a loopback call with random extension
     acekurento.loopback(Math.floor(Math.random() * Math.floor(1000)));
   });
-  document.getElementById('call').addEventListener('click', function() {
+  document.getElementById('call').addEventListener('click', function () {
     acekurento.call(
       document.getElementById('peer').value,
       document.getElementById('skipQueue').checked
     );
   });
-  document.getElementById('terminate').addEventListener('click', function() {
+  document.getElementById('terminate').addEventListener('click', function () {
     acekurento.stop(false);
   });
-  document.getElementById('hold').addEventListener('click', function() {
+  document.getElementById('hold').addEventListener('click', function () {
     this.setAttribute('disabled', '');
-    if(peerOnHold) {
+    if (peerOnHold) {
       acekurento.unhold((success) => {
         peerOnHold = false;
         this.removeAttribute('disabled');
-        if(success) {
+        if (success) {
           document.getElementById('hold-lbl').innerHTML = 'Hold';
         }
       });
@@ -66,21 +66,21 @@ window.onload = function() {
       acekurento.hold((success) => {
         peerOnHold = true;
         this.removeAttribute('disabled');
-        if(success) {
+        if (success) {
           document.getElementById('hold-lbl').innerHTML = 'Unhold';
         }
       });
     }
   });
-  document.getElementById('accept').addEventListener('click', function() {
+  document.getElementById('accept').addEventListener('click', function () {
     incomingCall && incomingCall.accept();
     document.getElementById('prompt').style.visibility = 'hidden';
   });
-  document.getElementById('reject').addEventListener('click', function() {
+  document.getElementById('reject').addEventListener('click', function () {
     incomingCall && incomingCall.reject();
     document.getElementById('prompt').style.visibility = 'hidden';
   });
-  document.getElementById('agentAway').addEventListener('click', function() {
+  document.getElementById('agentAway').addEventListener('click', function () {
     let away = document.getElementById('agentAway').checked;
     console.log('AWAY:', away);
     // activate/deactivate active member from queue
@@ -91,7 +91,7 @@ window.onload = function() {
     }
   });
 
-  document.getElementById('record').addEventListener('click', function() {
+  document.getElementById('record').addEventListener('click', function () {
     if (recording) {
       acekurento.stopRecording();
     } else {
@@ -99,26 +99,26 @@ window.onload = function() {
     }
   });
 
-  document.getElementById('private').addEventListener('click', function() {
+  document.getElementById('private').addEventListener('click', function () {
     if (privateMode) {
       acekurento.privateMode(false);
     } else {
-      if(privateIndex >= privateMedia.length) privateIndex = 0;
+      if (privateIndex >= privateMedia.length) privateIndex = 0;
       acekurento.privateMode(true, privateMedia[privateIndex++]);
     }
     privateMode = !privateMode;
   });
 
-  document.getElementById('invite').addEventListener('click', function(evt) {
+  document.getElementById('invite').addEventListener('click', function (evt) {
     evt.preventDefault();
     acekurento.invitePeer(document.getElementById('peer').value);
   });
 
-  document.getElementById('sipReinvite').addEventListener('click', function() {
+  document.getElementById('sipReinvite').addEventListener('click', function () {
     acekurento.sipReinvite();
   });
 
-  document.getElementById('screenShare').addEventListener('click', function() {
+  document.getElementById('screenShare').addEventListener('click', function () {
     if (acekurento.isScreensharing) {
       acekurento.screenshare(false);
     } else {
@@ -126,7 +126,7 @@ window.onload = function() {
     }
   });
 
-  document.getElementById('transfer').addEventListener('click', function(evt) {
+  document.getElementById('transfer').addEventListener('click', function (evt) {
     // evt.preventDefault();
     acekurento.callTransfer(document.getElementById('peer').value, false);
   });
@@ -139,7 +139,7 @@ window.onload = function() {
 
     'registerResponse': function (error) {
       console.log('--- Register response:', error || 'Success ---');
-      if(!error) {
+      if (!error) {
         document.getElementById('agentAwayConf').classList.remove("invisible");
       }
     },
@@ -163,7 +163,7 @@ window.onload = function() {
       incomingCall = call;
     },
 
-    'progress': function(e) {
+    'progress': function (e) {
       console.log('--- Calling... ---\n');
     },
 
@@ -188,16 +188,16 @@ window.onload = function() {
       }
     },
 
-    'failed': function(e) {
+    'failed': function (e) {
       console.log('--- Failed ---\n' + e);
     },
 
-    'ended': function(e) {
+    'ended': function (e) {
       var pNode = document.getElementById('participants');
       while (pNode.firstChild) {
         pNode.removeChild(pNode.firstChild);
       }
-      console.log('--- Call ended ['+ e.reason +'] ---\n');
+      console.log('--- Call ended [' + e.reason + '] ---\n');
     },
 
     'inviteResponse': function (e) {
@@ -226,7 +226,7 @@ window.onload = function() {
         pNode.removeChild(pNode.firstChild);
       }
 
-      for(var i = 0; i < e.participants.length; i++) {
+      for (var i = 0; i < e.participants.length; i++) {
         var p = e.participants[i];
         var li = document.createElement('li');
         var type = p.type.split(':');
@@ -235,7 +235,7 @@ window.onload = function() {
         li.appendChild(txt);
         pNode.appendChild(li);
       }
-    },
+    }
   };
 
   acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
@@ -246,15 +246,15 @@ window.onload = function() {
 
   audioChk.onclick = function () {
     acekurento.enableDisableTrack(audioChk.checked, true);
-  }
+  };
   videoChk.onclick = function () {
     acekurento.enableDisableTrack(videoChk.checked, false);
-  }
+  };
 
-  if(window.URLSearchParams) {
+  if (window.URLSearchParams) {
     var q = new URLSearchParams(window.location.search);
     var ext = q.get('ext');
-    if(ext) {
+    if (ext) {
       document.getElementById('ext').value = ext;
     }
     var peer = q.get('peer');
@@ -262,4 +262,4 @@ window.onload = function() {
       document.getElementById('peer').value = peer;
     }
   }
-}
+};
