@@ -1,4 +1,5 @@
 'use strict';
+
 module.exports = (sequelize, DataTypes) => {
   const PeerRecording = sequelize.define('PeerRecording', {
     session_id: DataTypes.UUID,

@@ -1,4 +1,5 @@
 'use strict';
+
 module.exports = (sequelize, DataTypes) => {
   const VALID_STAT_KEYS = [
     'bytesReceived',
