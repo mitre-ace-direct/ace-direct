@@ -28,7 +28,7 @@ module.exports = {
       value: {
         type: Sequelize.DECIMAL(15, 5),
         allowNull: false
-      },
+      }
     });
   },
 

@@ -1,4 +1,5 @@
 'use strict';
+
 module.exports = (sequelize, DataTypes) => {
   const WebrtcSession = sequelize.define('WebrtcSession', {
     session_id: {
