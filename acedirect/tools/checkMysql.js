@@ -1,6 +1,6 @@
-const nconf = require('nconf');
+// const nconf = require('nconf');
 const mysql = require('mysql');
-const fs = require('fs');
+// const fs = require('fs');
 
 // get params
 let mysqlFqdn = '';
@@ -8,10 +8,7 @@ let mysqlUser = '';
 let mysqlPass = '';
 let mysqlDb = '';
 if (process.argv.length === 6) {
-  mysqlFqdn = process.argv[2];
-  mysqlUser = process.argv[3];
-  mysqlPass = process.argv[4];
-  mysqlDb = process.argv[5];
+  [, , mysqlFqdn, mysqlUser, mysqlPass, mysqlDb] = process.argv;
 } else {
   console.log('\nusage: node checkMysql.js  <mysql fqdn>  <mysql user>  <mysql password>  <mysql database>\n');
   process.exit(process.argv.length);
