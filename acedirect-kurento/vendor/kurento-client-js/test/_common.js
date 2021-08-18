@@ -87,11 +87,12 @@ Timeout = function Timeout(id, delay, ontimeout) {
   };
 };
 
-const REPORTS_DIR = 'reports'
+const REPORTS_DIR = 'reports';
 
 function writeReport(ext, data) {
   var path = REPORTS_DIR + '/' + QUnit.config.prefix + require(
-    '../package.json').name + '.' + ext
+    '../package.json'
+  ).name + '.' + ext;
 
   require('fs-extra').outputFile(path, data, function (error) {
     if (error) return console.trace(error);
@@ -101,14 +102,14 @@ function writeReport(ext, data) {
 }
 
 function fetchReport(type, report) {
-  var ext = type
-  if (type == 'junit') ext = 'xml'
+  var ext = type;
+  if (type == 'junit') ext = 'xml';
 
-  report = report[ext]
+  report = report[ext];
 
   // Node.js - write report to file
   if (typeof window === 'undefined')
-    writeReport(ext, report)
+    writeReport(ext, report);
 
   // browser - write report to console
   else {
@@ -125,7 +126,7 @@ function fetchReport(type, report) {
 function isDockerContainer(callback) {
   var isDocker = false;
   var cat = spawn('cat', ['/proc/1/cgroup'])
-    .on('error', onerror)
+    .on('error', onerror);
 
   cat.stdout.on('data', function (data) {
     var lines = data.toString('utf8').split('\n');
@@ -157,7 +158,8 @@ function getIpDocker(callback) {
       ip.stdout.pipe(grep.stdin);
       grep.stdout.on('data', function (data) {
         callback(data.toString(
-          "utf8").split(" ")[2])
+          "utf8"
+        ).split(" ")[2]);
       });
     } else {
       var grep = spawn('grep', ['docker']);
@@ -166,11 +168,12 @@ function getIpDocker(callback) {
       ip.stdout.pipe(grep.stdin);
       grep.stdout.on('data', function (data) {
         var ips = data.toString(
-          "utf8").split(" ");
-        callback(ips[ips.length - 2])
+          "utf8"
+        ).split(" ");
+        callback(ips[ips.length - 2]);
       });
     }
-  })
+  });
 }
 
 function getopts(args, opts) {
@@ -179,7 +182,8 @@ function getopts(args, opts) {
     new RegExp("([^?=&]+)(=([^&]*))?", "g"),
     function ($0, $1, $2, $3) {
       result[$1] = decodeURI($3);
-    });
+    }
+  );
 
   return result;
 };
@@ -193,8 +197,8 @@ try {
   });
 } catch (e) {}
 
-QUnit.jUnitReport = fetchReport.bind(undefined, 'junit')
-QUnit.lcovReport = fetchReport.bind(undefined, 'lcov')
+QUnit.jUnitReport = fetchReport.bind(undefined, 'junit');
+QUnit.lcovReport = fetchReport.bind(undefined, 'lcov');
 
 // Tell QUnit what WebSocket servers to use
 
@@ -262,15 +266,15 @@ lifecycle = {
       this.kurento = new kurentoClient(ws_uri, options);
 
       this.kurento.then(function () {
-          this.create('MediaPipeline', function (error, pipeline) {
-            if (error) return onerror(error);
+        this.create('MediaPipeline', function (error, pipeline) {
+          if (error) return onerror(error);
 
-            self.pipeline = pipeline;
+          self.pipeline = pipeline;
 
-            QUnit.start();
-          });
-        },
-        onerror);
+          QUnit.start();
+        });
+      },
+      onerror);
     } else if (scope == "docker") {
       getIpDocker(function (ip) {
         var hostIp = ip;
@@ -297,14 +301,14 @@ lifecycle = {
                 var ipDocker = data.NetworkSettings
                   .IPAddress;
                 ipDocker = hostIp;
-                ws_uri = 'ws://' +
-                  ipDocker +
-                  ":" + ws_port + "/kurento";
+                ws_uri = 'ws://'
+                  + ipDocker
+                  + ":" + ws_port + "/kurento";
                 Timeout.factor = parseFloat(QUnit.config
                   .timeout_factor) || 1;
 
-                QUnit.config.testTimeout = 30000 *
-                  Timeout.factor;
+                QUnit.config.testTimeout = 30000
+                  * Timeout.factor;
 
                 var options = {
                   request_timeout: 5000 * Timeout
@@ -314,21 +318,21 @@ lifecycle = {
                 self.kurento = new kurentoClient(ws_uri,
                   options);
                 self.kurento.then(function () {
-                    this.create('MediaPipeline',
-                      function (error, pipeline) {
-                        if (error) return onerror(
-                          error);
+                  this.create('MediaPipeline',
+                    function (error, pipeline) {
+                      if (error) return onerror(
+                        error
+                      );
 
-                        self.pipeline = pipeline;
+                      self.pipeline = pipeline;
 
-                        QUnit.start();
-                      });
-                  },
-                  onerror);
-
-              })
-            })
-          })
+                      QUnit.start();
+                    });
+                },
+                onerror);
+              });
+            });
+          });
         });
       });
     }
@@ -343,13 +347,13 @@ lifecycle = {
       container.stop(function (error, data) {
         if (error) console.error(error);
         if (error) return onerror(error);
-        console.log("KMS container stopped.")
+        console.log("KMS container stopped.");
         container.remove(function (error, data) {
           if (error) console.error(error);
           if (error) return onerror(error);
-          console.log("KMS container removed.")
+          console.log("KMS container removed.");
           QUnit.start();
-        })
+        });
       });
     } else {
       if (this.pipeline)
