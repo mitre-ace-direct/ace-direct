@@ -490,6 +490,10 @@ function start_call(other_sip_uri) {
     if (document.getElementById('muteAudio').checked === true) {
       mute_audio();
     }
+    $('#outboundCallAlert').hide();
+    if (!captionsMuted()) {
+      show_captions();
+    }
     setTimeout(() => {
       calibrateVideo(2000);
     }, 1000);
