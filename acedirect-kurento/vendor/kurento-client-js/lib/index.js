@@ -28,7 +28,7 @@ require('error-tojson');
 
 var checkType = require('./checkType');
 
-var disguise = require('./disguise')
+var disguise = require('./disguise');
 var MediaObjectCreator = require('./MediaObjectCreator');
 var register = require('./register');
 var TransactionsManager = require('./TransactionsManager');
@@ -56,6 +56,6 @@ KurentoClient.TransactionsManager = TransactionsManager;
 
 // Register Kurento basic elements
 
-register('kurento-client-core')
-register('kurento-client-elements')
-register('kurento-client-filters')
+register('kurento-client-core');
+register('kurento-client-elements');
+register('kurento-client-filters');

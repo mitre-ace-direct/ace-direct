@@ -22,9 +22,9 @@ var Domain = require('domain').Domain || (function () {
   inherits(FakeDomain, require('events').EventEmitter);
   FakeDomain.prototype.run = function (fn) {
     try {
-      fn()
+      fn();
     } catch (err) {
-      this.emit('error', err)
+      this.emit('error', err);
     };
     return this;
   };
@@ -59,7 +59,7 @@ function Transaction(commit) {
 
   Object.defineProperty(this, 'length', {
     get: function () {
-      return operations.length
+      return operations.length;
     }
   });
 
@@ -77,7 +77,7 @@ function Transaction(commit) {
     var promise;
 
     if (this._transactionError)
-      promise = Promise.reject(this._transactionError)
+      promise = Promise.reject(this._transactionError);
 
     else {
       operations.forEach(function (operation) {
@@ -100,14 +100,14 @@ function Transaction(commit) {
 
           if (error) return reject(error);
 
-          resolve(result)
+          resolve(result);
         }
 
         commit(operations, callback);
-      })
+      });
     }
 
-    promise = promiseCallback(promise, callback)
+    promise = promiseCallback(promise, callback);
 
     this.catch = promise.catch.bind(promise);
     this.then = promise.then.bind(promise);
@@ -117,7 +117,7 @@ function Transaction(commit) {
     delete this.endTransaction;
 
     return this;
-  }
+  };
 
   this.rollback = function (callback) {
     Object.defineProperty(this, 'commited', {
@@ -125,7 +125,8 @@ function Transaction(commit) {
     });
 
     var error = new TransactionRollbackException(
-      'Transaction rollback by user');
+      'Transaction rollback by user'
+    );
 
     // Notify error to all the operations in the transaction
     operations.forEach(function (operation) {
@@ -155,7 +156,7 @@ function TransactionsManager(host, commit) {
 
   Object.defineProperty(this, 'length', {
     get: function () {
-      return transactions.length
+      return transactions.length;
     }
   });
 
@@ -181,7 +182,7 @@ function TransactionsManager(host, commit) {
 
   this.push = function (data) {
     transactions[0].push(data);
-  }
+  };
 };
 
 function transactionOperation(method, params, callback) {
@@ -189,12 +190,12 @@ function transactionOperation(method, params, callback) {
     method: method,
     params: params,
     callback: callback
-  }
+  };
 
   var object = params.object;
   if (object) {
     if (object.transactions) {
-      object.transactions.unshift(this)
+      object.transactions.unshift(this);
     } else {
       Object.defineProperty(object, 'transactions', {
         configurable: true,
@@ -210,8 +211,6 @@ module.exports = TransactionsManager;
 
 TransactionsManager.Transaction = Transaction;
 TransactionsManager.transactionOperation = transactionOperation;
-TransactionsManager.TransactionNotExecutedException =
-  TransactionNotExecutedException;
-TransactionsManager.TransactionNotCommitedException =
-  TransactionNotCommitedException;
+TransactionsManager.TransactionNotExecutedException = TransactionNotExecutedException;
+TransactionsManager.TransactionNotCommitedException = TransactionNotCommitedException;
 TransactionsManager.TransactionRollbackException = TransactionRollbackException;
