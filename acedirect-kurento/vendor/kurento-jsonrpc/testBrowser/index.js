@@ -1,55 +1,46 @@
 var METHOD = 'test';
 
+function noop(error, result) {};
 
-
-
-function noop(error, result){};
-
-
-function load()
-{
+function load() {
   var packer = RpcBuilder.packers.JsonRPC;
   var JsonRpcClient = RpcBuilder.clients.JsonRpcClient;
 
   var ws_uri = "ws://localhost:8888/kurento";
 
-  function connectCallback(){
-   connected = true;
+  function connectCallback() {
+    connected = true;
   }
 
-  function disconnectCallback(){
+  function disconnectCallback() {
     connected = false;
   }
 
   nodeunit.run({
     'encode JsonRPC 2.0':
     {
-      setUp: function(callback)
-      {
+      setUp: function (callback) {
         this.rpcBuilder = new RpcBuilder(packer);
 
         callback();
       },
 
-      tearDown: function(callback)
-      {
+      tearDown: function (callback) {
         this.rpcBuilder.close();
 
         callback();
       },
 
-
-      'notification': function(test)
-      {
+      'notification': function (test) {
         test.expect(5);
 
         var notification = this.rpcBuilder.encode(METHOD);
 
         test.deepEqual(JSON.parse(notification),
-        {
-          jsonrpc: '2.0',
-          method: METHOD
-        });
+          {
+            jsonrpc: '2.0',
+            method: METHOD
+          });
 
         // Test notification
         notification = this.rpcBuilder.decode(notification);
@@ -63,18 +54,17 @@ function load()
         test.done();
       },
 
-      'request': function(test)
-      {
+      'request': function (test) {
         test.expect(5);
 
         var request = this.rpcBuilder.encode(METHOD, noop);
 
         test.deepEqual(JSON.parse(request),
-        {
-          jsonrpc: '2.0',
-          method: METHOD,
-          id: 0
-        });
+          {
+            jsonrpc: '2.0',
+            method: METHOD,
+            id: 0
+          });
 
         // Test request
         request = this.rpcBuilder.decode(request);
@@ -88,12 +78,10 @@ function load()
         test.done();
       },
 
-      'request timeout': function(test)
-      {
+      'request timeout': function (test) {
         test.expect(2);
 
-        var request = this.rpcBuilder.encode(METHOD, function(error, result)
-        {
+        var request = this.rpcBuilder.encode(METHOD, function (error, result) {
           test.notEqual(error, undefined);
           test.deepEqual(error.request, request);
 
@@ -101,18 +89,15 @@ function load()
         });
       },
 
-      'request timeout and retry': function(test)
-      {
+      'request timeout and retry': function (test) {
         var self = this;
 
         test.expect(4);
 
         var gotError = false;
 
-        var request = this.rpcBuilder.encode(METHOD, function(error, result)
-        {
-          if(!gotError)
-          {
+        var request = this.rpcBuilder.encode(METHOD, function (error, result) {
+          if (!gotError) {
             gotError = true;
 
             test.notEqual(error, undefined);
@@ -128,10 +113,7 @@ function load()
 
             // Process response by 'client'
             self.rpcBuilder.decode(response);
-          }
-
-          else
-          {
+          } else {
             test.equal(error, undefined);
 
             test.done();
@@ -139,25 +121,21 @@ function load()
         });
       },
 
-      'cancel request': function(test)
-      {
+      'cancel request': function (test) {
         test.expect(0);
 
-        var request = this.rpcBuilder.encode(METHOD, function(error, result)
-        {
+        var request = this.rpcBuilder.encode(METHOD, function (error, result) {
           test.ifError(error);
         });
 
         this.rpcBuilder.cancel(request);
 
-        setTimeout(function()
-        {
+        setTimeout(function () {
           test.done();
-        }, 6*1000)
+        }, 6 * 1000);
       },
 
-      'duplicated request': function(test)
-      {
+      'duplicated request': function (test) {
         test.expect(3);
 
         var request = this.rpcBuilder.encode(METHOD, noop);
@@ -178,8 +156,7 @@ function load()
         test.done();
       },
 
-      'duplicated request with transport': function(test)
-      {
+      'duplicated request with transport': function (test) {
         test.expect(2);
 
         var request = this.rpcBuilder.encode(METHOD, noop);
@@ -190,8 +167,7 @@ function load()
 
         var reply1 = request1.reply(null, null);
 
-        var request2 = this.rpcBuilder.decode(request, function(reply2)
-        {
+        var request2 = this.rpcBuilder.decode(request, function (reply2) {
           test.deepEqual(reply1, reply2);
 
           test.done();
@@ -199,8 +175,7 @@ function load()
         test.equal(request2, undefined);
       },
 
-      'override duplicated request': function(test)
-      {
+      'override duplicated request': function (test) {
         test.expect(4);
 
         var request = this.rpcBuilder.encode(METHOD, noop);
@@ -222,12 +197,10 @@ function load()
         test.done();
       },
 
-      'response': function(test)
-      {
+      'response': function (test) {
         test.expect(2);
 
-        var request = this.rpcBuilder.encode(METHOD, function(error, result)
-        {
+        var request = this.rpcBuilder.encode(METHOD, function (error, result) {
           test.equal(result, null);
         });
 
@@ -247,12 +220,10 @@ function load()
         test.done();
       },
 
-      'duplicate response': function(test)
-      {
+      'duplicate response': function (test) {
         test.expect(3);
 
-        var request = this.rpcBuilder.encode(METHOD, function(error, result)
-        {
+        var request = this.rpcBuilder.encode(METHOD, function (error, result) {
           test.equal(result, null);
         });
 
@@ -275,14 +246,12 @@ function load()
         test.done();
       },
 
-      'request reply response': function(test)
-      {
+      'request reply response': function (test) {
         test.expect(3);
 
-        var value = {'asdf': 'qwert'};
+        var value = { 'asdf': 'qwert' };
 
-        var request = this.rpcBuilder.encode(METHOD, function(error, result)
-        {
+        var request = this.rpcBuilder.encode(METHOD, function (error, result) {
           test.deepEqual(result, value);
         });
 
@@ -293,11 +262,11 @@ function load()
 
         // Test response message
         test.deepEqual(JSON.parse(response),
-        {
-          jsonrpc: '2.0',
-          result: value,
-          id: 0
-        });
+          {
+            jsonrpc: '2.0',
+            result: value,
+            id: 0
+          });
 
         response = this.rpcBuilder.decode(response);
 
@@ -307,31 +276,28 @@ function load()
         test.done();
       },
 
-      'reply with transport': function(test)
-      {
+      'reply with transport': function (test) {
         test.expect(4);
 
         var self = this;
 
-        var value = {'asdf': 'qwert'};
+        var value = { 'asdf': 'qwert' };
 
-        var request = this.rpcBuilder.encode(METHOD, function(error, result)
-        {
+        var request = this.rpcBuilder.encode(METHOD, function (error, result) {
           test.deepEqual(result, value);
         });
 
         // Response request
         request = this.rpcBuilder.decode(request);
 
-        var response = request.reply(null, value, function(message)
-        {
+        var response = request.reply(null, value, function (message) {
           // Test response message
           test.deepEqual(JSON.parse(message),
-          {
-            jsonrpc: '2.0',
-            result: value,
-            id: 0
-          });
+            {
+              jsonrpc: '2.0',
+              result: value,
+              id: 0
+            });
 
           message = self.rpcBuilder.decode(message);
 
@@ -345,29 +311,26 @@ function load()
         test.done();
       },
 
-      'decode with transport': function(test)
-      {
+      'decode with transport': function (test) {
         test.expect(4);
 
         var self = this;
 
-        var value = {'asdf': 'qwert'};
+        var value = { 'asdf': 'qwert' };
 
-        var request = this.rpcBuilder.encode(METHOD, function(error, result)
-        {
+        var request = this.rpcBuilder.encode(METHOD, function (error, result) {
           test.deepEqual(result, value);
         });
 
         // Response request
-        request = this.rpcBuilder.decode(request, function(message)
-        {
+        request = this.rpcBuilder.decode(request, function (message) {
           // Test response message
           test.deepEqual(JSON.parse(message),
-          {
-            jsonrpc: '2.0',
-            result: value,
-            id: 0
-          });
+            {
+              jsonrpc: '2.0',
+              result: value,
+              id: 0
+            });
 
           message = self.rpcBuilder.decode(message);
 
@@ -383,38 +346,36 @@ function load()
         test.done();
       },
 
-      'transport with message event': function(test)
-      {
+      'transport with message event': function (test) {
         test.expect(2);
 
         var self = this;
 
-        var value = {'asdf': 'qwert'};
+        var value = { 'asdf': 'qwert' };
 
         var transport = new EventTarget;
-            transport.onmessage = null;
-            transport.send = function(message)
-            {
-              message = JSON.parse(message);
+        transport.onmessage = null;
+        transport.send = function (message) {
+          message = JSON.parse(message);
 
-              var event =
+          var event =
               {
                 type: 'message',
                 data: JSON.stringify(
-                {
-                  jsonrpc: '2.0',
-                  result: message.params,
-                  id: 0
-                })
+                  {
+                    jsonrpc: '2.0',
+                    result: message.params,
+                    id: 0
+                  }
+                )
               };
 
-              this.dispatchEvent(event);
-            };
+          this.dispatchEvent(event);
+        };
 
         this.rpcBuilder.setTransport(transport);
 
-        var request = this.rpcBuilder.encode(METHOD, value, function(error, result)
-        {
+        var request = this.rpcBuilder.encode(METHOD, value, function (error, result) {
           test.ifError(error);
 
           test.deepEqual(result, value);
@@ -426,16 +387,14 @@ function load()
         test.equal(request, undefined);
       },
 
-      'request event': function(test)
-      {
+      'request event': function (test) {
         test.expect(1);
 
         var transport = new EventTarget;
-            transport.onmessage = null;
+        transport.onmessage = null;
 
         this.rpcBuilder.setTransport(transport);
-        this.rpcBuilder.on('request', function(request)
-        {
+        this.rpcBuilder.on('request', function (request) {
           test.deepEqual(request.method, METHOD);
 
           test.done();
@@ -445,51 +404,48 @@ function load()
         {
           type: 'message',
           data: JSON.stringify(
-          {
-            jsonrpc: '2.0',
-            method: METHOD
-          })
+            {
+              jsonrpc: '2.0',
+              method: METHOD
+            }
+          )
         };
         transport.dispatchEvent(event);
       }
       ,
 
-  'create JsonRpcClientWs with WS': function(test)
-  {
-    test.expect(1);
+      'create JsonRpcClientWs with WS': function (test) {
+        test.expect(1);
 
-    var configuration = {
-      sendCloseMessage : false,
-      ws : {
-        uri : ws_uri,
-        useSockJS: false,
-        onconnected : connectCallback,
-        ondisconnect : disconnectCallback,
-        onreconnecting : disconnectCallback,
-        onreconnected : connectCallback
-      },
-      rpc : {
-        requestTimeout : 15000
+        var configuration = {
+          sendCloseMessage: false,
+          ws: {
+            uri: ws_uri,
+            useSockJS: false,
+            onconnected: connectCallback,
+            ondisconnect: disconnectCallback,
+            onreconnecting: disconnectCallback,
+            onreconnected: connectCallback
+          },
+          rpc: {
+            requestTimeout: 15000
+          }
+        };
+
+        var jsonRpcClientWs = new JsonRpcClient(configuration);
+
+        test.ok(jsonRpcClientWs instanceof JsonRpcClient);
+
+        setTimeout(function () {
+          jsonRpcClientWs.close();
+          test.done();
+        }, 4 * 1000);
       }
-    };
-
-    var jsonRpcClientWs = new JsonRpcClient(configuration);
-
-    test.ok(jsonRpcClientWs instanceof JsonRpcClient);
-
-    setTimeout(function()
-    {
-      jsonRpcClientWs.close();
-      test.done();
-    }, 4*1000)
-
-  }
     }
   });
 }
 
-
-if(window.addEventListener)
+if (window.addEventListener)
   window.addEventListener('load', load, false);
-else if(window.attachEvent)
+else if (window.attachEvent)
   window.attachEvent('onload', load);
