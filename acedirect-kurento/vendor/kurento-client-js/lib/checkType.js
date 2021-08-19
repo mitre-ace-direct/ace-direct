@@ -23,14 +23,14 @@
 if (!Number.isInteger) {
   Number.isInteger = function isInteger(nVal) {
     return typeof nVal === "number" && isFinite(nVal) && nVal > -
-      9007199254740992 && nVal < 9007199254740992 && Math.floor(nVal) ===
-      nVal;
+    9007199254740992 && nVal < 9007199254740992 && Math.floor(nVal)
+      === nVal;
   };
 }
 
 function ChecktypeError(key, type, value) {
-  return SyntaxError(key + ' param should be a ' + (type.name || type) +
-    ', not ' + value.constructor.name);
+  return SyntaxError(key + ' param should be a ' + (type.name || type)
+    + ', not ' + value.constructor.name);
 }
 
 //
@@ -43,7 +43,7 @@ function checkArray(type, key, value) {
 
   value.forEach(function (item, i) {
     checkType(type, key + '[' + i + ']', item);
-  })
+  });
 };
 
 function checkBoolean(key, value) {
@@ -87,7 +87,6 @@ function checkType(type, key, value, options) {
     //    throw TypeError("Could not check "+key+", unknown type "+type);
   } else if (options.required)
     throw SyntaxError(key + " param is required");
-
 };
 
 function checkParams(params, scheme, class_name) {
