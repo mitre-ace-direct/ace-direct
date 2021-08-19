@@ -58,34 +58,34 @@ QUnit.asyncTest('Record, Pause & Stop with Callback', function () {
   QUnit.expect(4);
 
   self.pipeline.create(QUnit.config.prefix + 'RecorderEndpoint', {
-      uri: URL_SMALL
-    },
-    function (error, recorder) {
+    uri: URL_SMALL
+  },
+  function (error, recorder) {
+    if (error) return onerror(error);
+
+    QUnit.notEqual(recorder, undefined, 'recorder');
+
+    return recorder.record(function (error) {
+      QUnit.equal(error, undefined, 'record');
+
       if (error) return onerror(error);
 
-      QUnit.notEqual(recorder, undefined, 'recorder');
-
-      return recorder.record(function (error) {
-        QUnit.equal(error, undefined, 'record');
+      return recorder.pause(function (error) {
+        QUnit.equal(error, undefined, 'pause');
 
         if (error) return onerror(error);
 
-        return recorder.pause(function (error) {
-          QUnit.equal(error, undefined, 'pause');
+        return recorder.stop(function (error) {
+          QUnit.equal(error, undefined, 'stop');
 
           if (error) return onerror(error);
 
-          return recorder.stop(function (error) {
-            QUnit.equal(error, undefined, 'stop');
-
-            if (error) return onerror(error);
-
-            QUnit.start();
-          });
+          QUnit.start();
         });
       });
-    })
-    .catch(onerror)
+    });
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Record, Pause & Stop with Promise', function () {
@@ -94,27 +94,25 @@ QUnit.asyncTest('Record, Pause & Stop with Promise', function () {
   QUnit.expect(1);
 
   self.pipeline.create(QUnit.config.prefix + 'RecorderEndpoint', {
-      uri: URL_SMALL
-    }).then(function (recorder) {
+    uri: URL_SMALL
+  }).then(function (recorder) {
+    QUnit.notEqual(recorder, undefined, 'recorder');
 
-      QUnit.notEqual(recorder, undefined, 'recorder');
-
-      return recorder.record().then(function () {
-        return recorder.pause().then(function () {
-          return recorder.stop().then(function () {
-
-            QUnit.start();
-          }, function(error) {
-              if (error) return onerror(error)
-            });
-        }, function(error) {
-            if (error) return onerror(error)
-         });
-      }, function(error) {
-          if (error) return onerror(error)
+    return recorder.record().then(function () {
+      return recorder.pause().then(function () {
+        return recorder.stop().then(function () {
+          QUnit.start();
+        }, function (error) {
+          if (error) return onerror(error);
         });
-    })
-    .catch(onerror)
+      }, function (error) {
+        if (error) return onerror(error);
+      });
+    }, function (error) {
+      if (error) return onerror(error);
+    });
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('GetUrl with Callback', function () {
@@ -123,20 +121,20 @@ QUnit.asyncTest('GetUrl with Callback', function () {
   QUnit.expect(1);
 
   self.pipeline.create(QUnit.config.prefix + 'RecorderEndpoint', {
-      uri: URL_SMALL
-    },
-    function (error, recorder) {
+    uri: URL_SMALL
+  },
+  function (error, recorder) {
+    if (error) return onerror(error);
+
+    return recorder.getUri(function (error, uri) {
       if (error) return onerror(error);
 
-      return recorder.getUri(function (error, uri) {
-        if (error) return onerror(error);
+      QUnit.equal(uri, URL_SMALL, 'URI: ' + uri);
 
-        QUnit.equal(uri, URL_SMALL, 'URI: ' + uri);
-
-        QUnit.start();
-      });
-    })
-    .catch(onerror)
+      QUnit.start();
+    });
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('GetUrl with Promise', function () {
@@ -145,19 +143,19 @@ QUnit.asyncTest('GetUrl with Promise', function () {
   QUnit.expect(2);
 
   self.pipeline.create(QUnit.config.prefix + 'RecorderEndpoint', {
-      uri: URL_SMALL
-    }).then(function (recorder) {
-      QUnit.notEqual(recorder, undefined, 'recorder');
+    uri: URL_SMALL
+  }).then(function (recorder) {
+    QUnit.notEqual(recorder, undefined, 'recorder');
 
-      return recorder.getUri().then(function (uri) {
-        QUnit.equal(uri, URL_SMALL, 'URI: ' + uri);
+    return recorder.getUri().then(function (uri) {
+      QUnit.equal(uri, URL_SMALL, 'URI: ' + uri);
 
-        QUnit.start();
-      }), function(error) {
-          if (error) return onerror(error)
-        };
-    }, function(error) {
-          if (error) return onerror(error)
-        })
-    .catch(onerror)
+      QUnit.start();
+    }), function (error) {
+      if (error) return onerror(error);
+    };
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });
