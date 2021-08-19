@@ -7,7 +7,7 @@ var modules = [];
 
 function registerAbstracts(classes, hierarchy) {
   for (var name in classes) {
-    var constructor = classes[name]
+    var constructor = classes[name];
 
     // Register constructor checker
     var check = constructor.check;
@@ -30,7 +30,7 @@ function registerClass(name, constructor) {
 
 function registerComplexTypes(types, hierarchy) {
   for (var name in types) {
-    var constructor = types[name]
+    var constructor = types[name];
 
     // Register constructor checker
     var check = constructor.check;
@@ -49,18 +49,18 @@ function registerComplexTypes(types, hierarchy) {
 }
 
 function registerModule(name) {
-  modules.push(name)
-  modules.sort()
+  modules.push(name);
+  modules.sort();
 }
 
 function register(name, constructor) {
   // Adjust parameters
   if (!name)
-    throw SyntaxError('Need to define an object, a module or a function')
+    throw SyntaxError('Need to define an object, a module or a function');
 
   if (typeof name != 'string') {
-    constructor = name
-    name = undefined
+    constructor = name;
+    name = undefined;
   }
 
   // Execute require if we only have a name
@@ -74,39 +74,39 @@ function register(name, constructor) {
   // Registering a function
   if (constructor instanceof Function) {
     // Registration name
-    if (!name) name = constructor.name
+    if (!name) name = constructor.name;
 
     if (name == undefined)
       throw new SyntaxError("Can't register an anonymous module");
 
-    return registerClass(name, constructor)
+    return registerClass(name, constructor);
   }
 
   // Registering a plugin
-  if (!name) name = constructor.name
+  if (!name) name = constructor.name;
 
-  if (name) registerModule(name)
+  if (name) registerModule(name);
 
   for (var key in constructor) {
-    var value = constructor[key]
+    var value = constructor[key];
 
     if (name === 'core' || name === 'elements' || name === 'filters')
-      name = 'kurento'
+      name = 'kurento';
     var hierarchy = name + "." + key;
 
     if (typeof value !== 'string')
       switch (key) {
-      case 'abstracts':
-        registerAbstracts(value, name)
-        break
+        case 'abstracts':
+          registerAbstracts(value, name);
+          break;
 
-      case 'complexTypes':
-        registerComplexTypes(value, name)
-        break
+        case 'complexTypes':
+          registerComplexTypes(value, name);
+          break;
 
-      default:
-        registerClass(hierarchy, value)
-        registerClass(key, value)
+        default:
+          registerClass(hierarchy, value);
+          registerClass(key, value);
       }
   }
 };
