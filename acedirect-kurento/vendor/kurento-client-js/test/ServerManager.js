@@ -58,18 +58,18 @@ QUnit.asyncTest('Server manager getInfo with callback', function (assert) {
   assert.expect(1);
 
   self.kurento.getServerManager(function (error, server) {
-      if (error) return onerror(error);
+    if (error) return onerror(error);
 
-      server.getInfo(function (error, info) {
-        if (error) {
-          return onerror(error)
-        }
-        assert.notEqual(info, undefined, 'Info: ' + info);
+    server.getInfo(function (error, info) {
+      if (error) {
+        return onerror(error);
+      }
+      assert.notEqual(info, undefined, 'Info: ' + info);
 
-        QUnit.start();
-      });
-    })
-    .catch(onerror)
+      QUnit.start();
+    });
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Server manager getInfo with promise', function (assert) {
@@ -78,13 +78,13 @@ QUnit.asyncTest('Server manager getInfo with promise', function (assert) {
   assert.expect(1);
 
   self.kurento.getServerManager().then(function (server) {
-      server.getInfo().then(function (info) {
-        assert.notEqual(info, undefined, 'Info: ' + info);
+    server.getInfo().then(function (info) {
+      assert.notEqual(info, undefined, 'Info: ' + info);
 
-        QUnit.start();
-      });
-    })
-    .catch(onerror)
+      QUnit.start();
+    });
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Server manager getPipelines with promise', function (assert) {
@@ -93,14 +93,14 @@ QUnit.asyncTest('Server manager getPipelines with promise', function (assert) {
   assert.expect(1);
 
   self.kurento.getServerManager().then(function (server) {
-      server.getPipelines().then(function (pipelines) {
-        assert.notEqual(pipelines, undefined, 'Pipelines: ' +
-          pipelines);
+    server.getPipelines().then(function (pipelines) {
+      assert.notEqual(pipelines, undefined, 'Pipelines: '
+          + pipelines);
 
-        QUnit.start();
-      })
-    })
-    .catch(onerror)
+      QUnit.start();
+    });
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Server manager getPipelines with callback', function (assert) {
@@ -109,14 +109,14 @@ QUnit.asyncTest('Server manager getPipelines with callback', function (assert) {
   assert.expect(1);
 
   self.kurento.getServerManager(function (error, server) {
-      if (error) return onerror(error);
+    if (error) return onerror(error);
 
-      server.getPipelines(function (error, pipelines) {
-        assert.notEqual(pipelines, undefined, 'Pipelines: ' +
-          pipelines);
+    server.getPipelines(function (error, pipelines) {
+      assert.notEqual(pipelines, undefined, 'Pipelines: '
+          + pipelines);
 
-        QUnit.start();
-      })
-    })
-    .catch(onerror)
+      QUnit.start();
+    });
+  })
+    .catch(onerror);
 });
