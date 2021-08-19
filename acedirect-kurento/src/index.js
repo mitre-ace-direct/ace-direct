@@ -14,7 +14,7 @@ async function main() {
     const server = new WebServer();
     const amiEnabled = param('asteriskss.ami.enabled');
     const ami = (amiEnabled) ? new AmiManager() : null;
-    server.on('connection', session => {
+    server.on('connection', (session) => {
       ix.register(session, conf, ami);
     });
     await server.start();
