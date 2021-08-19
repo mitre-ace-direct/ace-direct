@@ -66,43 +66,43 @@ QUnit.asyncTest('Detect face in a video with Callback', function () {
   };
 
   self.pipeline.create(QUnit.config.prefix + 'PlayerEndpoint', {
-      uri: URL_POINTER_DETECTOR
-    },
-    function (error, player) {
+    uri: URL_POINTER_DETECTOR
+  },
+  function (error, player) {
+    if (error) return onerror(error);
+
+    QUnit.notEqual(player, undefined, 'player');
+
+    self.pipeline.create(QUnit.config.prefix + 'FaceOverlayFilter', function (error, faceOverlay) {
       if (error) return onerror(error);
 
-      QUnit.notEqual(player, undefined, 'player');
+      QUnit.notEqual(faceOverlay, undefined, 'faceOverlay');
 
-      self.pipeline.create(QUnit.config.prefix + 'FaceOverlayFilter', function (error, faceOverlay) {
+      return player.connect(faceOverlay, function (error) {
+        QUnit.equal(error, undefined, 'connect');
+
         if (error) return onerror(error);
 
-        QUnit.notEqual(faceOverlay, undefined, 'faceOverlay');
-
-        return player.connect(faceOverlay, function (error) {
-          QUnit.equal(error, undefined, 'connect');
+        return player.play(function (error) {
+          QUnit.equal(error, undefined, 'playing');
 
           if (error) return onerror(error);
 
-          return player.play(function (error) {
-            QUnit.equal(error, undefined, 'playing');
-
-            if (error) return onerror(error);
-
-            timeout.start();
-          });
+          timeout.start();
         });
-      })
-      .catch(onerror)
-
-      player.on('EndOfStream', function (data) {
-        QUnit.ok(true, 'EndOfStream');
-
-        timeout.stop();
-
-        QUnit.start();
       });
     })
-    .catch(onerror)
+      .catch(onerror);
+
+    player.on('EndOfStream', function (data) {
+      QUnit.ok(true, 'EndOfStream');
+
+      timeout.stop();
+
+      QUnit.start();
+    });
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Detect face in a video with Promise', function () {
@@ -119,32 +119,32 @@ QUnit.asyncTest('Detect face in a video with Promise', function () {
   };
 
   self.pipeline.create(QUnit.config.prefix + 'PlayerEndpoint', {
-      uri: URL_POINTER_DETECTOR
-    }).then(function (player) {
-      QUnit.notEqual(player, undefined, 'player');
+    uri: URL_POINTER_DETECTOR
+  }).then(function (player) {
+    QUnit.notEqual(player, undefined, 'player');
 
-      self.pipeline.create(QUnit.config.prefix + 'FaceOverlayFilter').then(function (faceOverlay) {
-        QUnit.notEqual(faceOverlay, undefined, 'faceOverlay');
+    self.pipeline.create(QUnit.config.prefix + 'FaceOverlayFilter').then(function (faceOverlay) {
+      QUnit.notEqual(faceOverlay, undefined, 'faceOverlay');
 
-        return player.connect(faceOverlay).then(function () {
-          return player.play().then(function () {
-            timeout.start();
-          });
+      return player.connect(faceOverlay).then(function () {
+        return player.play().then(function () {
+          timeout.start();
         });
-      }, function(error) {
-          if (error) return onerror(error)
-        })
-      .catch(onerror)
-
-      player.on('EndOfStream', function (data) {
-        QUnit.ok(true, 'EndOfStream');
-
-        timeout.stop();
-
-        QUnit.start();
       });
-    }, function(error) {
-        if (error) return onerror(error)
-      })
-    .catch(onerror)
+    }, function (error) {
+      if (error) return onerror(error);
+    })
+      .catch(onerror);
+
+    player.on('EndOfStream', function (data) {
+      QUnit.ok(true, 'EndOfStream');
+
+      timeout.stop();
+
+      QUnit.start();
+    });
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });
