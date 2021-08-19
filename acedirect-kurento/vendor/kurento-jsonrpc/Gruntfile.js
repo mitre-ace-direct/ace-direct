@@ -15,55 +15,52 @@
  *
  */
 
-
-module.exports = function(grunt)
-{
+module.exports = function (grunt) {
   var DIST_DIR = 'dist';
 
   var pkg = grunt.file.readJSON('package.json');
 
-  var bower =
-  {
-    TOKEN:      process.env.TOKEN,
+  var bower = {
+    TOKEN: process.env.TOKEN,
     repository: 'git://github.com/Kurento/<%= pkg.name %>-bower.git'
   };
 
   // Project configuration.
   grunt.initConfig(
-  {
-    pkg:   pkg,
-    bower: bower,
+    {
+      pkg: pkg,
+      bower: bower,
 
-    // Plugins configuration
-    clean:
+      // Plugins configuration
+      clean:
     {
       generated_code: [DIST_DIR, 'src'],
 
       generated_doc: '<%= jsdoc.all.dest %>'
     },
 
-    // Generate documentation
-    jsdoc:
+      // Generate documentation
+      jsdoc:
     {
       all:
       {
-        src: ['README.md', 'lib/**/*.js', 'test/*.js'], 
+        src: ['README.md', 'lib/**/*.js', 'test/*.js'],
         dest: 'doc/jsdoc'
       }
     },
 
-    // Generate browser versions and mapping debug file
-    browserify:
+      // Generate browser versions and mapping debug file
+      browserify:
     {
       require:
       {
-        src:  '<%= pkg.main %>',
-        dest: DIST_DIR+'/<%= pkg.name %>_require.js'
+        src: '<%= pkg.main %>',
+        dest: DIST_DIR + '/<%= pkg.name %>_require.js'
       },
       standalone:
       {
-        src:  '<%= pkg.main %>',
-        dest: DIST_DIR+'/<%= pkg.name %>.js',
+        src: '<%= pkg.main %>',
+        dest: DIST_DIR + '/<%= pkg.name %>.js',
 
         options:
         {
@@ -77,8 +74,8 @@ module.exports = function(grunt)
 
       'require minified':
       {
-        src:  '<%= pkg.main %>',
-        dest: DIST_DIR+'/<%= pkg.name %>_require.min.js',
+        src: '<%= pkg.main %>',
+        dest: DIST_DIR + '/<%= pkg.name %>_require.min.js',
 
         options:
         {
@@ -90,18 +87,18 @@ module.exports = function(grunt)
           },
           plugin: [
             ['minifyify',
-             {
-               compressPath: DIST_DIR,
-               map: '<%= pkg.name %>.map'
-             }]
+              {
+                compressPath: DIST_DIR,
+                map: '<%= pkg.name %>.map'
+              }]
           ]
         }
       },
 
       'standalone minified':
       {
-        src:  '<%= pkg.main %>',
-        dest: DIST_DIR+'/<%= pkg.name %>.min.js',
+        src: '<%= pkg.main %>',
+        dest: DIST_DIR + '/<%= pkg.name %>.min.js',
 
         options:
         {
@@ -113,18 +110,18 @@ module.exports = function(grunt)
           },
           plugin: [
             ['minifyify',
-             {
-               compressPath: DIST_DIR,
-               map: '<%= pkg.name %>.map',
-               output: DIST_DIR+'/<%= pkg.name %>.map'
-             }]
+              {
+                compressPath: DIST_DIR,
+                map: '<%= pkg.name %>.map',
+                output: DIST_DIR + '/<%= pkg.name %>.map'
+              }]
           ]
         }
       }
     },
 
-    // Generate bower.json file from package.json data
-    sync:
+      // Generate bower.json file from package.json data
+      sync:
     {
       bower:
       {
@@ -141,8 +138,8 @@ module.exports = function(grunt)
       }
     },
 
-    // Publish / update package info in Bower
-    shell:
+      // Publish / update package info in Bower
+      shell:
     {
       bower: {
         command: [
@@ -152,7 +149,8 @@ module.exports = function(grunt)
         ].join('&&')
       }
     }
-  });
+    }
+  );
 
   // Load plugins
   grunt.loadNpmTasks('grunt-browserify');
@@ -163,5 +161,5 @@ module.exports = function(grunt)
 
   // Alias tasks
   grunt.registerTask('default', ['clean', 'jsdoc', 'browserify']);
-  grunt.registerTask('bower',   ['sync:bower', 'shell:bower']);
+  grunt.registerTask('bower', ['sync:bower', 'shell:bower']);
 };
