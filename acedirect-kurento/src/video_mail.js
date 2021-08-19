@@ -103,7 +103,7 @@ class VideoMail extends Events {
 
   async _startRecording() {
     const dir = param('videomailss.directory');
-    const profile = "MP4_VIDEO_ONLY";
+    const profile = 'MP4_VIDEO_ONLY';
     const ext = 'mp4';
     const filename = `${this._id}.${ext}`;
 
@@ -111,7 +111,7 @@ class VideoMail extends Events {
       uri: `file://${dir}/${filename}`,
       mediaProfile: profile.toUpperCase()
     });
-    this._recorder.on('Error', evt => {
+    this._recorder.on('Error', (evt) => {
       debug('Recording error:', evt);
     });
     await this._rtp.connect(this._recorder);
@@ -141,7 +141,7 @@ class VideoMail extends Events {
   generateKey(size = 30) {
     const key = [];
     const buffer = crypto.randomBytes(size);
-    buffer.forEach(b => {
+    buffer.forEach((b) => {
       key.push(String.fromCharCode(b % 96 + 32));
     });
     return key.join('');
