@@ -9,7 +9,7 @@
  * @return {Promise}
  */
 function promiseCatch(onRejected) {
-  return this.then(null, onRejected)
+  return this.then(null, onRejected);
 }
 
 //
@@ -30,31 +30,31 @@ function promiseCatch(onRejected) {
  * @return {Object} `target` disguised
  */
 function disguise(target, source, unthenable) {
-  if (source == null || target === source) return target
+  if (source == null || target === source) return target;
 
   for (var key in source) {
-    if (target[key] !== undefined) continue
-    if (unthenable && (key === 'then' || key === 'catch')) continue
+    if (target[key] !== undefined) continue;
+    if (unthenable && (key === 'then' || key === 'catch')) continue;
 
     if (typeof source[key] === 'function')
       var descriptor = {
         value: source[key]
-      }
+      };
     else
       var descriptor = {
         get: function () {
-          return source[key]
+          return source[key];
         },
         set: function (value) {
-          source[key] = value
+          source[key] = value;
         }
-      }
+      };
 
-    descriptor.enumerable = true
+    descriptor.enumerable = true;
 
-    Object.defineProperty(target, key, descriptor)
+    Object.defineProperty(target, key, descriptor);
   }
-  return target
+  return target;
 }
 
 /**
@@ -72,18 +72,18 @@ function disguise(target, source, unthenable) {
  * @return {thenable} `target` disguised
  */
 function disguiseThenable(target, source) {
-  if (target === source) return target
+  if (target === source) return target;
 
   if (target.then instanceof Function) {
-    var target_then = target.then
+    var target_then = target.then;
 
     function then(onFulfilled, onRejected) {
-      if (onFulfilled != null) onFulfilled = onFulfilled.bind(target)
-      if (onRejected != null) onRejected = onRejected.bind(target)
+      if (onFulfilled != null) onFulfilled = onFulfilled.bind(target);
+      if (onRejected != null) onRejected = onRejected.bind(target);
 
-      var promise = target_then.call(target, onFulfilled, onRejected)
+      var promise = target_then.call(target, onFulfilled, onRejected);
 
-      return disguiseThenable(promise, source)
+      return disguiseThenable(promise, source);
     }
 
     Object.defineProperties(target, {
@@ -93,10 +93,10 @@ function disguiseThenable(target, source) {
       catch: {
         value: promiseCatch
       }
-    })
+    });
   }
 
-  return disguise(target, source)
+  return disguise(target, source);
 }
 
 /**
@@ -107,20 +107,18 @@ function disguiseThenable(target, source) {
  * @return {Object} unthenabled input object
  */
 function unthenable(input) {
-  var output = Object.assign({}, input)
-  delete output.then
-  if (input !== undefined)
-    output.constructor = input.constructor
+  var output = Object.assign({}, input);
+  delete output.then;
+  if (input !== undefined) output.constructor = input.constructor;
 
-  if (input && input.then instanceof Function) return disguise(output, input,
-    true)
+  if (input && input.then instanceof Function) return disguise(output, input, true);
 
   // `input` is not thenable
-  return input
+  return input;
 }
 
-disguiseThenable.disguise = disguise
-disguiseThenable.disguiseThenable = disguiseThenable
-disguiseThenable.unthenable = unthenable
+disguiseThenable.disguise = disguise;
+disguiseThenable.disguiseThenable = disguiseThenable;
+disguiseThenable.unthenable = unthenable;
 
-module.exports = disguiseThenable
+module.exports = disguiseThenable;

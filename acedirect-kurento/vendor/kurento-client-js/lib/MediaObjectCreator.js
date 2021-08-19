@@ -39,9 +39,9 @@ var Transaction = require('./TransactionsManager').Transaction;
  */
 function getConstructor(type, strict) {
   var result = register.classes[type.qualifiedType] || register.abstracts[type
-      .qualifiedType] ||
-    register.classes[type.type] || register.abstracts[type.type] ||
-    register.classes[type] || register.abstracts[type];
+    .qualifiedType]
+    || register.classes[type.type] || register.abstracts[type.type]
+    || register.classes[type] || register.abstracts[type];
   if (result) return result;
 
   if (type.hierarchy != undefined) {
@@ -52,10 +52,10 @@ function getConstructor(type, strict) {
     };
   }
   if (strict) {
-    var error = new SyntaxError("Unknown type '" + type + "'")
-    error.type = type
+    var error = new SyntaxError("Unknown type '" + type + "'");
+    error.type = type;
 
-    throw error
+    throw error;
   }
 
   console.warn("Unknown type '", type, "', using MediaObject instead");
@@ -103,7 +103,7 @@ function MediaObjectCreator(host, encodeCreate, encodeRpc, encodeTransaction,
   describe, strict) {
   if (!(this instanceof MediaObjectCreator))
     return new MediaObjectCreator(host, encodeCreate, encodeRpc,
-      encodeTransaction, describe)
+      encodeTransaction, describe);
 
   /**
    * @param constructor
@@ -111,14 +111,14 @@ function MediaObjectCreator(host, encodeCreate, encodeRpc, encodeTransaction,
    * @return {module:core/abstracts.MediaObject}
    */
   function createObject(constructor) {
-    var mediaObject = new constructor(strict)
+    var mediaObject = new constructor(strict);
 
     mediaObject.on('_describe', describe);
     mediaObject.on('_rpc', encodeRpc);
 
-    if (mediaObject instanceof register.abstracts['kurento.Hub'] ||
-      mediaObject instanceof register
-      .classes['kurento.MediaPipeline'])
+    if (mediaObject instanceof register.abstracts['kurento.Hub']
+      || mediaObject instanceof register
+        .classes['kurento.MediaPipeline'])
       mediaObject.on('_create', encodeCreate);
 
     if (mediaObject instanceof register.classes['kurento.MediaPipeline'])
@@ -149,7 +149,7 @@ function MediaObjectCreator(host, encodeCreate, encodeRpc, encodeTransaction,
       .MediaPipeline)
       params.mediaPipeline = host;
 
-    var params_ = extend({}, params)
+    var params_ = extend({}, params);
     item.constructorParams = checkParams(params_, constructor.constructorParams,
       item.type);
 
@@ -161,9 +161,9 @@ function MediaObjectCreator(host, encodeCreate, encodeRpc, encodeTransaction,
       delete item.constructorParams;
 
     try {
-      var mediaObject = createObject(constructor)
+      var mediaObject = createObject(constructor);
     } catch (error) {
-      return callback(error)
+      return callback(error);
     };
 
     Object.defineProperty(item, 'object', {
@@ -172,7 +172,7 @@ function MediaObjectCreator(host, encodeCreate, encodeRpc, encodeTransaction,
 
     encodeCreate(transaction, item, callback);
 
-    return mediaObject
+    return mediaObject;
   };
   /**
    * @callback module:kurentoClient~MediaObjectCreator~createMediaObjectCallback
@@ -191,10 +191,10 @@ function MediaObjectCreator(host, encodeCreate, encodeRpc, encodeTransaction,
       .shift.apply(arguments) : undefined;
 
     switch (arguments.length) {
-    case 1:
-      params = undefined;
-    case 2:
-      callback = undefined;
+      case 1:
+        params = undefined;
+      case 2:
+        callback = undefined;
     };
 
     // Fix optional parameters
@@ -207,51 +207,51 @@ function MediaObjectCreator(host, encodeCreate, encodeRpc, encodeTransaction,
     };
 
     if (type instanceof Array) {
-      var createPipeline = false
+      var createPipeline = false;
 
       type.forEach(function (request) {
-        var params = request.params || {}
+        var params = request.params || {};
 
         if (typeof params.mediaPipeline === 'number')
-          createPipeline = true
-      })
+          createPipeline = true;
+      });
 
       function connectElements(error, elements) {
-        if (error) return callback(error)
+        if (error) return callback(error);
 
         if (params === true && host.connect)
           return host.connect(elements.filter(function (element) {
-              try {
-                checkMediaElement(element)
-                return true
-              } catch (e) {}
-            }),
-            function (error) {
-              if (error) return callback(error)
+            try {
+              checkMediaElement(element);
+              return true;
+            } catch (e) {}
+          }),
+          function (error) {
+            if (error) return callback(error);
 
-              callback(null, elements)
-            })
+            callback(null, elements);
+          });
 
-        callback(null, elements)
+        callback(null, elements);
       }
 
       if (createPipeline)
         return host.transaction(function () {
-          var mediaObjects = []
+          var mediaObjects = [];
 
           async.map(type, function (request, callback) {
-              var params = request.params || {}
+            var params = request.params || {};
 
-              if (typeof params.mediaPipeline === 'number')
-                params.mediaPipeline = mediaObjects[params
-                  .mediaPipeline]
+            if (typeof params.mediaPipeline === 'number')
+              params.mediaPipeline = mediaObjects[params
+                .mediaPipeline];
 
-              mediaObjects.push(createMediaObject(request, callback))
-            },
-            connectElements)
-        })
+            mediaObjects.push(createMediaObject(request, callback));
+          },
+          connectElements);
+        });
 
-      return createPromise(type, createMediaObject, connectElements)
+      return createPromise(type, createMediaObject, connectElements);
     }
 
     type = {
@@ -260,7 +260,7 @@ function MediaObjectCreator(host, encodeCreate, encodeRpc, encodeTransaction,
       type: type
     };
 
-    return createMediaObject(type, callback)
+    return createMediaObject(type, callback);
   };
   /**
    * @callback module:kurentoClient~MediaObjectCreator~createCallback
@@ -280,7 +280,7 @@ function MediaObjectCreator(host, encodeCreate, encodeRpc, encodeTransaction,
     delete constructor.item;
 
     return createObject(constructor);
-  }
+  };
 }
 
 module.exports = MediaObjectCreator;
