@@ -35,7 +35,7 @@ QUnit.test('setVideoFormat with Callback', function (assert) {
   var done = assert.async();
 
   this.pipeline.create(QUnit.config.prefix + 'PassThrough', function (error, passThrough) {
-    if (error) return onerror(error)
+    if (error) return onerror(error);
 
     var caps = {
       codec: 'RAW',
@@ -43,18 +43,18 @@ QUnit.test('setVideoFormat with Callback', function (assert) {
         numerator: 30,
         denominator: 1
       }
-    }
+    };
 
-    caps.framerate = kurentoClient.register.complexTypes.Fraction(caps.framerate)
-    caps = kurentoClient.register.complexTypes.VideoCaps(caps)
+    caps.framerate = kurentoClient.register.complexTypes.Fraction(caps.framerate);
+    caps = kurentoClient.register.complexTypes.VideoCaps(caps);
 
     return passThrough.setVideoFormat(caps, function (error) {
-      assert.equal(error, undefined)
+      assert.equal(error, undefined);
 
       done();
-    })
+    });
   })
-  .catch(onerror)
+    .catch(onerror);
 });
 
 QUnit.test('setVideoFormat with Promise', function (assert) {
@@ -63,25 +63,24 @@ QUnit.test('setVideoFormat with Promise', function (assert) {
   var done = assert.async();
 
   this.pipeline.create(QUnit.config.prefix + 'PassThrough').then(function (passThrough) {
-
     var caps = {
       codec: 'RAW',
       framerate: {
         numerator: 30,
         denominator: 1
       }
-    }
+    };
 
-    caps.framerate = kurentoClient.register.complexTypes.Fraction(caps.framerate)
-    caps = kurentoClient.register.complexTypes.VideoCaps(caps)
+    caps.framerate = kurentoClient.register.complexTypes.Fraction(caps.framerate);
+    caps = kurentoClient.register.complexTypes.VideoCaps(caps);
 
     return passThrough.setVideoFormat(caps, function (error) {
-      assert.equal(error, null)
+      assert.equal(error, null);
 
       done();
-    })
-  }, function(error) {
-      if (error) return onerror(error)
-    })
-  .catch(onerror)
+    });
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });
