@@ -42,10 +42,10 @@ var spawn = require('child_process').spawn;
 
 var QUnit = require('qunit-cli');
 
-const REPORTS_DIR = 'reports'
+const REPORTS_DIR = 'reports';
 
 function writeReport(ext, data) {
-  var path = REPORTS_DIR + '/' + require('../package.json').name + '.' + ext
+  var path = REPORTS_DIR + '/' + require('../package.json').name + '.' + ext;
 
   require('fs-extra').outputFile(path, data, function (error) {
     if (error) return console.trace(error);
@@ -55,22 +55,22 @@ function writeReport(ext, data) {
 }
 
 function fetchReport(type, report) {
-  var ext = type
-  if (type == 'junit') ext = 'xml'
+  var ext = type;
+  if (type == 'junit') ext = 'xml';
 
-  report = report[ext]
+  report = report[ext];
 
-  writeReport(ext, report)
+  writeReport(ext, report);
 }
 
-QUnit.jUnitReport = fetchReport.bind(undefined, 'junit')
+QUnit.jUnitReport = fetchReport.bind(undefined, 'junit');
 
 QUnit.load();
 
 var kurentoClient = require('..');
 
 // Get ws_port
-var ws_port = "8888"
+var ws_port = "8888";
 
 // --scope=docker|local --name=kms  --ws_port=XXXX
 var argv = minimist(process.argv.slice(2), {
@@ -87,7 +87,7 @@ if (argv.ws_port == undefined) {
 function isDockerContainer(callback) {
   var isDocker = false;
   var cat = spawn('cat', ['/proc/1/cgroup'])
-    .on('error', onerror)
+    .on('error', onerror);
 
   cat.stdout.on('data', function (data) {
     var lines = data.toString('utf8').split('\n');
@@ -119,7 +119,8 @@ function getIpDocker(callback) {
       ip.stdout.pipe(grep.stdin);
       grep.stdout.on('data', function (data) {
         callback(data.toString(
-          "utf8").split(" ")[2])
+          "utf8"
+        ).split(" ")[2]);
       });
     } else {
       var grep = spawn('grep', ['docker']);
@@ -128,12 +129,12 @@ function getIpDocker(callback) {
       ip.stdout.pipe(grep.stdin);
       grep.stdout.on('data', function (data) {
         var ips = data.toString(
-          "utf8").split(" ");
-        callback(ips[ips.length - 2])
+          "utf8"
+        ).split(" ");
+        callback(ips[ips.length - 2]);
       });
     }
-  })
-
+  });
 }
 
 const ARGV = ['-f', './test_reconnect/kurento.conf.json',
@@ -197,10 +198,10 @@ QUnit.module('reconnect', {
     };
 
     if (argv.scope == "local") {
-      var ws_uri = 'ws://127.0.0.1:' + argv.ws_port + '/kurento'
+      var ws_uri = 'ws://127.0.0.1:' + argv.ws_port + '/kurento';
 
       this.server = spawn('kurento-media-server', ARGV)
-        .on('error', onerror)
+        .on('error', onerror);
 
       this.server.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
@@ -210,9 +211,9 @@ QUnit.module('reconnect', {
         console.log('stderr: ' + data);
       });
 
-      console.log("Waiting KMS is started... KMS pid:", this.server.pid)
+      console.log("Waiting KMS is started... KMS pid:", this.server.pid);
 
-      this.client = kurentoClient(ws_uri, options)
+      this.client = kurentoClient(ws_uri, options);
       this.client.create('MediaPipeline', function (error, pipeline) {
         if (error) return onerror(error);
 
@@ -223,7 +224,6 @@ QUnit.module('reconnect', {
 
       QUnit.stop();
     } else if (argv.scope == "docker") {
-
       getIpDocker(function (ip) {
         var hostIp = ip;
         console.log("Docker IP:", hostIp);
@@ -252,25 +252,26 @@ QUnit.module('reconnect', {
                 var ipDocker = data.NetworkSettings
                   .IPAddress;
                 ipDocker = hostIp;
-                var ws_uri_docker = 'ws://' +
-                  ipDocker +
-                  ":" + argv.ws_port + "/kurento";
+                var ws_uri_docker = 'ws://'
+                  + ipDocker
+                  + ":" + argv.ws_port + "/kurento";
 
                 self.client = kurentoClient(
                   ws_uri_docker,
-                  options)
+                  options
+                );
 
                 self.client.create('MediaPipeline',
                   function (error, pipeline) {
                     if (error) return onerror(
-                      error);
+                      error
+                    );
                     self.pipeline = pipeline;
                     QUnit.start();
                   });
-
-              })
-            })
-          })
+              });
+            });
+          });
         });
       });
       QUnit.stop();
@@ -280,15 +281,15 @@ QUnit.module('reconnect', {
   afterEach: function () {
     this.client.close();
     if (argv.scope == "local") {
-      this.server.kill()
+      this.server.kill();
     } else if (argv.scope == "docker") {
       QUnit.stop();
       container.stop(function (error, data) {
-        console.log("Container KMS stopped.")
+        console.log("Container KMS stopped.");
         container.remove(function (error, data) {
-          console.log("Container KMS removed.")
+          console.log("Container KMS removed.");
           QUnit.start();
-        })
+        });
       });
     }
   }
@@ -300,11 +301,11 @@ QUnit.module('reconnect', {
 QUnit.test('MediaServer restarted', function (assert) {
   var self = this;
 
-  var done = assert.async()
-  var onerror = getOnError(done)
+  var done = assert.async();
+  var onerror = getOnError(done);
 
-  var client = self.client
-  var pipeline = self.pipeline
+  var client = self.client;
+  var pipeline = self.pipeline;
 
   var sessionId = client.sessionId;
 
@@ -316,10 +317,10 @@ QUnit.test('MediaServer restarted', function (assert) {
     self.server.on('exit', function (code, signal) {
       assert.equal(code, 0, 'MediaServer killed');
 
-      client._resetCache()
+      client._resetCache();
 
       self.server = spawn('kurento-media-server', ARGV)
-        .on('error', onerror)
+        .on('error', onerror);
 
       self.server.stdout.on('data', function (data) {
         console.log('stdout: ' + data);
@@ -331,7 +332,7 @@ QUnit.test('MediaServer restarted', function (assert) {
 
       console.log("Waiting KMS is started again... KMS pid:", self
         .server
-        .pid)
+        .pid);
 
       var grep = spawn('grep', ['kurento']);
       var ps = spawn('ps', ['aux']);
@@ -340,7 +341,8 @@ QUnit.test('MediaServer restarted', function (assert) {
 
       grep.stdout.on('data', function (data) {
         console.log("ps aux | grep kurento =>", data.toString(
-          "utf8"));
+          "utf8"
+        ));
       });
 
       client.getMediaobjectById(pipeline.id, function (error,
@@ -349,53 +351,56 @@ QUnit.test('MediaServer restarted', function (assert) {
           error);
         console.log(
           "Info on client.getMediaObjectById: client.sessionId(",
-          client.sessionId, ") == ", sessionId);
+          client.sessionId, ") == ", sessionId
+        );
         assert.notEqual(error, undefined);
         assert.strictEqual(error.code, 40101);
 
         assert.strictEqual(client.sessionId, sessionId);
 
         done();
-      })
-    })
+      });
+    });
   } else if (argv.scope == "docker") {
     QUnit.expect(3);
     container.stop(function (error, data) {
-      //container.remove(function (error, data) {
+      // container.remove(function (error, data) {
 
       docker.run('kurento/kurento-media-server-dev:latest', [], [
-          process.stdout,
-          process.stderr
-        ], {
-          Tty: false,
-          'PortBindings': {
-            "8888/tcp": [{
-              "HostIp": "",
-              "HostPort": argv.ws_port.toString()
-            }]
-          }
-        },
-        function (err, data, container) {
-          if (err) console.error(err);
-        }).on('container', function (container_) {
+        process.stdout,
+        process.stderr
+      ], {
+        Tty: false,
+        'PortBindings': {
+          "8888/tcp": [{
+            "HostIp": "",
+            "HostPort": argv.ws_port.toString()
+          }]
+        }
+      },
+      function (err, data, container) {
+        if (err) console.error(err);
+      }).on('container', function (container_) {
         container = container_;
         container.inspect(function (err, data) {
           container.inspect(function (err, data) {
             container.inspect(function (err, data) {
-
-              client._resetCache()
+              client._resetCache();
 
               client.getMediaobjectById(pipeline.id,
                 function (
                   error,
-                  mediaObject) {
+                  mediaObject
+                ) {
                   console.log(
                     "Info on client.getMediaObjectById: error->",
-                    error);
+                    error
+                  );
                   console.log(
                     "Info on client.getMediaObjectById: client.sessionId(",
                     client.sessionId, ") == ",
-                    sessionId);
+                    sessionId
+                  );
                   assert.notEqual(error, undefined);
                   assert.strictEqual(error.code,
                     40101);
@@ -403,12 +408,12 @@ QUnit.test('MediaServer restarted', function (assert) {
                   assert.strictEqual(client.sessionId,
                     sessionId);
                   done();
-                })
-            })
-          })
-        })
+                });
+            });
+          });
+        });
       });
-      //})
+      // })
     });
   }
 });
@@ -421,11 +426,11 @@ QUnit.test('MediaServer closed, client disconnected', function (assert) {
 
   QUnit.expect(2);
 
-  var done = assert.async()
-  var onerror = getOnError(done)
+  var done = assert.async();
+  var onerror = getOnError(done);
 
-  var client = self.client
-  var pipeline = self.pipeline
+  var client = self.client;
+  var pipeline = self.pipeline;
 
   // stop MediaServer
   if (argv.scope == "local") {
@@ -437,31 +442,30 @@ QUnit.test('MediaServer closed, client disconnected', function (assert) {
         assert.notEqual(error, undefined);
 
         assert.throws(function () {
-            client.sessionId
-          },
-          new SyntaxError('Client has been disconnected'));
+          client.sessionId;
+        },
+        new SyntaxError('Client has been disconnected'));
 
         done();
       });
-    })
+    });
   } else if (argv.scope == "docker") {
     container.stop(function (error, data) {
-      console.log("Container KMS stopped.")
+      console.log("Container KMS stopped.");
       container.remove(function (error, data) {
-        console.log("Container KMS removed", client)
+        console.log("Container KMS removed", client);
         client.once('disconnect', function (error) {
           console.log("Client disconnected");
           assert.notEqual(error, undefined);
 
           assert.throws(function () {
-              client.sessionId
-            },
-            new SyntaxError('Client has been disconnected')
-          );
+            client.sessionId;
+          },
+          new SyntaxError('Client has been disconnected'));
 
           done();
         });
-      })
-    })
+      });
+    });
   }
 });

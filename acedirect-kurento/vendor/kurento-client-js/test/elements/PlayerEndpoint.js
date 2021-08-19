@@ -58,34 +58,34 @@ QUnit.asyncTest('Play, Pause & Stop with Callback', function () {
   QUnit.expect(4);
 
   self.pipeline.create('PlayerEndpoint', {
-      uri: URL_SMALL
-    },
-    function (error, player) {
+    uri: URL_SMALL
+  },
+  function (error, player) {
+    if (error) return onerror(error);
+
+    QUnit.notEqual(player, undefined, 'player');
+
+    return player.play(function (error) {
+      QUnit.equal(error, undefined, 'playing');
+
       if (error) return onerror(error);
 
-      QUnit.notEqual(player, undefined, 'player');
-
-      return player.play(function (error) {
-        QUnit.equal(error, undefined, 'playing');
+      return player.pause(function (error) {
+        QUnit.equal(error, undefined, 'paused');
 
         if (error) return onerror(error);
 
-        return player.pause(function (error) {
-          QUnit.equal(error, undefined, 'paused');
+        return player.stop(function (error) {
+          QUnit.equal(error, undefined, 'stoped');
 
           if (error) return onerror(error);
 
-          return player.stop(function (error) {
-            QUnit.equal(error, undefined, 'stoped');
-
-            if (error) return onerror(error);
-
-            QUnit.start();
-          });
+          QUnit.start();
         });
       });
-    })
-    .catch(onerror)
+    });
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Play, Pause & Stop with Promise', function () {
@@ -94,27 +94,27 @@ QUnit.asyncTest('Play, Pause & Stop with Promise', function () {
   QUnit.expect(1);
 
   self.pipeline.create('PlayerEndpoint', {
-      uri: URL_SMALL
-    }).then(function (player) {
-      QUnit.notEqual(player, undefined, 'player');
+    uri: URL_SMALL
+  }).then(function (player) {
+    QUnit.notEqual(player, undefined, 'player');
 
-      return player.play().then(function () {
-        return player.pause().then(function () {
-          return player.stop().then(function () {
-            QUnit.start();
-          }, function(error) {
-            if (error) return onerror(error)
-          });
-        }, function(error) {
-            if (error) return onerror(error)
-          });
-      }, function(error) {
-          if (error) return onerror(error)
+    return player.play().then(function () {
+      return player.pause().then(function () {
+        return player.stop().then(function () {
+          QUnit.start();
+        }, function (error) {
+          if (error) return onerror(error);
         });
-    }, function(error) {
-        if (error) return onerror(error)
-      })
-    .catch(onerror)
+      }, function (error) {
+        if (error) return onerror(error);
+      });
+    }, function (error) {
+      if (error) return onerror(error);
+    });
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('End of Stream with Callback', function (assert) {
@@ -142,7 +142,7 @@ QUnit.asyncTest('End of Stream with Callback', function (assert) {
 
       QUnit.start();
     })
-    .catch(onerror)
+      .catch(onerror);
 
     return player.play(function (error) {
       assert.equal(error, undefined, 'playing');
@@ -152,7 +152,7 @@ QUnit.asyncTest('End of Stream with Callback', function (assert) {
       timeout.start();
     });
   })
-  .catch(onerror)
+    .catch(onerror);
 });
 
 QUnit.asyncTest('End of Stream with Promise', function (assert) {
@@ -171,7 +171,7 @@ QUnit.asyncTest('End of Stream with Promise', function (assert) {
   self.pipeline.create('PlayerEndpoint', {
     uri: URL_SMALL
   }).then(function (player) {
-   QUnit.notEqual(player, undefined, 'player');
+    QUnit.notEqual(player, undefined, 'player');
 
     player.on('EndOfStream', function (data) {
       assert.ok(true, 'EndOfStream');
@@ -179,17 +179,17 @@ QUnit.asyncTest('End of Stream with Promise', function (assert) {
       timeout.stop();
 
       QUnit.start();
-    })
+    });
 
     return player.play().then(function () {
       timeout.start();
-    }, function(error) {
-        if (error) return onerror(error)
-      });
-  }, function(error) {
-      if (error) return onerror(error)
-    })
-  .catch(onerror)
+    }, function (error) {
+      if (error) return onerror(error);
+    });
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('GetUri with Callback', function () {
@@ -210,7 +210,7 @@ QUnit.asyncTest('GetUri with Callback', function () {
       QUnit.start();
     });
   })
-  .catch(onerror)
+    .catch(onerror);
 });
 
 QUnit.asyncTest('GetUri with Promise', function () {
@@ -221,19 +221,19 @@ QUnit.asyncTest('GetUri with Promise', function () {
   self.pipeline.create('PlayerEndpoint', {
     uri: URL_SMALL
   }).then(function (player) {
-      QUnit.notEqual(player, undefined, 'player');
+    QUnit.notEqual(player, undefined, 'player');
 
     return player.getUri().then(function (url) {
       QUnit.equal(url, URL_SMALL, 'URL: ' + url);
 
       QUnit.start();
-    }, function(error) {
-      if (error) return onerror(error)
+    }, function (error) {
+      if (error) return onerror(error);
     });
-  }, function(error) {
-      if (error) return onerror(error)
-    })
-  .catch(onerror)
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Connect with Callback', function () {
@@ -280,7 +280,7 @@ QUnit.asyncTest('Connect with Callback', function () {
       });
     });
   })
-  .catch(onerror)
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Connect with Promise', function () {
@@ -303,25 +303,25 @@ QUnit.asyncTest('Connect with Promise', function () {
           return recorder.release().then(function () {
             return player.release().then(function () {
               QUnit.start();
-            }, function(error) {
-              if (error) return onerror(error)
+            }, function (error) {
+              if (error) return onerror(error);
             });
-          }, function(error) {
-              if (error) return onerror(error)
-            });
-        }, function(error) {
-            if (error) return onerror(error)
+          }, function (error) {
+            if (error) return onerror(error);
           });
-      }, function(error) {
-          if (error) return onerror(error)
+        }, function (error) {
+          if (error) return onerror(error);
         });
-    }, function(error) {
-        if (error) return onerror(error)
+      }, function (error) {
+        if (error) return onerror(error);
       });
-  }, function(error) {
-      if (error) return onerror(error)
-    })
-  .catch(onerror)
+    }, function (error) {
+      if (error) return onerror(error);
+    });
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Connect by type with Callback', function () {
@@ -372,7 +372,7 @@ QUnit.asyncTest('Connect by type with Callback', function () {
       });
     });
   })
-  .catch(onerror)
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Connect by type with Promise', function () {
@@ -396,26 +396,26 @@ QUnit.asyncTest('Connect by type with Promise', function () {
             return recorder.release().then(function () {
               return player.release().then(function () {
                 QUnit.start();
-              }, function(error) {
-                  if (error) return onerror(error)
-                });
-            }, function(error) {
-                if (error) return onerror(error)
+              }, function (error) {
+                if (error) return onerror(error);
               });
-          }, function(error) {
-              if (error) return onerror(error)
+            }, function (error) {
+              if (error) return onerror(error);
             });
-        }, function(error) {
-            if (error) return onerror(error)
+          }, function (error) {
+            if (error) return onerror(error);
           });
-      }, function(error) {
-          if (error) return onerror(error)
+        }, function (error) {
+          if (error) return onerror(error);
         });
-    }, function(error) {
-        if (error) return onerror(error)
+      }, function (error) {
+        if (error) return onerror(error);
       });
-  }, function(error) {
-      if (error) return onerror(error)
-    })
-  .catch(onerror)
+    }, function (error) {
+      if (error) return onerror(error);
+    });
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });

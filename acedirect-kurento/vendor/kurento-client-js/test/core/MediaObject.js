@@ -31,21 +31,21 @@ QUnit.test('setName with Callback', function (assert) {
 
   var done = assert.async();
 
-  const NAME = 'MediaObjectRandomName'
+  const NAME = 'MediaObjectRandomName';
 
-  var pipeline = this.pipeline
+  var pipeline = this.pipeline;
 
   pipeline.setName(NAME, function (error) {
-    if (error) return onerror(error)
+    if (error) return onerror(error);
 
     return pipeline.getName(function (error, name) {
-      if (error) return onerror(error)
+      if (error) return onerror(error);
 
-      assert.equal(name, NAME)
+      assert.equal(name, NAME);
       done();
-    })
+    });
   })
-  .catch(onerror)
+    .catch(onerror);
 });
 
 QUnit.test('setName with Promise', function (assert) {
@@ -53,20 +53,19 @@ QUnit.test('setName with Promise', function (assert) {
 
   var done = assert.async();
 
-  const NAME = 'MediaObjectRandomName'
+  const NAME = 'MediaObjectRandomName';
 
-  var pipeline = this.pipeline
+  var pipeline = this.pipeline;
 
   pipeline.setName(NAME).then(function () {
-    return pipeline.getName().then(function(name) {
-      assert.equal(name, NAME)
+    return pipeline.getName().then(function (name) {
+      assert.equal(name, NAME);
       done();
-    }, function(error) {
-      if (error) return onerror(error)
-    })
-  },function(error) {
-      if (error) return onerror(error)
-    })
-  .catch(onerror)
+    }, function (error) {
+      if (error) return onerror(error);
+    });
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });
-
