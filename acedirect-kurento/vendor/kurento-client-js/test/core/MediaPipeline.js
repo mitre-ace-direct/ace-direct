@@ -82,7 +82,7 @@ QUnit.asyncTest('Creation with Callback', function (assert) {
       });
     });
   })
-  .catch(onerror)
+    .catch(onerror);
 });
 
 /**
@@ -95,7 +95,7 @@ QUnit.asyncTest('Creation with Promise', function (assert) {
 
   self.pipeline.create(QUnit.config.prefix + 'PlayerEndpoint', {
     uri: URL_SMALL
-  }).then(function(player) {
+  }).then(function (player) {
     assert.notEqual(player, undefined, 'player');
 
     return self.pipeline.create(QUnit.config.prefix + 'RecorderEndpoint', {
@@ -106,14 +106,13 @@ QUnit.asyncTest('Creation with Promise', function (assert) {
       return player.connect(recorder).then(function () {
         QUnit.start();
       });
-    }, function(error) {
-      if (error) return onerror(error)
+    }, function (error) {
+      if (error) return onerror(error);
     });
-  }, function(error) {
-      if (error) return onerror(error)
-    })
-  .catch(onerror)
-
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });
 
 /**
@@ -140,5 +139,4 @@ QUnit.asyncTest('Pseudo-syncronous API with Callback', function () {
 
     QUnit.start();
   });
-  
 });
