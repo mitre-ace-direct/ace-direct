@@ -68,85 +68,85 @@ QUnit.test('Continue after network error', function (assert) {
 
   QUnit.expect(13);
 
-  var done = assert.async()
-  var onerror = getOnError(done)
+  var done = assert.async();
+  var onerror = getOnError(done);
 
-  var client = this.kurento
-  var pipeline = this.pipeline
+  var client = this.kurento;
+  var pipeline = this.pipeline;
   var sessionId = client.sessionId;
 
   assert.notEqual(sessionId, undefined);
 
   pipeline.create(QUnit.config.prefix + 'PlayerEndpoint', {
+    uri: URL_SMALL
+  }, function (error, player) {
+    if (error) return onerror(error);
+
+    return pipeline.create(QUnit.config.prefix + 'RecorderEndpoint', {
       uri: URL_SMALL
-    }, function (error, player) {
+    },
+    function (error, recorder) {
       if (error) return onerror(error);
 
-      return pipeline.create(QUnit.config.prefix + 'RecorderEndpoint', {
-          uri: URL_SMALL
-        },
-        function (error, recorder) {
-          if (error) return onerror(error);
+      return player.connect(recorder, function (error) {
+        if (error) return onerror(error);
 
-          return player.connect(recorder, function (error) {
+        // End connection and wait for a new one
+        var old_connection = client._re._connection;
+        old_connection.end();
+
+        client._resetCache();
+
+        client._re.once('connect', function (con) {
+          assert.notStrictEqual(con, old_connection);
+
+          assert.strictEqual(client.sessionId, sessionId,
+            'sessionId=' + client.sessionId);
+
+          var ids = [pipeline.id, player.id, recorder.id];
+
+          client.getMediaobjectById(ids, function (error,
+            mediaObjects) {
             if (error) return onerror(error);
 
-            // End connection and wait for a new one
-            var old_connection = client._re._connection;
-            old_connection.end();
+            assert.strictEqual(mediaObjects.length, 3);
 
-            client._resetCache()
+            assert.strictEqual(mediaObjects[0].id,
+              pipeline.id);
+            assert.strictEqual(mediaObjects[1].id,
+              player.id);
+            assert.strictEqual(mediaObjects[2].id,
+              recorder.id);
 
-            client._re.once('connect', function (con) {
-              assert.notStrictEqual(con, old_connection);
+            assert.strictEqual(mediaObjects[0]
+              .__module__,
+            pipeline.__module__);
+            assert.strictEqual(mediaObjects[1]
+              .__module__,
+            player.__module__);
+            assert.strictEqual(mediaObjects[2]
+              .__module__,
+            recorder.__module__);
 
-              assert.strictEqual(client.sessionId, sessionId,
-                'sessionId=' + client.sessionId);
+            assert.strictEqual(mediaObjects[0].__type__,
+              pipeline.__type__);
+            assert.strictEqual(mediaObjects[1].__type__,
+              player.__type__);
+            assert.strictEqual(mediaObjects[2].__type__,
+              recorder.__type__);
 
-              var ids = [pipeline.id, player.id, recorder.id]
+            return player.play(function (error) {
+              if (error) return onerror(error);
 
-              client.getMediaobjectById(ids, function (error,
-                  mediaObjects) {
-                  if (error) return onerror(error);
-
-                  assert.strictEqual(mediaObjects.length, 3);
-
-                  assert.strictEqual(mediaObjects[0].id,
-                    pipeline.id);
-                  assert.strictEqual(mediaObjects[1].id,
-                    player.id);
-                  assert.strictEqual(mediaObjects[2].id,
-                    recorder.id);
-
-                  assert.strictEqual(mediaObjects[0]
-                    .__module__,
-                    pipeline.__module__);
-                  assert.strictEqual(mediaObjects[1]
-                    .__module__,
-                    player.__module__);
-                  assert.strictEqual(mediaObjects[2]
-                    .__module__,
-                    recorder.__module__);
-
-                  assert.strictEqual(mediaObjects[0].__type__,
-                    pipeline.__type__);
-                  assert.strictEqual(mediaObjects[1].__type__,
-                    player.__type__);
-                  assert.strictEqual(mediaObjects[2].__type__,
-                    recorder.__type__);
-
-                  return player.play(function (error) {
-                    if (error) return onerror(error);
-
-                    done();
-                  })
-                })
-                .catch(onerror)
+              done();
             });
-          });
+          })
+            .catch(onerror);
         });
-    })
-    .catch(onerror)
+      });
+    });
+  })
+    .catch(onerror);
 });
 
 // Re-send requests on network error
