@@ -68,9 +68,9 @@ QUnit.asyncTest('Method GetUrl with Callback', function () {
       QUnit.notEqual(url, undefined, 'URL: ' + url);
 
       QUnit.start();
-    })
+    });
   })
-  .catch(onerror)
+    .catch(onerror);
 });
 
 QUnit.asyncTest('Method GetUrl with Promise', function () {
@@ -85,17 +85,17 @@ QUnit.asyncTest('Method GetUrl with Promise', function () {
       QUnit.notEqual(url, undefined, 'URL: ' + url);
 
       QUnit.start();
-    }, function(error) {
-        if (error) return onerror(error)
-      })
-  }, function(error) {
-      if (error) return onerror(error)
-    })
-  .catch(onerror)
+    }, function (error) {
+      if (error) return onerror(error);
+    });
+  }, function (error) {
+    if (error) return onerror(error);
+  })
+    .catch(onerror);
 });
 
-//QUnit.asyncTest('Media session terminated', function()
-//{
+// QUnit.asyncTest('Media session terminated', function()
+// {
 //  var self = this;
 
 //  QUnit.expect(3);
@@ -134,4 +134,4 @@ QUnit.asyncTest('Method GetUrl with Promise', function () {
 //      doGet(url, timeout.start.bind(timeout), onerror);
 //    })
 //  });
-//});
+// });
