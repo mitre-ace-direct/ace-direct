@@ -90,53 +90,53 @@ function myCleanup() {
 }
 
 // after hours vars
-var isOpen = true;
-var startTimeUTC = '14:00'; // hh:mm in UTC
-var endTimeUTC = '21:30'; // hh:mm in UTC
+let isOpen = true;
+let startTimeUTC = '14:00'; // hh:mm in UTC
+let endTimeUTC = '21:30'; // hh:mm in UTC
 
 // Declaration for Asterisk Manager Interface see init_ami()
-var ami = null;
+let ami = null;
 
 // Contains login name => JSON data passed from browser
-var rStatusMap = 'statusMap';
+let rStatusMap = 'statusMap';
 
 // Contains the VRS number mapped to the Zendesk ticket number
-var rVrsToZenId = 'vrsToZenId';
+let rVrsToZenId = 'vrsToZenId';
 
 // Contains the consumer extension mapped to {"secret":extensionpassword, "inuse":true|false}
-var rConsumerExtensions = 'consumerExtensions';
+let rConsumerExtensions = 'consumerExtensions';
 
 // Contains the consumer extension(nnnnn) mapped to the VRS number (nnnnnnnnnn)
 // Redis will double map these key values meaning both will exist
 // key:value nnnnn:mmmmmmmmmm and mmmmmmmmmm:nnnnn
-var rExtensionToVrs = 'extensionToVrs';
+let rExtensionToVrs = 'extensionToVrs';
 
 // Contains the consumer extension(nnnnn) mapped to the preferred language
-var rExtensionToLanguage = 'extensionToLanguage';
+let rExtensionToLanguage = 'extensionToLanguage';
 
 // Maps Linphone caller extension to agent extension
-var rLinphoneToAgentMap = 'linphoneToAgentMap';
+let rLinphoneToAgentMap = 'linphoneToAgentMap';
 
 // Maps consumer extension to CSR extension
-var rConsumerToCsr = 'consumerToCsr';
+let rConsumerToCsr = 'consumerToCsr';
 
 // Map of Agent information, key agent_id value JSON object
-var rAgentInfoMap = 'agentInfoMap';
+let rAgentInfoMap = 'agentInfoMap';
 
 // Map of Token to status, key token value {status, date}.
-var rTokenMap = 'tokenMap';
+let rTokenMap = 'tokenMap';
 
 // keeps track of number of consumers in complaint queue, send to agent on login
-var complaint_queue_count = 0;
+let complaintQueueCount = 0;
 
 // keeps track of number of consumers in general queue, send to agent on login
-var general_queue_count = 0;
+let generalQueueCount = 0;
 
 // file share
 let sharingAgent = [];
 let sharingConsumer = [];
 let fileToken = [];
-var incomingVRS;
+let incomingVRS;
 
 // Initialize log4js
 const logname = 'ad-server';
@@ -162,12 +162,12 @@ log4js.configure({
 // Get the name of the config file from the command line (optional)
 nconf.argv().env();
 
-var cfile = '../dat/config.json';
+const cfile = '../dat/config.json';
 
 // Validate the incoming JSON config file
 try {
-  var content = fs.readFileSync(cfile, 'utf8');
-  var myjson = JSON.parse(content);
+  const content = fs.readFileSync(cfile, 'utf8');
+  const myjson = JSON.parse(content);
   console.log('Valid JSON config file');
 } catch (ex) {
   console.log('');
@@ -192,8 +192,8 @@ nconf.file({
  * @returns {unresolved} Decoded readable string.
  */
 function getConfigVal(paramName) {
-  var val = nconf.get(paramName);
-  var decodedString = null;
+  const val = nconf.get(paramName);
+  let decodedString = null;
   if (typeof val !== 'undefined' && val !== null) {
     // found value for paramName
     if (clearText) {
@@ -229,13 +229,13 @@ AWS.config.update({
   }
 });
 
-s3 = new AWS.S3();
+const s3 = new AWS.S3();
 
-var colorConfigs = {};
+let colorConfigs = {};
 
 // append a suffix to make REDIS maps specific to this server
-var pfx = process.env.LOGNAME;
-if (pfx == undefined) {
+let pfx = process.env.LOGNAME;
+if (pfx === undefined) {
   pfx = '';
 } else {
   pfx = `${pfx}_`;
@@ -260,35 +260,35 @@ logger.error('ERROR messages enabled.');
 logger.fatal('FATAL messages enabled.');
 logger.info(`Using config file: ${cfile}`);
 
-var queuesComplaintNumber = getConfigVal('asterisk:queues:complaint:number');
+const queuesComplaintNumber = getConfigVal('asterisk:queues:complaint:number');
 
 // global vars that don't need to be read every time
-var jwtKey = getConfigVal('web_security:json_web_token:secret_key');
+const jwtKey = getConfigVal('web_security:json_web_token:secret_key');
 
 // NGINX path parameter
-var nginxPath = getConfigVal('nginx:ad_path');
+let nginxPath = getConfigVal('nginx:ad_path');
 if (nginxPath.length === 0) {
   // default for backwards compatibility
   nginxPath = '/ACEDirect';
 }
 
 // outbound videomail timeout parameter
-var outVidTimeout = getConfigVal('videomail:outbound_timeout_secs');
+let outVidTimeout = getConfigVal('videomail:outbound_timeout_secs');
 if (!outVidTimeout) {
   // default if not there
   outVidTimeout = 45 * 1000; // ms
 } else {
-  outVidTimeout = outVidTimeout * 1000; // ms
+  outVidTimeout *= 1000; // ms
 }
 logger.debug(`outVidTimeout: ${outVidTimeout}`);
 
 // stun & turn params
-var stunFQDN = getConfigVal('servers:stun_fqdn');
-var stunPort = getConfigVal('app_ports:stun').toString();
-var turnFQDN = getConfigVal('servers:turn_fqdn');
-var turnPort = getConfigVal('app_ports:turn').toString();
-var turnUser = getConfigVal('asterisk:sip:turn_user');
-var turnCred = getConfigVal('asterisk:sip:turn_cred');
+const stunFQDN = getConfigVal('servers:stun_fqdn');
+const stunPort = getConfigVal('app_ports:stun').toString();
+const turnFQDN = getConfigVal('servers:turn_fqdn');
+let turnPort = getConfigVal('app_ports:turn').toString();
+const turnUser = getConfigVal('asterisk:sip:turn_user');
+const turnCred = getConfigVal('asterisk:sip:turn_cred');
 if (!stunFQDN) {
   console.log('ERROR: dat/config.json is missing servers:stun_fqdn');
   process.exit(0);
@@ -314,12 +314,12 @@ if (!turnCred) {
 }
 
 // log WebWebRTC stats parameters
-var logWebRTCStats = getConfigVal('webrtcstats:logWebRTCStats');
-var logWebRTCStatsFreq = 60000;
+let logWebRTCStats = getConfigVal('webrtcstats:logWebRTCStats');
+let logWebRTCStatsFreq = 60000;
 if (!logWebRTCStats) {
   logWebRTCStats = false;
 } else {
-  logWebRTCStats = (logWebRTCStats == 'true');
+  logWebRTCStats = (logWebRTCStats === 'true');
 }
 logger.debug(`logWebRTCStats: ${logWebRTCStats}`);
 if (logWebRTCStats) {
@@ -358,7 +358,7 @@ if (busyLightEnabled.length === 0) {
 logger.debug(`busyLightEnabled: ${busyLightEnabled}`);
 
 // busylight awayBlink parameter (blink while Away, if callers are in queue)
-var awayBlink = getConfigVal('busylight:awayBlink');
+let awayBlink = getConfigVal('busylight:awayBlink');
 if (awayBlink.length === 0) {
   // default to on
   awayBlink = true;
@@ -367,12 +367,12 @@ if (awayBlink.length === 0) {
 }
 logger.debug(`awayBlink: ${awayBlink}`);
 
-var agentPath = getConfigVal('nginx:agent_route');
+let agentPath = getConfigVal('nginx:agent_route');
 if (agentPath.length === 0) {
   agentPath = '/agent';
 }
 
-var consumerPath = getConfigVal('nginx:consumer_route');
+let consumerPath = getConfigVal('nginx:consumer_route');
 console.log(consumerPath.length);
 if (consumerPath.length === 0) {
   consumerPath = '/complaint';
@@ -384,12 +384,12 @@ const signalingServerUrl = `${getConfigVal('signaling_server:protocol')}://${get
 const queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
 
 // get complaint redirect options
-var complaintRedirectActive = (getConfigVal('complaint_redirect:active') === 'true');
-var complaintRedirectDesc = getConfigVal('complaint_redirect:desc');
-var complaintRedirectUrl = getConfigVal('complaint_redirect:url');
+const complaintRedirectActive = (getConfigVal('complaint_redirect:active') === 'true');
+const complaintRedirectDesc = getConfigVal('complaint_redirect:desc');
+const complaintRedirectUrl = getConfigVal('complaint_redirect:url');
 
 // translation server
-var translationServerUrl = `${getConfigVal('translation_server:protocol')}://${getConfigVal('servers:asterisk_private_ip')}:${getConfigVal('app_ports:translation_server')}`;
+const translationServerUrl = `${getConfigVal('translation_server:protocol')}://${getConfigVal('servers:asterisk_private_ip')}:${getConfigVal('app_ports:translation_server')}`;
 
 // get the ACE Direct version and year
 const version = getConfigVal('common:version');
@@ -397,7 +397,7 @@ const year = getConfigVal('common:year');
 logger.info(`This is ACE Direct v${version}, Copyright ${year}.`);
 
 // Create a connection to Redis
-var redisClient = redis.createClient(getConfigVal('app_ports:redis').toString(), getConfigVal('servers:redis_fqdn'));
+const redisClient = redis.createClient(getConfigVal('app_ports:redis').toString(), getConfigVal('servers:redis_fqdn'));
 
 redisClient.on('error', (err) => {
   logger.error('');
@@ -441,9 +441,9 @@ redisClient.on('connect', () => {
 });
 
 // Load the Zendesk login parameters
-var zenUrl = `${getConfigVal('zendesk:protocol')}://${getConfigVal('servers:zendesk_fqdn')}:${getConfigVal('app_ports:zendesk')}/api/v2`;
-var zenUserId = getConfigVal('zendesk:user_id');
-var zenToken = getConfigVal('zendesk:token');
+const zenUrl = `${getConfigVal('zendesk:protocol')}://${getConfigVal('servers:zendesk_fqdn')}:${getConfigVal('app_ports:zendesk')}/api/v2`;
+const zenUserId = getConfigVal('zendesk:user_id');
+const zenToken = getConfigVal('zendesk:token');
 
 logger.info('Zendesk config:');
 logger.info(`URL: ${zenUrl}`);
@@ -451,18 +451,18 @@ logger.info(`UserID: ${zenUserId}`);
 logger.info(`Token: ${zenToken}`);
 
 // Instantiate a connection to Zendesk
-var zendeskClient = zendeskApi.createClient({
+const zendeskClient = zendeskApi.createClient({
   username: zenUserId,
   token: zenToken,
   remoteUri: zenUrl
 });
 
-var dbHost = getConfigVal('servers:mysql_fqdn');
-var dbUser = getConfigVal('database_servers:mysql:user');
-var dbPassword = getConfigVal('database_servers:mysql:password');
-var dbName = getConfigVal('database_servers:mysql:ad_database_name');
-var dbPort = getConfigVal('app_ports:mysql');
-var vmTable = 'videomail';
+const dbHost = getConfigVal('servers:mysql_fqdn');
+const dbUser = getConfigVal('database_servers:mysql:user');
+const dbPassword = getConfigVal('database_servers:mysql:password');
+const dbName = getConfigVal('database_servers:mysql:ad_database_name');
+const dbPort = getConfigVal('app_ports:mysql');
+const vmTable = 'videomail';
 
 // Create MySQL connection and connect to the database
 dbConnection = mysql.createConnection({
@@ -496,7 +496,7 @@ dbConnection.connect((err) => {
 });
 
 // Pull MongoDB configuration from config.json file
-var mongodbUri = null;
+let mongodbUri = null;
 const mongodbFqdn = nconf.get('servers:mongodb_fqdn');
 const mongodbTlsCaFile = nconf.get('database_servers:mongodb:tlsCAFile');
 
@@ -526,14 +526,14 @@ if (mongodbTlsCaFile.length > 0) {
   mongoOptions.tlsCAFile = mongodbTlsCaFile;
 }
 
-var logCallData = nconf.get('database_servers:mongodb:logCallData');
-var mongodb;
-var colCallData = null;
+const logCallData = nconf.get('database_servers:mongodb:logCallData');
+let mongodb;
+let colCallData = null;
 // Connect to MongoDB
 if (mongodbUri) {
   // Initialize connection once
-  MongoClient.connect(mongodbUri, mongoOptions, (err, database) => {
-    if (err) {
+  MongoClient.connect(mongodbUri, mongoOptions, (errConnect, database) => {
+    if (errConnect) {
       logger.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
       console.error('*** ERROR: Could not connect to MongoDB. Please make sure it is running.');
       process.exit(-99);
@@ -548,15 +548,15 @@ if (mongodbUri) {
     // console.log('https web server listening on ' + port);
 
     // prepare an entry into MongoDB to log the acedirect restart
-    var data = {
-      'Timestamp': new Date(),
-      'Role': 'acedirect',
-      'Purpose': 'Restarted'
+    const data = {
+      Timestamp: new Date(),
+      Role: 'acedirect',
+      Purpose: 'Restarted'
     };
 
     if (logCallData) {
       // first check if collection "events" already exist, if not create one
-      mongodb.listCollections({ name: 'calldata' }).toArray((err, collections) => {
+      mongodb.listCollections({ name: 'calldata' }).toArray((_err, collections) => {
         console.log(`try to find calldata collection, colCallData length: ${collections.length}`);
         if (collections.length === 0) {
           // "stats" collection does not exist
@@ -566,8 +566,7 @@ if (mongodbUri) {
             console.log('Collection calldata is created capped size 100000, max 5000 entries');
             colCallData = mongodb.collection('calldata');
           });
-        }
-        else {
+        } else {
           // events collection exist already
           console.log('Collection calldata exists');
           colCallData = mongodb.collection('calldata');
@@ -595,10 +594,10 @@ const credentials = {
   cert: fs.readFileSync(getConfigVal('common:https:certificate'))
 };
 
-var agent = new openamAgent.PolicyAgent({
+const agent = new openamAgent.PolicyAgent({
   serverUrl: `https://${getConfigVal('servers:nginx_fqdn')}:${getConfigVal('app_ports:nginx')}/${getConfigVal('openam:path')}`,
   privateIP: getConfigVal('servers:nginx_private_ip'),
-  errorPage: function () {
+  errorPage() {
     return '<html><body><h1>Access Error</h1></body></html>';
   }
 });
@@ -656,7 +655,7 @@ logger.info(`FQDN URL: ${fqdnUrl}`);
 const httpsServer = https.createServer(credentials, app);
 
 // constant to identify provider devices in AMI messages
-var PROVIDER_STR = 'Provider';
+const PROVIDER_STR = 'Provider';
 
 const io = require('socket.io')(httpsServer, {
   cookie: false,
@@ -692,7 +691,7 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('logWebRTCEvt', (data) => {
     // log to MongoDB
-    data['username'] = token.username;
+    data.username = token.username;
     const collName = 'webRTCStats';
     const agentWebRTCStats = mongodb.collection(collName);
     agentWebRTCStats.insertOne(data, (err, _result) => {
@@ -745,7 +744,7 @@ io.sockets.on('connection', (socket) => {
           sharingConsumer[i] = incomingVRS;
           fileToken[i] = '';
           break;
-        } else if (sharingAgent[i] == '') {
+        } else if (sharingAgent[i] === '') {
           // fil any gaps
           sharingAgent[i] = token.extension;
           sharingConsumer[i] = incomingVRS;
@@ -770,7 +769,7 @@ io.sockets.on('connection', (socket) => {
     console.log('call ended');
 
     for (let i = 0; i < sharingAgent.length; i += 1) {
-      if (data.agentExt == sharingAgent[i] || token.vrs == sharingConsumer[i]) {
+      if (data.agentExt === sharingAgent[i] || token.vrs === sharingConsumer[i]) {
         // empty
         sharingAgent[i] = '';
         sharingConsumer[i] = '';
@@ -798,127 +797,123 @@ io.sockets.on('connection', (socket) => {
   // Handle multiple files
   socket.on('get-file-list-agent', (data) => {
     console.log('AGENT HAS UPLOADED FILE');
-    let vrsNum = (token.vrs) ? token.vrs : data.vrs;
+    const vrsNum = (token.vrs) ? token.vrs : data.vrs;
     let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}`;
     url += `/fileListByVRS?vrs=${vrsNum}`;
     request({
-      url: url,
+      url,
       json: true
     }, (error, response, results) => {
       if (error) {
         console.log('Error');
+      } else if (results.message === 'Success') {
+        const latestResult = results.result[results.result.length - 1];
+
+        console.log('last 5 results: ');
+        console.log(results.result.slice(Math.max(results.result.length - 5, 0)));
+
+        redisClient.hget(rConsumerToCsr, Number(data.vrs), (_err, _agentExtension) => {
+          let vrs = null;
+          console.log(`Token is ${JSON.stringify(token)}\n and data is ${JSON.stringify(data)}`);
+
+          // populate fileToken in the same spot as the uploader
+          let uploader;
+          if (token.vrs === undefined) {
+            uploader = token.extension;
+          } else {
+            uploader = token.vrs;
+          }
+
+          for (let i = 0; i < sharingAgent.length; i += 1) {
+            // console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
+            // console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
+            if (sharingAgent[i] === uploader) {
+              fileToken[i] = latestResult.id;
+              console.log(`${sharingAgent[i]} shared file`);
+              console.log('with id: ');
+              console.log(fileToken[i]);
+              break;
+            }
+          }
+          console.log(`agents: ${sharingAgent}`);
+          console.log(`consumers: ${sharingConsumer}`);
+          console.log(`file ID: ${fileToken}`);
+
+          // if (token.vrs) {
+          // vrs = token.vrs;
+          if (token.phone) {
+            vrs = token.phone.replace(/-/g, '');
+          } else {
+            vrs = data.vrs;
+          }
+          console.log(`Sending file list message to ${vrsNum} with ${JSON.stringify(latestResult)}`);
+
+          io.to(Number(vrsNum)).emit('fileListConsumer', (latestResult));
+        });
       } else {
-        if (results.message === 'Success') {
-          let latestResult = results.result[results.result.length - 1];
-
-          console.log('last 5 results: ');
-          console.log(results.result.slice(Math.max(results.result.length - 5, 0)));
-
-          redisClient.hget(rConsumerToCsr, Number(data.vrs), (_err, _agentExtension) => {
-            var vrs = null;
-            console.log(`Token is ${JSON.stringify(token)}\n and data is ${JSON.stringify(data)}`);
-
-            // populate fileToken in the same spot as the uploader
-            let uploader;
-            if (token.vrs == undefined) {
-              uploader = token.extension;
-            } else {
-              uploader = token.vrs;
-            }
-
-            for (let i = 0; i < sharingAgent.length; i += 1) {
-              // console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
-              // console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
-              if (sharingAgent[i] == uploader) {
-                fileToken[i] = latestResult.id;
-                console.log(`${sharingAgent[i]} shared file`);
-                console.log('with id: ');
-                console.log(fileToken[i]);
-                break;
-              }
-            }
-            console.log(`agents: ${sharingAgent}`);
-            console.log(`consumers: ${sharingConsumer}`);
-            console.log(`file ID: ${fileToken}`);
-
-            // if (token.vrs) {
-            // vrs = token.vrs;
-            if (token.phone) {
-              vrs = token.phone.replace(/-/g, '');
-            } else {
-              vrs = data.vrs;
-            }
-            console.log(`Sending file list message to ${vrsNum} with ${JSON.stringify(latestResult)}`);
-
-            io.to(Number(vrsNum)).emit('fileListConsumer', (latestResult));
-          });
-        } else {
-          console.log('Unkonwn error in get-file-list-agent');
-          console.log(results);
-        }
+        console.log('Unkonwn error in get-file-list-agent');
+        console.log(results);
       }
     });
   });
 
   socket.on('get-file-list-consumer', (data) => {
     console.log('CONSUMER HAS UPLOADED FILE');
-    let vrsNum = (token.vrs) ? token.vrs : data.vrs;
+    const vrsNum = (token.vrs) ? token.vrs : data.vrs;
     let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}`;
     url += `/fileListByVRS?vrs=${vrsNum}`;
     request({
-      url: url,
+      url,
       json: true
     }, (error, response, results) => {
       if (error) {
         console.log('Error');
+      } else if (results.message === 'Success') {
+        const latestResult = results.result[results.result.length - 1];
+
+        console.log('last 5 results: ');
+        console.log(results.result.slice(Math.max(results.result.length - 5, 0)));
+
+        redisClient.hget(rConsumerToCsr, Number(data.vrs), (_err, _agentExtension) => {
+          let vrs = null;
+          console.log(`Token is ${JSON.stringify(token)}\n and data is ${JSON.stringify(data)}`);
+
+          // populate fileToken in the same spot as the uploader
+          let uploader;
+          if (token.vrs === undefined) {
+            uploader = token.extension;
+          } else {
+            uploader = token.vrs;
+          }
+
+          for (let i = 0; i < sharingAgent.length; i += 1) {
+            // console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
+            // console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
+            if (sharingConsumer[i] === uploader) {
+              fileToken[i] = latestResult.id;
+              console.log(`${sharingConsumer[i]} shared file`);
+              console.log('with id: ');
+              console.log(fileToken[i]);
+            }
+          }
+          console.log(`agents: ${sharingAgent}`);
+          console.log(`consumers: ${sharingConsumer}`);
+          console.log(`file ID: ${fileToken}`);
+
+          // if (token.vrs) {
+          // vrs = token.vrs;
+          if (token.phone) {
+            vrs = token.phone.replace(/-/g, '');
+          } else {
+            vrs = data.vrs;
+          }
+          console.log(`Sending file list message to ${vrsNum} with ${JSON.stringify(latestResult)}`);
+
+          io.to(Number(vrsNum)).emit('fileListAgent', (latestResult));
+        });
       } else {
-        if (results.message === 'Success') {
-          let latestResult = results.result[results.result.length - 1];
-
-          console.log('last 5 results: ');
-          console.log(results.result.slice(Math.max(results.result.length - 5, 0)));
-
-          redisClient.hget(rConsumerToCsr, Number(data.vrs), (_err, _agentExtension) => {
-            var vrs = null;
-            console.log(`Token is ${JSON.stringify(token)}\n and data is ${JSON.stringify(data)}`);
-
-            // populate fileToken in the same spot as the uploader
-            let uploader;
-            if (token.vrs == undefined) {
-              uploader = token.extension;
-            } else {
-              uploader = token.vrs;
-            }
-
-            for (let i = 0; i < sharingAgent.length; i += 1) {
-              // console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
-              // console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
-              if (sharingConsumer[i] == uploader) {
-                fileToken[i] = latestResult.id;
-                console.log(`${sharingConsumer[i]} shared file`);
-                console.log('with id: ');
-                console.log(fileToken[i]);
-              }
-            }
-            console.log(`agents: ${sharingAgent}`);
-            console.log(`consumers: ${sharingConsumer}`);
-            console.log(`file ID: ${fileToken}`);
-
-            // if (token.vrs) {
-            // vrs = token.vrs;
-            if (token.phone) {
-              vrs = token.phone.replace(/-/g, '');
-            } else {
-              vrs = data.vrs;
-            }
-            console.log(`Sending file list message to ${vrsNum} with ${JSON.stringify(latestResult)}`);
-
-            io.to(Number(vrsNum)).emit('fileListAgent', (latestResult));
-          });
-        } else {
-          console.log('Unknown error in get-file-list-consumer');
-          console.log(results);
-        }
+        console.log('Unknown error in get-file-list-consumer');
+        console.log(results);
       }
     });
   });
@@ -968,17 +963,18 @@ io.sockets.on('connection', (socket) => {
   socket.on('multiparty-caption-agent', (data) => {
     if (data.final) {
       // only send finals during a multiparty call, browser caption engine fragments sentences
-      let d = new Date();
+      const d = new Date();
       data.timestamp = d.getTime();
       data.msgid = d.getTime();
       if (data.hasMonitor) {
         // send multiparty captions to the monitor
         io.to(Number(data.monitorExt)).emit('multiparty-caption', data);
       } else if (data.participants && data.participants.length > 0) {
-        data.participants.forEach(p => {
+        data.participants.forEach((p) => {
           redisClient.hget(rExtensionToVrs, Number(p), (err, vrsNum) => {
             if (!err) {
-              p = (vrsNum) ? vrsNum : p;
+              // p = (vrsNum) ? vrsNum : p;
+              p = (vrsNum) || p;
               io.to(Number(p)).emit('multiparty-caption', data);
             }
           });
@@ -1034,7 +1030,8 @@ io.sockets.on('connection', (socket) => {
   // Fired at end of call when new call history is added
   socket.on('callHistory', (data) => {
     console.log(`callhistory for ${token.username}`);
-    mongodb.listCollections({ name: `${token.username}callHistory` }).toArray((err, collections) => {
+    mongodb.listCollections({ name: `${token.username}callHistory` }).toArray((_err, collections) => {
+      let colCallHistory;
       if (collections.length === 0) {
         // "stats" collection does not exist
         console.log(`Creating new ${token.username}callHistory colleciton in MongoDB`);
@@ -1043,8 +1040,7 @@ io.sockets.on('connection', (socket) => {
           console.log(`Collection ${token.username}callHistory is created capped size 100000, max 5000 entries`);
           colCallHistory = mongodb.collection(`${token.username}callHistory`);
         });
-      }
-      else {
+      } else {
         // events collection exist already
         colCallHistory = mongodb.collection(`${token.username}callHistory`);
         // colCallHistory.remove({});
@@ -1062,7 +1058,8 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('getCallHistory', () => {
     console.log(`callhistory for ${token.username}`);
-    mongodb.listCollections({ name: `${token.username}callHistory` }).toArray((err, collections) => {
+    mongodb.listCollections({ name: `${token.username}callHistory` }).toArray((_err, collections) => {
+      let colCallHistory;
       if (collections.length === 0) {
         console.log(`Creating new ${token.username}callHistory colleciton in MongoDB`);
         mongodb.createCollection(`${token.username}callHistory`, cappedCollectionOptions, (err, _result) => {
@@ -1070,8 +1067,7 @@ io.sockets.on('connection', (socket) => {
           console.log('Collection callHistory is created capped size 100000, max 5000 entries');
           colCallHistory = mongodb.collection(`${token.username}callHistory`);
         });
-      }
-      else {
+      } else {
         // events collection exist already
         console.log(`Collection ${token.username}callHistory exists`);
         colCallHistory = mongodb.collection(`${token.username}callHistory`);
@@ -1091,7 +1087,8 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('set-shortcuts', (data) => {
     // first check if collection already exist, if not create one
-    mongodb.listCollections({ name: `${token.username}shortcuts` }).toArray((err, collections) => {
+    mongodb.listCollections({ name: `${token.username}shortcuts` }).toArray((_err, collections) => {
+      let colShortcuts;
       if (collections.length === 0) {
         // "stats" collection does not exist
         console.log('Creating new shortcuts colleciton in MongoDB');
@@ -1103,8 +1100,7 @@ io.sockets.on('connection', (socket) => {
           console.log(`Collection ${token.username}shortcuts is created`);
           colShortcuts = mongodb.collection(`${token.username}shortcuts`);
         });
-      }
-      else {
+      } else {
         // collection exist already
         // console.log("Collection shortcuts exists");
         colShortcuts = mongodb.collection(`${token.username}shortcuts`);
@@ -1120,7 +1116,8 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('get-shortcuts', () => {
-    mongodb.listCollections({ name: `${token.username}shortcuts` }).toArray((err, collections) => {
+    mongodb.listCollections({ name: `${token.username}shortcuts` }).toArray((_err, collections) => {
+      let colShortcuts;
       if (collections.length === 0) {
         // collection does not exist
         console.log('Creating new shortcuts colleciton in MongoDB');
@@ -1132,8 +1129,7 @@ io.sockets.on('connection', (socket) => {
           console.log('Collection shortcuts is created');
           colShortcuts = mongodb.collection(`${token.username}shortcuts`);
         });
-      }
-      else {
+      } else {
         // console.log("Collection shortcuts exists");
         colShortcuts = mongodb.collection(`${token.username}shortcuts`);
 
@@ -1151,7 +1147,7 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('reset-shortcuts', () => {
     console.log('resetting shortcuts');
-    colShortcuts = mongodb.collection(`${token.username}shortcuts`);
+    const colShortcuts = mongodb.collection(`${token.username}shortcuts`);
     colShortcuts.deleteMany({});
   });
 
@@ -1177,18 +1173,18 @@ io.sockets.on('connection', (socket) => {
     setInitialLoginAsteriskConfigs(token);
 
     io.to(token.extension).emit('lightcode-configs', colorConfigs);
-    var skinny = getConfigVal('skinny_mode:agent');
+    const skinny = getConfigVal('skinny_mode:agent');
     io.to(token.extension).emit('skinny-config', skinny);
 
-    var caption_agent = getConfigVal('caption_mode:agent');
-    io.to(token.extension).emit('caption-config', caption_agent);
+    const captionAgent = getConfigVal('caption_mode:agent');
+    io.to(token.extension).emit('caption-config', captionAgent);
 
-    var url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:aserver')}`;
+    let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:aserver')}`;
     if (url) {
       url += '/getallscripts/';
 
       request({
-        url: url,
+        url,
         json: true
       }, (error, response, data) => {
         if (error) {
@@ -1313,9 +1309,9 @@ io.sockets.on('connection', (socket) => {
   // Sends request for agent assistance to the Management Portal
   socket.on('request-assistance', () => {
     logger.info(`Request Assistance - ${token.username}:${token.extension}`);
-    var url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:managementportal')}/agentassist`; // assumes managementportal is co-located with adserver
+    const url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:managementportal')}/agentassist`; // assumes managementportal is co-located with adserver
     request({
-      url: url,
+      url,
       qs: {
         extension: token.extension
       },
@@ -1355,7 +1351,7 @@ io.sockets.on('connection', (socket) => {
     io.to(Number(data.vrs)).emit('agent-name', data);
   });
   socket.on('save-grid-layout', (data) => {
-    var requestJson = {};
+    const requestJson = {};
     requestJson.agent_id = token.agent_id;
     requestJson.layout = data.gridLayout;
     request({
@@ -1377,7 +1373,7 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('get-dial-in-number', (data) => {
-    var dialInNumber;
+    let dialInNumber;
     const obj = {
       Action: 'Command',
       command: 'database show global/dialin'
@@ -1389,12 +1385,12 @@ io.sockets.on('connection', (socket) => {
         console.log(JSON.stringify(err));
       } else {
         console.log('success getting dial-in number');
-        var outputValues = Object.values(res.output[0]);
-        var num = '';
+        const outputValues = Object.values(res.output[0]);
+        let num = '';
 
         for (let i = 0; i < outputValues.length; i += 1) {
           if (!isNaN(outputValues[i]) && outputValues[i] !== ' ') {
-            num = num + outputValues[i];
+            num += outputValues[i];
           }
         }
 
@@ -1422,12 +1418,12 @@ io.sockets.on('connection', (socket) => {
 
     // Remove the consumer from the extension map.
     if (token.vrs) {
-      redisClient.hget(rExtensionToVrs, Number(token.vrs), (err, ext) => {
-        regex_str = `/^PJSIP/${ext}-.*$/`;
+      redisClient.hget(rExtensionToVrs, Number(token.vrs), (_err, ext) => {
+        const regexStr = `/^PJSIP/${ext}-.*$/`;
         ami.action({
           Action: 'Hangup',
           ActionID: '4',
-          Channel: regex_str
+          Channel: regexStr
         }, (err, _res) => {
           if (err) {
             logger.info('ERROR in hangup');
@@ -1440,7 +1436,7 @@ io.sockets.on('connection', (socket) => {
           if (err) {
             logger.error(`Redis Error${err}`);
           } else if (reply) {
-            var val = JSON.parse(reply);
+            const val = JSON.parse(reply);
             val.inuse = false;
             redisClient.hset(rConsumerExtensions, Number(ext), JSON.stringify(val));
             redisClient.hdel(rExtensionToVrs, Number(ext));
@@ -1481,26 +1477,27 @@ io.sockets.on('connection', (socket) => {
   });
 
   // defaults to false
-  var isMuted = getConfigVal('agent_incall_audio:mute_all_audio');
-  socket.emit('mute-options', { isMuted: isMuted });
+  const isMuted = getConfigVal('agent_incall_audio:mute_all_audio');
+  socket.emit('mute-options', { isMuted });
 
-  var saveChatHistory = getConfigVal('agent_chat:save_agent_chats');
+  const saveChatHistory = getConfigVal('agent_chat:save_agent_chats');
   socket.emit('save-chat-value', { isSaved: saveChatHistory });
 
   // direct messaging between agents
   socket.on('check-agent-chat-status', (data) => {
-    if (saveChatHistory == 'true') {
+    if (saveChatHistory === 'true') {
       // if collection with data participants exists, send collection
       // if not, create collection
-      var chatMembers = [data.destext, data.senderext];
+      let chatMembers = [data.destext, data.senderext];
 
       if (chatMembers.length < 2) {
         console.log('ERROR');
       } else {
         chatMembers = chatMembers.sort();
-        var extensionsChat = chatMembers.toString();
+        const extensionsChat = chatMembers.toString();
 
         mongodb.listCollections({ name: `${extensionsChat}chatHistory` }).toArray((err, collections) => {
+          let colChatHistory;
           if (collections.length === 0) {
             // collection does not exist
             console.log('Creating new chatHistory colleciton in MongoDB');
@@ -1511,8 +1508,7 @@ io.sockets.on('connection', (socket) => {
             console.log(`Collection ${extensionsChat}chatHistory is created `);
 
             socket.emit('begin-agent-chat');
-          }
-          else {
+          } else {
             // collection exist already
             colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
 
@@ -1524,12 +1520,12 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('get-agent-chat', (data) => {
-    if (saveChatHistory == 'true') {
-      var chatMembers = [data.destext, data.senderext];
+    if (saveChatHistory === 'true') {
+      let chatMembers = [data.destext, data.senderext];
       chatMembers = chatMembers.sort();
-      var extensionsChat = chatMembers.toString();
+      const extensionsChat = chatMembers.toString();
 
-      colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
+      const colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
 
       colChatHistory.find({}).sort({ $natural: -1 }).limit(100).toArray((err, result) => {
         // only load the last 100 chats to prevent lagging
@@ -1547,12 +1543,12 @@ io.sockets.on('connection', (socket) => {
   socket.on('upload-agent-message', (data) => {
     io.to(Number(data.destext)).emit('new-agent-chat', data);
 
-    if (saveChatHistory == 'true') {
-      var chatMembers = [data.destext, data.senderext];
+    if (saveChatHistory === 'true') {
+      let chatMembers = [data.destext, data.senderext];
       chatMembers = chatMembers.sort();
-      var extensionsChat = chatMembers.toString();
+      const extensionsChat = chatMembers.toString();
 
-      colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
+      const colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
       colChatHistory.insertOne(data, (err, _result) => {
         if (err) {
           console.log(`Insert a record into chatHistory collection of MongoDB, error: ${err}`);
@@ -1565,12 +1561,12 @@ io.sockets.on('connection', (socket) => {
 
   // for testing only-- drop all chatHistory collections
   socket.on('clear-chat-messages', () => {
-    mongodb.listCollections().toArray((err, results) => {
-      if (err) throw err;
+    mongodb.listCollections().toArray((errListCollections, results) => {
+      if (errListCollections) throw errListCollections;
 
       for (let i = 0; i < results.length; i += 1) {
         if (results[i].name.includes('chatHistory')) {
-          colChatHistory = mongodb.collection(results[i].name);
+          const colChatHistory = mongodb.collection(results[i].name);
           console.log(results[i].name);
           colChatHistory.drop((err, success) => {
             if (err) throw err;
@@ -1582,11 +1578,11 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('get-my-chats', (data) => {
-    if (saveChatHistory == 'true') {
-      var chats = [];
+    if (saveChatHistory === 'true') {
+      const chats = [];
 
-      mongodb.listCollections().toArray((err, results) => {
-        if (err) throw err;
+      mongodb.listCollections().toArray((errListCollections, results) => {
+        if (errListCollections) throw errListCollections;
 
         for (let i = 0; i < results.length; i += 1) {
           if (results[i].name.includes(data.ext) && results[i].name.includes('chatHistory')) {
@@ -1595,18 +1591,19 @@ io.sockets.on('connection', (socket) => {
         }
 
         // get the last document from those chats
-        var totalChats = chats.length;
+        const totalChats = chats.length;
         for (let i = 0; i < chats.length; i += 1) {
-          colChatHistory = mongodb.collection(chats[i]);
+          const colChatHistory = mongodb.collection(chats[i]);
 
-          colChatHistory.find().sort({ $natural: -1 }).limit(1).next().then(
-            (doc) => {
-              socket.emit('my-chats', { doc: doc, total: totalChats });
-            },
-            (err) => {
-              console.log('Error:', err);
-            }
-          );
+          colChatHistory.find().sort({ $natural: -1 }).limit(1).next()
+            .then(
+              (doc) => {
+                socket.emit('my-chats', { doc, total: totalChats });
+              },
+              (err) => {
+                console.log('Error:', err);
+              }
+            );
         }
       });
     }
@@ -1614,8 +1611,8 @@ io.sockets.on('connection', (socket) => {
 
   // RTT for agent to agent chat
   socket.on('agent-chat-typing', (data) => {
-    var ext = data.ext;
-    var msg = data.rttmsg;
+    const { ext } = data;
+    let msg = data.rttmsg;
     // Replace html tags with character entity code
     msg = msg.replace(/</g, '&lt;');
     msg = msg.replace(/>/g, '&gt;');
@@ -1628,7 +1625,7 @@ io.sockets.on('connection', (socket) => {
 
   // RTT for agent to agent chat
   socket.on('agent-chat-typing-clear', (data) => {
-    var ext = data.ext;
+    const { ext } = data;
 
     io.to(Number(ext)).emit('agent-typing-clear', {
       displayname: data.displayname
@@ -1636,13 +1633,13 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('chat-read', (data) => {
-    if (saveChatHistory == 'true') {
-      var chatMembers = [data.ext, data.destext];
+    if (saveChatHistory === 'true') {
+      let chatMembers = [data.ext, data.destext];
       chatMembers = chatMembers.sort();
-      var extensionsChat = chatMembers.toString();
+      const extensionsChat = chatMembers.toString();
 
       mongodb.listCollections({ name: `${extensionsChat}chatHistory` }).toArray((_err, _collections) => {
-        colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
+        const colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
         // console.log('recipient opened message');
         colChatHistory.updateMany(
           {},
@@ -1654,32 +1651,32 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('broadcast-agent-chat', (data) => {
-    var broadcastExtensions = [];
+    const broadcastExtensions = [];
 
-    var clients_in_the_room = io.sockets.adapter.rooms['my room'];
-    var clients = (clients_in_the_room.sockets);
-    var roomKeys = Object.keys(clients);
+    const clientsInTheRoom = io.sockets.adapter.rooms['my room'];
+    const clients = (clientsInTheRoom.sockets);
+    const roomKeys = Object.keys(clients);
 
     // if the socketID matches, add to convo
     for (let i = 0; i < roomKeys.length; i += 1) {
-      var currentRooms = (io.sockets.sockets[roomKeys[i]].rooms);
+      const currentRooms = (io.sockets.sockets[roomKeys[i]].rooms);
       broadcastExtensions.push((Object.keys(currentRooms)));
     }
 
     io.emit('broadcast', data);
-    if (saveChatHistory == 'true') {
+    if (saveChatHistory === 'true') {
       // insert the broadcast into each conversation's db
       for (let i = 0; i < broadcastExtensions.length; i += 1) {
         data.destname = '';
-        var currentExt = broadcastExtensions[i][0];
+        const currentExt = broadcastExtensions[i][0];
 
         data.destext = broadcastExtensions[i][0];
 
-        var chatMembers = [currentExt, data.senderext];
+        let chatMembers = [currentExt, data.senderext];
         chatMembers = chatMembers.sort();
-        var extensionsChat = chatMembers.toString();
+        const extensionsChat = chatMembers.toString();
 
-        colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
+        const colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
         colChatHistory.insertOne(data, (err, _result) => {
           if (err) {
             console.log(`Insert a record into chatHistory collection of MongoDB, error: ${err}`);
@@ -1694,15 +1691,15 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('update-broadcast-name', (data) => {
-    if (saveChatHistory == 'true') {
+    if (saveChatHistory === 'true') {
       console.log('updating destname of broadcast');
 
-      var chatMembers = [data.destext, data.senderext];
+      let chatMembers = [data.destext, data.senderext];
       chatMembers = chatMembers.sort();
-      var extensionsChat = chatMembers.toString();
+      const extensionsChat = chatMembers.toString();
 
       mongodb.listCollections({ name: `${extensionsChat}chatHistory` }).toArray((_err, _collections) => {
-        colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
+        const colChatHistory = mongodb.collection(`${extensionsChat}chatHistory`);
 
         colChatHistory.updateOne(
           { displayname: data.sendername, timeSent: data.time },
@@ -1718,10 +1715,10 @@ io.sockets.on('connection', (socket) => {
     if (token.vrs) {
       logger.info(`chat: register-vrs - if() case ${token.vrs}`);
       socket.join(Number(token.vrs));
-      var skinny = getConfigVal('skinny_mode:consumer');
+      const skinny = getConfigVal('skinny_mode:consumer');
       io.to(token.vrs).emit('skinny-config', skinny);
-      var caption_cons = getConfigVal('caption_mode:consumer');
-      io.to(token.vrs).emit('caption-config', caption_cons);
+      const captionCons = getConfigVal('caption_mode:consumer');
+      io.to(token.vrs).emit('caption-config', captionCons);
     } else {
       logger.info(`chat: register-vrs - else() case ${data.vrs}`);
       socket.join(Number(data.vrs));
@@ -1738,8 +1735,8 @@ io.sockets.on('connection', (socket) => {
   // Handler catches a Socket.IO event (chat-message)
   // to create a Zendesk ticket based on incoming info.
   socket.on('chat-message', (data) => {
-    var vrs = null;
-    var msg = data.message;
+    let vrs = null;
+    let msg = data.message;
 
     // prevent vrs consumer from spoofing a vrs
     if (token.vrs) {
@@ -1763,7 +1760,7 @@ io.sockets.on('connection', (socket) => {
       url: `${translationServerUrl}/translate?languageFrom=${data.fromLanguage}&text=${encodeURI(data.message)}&languageTo=${data.toLanguage}`,
       headers: {
         'Content-Type': 'application/json'
-      },
+      }
     }, (error, response, newData) => {
       if (error) {
         logger.error(`translate ERROR: ${error}`);
@@ -1771,7 +1768,7 @@ io.sockets.on('connection', (socket) => {
         socket.emit('chat-message-new-translated', data);
         socket.emit('translate-language-error', error);
       } else {
-        let dataObj = JSON.parse(newData);
+        const dataObj = JSON.parse(newData);
         console.log(`Translation is ${dataObj.translation}`);
         data.message = dataObj.translation;
         socket.emit('chat-message-new-translated', data);
@@ -1782,8 +1779,8 @@ io.sockets.on('connection', (socket) => {
   // Handler catches a Socket.IO event (chat-typing)
   // to send the user an 'is typing...' message in the chat window.
   socket.on('chat-typing', (data) => {
-    var vrs = null;
-    var msg = data.rttmsg;
+    let vrs = null;
+    let msg = data.rttmsg;
     if (token.vrs) {
       vrs = token.vrs;
     } else {
@@ -1802,7 +1799,7 @@ io.sockets.on('connection', (socket) => {
   // Handler catches a Socket.IO event (chat-typing-clear)
   // to clear the 'is typing...' message in the chat window.
   socket.on('chat-typing-clear', (data) => {
-    var vrs = null;
+    let vrs = null;
     if (token.vrs) {
       vrs = token.vrs;
     } else {
@@ -1847,7 +1844,7 @@ io.sockets.on('connection', (socket) => {
 
   // Retrieval of videomail records from the database
   socket.on('get-videomail', (data) => {
-    const filterFlag = (data.filter === 'ALL' || typeof data.filter === 'undefined') ? false : true;
+    const filterFlag = !((data.filter === 'ALL' || typeof data.filter === 'undefined'));
     const sort = (typeof data.sortBy === 'undefined') ? [] : data.sortBy.split(' ');
 
     const vmSqlSelect = `SELECT id, extension, callbacknumber, recording_agent, processing_agent,
@@ -1937,7 +1934,7 @@ io.sockets.on('connection', (socket) => {
 
   // Retrieval of videomail records from the database
   socket.on('get-recordings', (data) => {
-    const filterFlag = (data.filter === 'ALL' || typeof data.filter === 'undefined') ? false : true;
+    const filterFlag = !((data.filter === 'ALL' || typeof data.filter === 'undefined'));
     const sort = (typeof data.sortBy === 'undefined') ? [] : data.sortBy.split(' ');
 
     const recordingSqlSelect = 'SELECT fileName, agentNumber, timeStamp, participants, status, duration FROM call_recordings';
@@ -2026,12 +2023,12 @@ io.sockets.on('connection', (socket) => {
     // Add this socket to the room
     socket.join(token.extension);
 
-    const url = `https://${getConfigVal('servers:main_private_ip')}:9905`;
+    let url = `https://${getConfigVal('servers:main_private_ip')}:9905`;
     if (url) {
       url += '/storeFileName';
 
       request({
-        url: url,
+        url,
         method: 'POST'
         // TODO Add the file body
       }, (error, response, data) => {
@@ -2059,45 +2056,43 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('translate-caption', (data) => {
     // fixme do we have to test this to avoid hacks or bugs?
-    let callerNumber = data.callerNumber.toString();
-    let msgid = data.transcripts.msgid;
-    let final = data.transcripts.final;
-    let displayname = data.displayname || 'Caller';
+    const callerNumber = data.callerNumber.toString();
+    const { msgid } = data.transcripts;
+    const { final } = data.transcripts;
+    const displayname = data.displayname || 'Caller';
 
     console.log('translating', data);
 
-    var fromNumber;
-    var toNumber;
-    var languageFrom;
-    var languageTo;
+    let fromNumber;
+    let toNumber;
+    let languageFrom;
+    let languageTo;
 
-    redisClient.hgetall(rConsumerToCsr, (err, tuples) => {
-      if (err) {
-        logger.error(`Redis Error${err}`);
-        console.log(`Redis Error${err}`);
+    redisClient.hgetall(rConsumerToCsr, (errHgeTail, tuples) => {
+      if (errHgeTail) {
+        logger.error(`Redis Error${errHgeTail}`);
+        console.log(`Redis Error${errHgeTail}`);
       } else {
         console.log('csr', callerNumber, tuples);
-        for (let clientNumber in tuples) {
-          agentNumber = tuples[clientNumber];
+        for (const clientNumber in tuples) {
+          const agentNumber = tuples[clientNumber];
           console.log(callerNumber, `${clientNumber} => ${agentNumber}`, typeof (callerNumber), typeof (agentNumber), callerNumber === agentNumber);
           if (callerNumber === agentNumber) {
             fromNumber = clientNumber;
             toNumber = agentNumber;
-          }
-          else if (callerNumber === clientNumber) {
+          } else if (callerNumber === clientNumber) {
             fromNumber = agentNumber;
             toNumber = clientNumber;
             console.log(agentNumber, clientNumber);
           }
         }
-        var promises = [
+        const promises = [
           new Promise((resolve, reject) => {
             redisClient.hget(rExtensionToLanguage, Number(fromNumber), (err, language) => {
               if (err) {
                 logger.error(`Redis Error${err}`);
                 reject(err);
-              }
-              else {
+              } else {
                 languageFrom = language;
                 console.log('language from for user', fromNumber, languageFrom);
                 if (!languageFrom) {
@@ -2113,8 +2108,7 @@ io.sockets.on('connection', (socket) => {
               if (err) {
                 logger.error(`Redis Error${err}`);
                 reject(err);
-              }
-              else {
+              } else {
                 languageTo = language;
                 if (!languageTo) {
                   languageTo = 'en'; // default English
@@ -2128,8 +2122,8 @@ io.sockets.on('connection', (socket) => {
         Promise.all(promises).then((_values) => {
           console.log('language', fromNumber, toNumber, languageFrom, languageTo);
           console.log('translating', data.transcripts.transcript, 'from', languageFrom, 'to', languageTo);
-          let encodedText = encodeURI(data.transcripts.transcript.trim());
-          let translationUrl = `${translationServerUrl}/translate?languageFrom=${languageFrom}&text=${encodedText}&languageTo=${languageTo}`;
+          const encodedText = encodeURI(data.transcripts.transcript.trim());
+          const translationUrl = `${translationServerUrl}/translate?languageFrom=${languageFrom}&text=${encodedText}&languageTo=${languageTo}`;
           console.log('is agent here? if so use color', data);
           if (languageTo === languageFrom) {
             console.log('same language!');
@@ -2137,11 +2131,10 @@ io.sockets.on('connection', (socket) => {
               transcript: data.transcripts.transcript.trim(),
               displayname: data.transcripts.displayname,
               agent: data.transcripts.agent,
-              msgid: msgid,
-              final: final
+              msgid,
+              final
             });
-          }
-          else {
+          } else {
             console.log('trying', translationUrl);
             request({
               method: 'GET',
@@ -2171,8 +2164,8 @@ io.sockets.on('connection', (socket) => {
                   transcript: data.translation,
                   displayname: data.transcripts.displayname,
                   agent: data.transcripts.agent,
-                  msgid: msgid,
-                  final: final
+                  msgid,
+                  final
                 });
                 // io.to(Number(callerNumber)).emit('caption-translated', {
                 // 'transcript' : data.translation,
@@ -2201,14 +2194,14 @@ io.sockets.on('connection', (socket) => {
  */
 function sendAgentStatusList(agent, value) {
   if (agent) {
-    redisClient.hget(rAgentInfoMap, agent, (err, agentInfo) => {
+    redisClient.hget(rAgentInfoMap, agent, (_err, agentInfo) => {
       if (agentInfo) {
-        var agentInfoJSON = JSON.parse(agentInfo);
+        const agentInfoJSON = JSON.parse(agentInfo);
         agentInfoJSON.status = value;
         redisClient.hset(rAgentInfoMap, agent, JSON.stringify(agentInfoJSON), () => {
           redisClient.hvals(rAgentInfoMap, (err, values) => {
-            var aList = [];
-            for (let id in values) {
+            const aList = [];
+            for (const id in values) {
               aList.push(JSON.parse(values[id]));
             }
             io.to('my room').emit('agent-status-list', {
@@ -2221,8 +2214,8 @@ function sendAgentStatusList(agent, value) {
     });
   } else { // forces socket emit without an update to user agent status map.
     redisClient.hvals(rAgentInfoMap, (err, values) => {
-      var aList = [];
-      for (let id in values) {
+      const aList = [];
+      for (const id in values) {
         aList.push(JSON.parse(values[id]));
       }
       io.to('my room').emit('agent-status-list', {
@@ -2241,7 +2234,7 @@ function sendAgentStatusList(agent, value) {
  * @param {type} evt Incoming Asterisk AMI event.
  * @returns {undefined} Not used
  */
-function handle_action_response(_evt) {
+function handleActionResponse(_evt) {
   // logger.info('\n######################################');
   // logger.info('Received an AMI action response: ' + evt);
   // logger.info(util.inspect(evt, false, null));
@@ -2250,17 +2243,16 @@ function handle_action_response(_evt) {
 // this method requires "popticket": {"url": "https://someurl.com/...."}, in the config file
 function popZendesk(callId, ani, agentid, agentphonenum, skillgrpnum,
   skillgrpnam, callernam, dnis) {
-  var popurl = '';
+  let popurl = '';
   if (typeof (nconf.get('popticket:url')) === 'undefined') {
     logger.info('popZendesk: popticket:url is not in the config file. Skipping popZendesk...');
     return;
-  } else {
-    popurl = getConfigVal('popticket:url');
-    logger.info(`popZendesk: popticket:url is ${popurl}`);
   }
+  popurl = getConfigVal('popticket:url');
+  logger.info(`popZendesk: popticket:url is ${popurl}`);
 
-  var formData = {};
-  var properties = {};
+  const formData = {};
+  const properties = {};
   // REQUIRED. The CallID that identifies call in originating system (Asterisk)
   properties.CallId = callId;
   // REQUIRED. Phone number of the caller.  Used to locate the caller in Zendesk
@@ -2311,7 +2303,9 @@ function insertCallDataRecord(eventType, vrs, uniqueId, origin) {
   if (logCallData) {
     colCallData = mongodb.collection('calldata');
 
-    var data = { Timestamp: new Date(), Event: eventType, UniqueId: uniqueId, Origin: origin };
+    const data = {
+      Timestamp: new Date(), Event: eventType, UniqueId: uniqueId, Origin: origin
+    };
     if (vrs != null) {
       data.vrs = vrs;
 
@@ -2337,16 +2331,16 @@ function insertCallDataRecord(eventType, vrs, uniqueId, origin) {
  * @param {type} evt Incoming Asterisk event.
  * @returns {undefined} Not used
  */
-function handle_manager_event(evt) {
+function handleManagerEvent(evt) {
   logger.info('\n\n######################################');
   logger.info(`Received an AMI event: ${evt.event}`);
   logger.info(util.inspect(evt, false, null));
   // console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>The event is " + evt.event);
   switch (evt.event) {
     case ('VarSet'):
-      let channel = evt.channel.split(/[\/,-]/);
-      if (channel[1] && (channel[1].startsWith('ProviderPurple') || channel[1].startsWith('ProviderZVRS')) && evt.variable && evt.variable.bridgepeer == '') {
-        let agentExt = evt.value.split(/[\/,-]/);
+      const channel = evt.channel.split(/[\/,-]/);
+      if (channel[1] && (channel[1].startsWith('ProviderPurple') || channel[1].startsWith('ProviderZVRS')) && evt.variable && evt.variable.bridgepeer === '') {
+        const agentExt = evt.value.split(/[\/,-]/);
         console.log('sending new-peer to', agentExt[1]);
         if (agentExt[1]) {
           io.to(agentExt[1]).emit('new-peer', {});
@@ -2362,8 +2356,8 @@ function handle_manager_event(evt) {
         logger.info(`Event is ${JSON.stringify(evt, null, 2)}`);
 
         if (evt.context === 'from-internal' && evt.destchannel.includes(PROVIDER_STR)) {
-          let channel = evt.channel;
-          let channelExt = channel.split(/[\/,-]/);
+          const { channel } = evt;
+          const channelExt = channel.split(/[\/,-]/);
           io.to(Number(channelExt[1])).emit('outbound-answered', {});
         }
         /*
@@ -2385,7 +2379,7 @@ function handle_manager_event(evt) {
           // Format is PJSIP/nnnnn-xxxxxx, we want to strip out the nnnnn only
           var extString = evt.channel;
           var extension = extString.split(/[\/,-]/);
-          var isOurPhone = false;
+          let isOurPhone = false;
 
           // is this one of our phones? one that we expect?
           if (extension[1].startsWith(PROVIDER_STR)) {
@@ -2396,8 +2390,8 @@ function handle_manager_event(evt) {
             logger.info(`No phone match, but this could be a WebRTC extension: ${extension[1]}. leaving extension[1] alone to continue processing...`);
           }
 
-          var destExtString = evt.destchannel;
-          var destExtension = destExtString.split(/[\/,-]/);
+          const destExtString = evt.destchannel;
+          const destExtension = destExtString.split(/[\/,-]/);
           redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
           logger.info(`Populating consumerToCsr: ${extension[1]} => ${destExtension[1]}`);
           logger.info(`Extension number: ${extension[1]}`);
@@ -2464,9 +2458,9 @@ function handle_manager_event(evt) {
 
             // Format is PJSIP/ZVRS-xxxxxx or PJSIP/Sorenson2-nnnnnn,
             // we want to strip out the xxxxxx only
-            var extString = evt.channel;
-            var extension = extString.split(/[\/,-]/);
-            var callType = null;
+            const extString = evt.channel;
+            const extension = extString.split(/[\/,-]/);
+            let callType = null;
 
             logger.info(`extension[1] is >${extension[1]}<`);
             if (extension[1].startsWith(PROVIDER_STR)) {
@@ -2475,8 +2469,8 @@ function handle_manager_event(evt) {
               extension[1] = evt.calleridnum;
             }
 
-            var destExtString = evt.destchannel;
-            var destExtension = destExtString.split(/[\/,-]/);
+            const destExtString = evt.destchannel;
+            const destExtension = destExtString.split(/[\/,-]/);
             redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
             logger.info(`Populating consumerToCsr: ${extension[1]} => ${destExtension[1]}`);
             logger.info(`Extension number: ${extension[1]}`);
@@ -2512,10 +2506,10 @@ function handle_manager_event(evt) {
             // This is a Linphone call
             logger.info(`DialEnd processing from a General Questions queue call, but UNKNOWN DEVICE. evt.context is: ${evt.context} , evt.channel is: ${evt.channel}`);
             logger.info('Proceeding anyway...');
-            var agentString = evt.destchannel;
-            var agentExtension = agentString.split(/[\/,-]/);
-            var linphoneString = evt.channel;
-            var linphoneExtension = linphoneString.split(/[\/,-]/);
+            const agentString = evt.destchannel;
+            const agentExtension = agentString.split(/[\/,-]/);
+            const linphoneString = evt.channel;
+            const linphoneExtension = linphoneString.split(/[\/,-]/);
 
             logger.info(`Adding to linphoneToAgentMap: ${Number(linphoneExtension[1])} =>${agentExtension[1]}`);
 
@@ -2545,7 +2539,7 @@ function handle_manager_event(evt) {
           // Format is PJSIP/nnnnn-xxxxxx, we want to strip out the nnnnn only
           var extString = evt.channel;
           var extension = extString.split(/[\/,-]/);
-          var isOurPhone = false;
+          let isOurPhone = false;
 
           // is this one of our phones? one that we expect?
           if (extension[1].startsWith(PROVIDER_STR)) {
@@ -2556,8 +2550,8 @@ function handle_manager_event(evt) {
             logger.info(`No phone match, but this could be a WebRTC extension: ${extension[1]}. leaving extension[1] alone to continue processing...`);
           }
 
-          var destExtString = evt.destchannel;
-          var destExtension = destExtString.split(/[\/,-]/);
+          const destExtString = evt.destchannel;
+          const destExtension = destExtString.split(/[\/,-]/);
           redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
           logger.info(`Populating consumerToCsr: ${extension[1]} => ${destExtension[1]}`);
           logger.info(`Extension number: ${extension[1]}`);
@@ -2606,8 +2600,7 @@ function handle_manager_event(evt) {
       if (evt.context === 'Provider_Videomail') {
         console.log(`VIDOEMAIL evt: ${JSON.stringify(evt, null, 2)}`);
         insertCallDataRecord('Videomail', evt.calleridnum, evt.uniqueid, 'D4');
-      }
-      else if (evt.connectedlinenum === queuesComplaintNumber
+      } else if (evt.connectedlinenum === queuesComplaintNumber
         || evt.exten === queuesComplaintNumber) {
         // Consumer portal ONLY! Zphone Complaint queue calls will go to the next if clause
         logger.info('Processing Hangup from a Complaints queue call');
@@ -2615,8 +2608,8 @@ function handle_manager_event(evt) {
 
         if (evt.context === 'from-internal' && evt.channelstatedesc === 'Ringing') {
           // this is a missed call from the consumer portal
-          var channelStr = evt.channel;
-          var agentExtension = (channelStr.split(/[\/,-]/))[1];
+          const channelStr = evt.channel;
+          const agentExtension = (channelStr.split(/[\/,-]/))[1];
 
           logger.info('**********************************');
           logger.info('**********************************');
@@ -2656,7 +2649,7 @@ function handle_manager_event(evt) {
             if (err) {
               logger.error(`Redis Error${err}`);
             } else if (reply) {
-              var val = JSON.parse(reply);
+              const val = JSON.parse(reply);
               val.inuse = false;
               redisClient.hset(rConsumerExtensions, Number(extension[1]), JSON.stringify(val));
             }
@@ -2664,7 +2657,7 @@ function handle_manager_event(evt) {
 
           logger.info('extensionToVrs contents:');
           redisClient.hgetall(rExtensionToVrs, (err, reply) => {
-            for (let id in reply) {
+            for (const id in reply) {
               logger.info(`${id} => ${reply[id]}`);
             }
           });
@@ -2698,8 +2691,8 @@ function handle_manager_event(evt) {
         // Zphone option #4 or 5
         logger.info(`HANGUP Zphone option 4 or 5 calleridnum: ${evt.calleridnum}`);
 
-        var linphoneString = evt.channel;
-        var linphoneExtension = linphoneString.split(/[\/,-]/);
+        const linphoneString = evt.channel;
+        const linphoneExtension = linphoneString.split(/[\/,-]/);
 
         logger.info('Processing Hangup for a Provider_General_Questions queue call');
         logger.info(`Linphone extension number: ${linphoneExtension[1]}`);
@@ -2726,7 +2719,7 @@ function handle_manager_event(evt) {
           if (err) {
             logger.error(`Redis Error${err}`);
           } else if (reply) {
-            var val = JSON.parse(reply);
+            const val = JSON.parse(reply);
             val.inuse = false;
             redisClient.hset(rConsumerExtensions, Number(evt.calleridnum), JSON.stringify(val));
           }
@@ -2734,7 +2727,7 @@ function handle_manager_event(evt) {
 
         logger.info('extensionToVrs contents:');
         redisClient.hgetall(rExtensionToVrs, (err, reply) => {
-          for (var id in reply) {
+          for (const id in reply) {
             logger.info(`${id} => ${reply[id]}`);
           }
         });
@@ -2762,7 +2755,7 @@ function handle_manager_event(evt) {
       } else if (evt.context === 'from-internal') {
         if (evt.channelstatedesc === 'Ringing') {
           // this is an abandoned call
-          var channelStr = evt.channel;
+          const channelStr = evt.channel;
           var agentExtension = (channelStr.split(/[\/,-]/))[1];
 
           logger.info('**********************************');
@@ -2788,8 +2781,7 @@ function handle_manager_event(evt) {
               logger.error(`Redis Error: ${err}`);
             } else {
               tokenMap = JSON.parse(tokenMap);
-              if (tokenMap !== null && tokenMap.token)
-                redisClient.hset(rTokenMap, tokenMap.token, 'MISSEDCALL');
+              if (tokenMap !== null && tokenMap.token) redisClient.hset(rTokenMap, tokenMap.token, 'MISSEDCALL');
             }
           });
         } else {
@@ -2798,7 +2790,7 @@ function handle_manager_event(evt) {
             if (err) {
               logger.error(`Redis Error${err}`);
             } else if (reply) {
-              var val = JSON.parse(reply);
+              const val = JSON.parse(reply);
               val.inuse = false;
               redisClient.hset(rConsumerExtensions, Number(extension[1]), JSON.stringify(val));
             }
@@ -2849,15 +2841,14 @@ function handle_manager_event(evt) {
       logger.info(`Queue name: ${evt.transfereecontext}`);
 
       redisClient.hexists(rConsumerExtensions, Number(evt.origtransfererconnectedlinenum),
-        (err, reply) => {
-          if (err) {
-            logger.error(`Redis Error${err}`);
-          } else {
-            if (reply === 1 && evt.transfereecontext === 'Complaints') {
-              // WebRTC call
-              logger.info('Received a WebRTC transfer');
+        (errHexists, reply) => {
+          if (errHexists) {
+            logger.error(`Redis Error${errHexists}`);
+          } else if (reply === 1 && evt.transfereecontext === 'Complaints') {
+            // WebRTC call
+            logger.info('Received a WebRTC transfer');
 
-              /*
+            /*
                * Need to send the following:
                *  - new-caller-complaints
                *  - ad-vrs
@@ -2865,113 +2856,112 @@ function handle_manager_event(evt) {
                *  - chat-leave (Maybe change to call end)
                */
 
-              /*
+            /*
                * Get the original extension number so we can look up the corresponding VRS.
                */
-              var origExtString = evt.origtransfererchannel;
-              var origExtension = origExtString.split(/[\/,-]/);
+            const origExtString = evt.origtransfererchannel;
+            const origExtension = origExtString.split(/[\/,-]/);
 
-              // Use the origExtension to look up the VRS number.
-              redisClient.hget(rExtensionToVrs, Number(evt.origtransfererconnectedlinenum),
-                (err, vrsNum) => {
-                  if (err) {
-                    logger.error(`Redis Error${err}`);
-                  } else {
-                    /*
+            // Use the origExtension to look up the VRS number.
+            redisClient.hget(rExtensionToVrs, Number(evt.origtransfererconnectedlinenum),
+              (errHget, vrsNum) => {
+                if (errHget) {
+                  logger.error(`Redis Error${errHget}`);
+                } else {
+                  /*
                      * First find the destination channel (who we are transferring to),
                      * should look like this:
                      * transfertargetchannel: 'PJSIP/nnnnn-00000031
                      * We only want the nnnnn extension to for a Socket.IO endpoint
                      */
-                    var destExtString = evt.transfertargetchannel;
-                    var destExtension = destExtString.split(/[\/,-]/);
+                  const destExtString = evt.transfertargetchannel;
+                  const destExtension = destExtString.split(/[\/,-]/);
 
-                    // Tell the CSR portal that a complaints queue call has connected
-                    io.to(Number(destExtension[1])).emit('new-caller-complaints', evt.context);
+                  // Tell the CSR portal that a complaints queue call has connected
+                  io.to(Number(destExtension[1])).emit('new-caller-complaints', evt.context);
 
-                    // Calling the lookup with the VRS and extension,
-                    // we should generate the ad-vrs and ad-zendesk
-                    // function vrsAndZenLookup(vrsNum, destAgentExtension) {
-                    vrsAndZenLookup(vrsNum, Number(destExtension[1]));
+                  // Calling the lookup with the VRS and extension,
+                  // we should generate the ad-vrs and ad-zendesk
+                  // function vrsAndZenLookup(vrsNum, destAgentExtension) {
+                  vrsAndZenLookup(vrsNum, Number(destExtension[1]));
 
-                    io.to(Number(origExtension[1])).emit('chat-leave', {
-                      vrs: vrsNum
-                    });
-                  }
-                });
-            } else if (evt.transfereecontext === 'Provider_General_Questions' || evt.transfereecontext === 'General_Questions') {
-              // Zphone #4
-              logger.info('Received a Zphone transfer - general questions');
-
-              var destExtension = evt.secondtransfererconnectedlinenum;
-
-              logger.info(`destExtension: ${destExtension}`);
-
-              io.to(Number(destExtension)).emit('no-ticket-info', {});
-
-              logger.info(`Sending no-ticket-info to: ${destExtension}`);
-
-              // Tell CSR portal that a complaints queue call has connected
-              io.to(Number(destExtension)).emit('new-caller-general', evt.context);
-              logger.info(`Sending new-caller-general to: ${destExtension}`);
-
-              logger.info(`Calling vrsAndZenLookup() for: ${evt.origtransfererconnectedlinenum},${destExtension}`);
-              vrsAndZenLookup(evt.origtransfererconnectedlinenum, Number(destExtension));
-
-              io.to(Number(evt.origtransfererconnectedlinenum)).emit('chat-leave', {
-                vrs: evt.origtransfererconnectedlinenum
+                  io.to(Number(origExtension[1])).emit('chat-leave', {
+                    vrs: vrsNum
+                  });
+                }
               });
-              logger.info(`Sending chat-leave to: ${evt.origtransfererconnectedlinenum}`);
+          } else if (evt.transfereecontext === 'Provider_General_Questions' || evt.transfereecontext === 'General_Questions') {
+            // Zphone #4
+            logger.info('Received a Zphone transfer - general questions');
 
-              // Need to update the consumerToCsr map so that the chat-leave goes to the right agent
-              redisClient.hexists(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
-                (err, reply) => {
-                  if (reply === 1) {
-                    redisClient.hset(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
-                      Number(evt.secondtransfererconnectedlinenum));
-                    logger.info(`Inside if(), updating consumerToCsr hash with: ${evt.origtransfererconnectedlinenum} => ${evt.secondtransfererconnectedlinenum}`);
-                  }
-                });
-            } else if (evt.transfereecontext === 'Provider_Complaints' || evt.transfereecontext === 'Complaints') {
-              // Zphone #5
+            const destExtension = evt.secondtransfererconnectedlinenum;
 
-              logger.info('Received a Zphone transfer - provider');
+            logger.info(`destExtension: ${destExtension}`);
 
-              var destExtension = evt.secondtransfererconnectedlinenum;
-              logger.info(`destExtension: ${destExtension}`);
+            io.to(Number(destExtension)).emit('no-ticket-info', {});
 
-              io.to(Number(destExtension)).emit('no-ticket-info', {});
+            logger.info(`Sending no-ticket-info to: ${destExtension}`);
 
-              logger.info(`Sending no-ticket-info to: ${destExtension}`);
+            // Tell CSR portal that a complaints queue call has connected
+            io.to(Number(destExtension)).emit('new-caller-general', evt.context);
+            logger.info(`Sending new-caller-general to: ${destExtension}`);
 
-              // Tell CSR portal that a complaints queue call has connected
-              io.to(Number(destExtension)).emit('new-caller-complaints', evt.context);
+            logger.info(`Calling vrsAndZenLookup() for: ${evt.origtransfererconnectedlinenum},${destExtension}`);
+            vrsAndZenLookup(evt.origtransfererconnectedlinenum, Number(destExtension));
 
-              logger.info(`Sending new-caller-complaints to: ${destExtension}`);
+            io.to(Number(evt.origtransfererconnectedlinenum)).emit('chat-leave', {
+              vrs: evt.origtransfererconnectedlinenum
+            });
+            logger.info(`Sending chat-leave to: ${evt.origtransfererconnectedlinenum}`);
 
-              logger.info(`Calling vrsAndZenLookup() for: ${evt.origtransfererconnectedlinenum},${destExtension}`);
-              vrsAndZenLookup(evt.origtransfererconnectedlinenum, Number(destExtension));
-
-              io.to(Number(evt.origtransfererconnectedlinenum)).emit('chat-leave', {
-                vrs: evt.origtransfererconnectedlinenum
+            // Need to update the consumerToCsr map so that the chat-leave goes to the right agent
+            redisClient.hexists(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
+              (err, reply) => {
+                if (reply === 1) {
+                  redisClient.hset(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
+                    Number(evt.secondtransfererconnectedlinenum));
+                  logger.info(`Inside if(), updating consumerToCsr hash with: ${evt.origtransfererconnectedlinenum} => ${evt.secondtransfererconnectedlinenum}`);
+                }
               });
+          } else if (evt.transfereecontext === 'Provider_Complaints' || evt.transfereecontext === 'Complaints') {
+            // Zphone #5
 
-              logger.info(`Sending chat-leave to: ${evt.origtransfererconnectedlinenum}`);
+            logger.info('Received a Zphone transfer - provider');
 
-              // Need to update the consumerToCsr map so that the chat-leave goes to the right agent
-              redisClient.hexists(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
-                (err, reply) => {
-                  if (reply === 1) {
-                    redisClient.hset(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
-                      Number(evt.secondtransfererconnectedlinenum));
-                    logger.info(`Inside if(), updating consumerToCsr hash with: ${evt.origtransfererconnectedlinenum} => ${evt.secondtransfererconnectedlinenum}`);
-                  }
-                });
-            } else if (evt.transfereecontext === 'Linphone') {
-              // Need to see what this means
-            } else {
-              logger.info('Unable to identify transferred call');
-            }
+            var destExtension = evt.secondtransfererconnectedlinenum;
+            logger.info(`destExtension: ${destExtension}`);
+
+            io.to(Number(destExtension)).emit('no-ticket-info', {});
+
+            logger.info(`Sending no-ticket-info to: ${destExtension}`);
+
+            // Tell CSR portal that a complaints queue call has connected
+            io.to(Number(destExtension)).emit('new-caller-complaints', evt.context);
+
+            logger.info(`Sending new-caller-complaints to: ${destExtension}`);
+
+            logger.info(`Calling vrsAndZenLookup() for: ${evt.origtransfererconnectedlinenum},${destExtension}`);
+            vrsAndZenLookup(evt.origtransfererconnectedlinenum, Number(destExtension));
+
+            io.to(Number(evt.origtransfererconnectedlinenum)).emit('chat-leave', {
+              vrs: evt.origtransfererconnectedlinenum
+            });
+
+            logger.info(`Sending chat-leave to: ${evt.origtransfererconnectedlinenum}`);
+
+            // Need to update the consumerToCsr map so that the chat-leave goes to the right agent
+            redisClient.hexists(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
+              (err, reply) => {
+                if (reply === 1) {
+                  redisClient.hset(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
+                    Number(evt.secondtransfererconnectedlinenum));
+                  logger.info(`Inside if(), updating consumerToCsr hash with: ${evt.origtransfererconnectedlinenum} => ${evt.secondtransfererconnectedlinenum}`);
+                }
+              });
+          } else if (evt.transfereecontext === 'Linphone') {
+            // Need to see what this means
+          } else {
+            logger.info('Unable to identify transferred call');
           }
         });
 
@@ -2985,14 +2975,13 @@ function handle_manager_event(evt) {
         // Format is PJSIP/nnnnn-xxxxxx, we want to strip out the nnnnn only
         var extString = evt.channel;
         var extension = extString.split(/[\/,-]/)[1];
-        var callerExt = evt.connectedlinenum;
+        const callerExt = evt.connectedlinenum;
 
-        redisClient.hget(rExtensionToVrs, Number(callerExt), (err, phoneNum) => {
-          if (err) {
-            logger.error(`Redis Error: ${err}`);
+        redisClient.hget(rExtensionToVrs, Number(callerExt), (errHget, phoneNum) => {
+          if (errHget) {
+            logger.error(`Redis Error: ${errHget}`);
           } else {
-            if (!phoneNum)
-              phoneNum = callerExt;
+            if (!phoneNum) phoneNum = callerExt;
             logger.info(`New caller Ringing: to:${extension}, from: ${phoneNum}`);
             io.to(Number(extension)).emit('new-caller-ringing', {
               phoneNumber: phoneNum
@@ -3003,8 +2992,7 @@ function handle_manager_event(evt) {
                 logger.error(`Redis Error: ${err}`);
               } else {
                 tokenMap = JSON.parse(tokenMap);
-                if (tokenMap !== null && tokenMap.token)
-                  redisClient.hset(rTokenMap, tokenMap.token, 'INCOMINGCALL');
+                if (tokenMap !== null && tokenMap.token) redisClient.hset(rTokenMap, tokenMap.token, 'INCOMINGCALL');
               }
             });
           }
@@ -3019,7 +3007,7 @@ function handle_manager_event(evt) {
 
       console.log(`ABANDONED evt: ${JSON.stringify(evt, null, 2)}`);
 
-      let ext = evt.calleridnum;
+      const ext = evt.calleridnum;
       let vrs;
       redisClient.hget(rExtensionToVrs, Number(ext), (err, vrsNum) => {
         if (!err && vrsNum) {
@@ -3033,21 +3021,25 @@ function handle_manager_event(evt) {
       break;
     // sent by asterisk when a caller joins the queue
     case ('QueueCallerJoin'):
-      if (evt.queue === 'ComplaintsQueue') complaint_queue_count = evt.count;
-      if (evt.queue === 'GeneralQuestionsQueue') general_queue_count = evt.count;
+      if (evt.queue === 'ComplaintsQueue') complaintQueueCount = evt.count;
+      if (evt.queue === 'GeneralQuestionsQueue') generalQueueCount = evt.count;
       var data = {
-        position: evt.position, extension: evt.calleridnum,
-        queue: evt.queue, count: evt.count
+        position: evt.position,
+        extension: evt.calleridnum,
+        queue: evt.queue,
+        count: evt.count
       };
       sendEmit('queue-caller-join', data);
       break;
     // sent by aasterisk a caller leaves the queue (either by abandoning or being connected)
     case ('QueueCallerLeave'):
-      if (evt.queue === 'ComplaintsQueue') complaint_queue_count = evt.count;
-      if (evt.queue === 'GeneralQuestionsQueue') general_queue_count = evt.count;
+      if (evt.queue === 'ComplaintsQueue') complaintQueueCount = evt.count;
+      if (evt.queue === 'GeneralQuestionsQueue') generalQueueCount = evt.count;
       var data = {
-        position: evt.position, extension: evt.calleridnum,
-        queue: evt.queue, count: evt.count
+        position: evt.position,
+        extension: evt.calleridnum,
+        queue: evt.queue,
+        count: evt.count
       };
       sendEmit('queue-caller-leave', data);
       break;
@@ -3074,18 +3066,18 @@ function init_ami() {
       // Define event handlers here
 
       // add only the manager ami events we care about
-      // ami.on('managerevent', handle_manager_event);
-      ami.on('dialend', handle_manager_event);
-      ami.on('varset', handle_manager_event);
-      ami.on('hangup', handle_manager_event);
-      ami.on('attendedtransfer', handle_manager_event);
-      ami.on('newstate', handle_manager_event);
-      ami.on('queuecallerabandon', handle_manager_event);
-      ami.on('queuecallerjoin', handle_manager_event);
-      ami.on('queuecallerleave', handle_manager_event);
+      // ami.on('managerevent', handleManagerEvent);
+      ami.on('dialend', handleManagerEvent);
+      ami.on('varset', handleManagerEvent);
+      ami.on('hangup', handleManagerEvent);
+      ami.on('attendedtransfer', handleManagerEvent);
+      ami.on('newstate', handleManagerEvent);
+      ami.on('queuecallerabandon', handleManagerEvent);
+      ami.on('queuecallerjoin', handleManagerEvent);
+      ami.on('queuecallerleave', handleManagerEvent);
 
       // handle the response
-      ami.on('response', handle_action_response);
+      ami.on('response', handleActionResponse);
 
       logger.info('Connected to Asterisk');
     } catch (exp) {
@@ -3106,21 +3098,21 @@ init_ami();
 setInterval(() => {
   redisClient.hgetall(rAgentInfoMap, (err, data) => {
     if (data) {
-      agents_logged_in = false;
-      for (var prop in data) {
+      let agentsLoggedIn = false;
+      for (const prop in data) {
         if (Object.prototype.hasOwnProperty.call(data, prop)) {
-          obj = JSON.parse(data[prop]);
-          astatus = obj.status;
+          const obj = JSON.parse(data[prop]);
+          let astatus = obj.status;
           astatus = astatus.toUpperCase();
           if (astatus !== 'AWAY') {
-            agents_logged_in = true;
+            agentsLoggedIn = true;
             break;
           }
         }
       }
-      sendEmit('agents', { agents_logged_in: agents_logged_in });
+      sendEmit('agents', { agentsLoggedIn });
     } else {
-      sendEmit('agents', { agents_logged_in: false });
+      sendEmit('agents', { agentsLoggedIn: false });
     }
   });
 }, 5000);
@@ -3132,7 +3124,7 @@ setInterval(() => {
 
 setInterval(() => {
   // query for after hours
-  var ohurl = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/operatinghours`;
+  const ohurl = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/operatinghours`;
   request({
     method: 'GET',
     url: ohurl,
@@ -3163,9 +3155,9 @@ setInterval(() => {
  * @returns {undefined} Not used
  */
 function getUserInfo(username, callback) {
-  var url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/getagentrec/${username}`;
+  const url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/getagentrec/${username}`;
   request({
-    url: url,
+    url,
     json: true
   }, (error, response, data) => {
     if (error) {
@@ -3191,8 +3183,7 @@ function logout(token) {
   if (token.username !== null) {
     redisClient.hdel(rStatusMap, token.username);
     redisClient.hdel(rAgentInfoMap, token.username);
-    if (token.lightcode)
-      redisClient.hset(rTokenMap, token.lightcode, 'OFFLINE');
+    if (token.lightcode) redisClient.hset(rTokenMap, token.lightcode, 'OFFLINE');
 
     sendAgentStatusList();
 
@@ -3230,7 +3221,7 @@ function logout(token) {
  * @returns {undefined}
  */
 function getCallerInfo(phoneNumber, callback) {
-  var url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}`;
+  let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}`;
 
   // remove the leading characters and 1 before the VRS number (if it's there)
 
@@ -3241,7 +3232,7 @@ function getCallerInfo(phoneNumber, callback) {
   url += `/vrsverify/?vrsnum=${phoneNumber}`;
 
   request({
-    url: url,
+    url,
     json: true
   }, (error, response, data) => {
     if (error) {
@@ -3284,13 +3275,13 @@ function checkIfBlocked(phoneNumber, callback) {
  * @returns {undefined} N/A
  */
 function getScriptInfo(queueName, queueType, _callback) {
-  var url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:aserver')}`;
+  let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:aserver')}`;
 
   if (queueType && queueName) {
     url += `/getscript/?queue_name=${queueType}&type=${queueName}`;
 
     request({
-      url: url,
+      url,
       json: true
     }, (error, response, data) => {
       if (error) {
@@ -3315,7 +3306,7 @@ function getScriptInfo(queueName, queueType, _callback) {
  * @returns {undefined}
  */
 function processConsumerRequest(data) {
-  var resultJson = {};
+  let resultJson = {};
 
   logger.info(`processConsumerRequest - incoming ${JSON.stringify(data)}`);
 
@@ -3334,9 +3325,9 @@ function processConsumerRequest(data) {
        * fields are coming from the VRS lookup. We're merging the
        * two sources here.
        */
-      var ticketId = 0;
+      let ticketId = 0;
 
-      var ticket = {
+      const ticket = {
         ticket: {
           subject: data.subject,
           description: data.description,
@@ -3410,9 +3401,9 @@ function processConsumerRequest(data) {
  * @returns {undefined} N/A
  */
 function updateZendeskTicket(data) {
-  var ticketId = data.ticketId;
+  const { ticketId } = data;
 
-  var ticket = {
+  const ticket = {
     ticket: {
       subject: data.subject,
       description: data.description,
@@ -3456,22 +3447,22 @@ function updateZendeskTicket(data) {
  * @returns {undefined}
  */
 function processExtension(data) {
-  var resultJson = {};
+  let resultJson = {};
 
   logger.info(`processExtension - incoming ${JSON.stringify(data)}`);
   console.log(`processExtension - incoming ${JSON.stringify(data)}`);
 
-  var asteriskPublicHostname = getConfigVal('servers:asterisk_fqdn');
-  var stunServer = `${getConfigVal('servers:stun_fqdn')}:${getConfigVal('app_ports:stun')}`;
+  const asteriskPublicHostname = getConfigVal('servers:asterisk_fqdn');
+  const stunServer = `${getConfigVal('servers:stun_fqdn')}:${getConfigVal('app_ports:stun')}`;
 
   // if wsPort is "", then it defaults to no port in the wss url
-  var wsPort = getConfigVal('app_ports:asterisk_ws');
+  let wsPort = getConfigVal('app_ports:asterisk_ws');
   if (wsPort !== '') {
     wsPort = parseInt(wsPort, 10);
   }
 
-  var queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
-  var queuesVideomailMaxrecordsecs = getConfigVal('videomail:max_record_secs');
+  const queuesVideomailNumber = getConfigVal('asterisk:queues:videomail:number');
+  const queuesVideomailMaxrecordsecs = getConfigVal('videomail:max_record_secs');
 
   logger.info('Config lookup:');
   logger.info(`asteriskPublicHostname: ${asteriskPublicHostname}`);
@@ -3483,7 +3474,7 @@ function processExtension(data) {
   try {
     findNextAvailableExtension((nextExtension) => {
       findExtensionPassword(nextExtension, (extensionPassword) => {
-        if (nextExtension == 0) {
+        if (nextExtension === 0) {
           resultJson = { message: 'OutOfExtensions' };
         } else {
           resultJson = {
@@ -3509,8 +3500,7 @@ function processExtension(data) {
           redisClient.hset(rExtensionToVrs, Number(data.vrs), Number(nextExtension));
           if (data.language) {
             redisClient.hset(rExtensionToLanguage, Number(nextExtension), data.language);
-          }
-          else {
+          } else {
             logger.error('Language has not been specified for extension', Number(nextExtension));
           }
         }
@@ -3538,9 +3528,8 @@ function processExtension(data) {
 function processFilter(filter) {
   if (filter === 'ALL') {
     return (false);
-  } else {
-    return (`'${filter}'`);
   }
+  return (`'${filter}'`);
 }
 
 /**
@@ -3559,9 +3548,9 @@ function handleError(err) {
  * @returns {undefined}
  */
 function loadColorConfigs() {
-  var colorfile = '../dat/color_config.json';
+  const colorfile = '../dat/color_config.json';
   try {
-    var content = fs.readFileSync(colorfile, 'utf8');
+    const content = fs.readFileSync(colorfile, 'utf8');
     myjson = JSON.parse(content);
     colorConfigs = myjson.statuses;
     sendEmit('lightcode-configs', colorConfigs);
@@ -3589,13 +3578,13 @@ function sendEmit(evt, message) {
  * @returns {undefined} N/A
  */
 function prepareExtensions() {
-  var start_extension = getConfigVal('asterisk:extensions:start_number');
-  var end_extension = getConfigVal('asterisk:extensions:end_number');
-  var secret = getConfigVal('asterisk:extensions:secret');
-  logger.info(`Extensions start: ${start_extension} end: ${end_extension}`);
-  for (let num = parseInt(start_extension, 10); num <= parseInt(end_extension, 10); num++) {
-    var data = {
-      secret: secret,
+  const startExtension = getConfigVal('asterisk:extensions:start_number');
+  const endExtension = getConfigVal('asterisk:extensions:end_number');
+  const secret = getConfigVal('asterisk:extensions:secret');
+  logger.info(`Extensions start: ${startExtension} end: ${endExtension}`);
+  for (let num = parseInt(startExtension, 10); num <= parseInt(endExtension, 10); num += 1) {
+    const data = {
+      secret,
       inuse: false
     };
     redisClient.hset(rConsumerExtensions, Number(num), JSON.stringify(data));
@@ -3609,14 +3598,14 @@ function prepareExtensions() {
  * @returns {Number} Next available extension.
  */
 function findNextAvailableExtension(callback) {
-  var nextExtension = 0;
+  let nextExtension = 0;
   redisClient.hgetall(rConsumerExtensions, (err, reply) => {
     if (err) {
       logger.error(`Redis Error${err}`);
     } else if (reply) {
-      for (var id in reply) {
+      for (const id in reply) {
         logger.info(`${id} => ${reply[id]}`);
-        var val = JSON.parse(reply[id]);
+        const val = JSON.parse(reply[id]);
         if (val.inuse === false) {
           logger.info(`Found an open extension in consumerExtensions: ${id}`);
           val.inuse = true;
@@ -3640,7 +3629,7 @@ function findNextAvailableExtension(callback) {
 function findExtensionPassword(extension, callback) {
   logger.info(`Entering findExtensionPassword() for extension: ${extension}`);
 
-  let passphrase = shortid.generate();
+  const passphrase = shortid.generate();
   let password = 'unknown';
 
   redisClient.hget(rConsumerExtensions, Number(extension), (err, reply) => {
@@ -3648,7 +3637,7 @@ function findExtensionPassword(extension, callback) {
       logger.error(`Redis Error${err}`);
     } else if (reply) {
       logger.info('Found a match in the consumerExtensions map');
-      var json = JSON.parse(reply);
+      const json = JSON.parse(reply);
       password = json.secret;
       redisClient.set(passphrase, password);
       redisClient.expire(passphrase, 5); // remove passphrase after 5 seconds.
@@ -3696,13 +3685,13 @@ function vrsAndZenLookup(vrsNum, destAgentExtension) {
     logger.error('Could not find VRS in vrsAndZenLookup()');
   }
 
-  redisClient.hget(rVrsToZenId, vrsNum, (err, zenTicketId) => {
+  redisClient.hget(rVrsToZenId, vrsNum, (_err, zenTicketId) => {
     if (zenTicketId) {
       logger.info(`Performing Zendesk ticket lookup for ticket: ${zenTicketId}`);
 
       zendeskClient.tickets.show(zenTicketId, (err, statusList, body,
         _responseList, _resultList) => {
-        var resultJson = {
+        let resultJson = {
           message: 'failure'
         };
         if (err) {
@@ -3728,14 +3717,14 @@ function setInitialLoginAsteriskConfigs(user) {
   logger.info(`queue_name: ${user.queue_name}`);
   logger.info(`queue2_name: ${user.queue2_name}`);
 
-  var interfaceName = `PJSIP/${user.extension}`;
-  var queueList = {
+  const interfaceName = `PJSIP/${user.extension}`;
+  const queueList = {
     queue_name: user.queue_name,
     queue2_name: user.queue2_name
   };
 
   // Keep agent info in memory for agent status calls.
-  var agentInfo = {
+  const agentInfo = {
     status: 'Away',
     username: user.username,
     name: `${user.first_name} ${user.last_name}`,
@@ -3743,12 +3732,12 @@ function setInitialLoginAsteriskConfigs(user) {
     queues: []
   };
   if (queueList.queue_name) {
-    agentInfo['queues'].push({
+    agentInfo.queues.push({
       queuename: queueList.queue_name
     });
   }
   if (queueList.queue2_name) {
-    agentInfo['queues'].push({
+    agentInfo.queues.push({
       queuename: queueList.queue2_name
     });
   }
@@ -3762,7 +3751,7 @@ function setInitialLoginAsteriskConfigs(user) {
  * @returns {unresolved} Decoded readable string.
  */
 function decodeBase64(encodedString) {
-  var decodedString = null;
+  let decodedString = null;
   if (clearText) {
     decodedString = encodedString;
   } else {
@@ -3775,9 +3764,9 @@ function decodeBase64(encodedString) {
 // Load available agents for multi-party
 // Need common_private_ip and agent_service_port
 function getAgentsFromProvider(callback) {
-  var url = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}/getallagentrecs`;
+  const url = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}/getallagentrecs`;
   request({
-    url: url,
+    url,
     json: true
   }, (err, res, data) => {
     if (err) {
@@ -3803,7 +3792,7 @@ function createToken() {
 // Used for the force logout functionality since we need to send a POST
 // request from MP to acedirect outlining what user(s) to forcefully logout
 app.use((err, req, res, next) => {
-  let mp = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:managementportal')}`;
+  const mp = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:managementportal')}`;
   res.setHeader('Access-Control-Allow-Origin', mp);
   next();
 });
@@ -3820,9 +3809,9 @@ app.use((err, req, res, next) => {
  * Handles the forceful logout request from Management Portal
  */
 app.post('/forcelogout', (req, _res) => {
-  let body = req.body;
-  let agents = body.agents;
-  let forceLogoutPassword = req.headers.force_logout_password;
+  const { body } = req;
+  const { agents } = body;
+  const forceLogoutPassword = req.headers.force_logout_password;
   // Check that the received force logout password matches the one we have in the config
   // This verifies that the request is being made internally and is a valid request
   if (forceLogoutPassword === getConfigVal('management_portal:force_logout_password')) {
@@ -3842,13 +3831,12 @@ app.post('/forcelogout', (req, _res) => {
 app.post('/consumer_login', (req, res) => {
   // All responses will be JSON sets response header.
   res.setHeader('Content-Type', 'application/json');
-  var vrsnum = req.body.vrsnumber;
+  const vrsnum = req.body.vrsnumber;
   if (/^\d+$/.test(vrsnum)) {
     checkIfBlocked(vrsnum, (isBlocked) => {
       if (isBlocked) {
         res.status(401).json({ message: 'Number blocked', redirectUrl: complaintRedirectUrl });
-      }
-      else {
+      } else {
         getCallerInfo(vrsnum, (vrs) => {
           if (vrs.message === 'success') {
             req.session.role = 'VRS';
@@ -3874,24 +3862,24 @@ app.post('/consumer_login', (req, res) => {
 
 app.use((req, res, next) => {
   res.locals = {
-    nginxPath: nginxPath,
-    busyLightEnabled: busyLightEnabled,
-    awayBlink: awayBlink,
-    outVidTimeout: outVidTimeout,
-    stunFQDN: stunFQDN,
-    stunPort: stunPort,
-    turnFQDN: turnFQDN,
-    turnPort: turnPort,
-    turnUser: turnUser,
-    turnCred: turnCred,
-    logWebRTCStats: logWebRTCStats,
-    logWebRTCStatsFreq: logWebRTCStatsFreq,
-    logWebRTCMongo: logWebRTCMongo,
-    fpsHigh: fpsHigh,
-    fpsLow: fpsLow,
-    fpsMax: fpsMax,
-    fpsMin: fpsMin,
-    fpsOptimum: fpsOptimum
+    nginxPath,
+    busyLightEnabled,
+    awayBlink,
+    outVidTimeout,
+    stunFQDN,
+    stunPort,
+    turnFQDN,
+    turnPort,
+    turnUser,
+    turnCred,
+    logWebRTCStats,
+    logWebRTCStatsFreq,
+    logWebRTCMongo,
+    fpsHigh,
+    fpsLow,
+    fpsMax,
+    fpsMin,
+    fpsOptimum
   };
   next();
 });
@@ -3950,8 +3938,8 @@ app.get('/logout', (req, res) => {
     if (error) {
       logger.error(`logout ERROR: ${error}`);
     } else {
-      var domaintemp = getConfigVal('servers:nginx_fqdn');
-      var n1 = domaintemp.indexOf('.');
+      const domaintemp = getConfigVal('servers:nginx_fqdn');
+      const n1 = domaintemp.indexOf('.');
       res.cookie('iPlanetDirectoryPro', 'cookievalue', {
         maxAge: 0,
         domain: domaintemp.substring(n1 + 1),
@@ -3980,7 +3968,7 @@ app.get('/logout', (req, res) => {
 app.get('/token', (req, res) => {
   if (req.session.role === 'VRS') {
     res.setHeader('Content-Type', 'application/json');
-    var vrsnum = req.session.vrs;
+    const vrsnum = req.session.vrs;
     if (/^\d+$/.test(vrsnum)) {
       getCallerInfo(vrsnum, (vrs) => {
         if (vrs.message === 'success') {
@@ -3991,12 +3979,12 @@ app.get('/token', (req, res) => {
           vrs.data[0].startTimeUTC = startTimeUTC; // hh:mm in UTC
           vrs.data[0].endTimeUTC = endTimeUTC; // hh:mm in UTC
 
-          var token = jwt.sign(vrs.data[0], jwtKey, {
+          const token = jwt.sign(vrs.data[0], jwtKey, {
             expiresIn: '2000'
           });
           res.status(200).json({
             message: 'success',
-            token: token
+            token
           });
         } else {
           res.status(200).json(vrs);
@@ -4008,11 +3996,11 @@ app.get('/token', (req, res) => {
       });
     }
   } else if (req.session.role === 'AD Agent') {
-    let passphrase = shortid.generate();
+    const passphrase = shortid.generate();
     redisClient.set(passphrase, req.session.extensionPassword);
     redisClient.expire(passphrase, 5); // remove passphrase after 5 seconds.
 
-    var payload = {};
+    const payload = {};
     payload.agent_id = req.session.agent_id;
     payload.username = req.session.username;
     payload.first_name = req.session.first_name;
@@ -4032,14 +4020,14 @@ app.get('/token', (req, res) => {
     payload.signalingServerUrl = req.session.signalingServerUrl;
     payload.queuesComplaintNumber = req.session.queuesComplaintNumber;
     payload.extensionPassword = passphrase;
-    payload.complaint_queue_count = complaint_queue_count;
-    payload.general_queue_count = general_queue_count;
+    payload.complaint_queue_count = complaintQueueCount;
+    payload.general_queue_count = generalQueueCount;
 
-    var queueList = {
+    const queueList = {
       queue_name: payload.queue_name,
       queue2_name: payload.queue2_name
     };
-    var agentInfo = {
+    const agentInfo = {
       status: 'Away',
       username: payload.username,
       name: `${payload.first_name} ${payload.last_name}`,
@@ -4047,24 +4035,24 @@ app.get('/token', (req, res) => {
       queues: []
     };
     if (queueList.queue_name) {
-      agentInfo['queues'].push({
+      agentInfo.queues.push({
         queuename: queueList.queue_name
       });
     }
     if (queueList.queue2_name) {
-      agentInfo['queues'].push({
+      agentInfo.queues.push({
         queuename: queueList.queue2_name
       });
     }
     redisClient.hset(rAgentInfoMap, payload.username, JSON.stringify(agentInfo));
     sendAgentStatusList(payload.username, 'AWAY');
 
-    var token = jwt.sign(payload, jwtKey, {
+    const token = jwt.sign(payload, jwtKey, {
       expiresIn: '2000'
     });
     res.status(200).json({
       message: 'success',
-      token: token
+      token
     });
   } else {
     req.session.destroy((_err) => {
@@ -4139,10 +4127,10 @@ app.get('/login', (req, res, next) => {
  * @param {function} function(req, res)
  */
 app.get('/login', agent.shield(cookieShield), (req, res) => {
-  var username = req.session.data.uid;
+  const username = req.session.data.uid;
   getUserInfo(username, (user) => {
     if (user.message === 'success') {
-      redisClient.hget(rStatusMap, user.data[0].username, (err, status) => {
+      redisClient.hget(rStatusMap, user.data[0].username, (_err, status) => {
         if (status !== null) {
           res.render('pages/agent_duplicate_login', {
             user: user.data[0].username
@@ -4157,8 +4145,8 @@ app.get('/login', agent.shield(cookieShield), (req, res) => {
         } else if (user.data[0].role === 'AD Agent') {
           redisClient.hget(rTokenMap, user.data[0].extension, (err, tokenMap) => {
             tokenMap = JSON.parse(tokenMap);
-            var d = new Date();
-            var now = d.getTime();
+            const d = new Date();
+            const now = d.getTime();
             // Delete Token if its older than 24 hours
             if (tokenMap !== null && now > (tokenMap.date + 86400000)) {
               redisClient.hdel(rTokenMap, tokenMap.token);
@@ -4166,22 +4154,22 @@ app.get('/login', agent.shield(cookieShield), (req, res) => {
             }
             // Create new token if token didn't exist or expired
             if (tokenMap === null || Object.keys(tokenMap).length === 0) {
-              var token = createToken();
+              const token = createToken();
               tokenMap = {
-                token: token,
+                token,
                 date: now
               };
               redisClient.hset(rTokenMap, user.data[0].extension, JSON.stringify(tokenMap));
             }
-            var asteriskPublicHostname = getConfigVal('servers:asterisk_fqdn');
-            var stunServer = `${getConfigVal('servers:stun_fqdn')}:${getConfigVal('app_ports:stun')}`;
+            const asteriskPublicHostname = getConfigVal('servers:asterisk_fqdn');
+            const stunServer = `${getConfigVal('servers:stun_fqdn')}:${getConfigVal('app_ports:stun')}`;
 
-            var wsPort = getConfigVal('app_ports:asterisk_ws');
+            let wsPort = getConfigVal('app_ports:asterisk_ws');
             if (wsPort !== '') {
               wsPort = parseInt(wsPort, 10);
             }
 
-            var extensionPassword = getConfigVal('asterisk:extensions:secret');
+            const extensionPassword = getConfigVal('asterisk:extensions:secret');
 
             redisClient.hset(rTokenMap, tokenMap.token, 'AWAY');
             // Adds user to statusMap.
@@ -4207,8 +4195,8 @@ app.get('/login', agent.shield(cookieShield), (req, res) => {
             req.session.signalingServerUrl = signalingServerUrl;
             req.session.queuesComplaintNumber = queuesComplaintNumber;
             req.session.extensionPassword = extensionPassword;
-            req.session.complaint_queue_count = complaint_queue_count;
-            req.session.general_queue_count = general_queue_count;
+            req.session.complaint_queue_count = complaintQueueCount;
+            req.session.general_queue_count = generalQueueCount;
             res.redirect(`.${agentPath}`);
           });
         } else {
@@ -4237,9 +4225,9 @@ app.get('/updatelightconfigs', (req, res) => {
  */
 app.get('/getVideomail', agent.shield(cookieShield), (req, res) => {
   logger.debug('/getVideomail');
-  var videoId = req.query.id;
+  const videoId = req.query.id;
   logger.debug(`id: ${videoId}`);
-  var agentExt = req.session.extension;
+  const agentExt = req.session.extension;
   // Wrap in mysql query
   dbConnection.query('SELECT video_filepath AS filepath, video_filename AS filename FROM videomail WHERE id = ?', videoId, (err, result) => {
     if (err) {
@@ -4248,19 +4236,19 @@ app.get('/getVideomail', agent.shield(cookieShield), (req, res) => {
       console.log(`|${result[0].filepath}|`);
       if (result[0].filepath === 's3') {
         console.log('s3 videomail');
-        var file = s3.getObject({ Bucket: getConfigVal('s3:bucketname'), Key: result[0].filename });
+        const file = s3.getObject({ Bucket: getConfigVal('s3:bucketname'), Key: result[0].filename });
 
         res.writeHead(200, {
           'Content-Type': 'video/webm',
           'Accept-Ranges': 'bytes'
         });
-        var filestream = file.createReadStream();
+        const filestream = file.createReadStream();
         filestream.pipe(res);
       } else {
         console.log('other videomail ');
-        var videoFile = result[0].filepath + result[0].filename;
+        const videoFile = result[0].filepath + result[0].filename;
         try {
-          var stat = fs.statSync(videoFile);
+          const stat = fs.statSync(videoFile);
           // Added Accept-Ranges bytes to header so seek bar & setting
           // video.currentTime works in Chrome without always going to time zero.
           res.writeHead(200, {
@@ -4268,9 +4256,9 @@ app.get('/getVideomail', agent.shield(cookieShield), (req, res) => {
             'Content-Length': stat.size,
             'Accept-Ranges': 'bytes'
           });
-          var readStream = fs.createReadStream(videoFile);
+          const readStream = fs.createReadStream(videoFile);
           readStream.pipe(res);
-        } catch (err) {
+        } catch (_err) {
           io.to(Number(agentExt)).emit('videomail-retrieval-error', videoId);
         }
       }
@@ -4283,25 +4271,26 @@ app.get('/getVideomail', agent.shield(cookieShield), (req, res) => {
  */
 app.get('/getRecording', agent.shield(cookieShield), (req, res) => {
   console.log(`USING ${req.query.fileName}`);
-  var file = s3.getObject({ Bucket: getConfigVal('s3:bucketname'), Key: req.query.fileName });
+  const file = s3.getObject({ Bucket: getConfigVal('s3:bucketname'), Key: req.query.fileName });
 
   res.attachment(req.query.fileName);
-  var filestream = file.createReadStream();
+  const filestream = file.createReadStream();
   filestream.pipe(res);
-})
+});
 
 // For fileshare
 // TODO Needs middleware for agent and consumer
 // Use app,get for cooki to see if auth,  If not kicked
-var multer = require('multer');
-var upload = multer({ dest: 'uploads/' });
+const multer = require('multer');
+
+const upload = multer({ dest: 'uploads/' });
 app.post('/fileUpload', upload.single('uploadfile'), (req, res) => {
   let uploadedBy = req.session.vrs || ((req.session.role === 'AD Agent') ? req.body.vrs : false);
 
   // sometimes the consumer doesn't have it's vrs number in req.session
   // also sometimes the req.session doesn't update?? **** This is the issue
   // this is rare and hard to reproduce, but this will catch it when/if it does
-  if (uploadedBy == undefined) {
+  if (uploadedBy === undefined) {
     uploadedBy = req.session.data.valid;
   }
 
@@ -4310,17 +4299,17 @@ app.post('/fileUpload', upload.single('uploadfile'), (req, res) => {
 
   if (uploadedBy) {
     console.log(`Valid agent ${uploadedBy}`);
-    let uploadMetadata = {};
+    const uploadMetadata = {};
 
     if (uploadedBy === true) {
       // this means vrs isn't in the req.session
       // this is a weird workaround that finds the vrs
       // by looking at the agent extension and finding the vrs associated with it
 
-      let uploadAgentExt = req.session.extension;
+      const uploadAgentExt = req.session.extension;
 
       for (let i = 0; i < sharingAgent.length; i += 1) {
-        if (sharingAgent[i] == uploadAgentExt) {
+        if (sharingAgent[i] === uploadAgentExt) {
           uploadMetadata.vrs = sharingConsumer[i];
           break;
         }
@@ -4337,7 +4326,7 @@ app.post('/fileUpload', upload.single('uploadfile'), (req, res) => {
     uploadMetadata.size = req.file.size;
 
     if (getConfigVal('filesharing:virus_scan_enabled') === 'true') {
-      ClamScan.then(async clamscan => {
+      ClamScan.then(async (clamscan) => {
         try {
           console.log('scanning', uploadMetadata.filepath, 'as', require('os').userInfo().username, fs.existsSync(uploadMetadata.filepath));
 
@@ -4345,12 +4334,11 @@ app.post('/fileUpload', upload.single('uploadfile'), (req, res) => {
           // const version = await clamscan.get_version();
           // console.log(`ClamAV Version: ${version}`);
 
-          const { is_infected, file, viruses } = await clamscan.is_infected(uploadMetadata.filepath);
-          if (is_infected) {
+          const { isInfected, file, viruses } = await clamscan.isInfected(uploadMetadata.filepath);
+          if (isInfected) {
             console.log(`${req.file.originalname} is infected with ${viruses}!`);
             res.status(400).send('Error scanning file i');
-          }
-          else {
+          } else {
             console.log(`${req.file.originalname} passed inspection!`);
             request({
               method: 'POST',
@@ -4373,13 +4361,12 @@ app.post('/fileUpload', upload.single('uploadfile'), (req, res) => {
           console.log('Error using Clam AV:', err);
           res.status(400).send('Error scanning file');
         }
-      }).catch(err => {
+      }).catch((err) => {
         // Handle errors that may have occurred during initialization
         console.log('Error initializing Clam AV:', err);
         res.status(400).send('Error scanning file');
       });
-    }
-    else {
+    } else {
       console.log('WARNING: VIRUS SCAN IS DISABLED!');
       request({
         method: 'POST',
@@ -4406,36 +4393,34 @@ app.post('/fileUpload', upload.single('uploadfile'), (req, res) => {
 // Download
 app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
   if (sharingAgent !== undefined && sharingConsumer !== undefined) {
-    for (let i = 0; i < sharingAgent.length; i++) {
+    for (let i = 0; i < sharingAgent.length; i += 1) {
       // make sure the agent is in a call with the consumer who sent the file
-      if (req.session.extension == sharingAgent[i] || req.session.vrs == sharingConsumer[i]) {
+      if (req.session.extension === sharingAgent[i] || req.session.vrs === sharingConsumer[i]) {
         console.log('In valid session');
 
         console.log('Comparing file IDs');
         // console.log(fileToken[i] + " vs " +req.query.id.split('"')[0]);
-        if (fileToken[i] == (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
+        if (fileToken[i] === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
           console.log('allowed to download');
 
-          let documentID = req.query.id;
+          const documentID = req.query.id;
           let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}`;
           url += `/storeFileInfo?documentID=${documentID}`;
 
           request({
-            url: url,
+            url,
             json: true
           }, (error, response, data) => {
             if (error) {
               res.status(500).send('Error');
+            } else if (data.message === 'Success') {
+              const { filepath } = data;
+              const { filename } = data;
+              const readStream = fs.createReadStream(filepath);
+              res.attachment(filename);
+              readStream.pipe(res);
             } else {
-              if (data.message == 'Success') {
-                const filepath = data.filepath;
-                const filename = data.filename;
-                var readStream = fs.createReadStream(filepath);
-                res.attachment(filename);
-                readStream.pipe(res);
-              } else {
-                res.status(500).send('Error');
-              }
+              res.status(500).send('Error');
             }
           });
           break;
@@ -4452,7 +4437,7 @@ app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
 });
 
 app.get('/getagentstatus/:token', (req, res) => {
-  var resObj = {
+  const resObj = {
     status: 'Unknown',
     r: 0,
     g: 0,
@@ -4461,7 +4446,7 @@ app.get('/getagentstatus/:token', (req, res) => {
     stop: true
   };
 
-  var token = req.params.token;
+  const { token } = req.params;
   if (token) {
     redisClient.hget(rTokenMap, token, (err, status) => {
       if (err) {
@@ -4532,7 +4517,7 @@ app.get('/getagentstatus/:token', (req, res) => {
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
-  var err = new Error('Not Found');
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
