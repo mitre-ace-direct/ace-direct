@@ -396,14 +396,14 @@ class ConfManager extends Events {
 
         setTimeout(() => {
           // force pfu at start of the call
-          const body = `<?xml version="1.0" encoding="utf-8" ?>
-          <media_control>
-            <vc_primitive>
-              <to_encoder>
-                <picture_fast_update/>
-              </to_encoder>
-            </vc_primitive>
-          </media_control>`;
+          const body = '<?xml version="1.0" encoding="utf-8" ?>'
+          + '<media_control>'
+            + '<vc_primitive>'
+              + '<to_encoder>'
+                + '<picture_fast_update/>'
+              + '</to_encoder>'
+            + '</vc_primitive>'
+          + '</media_control>';
 
           session.sendInfo('application/media_control+xml', body);
 
