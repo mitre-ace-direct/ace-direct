@@ -43,7 +43,7 @@ class ClientSession extends Events {
   }
 
   init() {
-    this._socket.on('message', payload => {
+    this._socket.on('message', (payload) => {
       const message = JSON.parse(payload);
       debug('[%s] Got payload', this._id, message.id);
       switch (message.id) {
@@ -109,7 +109,7 @@ class ClientSession extends Events {
 
   async sipReinvite(ext, customSdp) {
     let success = false;
-    let isUpdate = false;
+    const isUpdate = false;
     if (this._session) {
       success = await this._confm.handleRenegotiate(this, customSdp, isUpdate);
     }
@@ -122,7 +122,7 @@ class ClientSession extends Events {
 
   async sipUpdate(ext, customSdp) {
     let success = false;
-    let isUpdate = true;
+    const isUpdate = true;
     if (this._session) {
       success = await this._confm.handleRenegotiate(this, customSdp, isUpdate);
     }
@@ -190,14 +190,14 @@ class ClientSession extends Events {
   }
 
   async loopback(ext, offer) {
-    let calleeExt = ext + 1;
+    const calleeExt = ext + 1;
     debug('[%s] Initiated call from [%s] to [%s]', this._id, calleeExt);
     try {
       this._status = CL_STATUS_REGISTERED;
       this._ext = ext;
       this._session = await this._confm.loopbackCall(this, offer, calleeExt);
       const candidates = this._queue.splice(0);
-      candidates.forEach(c => {
+      candidates.forEach((c) => {
         this._session.handleIce(this._ext, c);
       });
     } catch (error) {
@@ -224,7 +224,7 @@ class ClientSession extends Events {
           && this._asteriskQueueNames && this._asteriskQueueNames.length) {
         // add user to asterisk queue
         let res = null;
-        this._asteriskQueueNames.forEach(async queueName => {
+        this._asteriskQueueNames.forEach(async (queueName) => {
           res = await this._ami.queueAdd(ext, queueName);
           if (res) this._isMemberQueue = true;
         });
@@ -247,7 +247,7 @@ class ClientSession extends Events {
     try {
       this._session = await this._confm.call(this, offer, target, skipQueue);
       const candidates = this._queue.splice(0);
-      candidates.forEach(c => {
+      candidates.forEach((c) => {
         this._session.handleIce(this._ext, c);
       });
     } catch (error) {
@@ -262,7 +262,7 @@ class ClientSession extends Events {
       if (removeFromQueue && this._isMemberQueue && this._isAgent && this._ami
           && this._asteriskQueueNames && this._asteriskQueueNames.length) {
         let amires = null;
-        this._asteriskQueueNames.forEach(async queueName => {
+        this._asteriskQueueNames.forEach(async (queueName) => {
           amires = await this._ami.queueRemove(this._ext, queueName);
           if (amires) this._isMemberQueue = false;
         });
@@ -272,8 +272,8 @@ class ClientSession extends Events {
         this._isMonitoring = false;
       }
       this._status = CL_STATUS_REGISTERED;
-      let sid = this._session.id;
-      let ext = this._ext;
+      const sid = this._session.id;
+      const ext = this._ext;
       if (this._ua) {
         this._ua.terminateSessions();
       }
@@ -289,7 +289,7 @@ class ClientSession extends Events {
     if (this._isMemberQueue && this._isAgent && this._ami
         && this._asteriskQueueNames && this._asteriskQueueNames.length) {
       let amires = null;
-      this._asteriskQueueNames.forEach(async queueName => {
+      this._asteriskQueueNames.forEach(async (queueName) => {
         amires = await this._ami.queueRemove(this._ext, queueName);
         if (amires) this._isMemberQueue = false;
       });
@@ -337,7 +337,7 @@ class ClientSession extends Events {
       caller,
       isWarmTransfer: this._warmTransfer
     });
-    return new Promise(success => {
+    return new Promise((success) => {
       const handler = async (payload) => {
         const msg = JSON.parse(payload);
         if (msg.id === 'accept' && msg.caller === caller) {
@@ -360,7 +360,7 @@ class ClientSession extends Events {
         this._session = session;
         // debug(this._session);
         const candidates = this._queue.splice(0);
-        candidates.forEach(c => {
+        candidates.forEach((c) => {
           this._session.handleIce(this._ext, c);
         });
       });
@@ -385,10 +385,10 @@ class ClientSession extends Events {
       return this._send('Asterisk AMI disabled');
     }
     if (this._isMemberQueue && this._isAgent) {
-      this._asteriskQueueNames.forEach(queueName => {
+      this._asteriskQueueNames.forEach((queueName) => {
         try {
-          let that = this;
-          this._ami.pauseQueue(this._ext, queueName, function (r) {
+          const that = this;
+          this._ami.pauseQueue(this._ext, queueName, (_r) => {
             that._send({ id: 'pausedQueue' });
           });
         } catch (e) {
@@ -403,10 +403,10 @@ class ClientSession extends Events {
       return this._send('Asterisk AMI disabled');
     }
     if (this._isMemberQueue && this._isAgent) {
-      this._asteriskQueueNames.forEach(queueName => {
+      this._asteriskQueueNames.forEach((queueName) => {
         try {
-          let that = this;
-          this._ami.unpauseQueue(this._ext, queueName, function (r) {
+          const that = this;
+          this._ami.unpauseQueue(this._ext, queueName, (_r) => {
             that._send({ id: 'unpausedQueue' });
           });
         } catch (e) {
@@ -451,14 +451,14 @@ class ClientSession extends Events {
 
   async handleSipInfo() {
     const jssip_session = this._confm._jssipRTCSessions.get(this._ext);
-    let body = `<?xml version="1.0" encoding="utf-8" ?>
-  <media_control>
-    <vc_primitive>
-      <to_encoder>
-        <picture_fast_update/>
-      </to_encoder>
-    </vc_primitive>
-  </media_control>`;
+    const body = '<?xml version="1.0" encoding="utf-8" ?>'
+    + '<media_control>'
+      + '<vc_primitive>'
+        + '<to_encoder>'
+          + '<picture_fast_update/>'
+        + '</to_encoder>'
+      + '</vc_primitive>'
+    + '</media_control>';
 
     return jssip_session.sendInfo('application/media_control+xml', body);
   }
@@ -467,11 +467,11 @@ class ClientSession extends Events {
     const ms = param('asteriskss.sip_media_request_interval');
     if (ms) {
       await this.handleSipInfo();
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         this._sipIntervalTimeout = setInterval(async () => {
           debug(`Request Key frame and sleep: ${ms} ms`);
           // try {
-          await this.handleSipInfo().catch(e => {
+          await this.handleSipInfo().catch((e) => {
             debug(`${e}\nClearing picture_fast_update SIP INFO interval`);
             clearInterval(this._sipIntervalTimeout);
           });
