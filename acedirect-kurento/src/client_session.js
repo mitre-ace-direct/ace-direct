@@ -451,14 +451,14 @@ class ClientSession extends Events {
 
   async handleSipInfo() {
     const jssip_session = this._confm._jssipRTCSessions.get(this._ext);
-    const body = `<?xml version="1.0" encoding="utf-8" ?>
-  <media_control>
-    <vc_primitive>
-      <to_encoder>
-        <picture_fast_update/>
-      </to_encoder>
-    </vc_primitive>
-  </media_control>`;
+    const body = '<?xml version="1.0" encoding="utf-8" ?>'
+    + '<media_control>'
+      + '<vc_primitive>'
+        + '<to_encoder>'
+          + '<picture_fast_update/>'
+        + '</to_encoder>'
+      + '</vc_primitive>'
+    + '</media_control>';
 
     return jssip_session.sendInfo('application/media_control+xml', body);
   }
