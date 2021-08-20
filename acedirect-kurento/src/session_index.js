@@ -14,7 +14,7 @@ class SessionIndex extends Events {
     const id = uuid.v4();
     debug('Add %s to index', id);
     const client = new ClientSession(id, socket, confm, ami);
-    client.on('registered', ext => {
+    client.on('registered', (ext) => {
       this._extIndex.set(ext, id);
     });
 
