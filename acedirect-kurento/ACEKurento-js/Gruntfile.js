@@ -49,25 +49,25 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-karma');
 
-  grunt.registerTask('test', ["karma"]);
+  grunt.registerTask('test', ['karma']);
 
-  grunt.registerTask('clear-version', 'Reset version variable in process.env', function () {
+  grunt.registerTask('clear-version', 'Reset version variable in process.env', () => {
     delete process.env.version;
   });
 
-  grunt.registerTask('build-version', 'Generates a version of ACEKurento.js library', function (type) {
-    var pkg = grunt.config.data.pkg;
-    var version = pkg.version.split('.');
+  grunt.registerTask('build-version', 'Generates a version of ACEKurento.js library', (type) => {
+    const pkg = grunt.config.data.pkg;
+    const version = pkg.version.split('.');
 
-    var major = version[0],
-      minor = version[1];
+    const major = version[0];
+    const minor = version[1];
 
     switch (type) {
       case 'major':
         process.env.version = major;
         break;
       case 'minor':
-        process.env.version = major + '.' + minor;
+        process.env.version = `${major}.${minor}`;
         break;
       case 'patch':
         process.env.version = pkg.version;
