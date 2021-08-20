@@ -20,38 +20,38 @@
  * @returns {Object} acekurento
  */
 function ACEKurento(config) {
-  var ws;
+  let ws;
   if (config && config.hasOwnProperty('acekurentoSignalingUrl')) {
     ws = new WebSocket(config.acekurentoSignalingUrl);
   } else {
-    ws = new WebSocket('wss://' + window.location.host + '/signaling');
+    ws = new WebSocket(`wss://${window.location.host}/signaling`);
   }
-  var selfStream;
-  var remoteStream;
-  var webRtcPeer;
+  let selfStream;
+  let remoteStream;
+  let webRtcPeer;
 
   const NOT_REGISTERED = 0;
   const REGISTERING = 1;
   const REGISTERED = 2;
-  var registerState = NOT_REGISTERED;
+  let registerState = NOT_REGISTERED;
 
   const NO_CALL = 0;
   const PROCESSING_CALL = 1;
   const IN_CALL = 2;
   // var callState = null;
-  var holdCb = null;
-  var peerOnHold = false;
+  let holdCb = null;
+  let peerOnHold = false;
 
   /** @member {Object} */
-  var acekurento = acekurento || {};
+  const acekurento = acekurento || {};
 
   // extend.js
   // Written by Andrew Dupont, optimized by Addy Osmani
   function extend(destination, source) {
-    var toString = Object.prototype.toString,
-      objTest = toString.call({});
+    const toString = Object.prototype.toString;
+    const objTest = toString.call({});
 
-    for (var property in source) {
+    for (const property in source) {
       if (source[property] && objTest === toString.call(source[property])) {
         destination[property] = destination[property] || {};
         extend(destination[property], source[property]);
@@ -105,11 +105,11 @@ function ACEKurento(config) {
     /**
      * Call id for current session
      */
-    callid: "",
+    callid: '',
     /**
      * Call id of previous session
      */
-    previous_callid: "",
+    previous_callid: '',
     /**
      * Call state string
      */
@@ -127,13 +127,13 @@ function ACEKurento(config) {
      * You can find the available config options in {@link ACEKurento}
      */
     configuration: {
-      'connectionId': undefined,
-      'acekurentoSignalingUrl': this.acekurentoSignalingUrl,
-      'displayName': this.displayName,
-      'sipUsername': this.sipUsername,
-      'sipPassword': this.sipPassword,
-      'guestUser': false,
-      'sipUri': this.sipUri
+      connectionId: undefined,
+      acekurentoSignalingUrl: this.acekurentoSignalingUrl,
+      displayName: this.displayName,
+      sipUsername: this.sipUsername,
+      sipPassword: this.sipPassword,
+      guestUser: false,
+      sipUri: this.sipUri
     },
     /**
      * Event handlers. {@link #Events}
@@ -151,102 +151,102 @@ function ACEKurento(config) {
        * }
        * acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
        */
-      'connected': function (e) {},
+      connected: function (e) {},
       /**
        * Register Response Event
        * @event {Function} registerResponse
        */
-      'registerResponse': function (e) {},
+      registerResponse: function (e) {},
       /**
        * Call Response Event
        * @event {Function} callResponse
        */
-      'callResponse': function (e) {},
+      callResponse: function (e) {},
       /**
        * Call incoming Event
        * @event {Function} incomingCall
        */
-      'incomingCall': function (e) {},
+      incomingCall: function (e) {},
       /**
        * Call in progress Event
        * @event {Function} progress
        */
-      'progress': function (e) {},
+      progress: function (e) {},
       /**
        * Call Accepted Event
        * @event {Function} accepted (20X sent/received)
        */
-      'accepted': function (e) {},
+      accepted: function (e) {},
       /**
        * Call sipConfirmed Event (ACK sent/received)
        * @event {Function} sipConfirmed
        */
-      'sipConfirmed': function (e) {},
+      sipConfirmed: function (e) {},
       /**
        * Call error Event
        * @event {Function} callError
        */
-      'callError': function (e) {},
+      callError: function (e) {},
       /**
        * Call ended Event
        * @event {Function} ended
        */
-      'ended': function (e) {},
+      ended: function (e) {},
       /**
        * Call queue paused Event
        * @event {Function} pausedQueue
        */
-      'pausedQueue': function (e) {},
+      pausedQueue: function (e) {},
       /**
        * Call queue unpaused Event
        * @event {Function} unpausedQueue
        */
-      'unpausedQueue': function (e) {},
+      unpausedQueue: function (e) {},
       /**
        * Call recording started Event
        * @event {Function} callRecording
        */
-      'startedRecording': function (e) {},
+      startedRecording: function (e) {},
       /**
        * Call recording stopped Event
        * @event {Function} stoppedRecording
        */
-      'stoppedRecording': function (e) {},
+      stoppedRecording: function (e) {},
       /**
        * Call invite to another peer response
        * @event {Function} inviteResponse
        */
-      'inviteResponse': function (e) {},
+      inviteResponse: function (e) {},
       /**
        * Call transfer SIP request to peer response
        * @event {Function} callTransferResponse
        */
-      'callTransferResponse': function (e) {},
+      callTransferResponse: function (e) {},
       /**
        * Call reinvite to another peer response
        * @event {Function} reinviteResponse
        */
-      'reinviteResponse': function (e) {},
+      reinviteResponse: function (e) {},
       /**
        * Call SIP update to another peer response
        * @event {Function} updateResponse
        */
-      'updateResponse': function (e) {},
+      updateResponse: function (e) {},
       /**
        * Call webrtc peer restart response
        * @event {Function} restartCallResponse
        */
-      'restartCallResponse': function (e) {},
+      restartCallResponse: function (e) {},
       /**
        * Invoked when the number of participants on a call changes
        * @event {Function} participantsUpdate
        */
-      'participantsUpdate': function (e) {},
+      participantsUpdate: function (e) {},
       /**
        * newMessage Event
        * @event {Function} newMessage
        */
-      'newMessage': function (e) {}
+      newMessage: function (e) {}
     },
     /**
      * Connect and call, loopback stream to Kurento
@@ -255,7 +255,7 @@ function ACEKurento(config) {
     loopback: function (ext) {
       setCallState(PROCESSING_CALL);
       this.isLoopback = true;
-      var options = {
+      const options = {
         localVideo: this.selfStream,
         remoteVideo: this.remoteStream,
         onicecandidate: onIceCandidate,
@@ -272,14 +272,14 @@ function ACEKurento(config) {
         }
         console.log('created webRtcPeer');
 
-        this.generateOffer(function (error, offerSdp) {
+        this.generateOffer((error, offerSdp) => {
           if (error) {
             console.error(error);
             setCallState(NO_CALL);
           }
           console.log('Generate offer');
 
-          var message = {
+          const message = {
             id: 'loopback',
             ext: ext,
             sdp: offerSdp
@@ -291,20 +291,21 @@ function ACEKurento(config) {
     /**
      * Connect, register to node backend and Asterisk using JSSIP
      * @param {String} sipUsername - It is your sip uri, the uri of the caller/callee to register
-     * @param {String} sipPassword - It is your sip password, the password of the caller/callee to register
+     * @param {String} sipPassword - It is your sip password,
+     * the password of the caller/callee to register
      * @param {Boolean} isAgent - Boolean to let backend know if you are an agent
      */
     register: function (sipUsername, sipPassword, isAgent) {
-      var ext = sipUsername || this.sipUsername;
-      var password = sipPassword || this.sipPassword;
+      const ext = sipUsername || this.sipUsername;
+      const password = sipPassword || this.sipPassword;
 
       if (!ext) {
-        throw new Error("You must insert your user uri extension");
+        throw new Error('You must insert your user uri extension');
       }
 
       setRegisterState(REGISTERING);
 
-      var message = {
+      const message = {
         id: 'register',
         ext: ext,
         password: password,
@@ -315,19 +316,20 @@ function ACEKurento(config) {
     /**
      * Makes a call
      * @param {String} uri - uri is the callee, the sip uri of the person to call
-     * @param {Boolean} skipQueue - Skip queue, if "true" call sending media directly through Kurento (no Asterisk)
+     * @param {Boolean} skipQueue - Skip queue, if "true" call sending media
+     * directly through Kurento (no Asterisk)
      */
     call: function (uri, skipQueue) {
       if (!uri) {
-        console.log("You must specify the peer ext");
+        console.log('You must specify the peer ext');
         return;
       } else if (acekurento.callState === PROCESSING_CALL || acekurento.callState === IN_CALL) {
-        console.log("You are already on a call");
+        console.log('You are already on a call');
         return;
       }
       setCallState(PROCESSING_CALL);
 
-      var options = {
+      const options = {
         localVideo: this.selfStream,
         remoteVideo: this.remoteStream,
         onicecandidate: onIceCandidate,
@@ -345,14 +347,14 @@ function ACEKurento(config) {
         }
         console.log('created webRtcPeer');
 
-        this.generateOffer(function (error, offerSdp) {
+        this.generateOffer((error, offerSdp) => {
           if (error) {
             console.error(error);
             setCallState(NO_CALL);
           }
           console.log('Generate offer');
 
-          var message = {
+          const message = {
             id: 'call',
             uri: uri,
             sdp: offerSdp,
@@ -368,7 +370,7 @@ function ACEKurento(config) {
     acceptCall: function (message) {
       setCallState(PROCESSING_CALL);
 
-      var options = {
+      const options = {
         localVideo: this.selfStream,
         remoteVideo: this.remoteStream,
         onicecandidate: onIceCandidate,
@@ -384,12 +386,12 @@ function ACEKurento(config) {
           setCallState(NO_CALL);
         }
 
-        this.generateOffer(function (error, offerSdp) {
+        this.generateOffer((error, offerSdp) => {
           if (error) {
             console.error(error);
             setCallState(NO_CALL);
           }
-          var response = {
+          const response = {
             id: 'accept',
             caller: message.caller,
             sdp: offerSdp
@@ -402,10 +404,10 @@ function ACEKurento(config) {
      * Decline incoming call
      */
     declineCall: function (message) {
-      console.log('Incoming call! Call state: ' + this.callState);
+      console.log(`Incoming call! Call state: ${this.callState}`);
       setCallState(PROCESSING_CALL);
 
-      var response = {
+      const response = {
         id: 'decline',
         caller: message.caller
       };
@@ -414,7 +416,8 @@ function ACEKurento(config) {
     },
     /**
      * Stops a call
-     * @param {Boolean} removeFromQueue - removeFromQueue boolean "true" to send hangup message and leave member queue.
+     * @param {Boolean} removeFromQueue - removeFromQueue boolean "true"
+     * to send hangup message and leave member queue.
      * Else just hangup
      */
     stop: function (removeFromQueue) {
@@ -425,7 +428,7 @@ function ACEKurento(config) {
         webRtcPeer = null;
         // TODO totally stop media, camera led off
         // acekurento.mediaStream().getTracks().forEach(track => track.stop());
-        var message = {
+        const message = {
           id: 'stop',
           removeFromQueue: removeFromQueue
         };
@@ -469,16 +472,16 @@ function ACEKurento(config) {
      */
     iceRestart: function () {
       console.info('pc createOffer restart');
-      var pc = this.pc();
+      const pc = this.pc();
       pc.createOffer({
         offerToReceiveAudio: true,
         offerToReceiveVideo: true,
         iceRestart: true
-      }).then(function (offer) {
+      }).then((offer) => {
         console.info('Created SDP offer');
         // offer = mangleSdpToAddSimulcast(offer);
         return pc.setLocalDescription(offer);
-      }).catch(function (e) {
+      }).catch((e) => {
         console.error(e);
       });
     },
@@ -487,7 +490,7 @@ function ACEKurento(config) {
      * @param {String} customSdp - (optional) custom SDP to send for the reinvite
      */
     sipReinvite: function (customSdp) {
-      var options = {
+      const options = {
         localVideo: this.selfStream,
         remoteVideo: this.remoteStream,
         onicecandidate: onIceCandidate,
@@ -503,14 +506,14 @@ function ACEKurento(config) {
           setCallState(NO_CALL);
         }
         console.log('created webRtcPeer');
-        this.generateOffer(function (error, offerSdp) {
+        this.generateOffer((error, offerSdp) => {
           if (error) {
             console.error(error);
             setCallState(NO_CALL);
           }
           console.log('Generate offer');
 
-          var message = {
+          const message = {
             id: 'sipReinvite',
             sdp: (customSdp) ? customSdp : offerSdp
           };
@@ -523,7 +526,7 @@ function ACEKurento(config) {
      * @param {String} customSdp - (optional) custom SDP to send for the SIP update
      */
     sipUpdate: function (customSdp) {
-      var options = {
+      const options = {
         localVideo: this.selfStream,
         remoteVideo: this.remoteStream,
         onicecandidate: onIceCandidate,
@@ -539,14 +542,14 @@ function ACEKurento(config) {
           setCallState(NO_CALL);
         }
         console.log('created webRtcPeer');
-        this.generateOffer(function (error, offerSdp) {
+        this.generateOffer((error, offerSdp) => {
           if (error) {
             console.error(error);
             setCallState(NO_CALL);
           }
           console.log('Generate offer');
 
-          var message = {
+          const message = {
             id: 'sipUpdate',
             sdp: (customSdp) ? customSdp : offerSdp
           };
@@ -558,7 +561,7 @@ function ACEKurento(config) {
      * Pause Queue
      */
     pauseQueue: function () {
-      var message = {
+      const message = {
         id: 'pauseQueue'
       };
       sendMessage(message);
@@ -567,7 +570,7 @@ function ACEKurento(config) {
      * Unpause Queue
      */
     unpauseQueue: function () {
-      var message = {
+      const message = {
         id: 'unpauseQueue'
       };
       sendMessage(message);
@@ -576,7 +579,7 @@ function ACEKurento(config) {
      * Start Recording
      */
     startRecording: function () {
-      var message = {
+      const message = {
         id: 'startRecording'
       };
       sendMessage(message);
@@ -585,7 +588,7 @@ function ACEKurento(config) {
      * Stop Recording
      */
     stopRecording: function () {
-      var message = {
+      const message = {
         id: 'stopRecording'
       };
       sendMessage(message);
@@ -594,7 +597,7 @@ function ACEKurento(config) {
      * Start Playing Recording
      */
     startPlayingRecording: function () {
-      var message = {
+      const message = {
         id: 'startPlayingRecording'
       };
       sendMessage(message);
@@ -603,7 +606,7 @@ function ACEKurento(config) {
      * Stop Playing Recording
      */
     stopPlayingRecording: function () {
-      var message = {
+      const message = {
         id: 'stopPlayingRecording'
       };
       sendMessage(message);
@@ -613,7 +616,7 @@ function ACEKurento(config) {
      * @param {String} ext - ext is the callee extension, the person to call
      */
     invitePeer: function (ext) {
-      var message = {
+      const message = {
         id: 'invitePeer',
         ext: ext
       };
@@ -623,10 +626,11 @@ function ACEKurento(config) {
      * Call transfer that allows hot/blind or warm transfer to peer
 
      * @param {String} ext - ext is the callee extension, the person to call
-     * @param {Boolean} isBlind - used to do blind/hot transfer or warm transfer (started after invitePeer())
+     * @param {Boolean} isBlind - used to do blind/hot
+     * transfer or warm transfer (started after invitePeer())
      */
     callTransfer: function (ext, isBlind) {
-      var message = {
+      const message = {
         id: 'callTransfer',
 
         ext: ext,
@@ -636,12 +640,14 @@ function ACEKurento(config) {
     },
     /**
      * Enable/Disable video or audio tracks
-     * @param {Boolean} isActive - If "true" will disable/pause media type. Otherwise will resume a specified media type.
-     * @param {Boolean} isAudio - If "true" will act on the audio media stream type. Otherwise it will act on the video type.
+     * @param {Boolean} isActive - If "true" will disable/pause media type.
+     * Otherwise will resume a specified media type.
+     * @param {Boolean} isAudio - If "true" will act on the audio media stream type.
+     * Otherwise it will act on the video type.
      */
     enableDisableTrack: function (isActive, isAudio) {
-      var mediaStream = this.mediaStream();
-      console.log("Set " + (isAudio ? "AUDIO" : "VIDEO") + " " + (isActive ? "ON" : "OFF"));
+      const mediaStream = this.mediaStream();
+      console.log(`Set ${isAudio ? 'AUDIO' : 'VIDEO'} ${isActive ? 'ON' : 'OFF'}`);
 
       if (isAudio) {
         mediaStream.getAudioTracks()[0].enabled = !(mediaStream.getAudioTracks()[0].enabled);
@@ -649,14 +655,15 @@ function ACEKurento(config) {
         mediaStream.getVideoTracks()[0].enabled = !(mediaStream.getVideoTracks()[0].enabled);
       }
 
-      console.log((isAudio ? "AUDIO" : "VIDEO") + " is " + (isActive ? "ON" : "OFF"));
+      console.log(`${isAudio ? 'AUDIO' : 'VIDEO'} is ${isActive ? 'ON' : 'OFF'}`);
     },
     /**
      * Screenshare to Kurento
-     * @param {Boolean} enable - If "true" will enable screenshare. Otherwise will stop and use camera.
+     * @param {Boolean} enable - If "true" will enable screenshare.
+     * Otherwise will stop and use camera.
      */
     screenshare: function (enable) {
-      var options = {
+      const options = {
         localVideo: this.selfStream,
         remoteVideo: this.remoteStream,
         sendSource: enable ? 'screen' : 'webcam',
@@ -674,14 +681,14 @@ function ACEKurento(config) {
         }
         console.log('created webRtcPeer');
         acekurento.isScreensharing = enable;
-        this.generateOffer(function (error, offerSdp) {
+        this.generateOffer((error, offerSdp) => {
           if (error) {
             console.error(error);
             setCallState(NO_CALL);
           }
           console.log('Generate offer');
 
-          var message = {
+          const message = {
             id: 'restartCall',
             sdp: offerSdp
           };
@@ -734,7 +741,7 @@ function ACEKurento(config) {
     } catch (e) {
       message = message.data;
     }
-    console.info('Received message data: ' + JSON.stringify(message));
+    console.info(`Received message data: ${JSON.stringify(message)}`);
 
     switch (message.id) {
       case 'registerResponse':
@@ -818,7 +825,7 @@ function ACEKurento(config) {
       setRegisterState(REGISTERED);
     } else {
       setRegisterState(NOT_REGISTERED);
-      var errorMessage = message.error || 'Unknown reason for register rejection.';
+      const errorMessage = message.error || 'Unknown reason for register rejection.';
       console.log(errorMessage);
     }
   }
@@ -826,7 +833,7 @@ function ACEKurento(config) {
   function callResponse(message) {
     if (message.response != 'accepted') {
       console.info('Call not accepted by peer. Closing call');
-      var errorMessage = message.message ? message.message
+      const errorMessage = message.message ? message.message
         : 'Unknown reason for call rejection.';
       console.log(errorMessage);
       stop();
@@ -860,15 +867,15 @@ function ACEKurento(config) {
   }
 
   function sendMessage(message) {
-    var jsonMessage = JSON.stringify(message);
-    console.log('Sending message: ' + jsonMessage);
+    const jsonMessage = JSON.stringify(message);
+    console.log(`Sending message: ${jsonMessage}`);
     ws.send(jsonMessage);
   }
 
   function onIceCandidate(candidate) {
-    console.log('Local candidate' + JSON.stringify(candidate));
+    console.log(`Local candidate${JSON.stringify(candidate)}`);
 
-    var message = {
+    const message = {
       id: 'ice',
       candidate: candidate
     };
