@@ -64,7 +64,7 @@ class WebServer extends Events {
 
   authentication(req, res, next) {
     const token = req.get('X-Auth-Token');
-    if(token && token === param('webserver.token')) {
+    if (token && token === param('webserver.token')) {
       next();
     } else {
       res.status(401).end('Unauthorized');

@@ -3,11 +3,11 @@ const param = require('param');
 const Events = require('events');
 const models = require('./dal/models');
 const S3Client = require('./s3_client');
-var proxy = require('proxy-agent');
-var fs = require('fs');
+const proxy = require('proxy-agent');
+const fs = require('fs');
 const request = require('request');
 const { getVideoDurationInSeconds } = require('get-video-duration');
-var mysql = require('mysql2');
+const mysql = require('mysql2');
 
 /**
  * Custom logic for screen recording
@@ -20,21 +20,21 @@ AWS.config.update({
     agent: proxy(param('common.proxy'))
   }
 });
-var s3 = new AWS.S3();
+const s3 = new AWS.S3();
 
 /**
  * Custom logic for mysql connection
  */
 
-var dbHost = param('servers.mysql_fqdn');
-var dbUser = param('database_servers.mysql.user');
-var dbPassword = param('database_servers.mysql.password');
-var dbName = param('database_servers.mysql.ad_database_name');
-var dbPort = parseInt(param('app_ports.mysql'));
-console.log("Using host: " + dbHost);
-console.log("Using username: " + dbUser);
-console.log("Using name: " + dbName);
-console.log("Using port: " + dbPort);
+const dbHost = param('servers.mysql_fqdn');
+const dbUser = param('database_servers.mysql.user');
+const dbPassword = param('database_servers.mysql.password');
+const dbName = param('database_servers.mysql.ad_database_name');
+const dbPort = parseInt(param('app_ports.mysql'));
+console.log(`Using host: ${dbHost}`);
+console.log(`Using username: ${dbUser}`);
+console.log(`Using name: ${dbName}`);
+console.log(`Using port: ${dbPort}`);
 
 class RecordingManager extends Events {
   static async createRecording(filename, peer, session_id, agentNumber, otherCallers) {
@@ -45,14 +45,14 @@ class RecordingManager extends Events {
     });
     // debug('Created recording for %s: %s', peer, id);
     // Custom logic to try uploading the recording to the s3 bucket
-    var uploadParams = { Bucket: param('s3.bucketname'), Key: filename, Body: "" };
+    const uploadParams = { Bucket: param('s3.bucketname'), Key: filename, Body: '' };
 
-    let fileRequest = "http://" + param('servers.kurento_private_ip') + ":" + param('app_ports.kmsshare') + "/recordings/" + filename;
-    const filepath = 'media/' + filename;
-    let record = fs.createWriteStream(filepath);
+    const fileRequest = `http://${param('servers.kurento_private_ip')}:${param('app_ports.kmsshare')}/recordings/${filename}`;
+    const filepath = `media/${filename}`;
+    const record = fs.createWriteStream(filepath);
     request(fileRequest).pipe(record);
-    record.on('finish', function () {
-      fs.readFile(filepath, function (err, fileData) {
+    record.on('finish', () => {
+      fs.readFile(filepath, (err, fileData) => {
         uploadParams.Body = fileData;
         getVideoDurationInSeconds(filepath).then((duration) => {
           const con = mysql.createConnection(
@@ -64,18 +64,18 @@ class RecordingManager extends Events {
               port: dbPort
             }
           );
-          let sqlQuery = 'INSERT INTO call_recordings (fileName, agentNumber, participants, timestamp, status, duration, deleted) VALUES (?,?,?,NOW(),?,?,?);';
-          let params = [filename, agentNumber, otherCallers, 'UNREAD', Math.floor(duration), 0];
+          const sqlQuery = 'INSERT INTO call_recordings (fileName, agentNumber, participants, timestamp, status, duration, deleted) VALUES (?,?,?,NOW(),?,?,?);';
+          const params = [filename, agentNumber, otherCallers, 'UNREAD', Math.floor(duration), 0];
           con.promise().query(sqlQuery, params)
             .catch(console.log)
             .then(() => con.end());
         });
         // call S3 to retrieve upload file to specified bucket
-        s3.upload(uploadParams, function (err, data) {
+        s3.upload(uploadParams, (err, data) => {
           if (err) {
-            console.log("Error", err);
+            console.log('Error', err);
           } if (data) {
-            console.log("Upload Success", data.Location);
+            console.log('Upload Success', data.Location);
             // Delete file from media folder
           }
         });
