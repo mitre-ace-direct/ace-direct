@@ -53,7 +53,7 @@ class AmiManager extends Events {
      */
     function handle_manager_event(evt) {
       debug('\n######################################');
-      debug('Received an AMI event: ' + util.inspect(evt, false, null));
+      debug(`Received an AMI event: ${util.inspect(evt, false, null)}`);
       //  TODO SOME HANDLE AMI EVENTS
     }
   }
@@ -64,15 +64,15 @@ class AmiManager extends Events {
   async queueAdd(ext, queue) {
     if (queue) {
       debug(ext);
-      debug('ADDING TO QUEUE: PJSIP/' + ext + ', queue name ' + queue);
+      debug(`ADDING TO QUEUE: PJSIP/${ext}, queue name ${queue}`);
 
       return this.ami.action({
-        "Action": "QueueAdd",
-        "ActionId": "1000",
-        "Interface": "PJSIP/" + ext,
-        "Paused": "true",
-        "Queue": queue
-      }, function (err, res) {
+        Action: 'QueueAdd',
+        ActionId: '1000',
+        Interface: `PJSIP/${ext}`,
+        Paused: 'true',
+        Queue: queue
+      }, (err, res) => {
         return res;
       });
     }
@@ -84,16 +84,16 @@ class AmiManager extends Events {
   pauseQueue(ext, queue, cb) {
     if (queue) {
       debug(ext);
-      debug('PAUSING QUEUE: PJSIP/' + ext + ', queue name ' + queue);
+      debug(`PAUSING QUEUE: PJSIP/${ext}, queue name ${queue}`);
 
       this.ami.action({
-        "Action": "QueuePause",
-        "ActionId": "1000",
-        "Interface": "PJSIP/" + ext,
-        "Paused": "true",
-        "Queue": queue,
-        "Reason": "QueuePause in pause-queue event handler"
-      }, function (err, res) {
+        Action: 'QueuePause',
+        ActionId: '1000',
+        Interface: `PJSIP/${ext}`,
+        Paused: 'true',
+        Queue: queue,
+        Reason: 'QueuePause in pause-queue event handler'
+      }, (err, res) => {
         if (err) {
           return err;
         }
@@ -108,16 +108,16 @@ class AmiManager extends Events {
   unpauseQueue(ext, queue, cb) {
     if (queue) {
       debug(ext);
-      debug('UNPAUSING QUEUE: PJSIP/' + ext + ', queue name ' + queue);
+      debug(`UNPAUSING QUEUE: PJSIP/${ext}, queue name ${queue}`);
 
       this.ami.action({
-        "Action": "QueuePause",
-        "ActionId": "1000",
-        "Interface": "PJSIP/" + ext,
-        "Paused": "false",
-        "Queue": queue,
-        "Reason": "QueuePause in pause-queue event handler"
-      }, function (err, res) {
+        Action: 'QueuePause',
+        ActionId: '1000',
+        Interface: `PJSIP/${ext}`,
+        Paused: 'false',
+        Queue: queue,
+        Reason: 'QueuePause in pause-queue event handler'
+      }, (err, res) => {
         if (err) {
           return err;
         }
@@ -132,15 +132,15 @@ class AmiManager extends Events {
   async queueRemove(ext, queue) {
     if (queue) {
       debug(ext);
-      debug('REMOVING FROM QUEUE: PJSIP/' + ext + ', queue name ' + queue);
+      debug(`REMOVING FROM QUEUE: PJSIP/${ext}, queue name ${queue}`);
 
       return this.ami.action({
-        "Action": "QueueRemove",
-        "ActionId": "1000",
-        "Interface": "PJSIP/" + ext,
-        "Paused": "true",
-        "Queue": queue
-      }, function (err, res) {
+        Action: 'QueueRemove',
+        ActionId: '1000',
+        Interface: `PJSIP/${ext}`,
+        Paused: 'true',
+        Queue: queue
+      }, (err, res) => {
         return res;
       });
     }
