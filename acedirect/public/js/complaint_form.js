@@ -139,8 +139,8 @@ function initiateCall() {
   const vrs = $('#callerPhone').val().replace(/^1|[^\d]/g, '');
   const language = sessionStorage.consumerLanguage;
   socket.emit('call-initiated', {
-    language: language,
-    vrs: vrs
+    language,
+    vrs
   }); // sends vrs number to adserver
 }
 
@@ -578,7 +578,7 @@ function connect_socket() {
           .on('multiparty-caption', (transcripts) => {
             console.log('multiparty caption:', JSON.stringify(transcripts));
             socket.emit('translate-caption', {
-              transcripts: transcripts,
+              transcripts,
               callerNumber: exten,
               displayname: transcripts.displayname
             });
@@ -693,8 +693,8 @@ function startRecordingVideomail(switchQueueFlag) {
     $('#videomailbutton').prop('disabled', true);
 
     socket.emit('call-initiated', {
-      language: language,
-      vrs: vrs
+      language,
+      vrs
     }); // sends vrs number to adserver
 
     console.log('call-initiated event for videomail');
@@ -709,8 +709,8 @@ $('#userform').submit((evt) => {
   evt.preventDefault();
 
   socket.emit('ad-ticket', {
-    vrs: vrs,
-    subject: subject,
+    vrs,
+    subject,
     description: complaint
   });
   $('#userformoverlay').addClass('overlay').show();
@@ -742,12 +742,12 @@ $('#newchatmessage').on('change keydown paste input', () => {
   const displayname = $('#displayname').val();
   if (value.length > 0) {
     socket.emit('chat-typing', {
-      displayname: displayname,
+      displayname,
       rttmsg: value
     });
   } else {
     socket.emit('chat-typing-clear', {
-      displayname: displayname
+      displayname
     });
   }
 });
@@ -767,8 +767,8 @@ $('#chatsend').submit((evt) => {
   isTyping = false;
   socket.emit('chat-message', {
     message: msg,
-    timestamp: timestamp,
-    displayname: displayname,
+    timestamp,
+    displayname,
     fromLanguage: language
   });
 });
@@ -785,7 +785,7 @@ function addEmoji(emoji) {
 
   // update rtt
   socket.emit('chat-typing', {
-    displayname: displayname,
+    displayname,
     rttmsg: value
   });
 
@@ -871,7 +871,7 @@ $('#screenshareButton').prop('disabled', true).click(() => {
 $('#startScreenshare').prop('disabled', true).click(() => {
   if (monitorExt) {
     // kick the monitor from the session first
-    socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
+    socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
   }
   acekurento.screenshare(true);
 });
