@@ -99,14 +99,14 @@ function stopRecordProgress() {
 function enableVideoPrivacy() {
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
-      socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
+      socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
       setTimeout(() => {
         selfStream.classList.remove('mirror-mode');
         acekurento.enableDisableTrack(false, false); // mute video
         hideVideoButton.setAttribute('onclick', 'javascript: disableVideoPrivacy();');
         hideVideoIcon.style.display = 'block';
         acekurento.privateMode(true, privacyVideoUrl);
-        socket.emit('reinvite-monitor', { monitorExt: monitorExt });
+        socket.emit('reinvite-monitor', { monitorExt });
       }, 500);
     } else {
       selfStream.classList.remove('mirror-mode');
@@ -121,7 +121,7 @@ function enableVideoPrivacy() {
 function disableVideoPrivacy() {
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
-      socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
+      socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
       setTimeout(() => {
         selfStream.classList.add('mirror-mode');
         acekurento.enableDisableTrack(true, false); // unmute video
@@ -129,7 +129,7 @@ function disableVideoPrivacy() {
         hideVideoIcon.style.display = 'none';
         acekurento.privateMode(false);
         hideVideoIcon.style.display = 'none';
-        socket.emit('reinvite-monitor', { monitorExt: monitorExt });
+        socket.emit('reinvite-monitor', { monitorExt });
       }, 500);
     } else {
       selfStream.classList.add('mirror-mode');
@@ -306,7 +306,7 @@ function registerJssip(myExtension, myPassword) {
             // Acedirect will skip translation service if languages are the same
             console.log('sending caption:', transcripts.transcript, myExtension);
             socket.emit('translate-caption', {
-              transcripts: transcripts,
+              transcripts,
               callerNumber: myExtension
             });
             // acedirect.js is listening for 'caption-translated' and will call
@@ -362,7 +362,7 @@ function registerJssip(myExtension, myPassword) {
 
           if (monitorExt) {
             // force monitor to leave the session first
-            socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: true });
+            socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
 
             setTimeout(() => {
               screenShareEnabled = false;
@@ -384,7 +384,7 @@ function registerJssip(myExtension, myPassword) {
 
       if (monitorExt) {
         // bring the monitor back to the session
-        socket.emit('reinvite-monitor', { monitorExt: monitorExt });
+        socket.emit('reinvite-monitor', { monitorExt });
       }
     },
     ended: (e) => {
@@ -464,7 +464,7 @@ function transferToVideomail() {
 }
 
 function monitorHangup() {
-  socket.emit('force-monitor-leave', { monitorExt: monitorExt, reinvite: false });
+  socket.emit('force-monitor-leave', { monitorExt, reinvite: false });
   setTimeout(() => {
     terminateCall();
   }, 500);
@@ -592,7 +592,7 @@ function changeCaption(id) {
 
   // change css variable value
   if (target === 'bg') {
-    if (alpha === 0 ) {
+    if (alpha === 0) {
       alpha = 1;
       $('#opacity-slider-consumer').val(1);
     }
