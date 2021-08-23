@@ -837,8 +837,8 @@ function clearFadeTimer() {
 }
 
 function fade(type = 'out') {
-  $('#call-option-buttons button').each((i) => {
-    $(this).css('animation', `fade-${type} 0.${i + 2}s ease-out forwards`);
+  $('#call-option-buttons button').each((i, element) => {
+    $(element).css('animation', `fade-${type} 0.${i + 2}s ease-out forwards`);
   });
 
   if (type === 'out') {
