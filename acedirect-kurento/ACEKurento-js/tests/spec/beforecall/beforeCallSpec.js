@@ -1,4 +1,4 @@
-describe('ACEDirect-Kurento before on call', () => {
+describe('ACEDirect-Kurento before on call', function () {
   let acekurento;
   let failed;
   // mock credentials
@@ -17,7 +17,7 @@ describe('ACEDirect-Kurento before on call', () => {
     }
   };
 
-  beforeEach((done) => {
+  beforeEach(function (done) {
     spyOn(console, 'log');
     setTimeout(() => {
       console.info('rendering time...');
@@ -61,8 +61,8 @@ describe('ACEDirect-Kurento before on call', () => {
     acekurento.register(username, password, false);
   });
 
-  describe('when registering', () => {
-    it('should be able to process successful registration response', (done) => {
+  describe('when registering', function () {
+    it('should be able to process successful registration response', function (done) {
       const onmessageCallbackSpy = jasmine.createSpy('onmessageCallback');
       spyOn(WebSocket.prototype, 'send').and.callFake(function (outMsg) {
         console.info(`message: ${outMsg}`);
@@ -91,8 +91,8 @@ describe('ACEDirect-Kurento before on call', () => {
       done();
     });
 
-    describe('when failing authenticating', () => {
-      it('should send a failed event with error', (done) => {
+    describe('when failing authenticating', function () {
+      it('should send a failed event with error', function (done) {
         spyOn(WebSocket.prototype, 'send').and.callFake(function (outMsg) {
           const msg = JSON.parse(outMsg);
           if (msg.id === 'register') {
