@@ -1,59 +1,114 @@
-"use strict";
+'use strict';
 
-function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+function _typeof(obj) {
+  if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
+    _typeof = function _typeof(obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function _typeof(obj) {
+      return obj && typeof Symbol === 'function' && obj.constructor === Symbol && obj !== Symbol.prototype ? 'symbol' : typeof obj;
+    };
+  }
+  return _typeof(obj);
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError('Cannot call a class as a function');
+  }
+}
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+function _possibleConstructorReturn(self, call) {
+  if (call && (_typeof(call) === 'object' || typeof call === 'function')) {
+    return call;
+  }
+  return _assertThisInitialized(self);
+}
 
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+function _getPrototypeOf(o) {
+  _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
+    return o.__proto__ || Object.getPrototypeOf(o);
+  };
+  return _getPrototypeOf(o);
+}
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function _defineProperties(target, props) {
+  for (let i = 0; i < props.length; i++) {
+    const descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ('value' in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
 
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== 'function' && superClass !== null) {
+    throw new TypeError('Super expression must either be null or a function');
+  }
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: { value: subClass, writable: true, configurable: true }
+  });
+  if (superClass) _setPrototypeOf(subClass, superClass);
+}
 
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+function _setPrototypeOf(o, p) {
+  _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
+    o.__proto__ = p; return o;
+  };
+  return _setPrototypeOf(o, p);
+}
 
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+  return self;
+}
 
-var EventEmitter = require('events').EventEmitter;
+const EventEmitter = require('events').EventEmitter;
 
-var JsSIP_C = require('./Constants');
+const JsSIP_C = require('./Constants');
 
-var Registrator = require('./Registrator');
+const Registrator = require('./Registrator');
 
-var RTCSession = require('./RTCSession');
+const RTCSession = require('./RTCSession');
 
-var Message = require('./Message');
+const Message = require('./Message');
 
-var Transactions = require('./Transactions');
+const Transactions = require('./Transactions');
 
-var Transport = require('./Transport');
+const Transport = require('./Transport');
 
-var Utils = require('./Utils');
+const Utils = require('./Utils');
 
-var Exceptions = require('./Exceptions');
+const Exceptions = require('./Exceptions');
 
-var URI = require('./URI');
+const URI = require('./URI');
 
-var Grammar = require('./Grammar');
+const Grammar = require('./Grammar');
 
-var Parser = require('./Parser');
+const Parser = require('./Parser');
 
-var SIPMessage = require('./SIPMessage');
+const SIPMessage = require('./SIPMessage');
 
-var sanityCheck = require('./sanityCheck');
+const sanityCheck = require('./sanityCheck');
 
-var config = require('./Config');
+const config = require('./Config');
 
-var debug = require('debug')('JsSIP:UA');
+const debug = require('debug')('JsSIP:UA');
 
-var debugerror = require('debug')('JsSIP:ERROR:UA');
+const debugerror = require('debug')('JsSIP:ERROR:UA');
 
 debugerror.log = console.warn.bind(console);
-var C = {
+const C = {
   // UA status codes.
   STATUS_INIT: 0,
   STATUS_READY: 1,
@@ -71,13 +126,11 @@ var C = {
  * @throws {TypeError} If no configuration is given.
  */
 
-module.exports =
-/* #__PURE__ */
-function (_EventEmitter) {
+module.exports = /* #__PURE__ */ (function (_EventEmitter) {
   _inherits(UA, _EventEmitter);
 
   _createClass(UA, null, [{
-    key: "C",
+    key: 'C',
     // Expose C object.
     get: function get() {
       return C;
@@ -132,7 +185,7 @@ function (_EventEmitter) {
   }
 
   _createClass(UA, [{
-    key: "start",
+    key: 'start',
     // =================
     //  High Level API
     // =================
@@ -172,7 +225,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "register",
+    key: 'register',
     value: function register() {
       debug('register()');
       this._dynConfiguration.register = true;
@@ -184,7 +237,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "unregister",
+    key: 'unregister',
     value: function unregister(options) {
       debug('unregister()');
       this._dynConfiguration.register = false;
@@ -196,7 +249,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "registrator",
+    key: 'registrator',
     value: function registrator() {
       return this._registrator;
     }
@@ -205,7 +258,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "isRegistered",
+    key: 'isRegistered',
     value: function isRegistered() {
       return this._registrator.registered;
     }
@@ -214,7 +267,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "isConnected",
+    key: 'isConnected',
     value: function isConnected() {
       return this._transport.isConnected();
     }
@@ -229,10 +282,10 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "call",
+    key: 'call',
     value: function call(target, options) {
       debug('call()');
-      var session = new RTCSession(this);
+      const session = new RTCSession(this);
       session.connect(target, options);
       return session;
     }
@@ -248,10 +301,10 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "sendMessage",
+    key: 'sendMessage',
     value: function sendMessage(target, body, options) {
       debug('sendMessage()');
-      var message = new Message(this);
+      const message = new Message(this);
       message.send(target, body, options);
       return message;
     }
@@ -260,11 +313,11 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "terminateSessions",
+    key: 'terminateSessions',
     value: function terminateSessions(options) {
       debug('terminateSessions()');
 
-      for (var idx in this._sessions) {
+      for (const idx in this._sessions) {
         if (!this._sessions[idx].isEnded()) {
           this._sessions[idx].terminate(options);
         }
@@ -276,9 +329,9 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "stop",
+    key: 'stop',
     value: function stop() {
-      var _this2 = this;
+      const _this2 = this;
 
       debug('stop()'); // Remove dynamic settings.
 
@@ -289,13 +342,14 @@ function (_EventEmitter) {
         return;
       } // Close registrator.
 
-      this._registrator.close(); // If there are session wait a bit so CANCEL/BYE can be sent and their responses received.
+      this._registrator.close();
+      // If there are session wait a bit so CANCEL/BYE can be sent and their responses received.
 
-      var num_sessions = Object.keys(this._sessions).length; // Run  _terminate_ on every Session.
+      const num_sessions = Object.keys(this._sessions).length; // Run  _terminate_ on every Session.
 
-      for (var session in this._sessions) {
+      for (const session in this._sessions) {
         if (Object.prototype.hasOwnProperty.call(this._sessions, session)) {
-          debug("closing session ".concat(session));
+          debug('closing session '.concat(session));
 
           try {
             this._sessions[session].terminate();
@@ -303,7 +357,7 @@ function (_EventEmitter) {
         }
       } // Run  _close_ on every applicant.
 
-      for (var applicant in this._applicants) {
+      for (const applicant in this._applicants) {
         if (Object.prototype.hasOwnProperty.call(this._applicants, applicant)) {
           try {
             this._applicants[applicant].close();
@@ -312,7 +366,10 @@ function (_EventEmitter) {
       }
 
       this._status = C.STATUS_USER_CLOSED;
-      var num_transactions = Object.keys(this._transactions.nict).length + Object.keys(this._transactions.nist).length + Object.keys(this._transactions.ict).length + Object.keys(this._transactions.ist).length;
+      const num_transactions = Object.keys(this._transactions.nict).length
+      + Object.keys(this._transactions.nist).length
+      + Object.keys(this._transactions.ict).length
+      + Object.keys(this._transactions.ist).length;
 
       if (num_transactions === 0 && num_sessions === 0) {
         this._transport.disconnect();
@@ -331,7 +388,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "normalizeTarget",
+    key: 'normalizeTarget',
     value: function normalizeTarget(target) {
       return Utils.normalizeTarget(target, this._configuration.hostport_params);
     }
@@ -340,7 +397,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "get",
+    key: 'get',
     value: function get(parameter) {
       switch (parameter) {
         case 'realm':
@@ -360,7 +417,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "set",
+    key: 'set',
     value: function set(parameter, value) {
       switch (parameter) {
         case 'password':
@@ -385,7 +442,7 @@ function (_EventEmitter) {
 
         case 'display_name':
         {
-          if (Grammar.parse("\"".concat(value, "\""), 'display_name') === -1) {
+          if (Grammar.parse('"'.concat(value, '"'), 'display_name') === -1) {
             debugerror('set() | wrong "display_name"');
             return false;
           }
@@ -409,7 +466,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "newTransaction",
+    key: 'newTransaction',
     value: function newTransaction(transaction) {
       this._transactions[transaction.type][transaction.id] = transaction;
       this.emit('newTransaction', {
@@ -421,7 +478,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "destroyTransaction",
+    key: 'destroyTransaction',
     value: function destroyTransaction(transaction) {
       delete this._transactions[transaction.type][transaction.id];
       this.emit('transactionDestroyed', {
@@ -433,7 +490,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "newDialog",
+    key: 'newDialog',
     value: function newDialog(dialog) {
       this._dialogs[dialog.id] = dialog;
     }
@@ -442,7 +499,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "destroyDialog",
+    key: 'destroyDialog',
     value: function destroyDialog(dialog) {
       delete this._dialogs[dialog.id];
     }
@@ -451,7 +508,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "newMessage",
+    key: 'newMessage',
     value: function newMessage(message, data) {
       this._applicants[message] = message;
       this.emit('newMessage', data);
@@ -461,7 +518,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "destroyMessage",
+    key: 'destroyMessage',
     value: function destroyMessage(message) {
       delete this._applicants[message];
     }
@@ -470,7 +527,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "newRTCSession",
+    key: 'newRTCSession',
     value: function newRTCSession(session, data) {
       this._sessions[session.id] = session;
       this.emit('newRTCSession', data);
@@ -480,7 +537,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "destroyRTCSession",
+    key: 'destroyRTCSession',
     value: function destroyRTCSession(session) {
       delete this._sessions[session.id];
     }
@@ -489,7 +546,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "registered",
+    key: 'registered',
     value: function registered(data) {
       this.emit('registered', data);
     }
@@ -498,7 +555,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "unregistered",
+    key: 'unregistered',
     value: function unregistered(data) {
       this.emit('unregistered', data);
     }
@@ -507,7 +564,7 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "registrationFailed",
+    key: 'registrationFailed',
     value: function registrationFailed(data) {
       this.emit('registrationFailed', data);
     } // =========================
@@ -519,11 +576,12 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "receiveRequest",
+    key: 'receiveRequest',
     value: function receiveRequest(request) {
-      var method = request.method; // Check that request URI points to us.
+      const method = request.method; // Check that request URI points to us.
 
-      if (request.ruri.user !== this._configuration.uri.user && request.ruri.user !== this._contact.uri.user) {
+      if (request.ruri.user !== this._configuration.uri.user
+        && request.ruri.user !== this._contact.uri.user) {
         debug('Request-URI does not point to us');
 
         if (request.method !== JsSIP_C.ACK) {
@@ -565,7 +623,7 @@ function (_EventEmitter) {
           return;
         }
 
-        var message = new Message(this);
+        const message = new Message(this);
         message.init_incoming(request);
       } else if (method === JsSIP_C.INVITE) {
         // Initial INVITE.
@@ -575,8 +633,8 @@ function (_EventEmitter) {
         }
       }
 
-      var dialog;
-      var session; // Initial Request.
+      let dialog;
+      let session; // Initial Request.
 
       if (!request.to_tag) {
         switch (method) {
@@ -584,7 +642,7 @@ function (_EventEmitter) {
             // if (window.RTCPeerConnection) {
             // TODO
             if (request.hasHeader('replaces')) {
-              var replaces = request.replaces;
+              const replaces = request.replaces;
               dialog = this._findDialog(replaces.call_id, replaces.from_tag, replaces.to_tag);
 
               if (dialog) {
@@ -636,8 +694,8 @@ function (_EventEmitter) {
             request.reply(405);
             break;
         }
-      } // In-dialog request.
-      else {
+      } else {
+        // In-dialog request.
         dialog = this._findDialog(request.call_id, request.from_tag, request.to_tag);
 
         if (dialog) {
@@ -651,13 +709,12 @@ function (_EventEmitter) {
             debug('received NOTIFY request for a non existent subscription');
             request.reply(481, 'Subscription does not exist');
           }
-        }
-        /* RFC3261 12.2.2
+        } else if (method !== JsSIP_C.ACK) {
+          /* RFC3261 12.2.2
            * Request with to tag, but no matching dialog found.
            * Exception: ACK for an Invite request for which a dialog has not
            * been created.
            */
-        else if (method !== JsSIP_C.ACK) {
           request.reply(481);
         }
       }
@@ -670,15 +727,15 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "_findSession",
+    key: '_findSession',
     value: function _findSession(_ref) {
-      var call_id = _ref.call_id,
-        from_tag = _ref.from_tag,
-        to_tag = _ref.to_tag;
-      var sessionIDa = call_id + from_tag;
-      var sessionA = this._sessions[sessionIDa];
-      var sessionIDb = call_id + to_tag;
-      var sessionB = this._sessions[sessionIDb];
+      const call_id = _ref.call_id;
+      const from_tag = _ref.from_tag;
+      const to_tag = _ref.to_tag;
+      const sessionIDa = call_id + from_tag;
+      const sessionA = this._sessions[sessionIDa];
+      const sessionIDb = call_id + to_tag;
+      const sessionB = this._sessions[sessionIDb];
 
       if (sessionA) {
         return sessionA;
@@ -693,10 +750,10 @@ function (_EventEmitter) {
      */
 
   }, {
-    key: "_findDialog",
+    key: '_findDialog',
     value: function _findDialog(call_id, from_tag, to_tag) {
-      var id = call_id + from_tag + to_tag;
-      var dialog = this._dialogs[id];
+      let id = call_id + from_tag + to_tag;
+      let dialog = this._dialogs[id];
 
       if (dialog) {
         return dialog;
@@ -712,7 +769,7 @@ function (_EventEmitter) {
       }
     }
   }, {
-    key: "_loadConfig",
+    key: '_loadConfig',
     value: function _loadConfig(configuration) {
       // Check and load the given configuration.
       try {
@@ -730,9 +787,10 @@ function (_EventEmitter) {
         this._configuration.instance_id = Utils.newUUID();
       } // Jssip_id instance parameter. Static random tag of length 5.
 
-      this._configuration.jssip_id = Utils.createRandomToken(5); // String containing this._configuration.uri without scheme and user.
+      this._configuration.jssip_id = Utils.createRandomToken(5);
+      // String containing this._configuration.uri without scheme and user.
 
-      var hostport_params = this._configuration.uri.clone();
+      const hostport_params = this._configuration.uri.clone();
 
       hostport_params.user = null;
       this._configuration.hostport_params = hostport_params.toString().replace(/^sip:/i, ''); // Transport.
@@ -762,7 +820,7 @@ function (_EventEmitter) {
       // without URI params/headers.
 
       if (!this._configuration.registrar_server) {
-        var registrar_server = this._configuration.uri.clone();
+        const registrar_server = this._configuration.uri.clone();
 
         registrar_server.user = null;
         registrar_server.clearParams();
@@ -774,8 +832,8 @@ function (_EventEmitter) {
 
       if (this._configuration.contact_uri) {
         this._configuration.via_host = this._configuration.contact_uri.host;
-      } // Contact URI.
-      else {
+      } else {
+        // Contact URI.
         this._configuration.contact_uri = new URI('sip', Utils.createRandomToken(8), this._configuration.via_host, null, {
           transport: 'ws'
         });
@@ -786,10 +844,10 @@ function (_EventEmitter) {
         temp_gruu: null,
         uri: this._configuration.contact_uri,
         toString: function toString() {
-          var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-          var anonymous = options.anonymous || null;
-          var outbound = options.outbound || null;
-          var contact = '<';
+          const options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+          const anonymous = options.anonymous || null;
+          const outbound = options.outbound || null;
+          let contact = '<';
 
           if (anonymous) {
             contact += this.temp_gruu || 'sip:anonymous@anonymous.invalid;transport=ws';
@@ -806,9 +864,9 @@ function (_EventEmitter) {
         }
       }; // Seal the configuration.
 
-      var writable_parameters = ['password', 'realm', 'ha1', 'display_name', 'register'];
+      const writable_parameters = ['password', 'realm', 'ha1', 'display_name', 'register'];
 
-      for (var parameter in this._configuration) {
+      for (const parameter in this._configuration) {
         if (Object.prototype.hasOwnProperty.call(this._configuration, parameter)) {
           if (writable_parameters.indexOf(parameter) !== -1) {
             Object.defineProperty(this._configuration, parameter, {
@@ -826,22 +884,22 @@ function (_EventEmitter) {
 
       debug('configuration parameters after validation:');
 
-      for (var _parameter in this._configuration) {
+      for (const _parameter in this._configuration) {
         // Only show the user user configurable parameters.
         if (Object.prototype.hasOwnProperty.call(config.settings, _parameter)) {
           switch (_parameter) {
             case 'uri':
             case 'registrar_server':
-              debug("- ".concat(_parameter, ": ").concat(this._configuration[_parameter]));
+              debug('- '.concat(_parameter, ': ').concat(this._configuration[_parameter]));
               break;
 
             case 'password':
             case 'ha1':
-              debug("- ".concat(_parameter, ": NOT SHOWN"));
+              debug('- '.concat(_parameter, ': NOT SHOWN'));
               break;
 
             default:
-              debug("- ".concat(_parameter, ": ").concat(JSON.stringify(this._configuration[_parameter])));
+              debug('- '.concat(_parameter, ': ').concat(JSON.stringify(this._configuration[_parameter])));
           }
         }
       }
@@ -849,34 +907,34 @@ function (_EventEmitter) {
       return;
     }
   }, {
-    key: "C",
+    key: 'C',
     get: function get() {
       return C;
     }
   }, {
-    key: "status",
+    key: 'status',
     get: function get() {
       return this._status;
     }
   }, {
-    key: "contact",
+    key: 'contact',
     get: function get() {
       return this._contact;
     }
   }, {
-    key: "configuration",
+    key: 'configuration',
     get: function get() {
       return this._configuration;
     }
   }, {
-    key: "transport",
+    key: 'transport',
     get: function get() {
       return this._transport;
     }
   }]);
 
   return UA;
-}(EventEmitter);
+}(EventEmitter));
 /**
  * Transport event handlers
  */
@@ -885,11 +943,11 @@ function (_EventEmitter) {
 function onTransportConnecting(data) {
   this.emit('connecting', data);
 
-  let reconnectAttempts = this._transport.recover_attempts;
+  const reconnectAttempts = this._transport.recover_attempts;
   if (reconnectAttempts > 10) {
     const errStr1 = `*** ERROR - too many reconnect attempts to Asterisk. Attempts: ${reconnectAttempts}.`;
-    const errStr2 = `***       - Try restarting the Asterisk service and the signaling server.`;
-    const errStr3 = `***       - exiting...\n`;
+    const errStr2 = '***       - Try restarting the Asterisk service and the signaling server.';
+    const errStr3 = '***       - exiting...\n';
     debugerror(errStr1);
     debugerror(errStr2);
     debugerror(errStr3);
@@ -922,12 +980,12 @@ function onTransportConnect(data) {
 
 function onTransportDisconnect(data) {
   // Run _onTransportError_ callback on every client transaction using _transport_.
-  var client_transactions = ['nict', 'ict', 'nist', 'ist'];
+  const client_transactions = ['nict', 'ict', 'nist', 'ist'];
 
-  for (var _i = 0; _i < client_transactions.length; _i++) {
-    var type = client_transactions[_i];
+  for (let _i = 0; _i < client_transactions.length; _i++) {
+    const type = client_transactions[_i];
 
-    for (var id in this._transactions[type]) {
+    for (const id in this._transactions[type]) {
       if (Object.prototype.hasOwnProperty.call(this._transactions[type], id)) {
         this._transactions[type][id].onTransportError();
       }
@@ -945,8 +1003,8 @@ function onTransportDisconnect(data) {
 } // Transport data event.
 
 function onTransportData(data) {
-  var transport = data.transport;
-  var message = data.message;
+  const transport = data.transport;
+  let message = data.message;
   message = Parser.parseMessage(message, this);
 
   if (!message) {
@@ -969,7 +1027,7 @@ function onTransportData(data) {
     * any transaction, it is discarded here and no passed to the core
     * in order to be discarded there.
     */
-    var transaction;
+    let transaction;
 
     switch (message.method) {
       case JsSIP_C.INVITE:
