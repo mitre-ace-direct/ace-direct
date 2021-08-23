@@ -1,33 +1,33 @@
-describe("ACEDirect-Kurento before on call", function () {
-  var acekurento;
-  var failed;
+describe('ACEDirect-Kurento before on call', function () {
+  let acekurento;
+  let failed;
   // mock credentials
-  var address = 'wss://localhost:8443/signaling';
-  var username = 'username';
-  var password = 'af8KSZQREMwov';
-  var registerErrorResponse = {
-    "data": {
-      "id": "registerResponse",
-      "error": "Unauthorized"
+  const address = 'wss://localhost:8443/signaling';
+  const username = 'username';
+  const password = 'af8KSZQREMwov';
+  const registerErrorResponse = {
+    data: {
+      id: 'registerResponse',
+      error: 'Unauthorized'
     }
   };
-  var registerSuccessResponse = {
-    "data": {
-      "id": "registerResponse"
+  const registerSuccessResponse = {
+    data: {
+      id: 'registerResponse'
     }
   };
 
   beforeEach(function (done) {
     spyOn(console, 'log');
-    setTimeout(function () {
+    setTimeout(() => {
       console.info('rendering time...');
       done();
     }, 2500);
   });
 
-  it("should call WebSocket constructor and connect to address", function (done) {
-    var realWS = WebSocket;
-    var WSSpy = spyOn(window, "WebSocket").and.callFake(function (url, protocols) {
+  it('should call WebSocket constructor and connect to address', (done) => {
+    const realWS = WebSocket;
+    const WSSpy = spyOn(window, 'WebSocket').and.callFake((url, protocols) => {
       return new realWS(url, protocols);
     });
     acekurento = new ACEKurento({ acekurentoSignalingUrl: address });
@@ -35,24 +35,24 @@ describe("ACEDirect-Kurento before on call", function () {
     done();
   });
 
-  it("should be able to send/receive WebSocket messages", function (done) {
-    var onmessageCallbackSpy = jasmine.createSpy('onmessageCallback');
-    spyOn(WebSocket.prototype, "send").and.callFake(function (outMsg) {
-      if (outMsg == "outgoing message") {
-        this.onmessage("incoming message");
+  it('should be able to send/receive WebSocket messages', (done) => {
+    const onmessageCallbackSpy = jasmine.createSpy('onmessageCallback');
+    spyOn(WebSocket.prototype, 'send').and.callFake(function (outMsg) {
+      if (outMsg == 'outgoing message') {
+        this.onmessage('incoming message');
       }
     });
     acekurento = new ACEKurento({ acekurentoSignalingUrl: address });
     acekurento.ua.onmessage = onmessageCallbackSpy;
-    acekurento.ua.send("outgoing message");
+    acekurento.ua.send('outgoing message');
 
-    expect(onmessageCallbackSpy).toHaveBeenCalledWith("incoming message");
+    expect(onmessageCallbackSpy).toHaveBeenCalledWith('incoming message');
     done();
   });
 
-  it("should be able to start registration sending register message", function (done) {
-    spyOn(WebSocket.prototype, "send").and.callFake(function (outMsg) {
-      var msg = JSON.parse(outMsg);
+  it('should be able to start registration sending register message', (done) => {
+    spyOn(WebSocket.prototype, 'send').and.callFake((outMsg) => {
+      const msg = JSON.parse(outMsg);
       if (msg.id === 'register' && msg.ext === username && msg.password === password) {
         done();
       }
@@ -61,21 +61,21 @@ describe("ACEDirect-Kurento before on call", function () {
     acekurento.register(username, password, false);
   });
 
-  describe("when registering", function () {
-    it("should be able to process successful registration response", function (done) {
-      var onmessageCallbackSpy = jasmine.createSpy('onmessageCallback');
-      spyOn(WebSocket.prototype, "send").and.callFake(function (outMsg) {
-        console.info('message: ' + outMsg);
-        var msg = JSON.parse(outMsg);
+  describe('when registering', function () {
+    it('should be able to process successful registration response', function (done) {
+      const onmessageCallbackSpy = jasmine.createSpy('onmessageCallback');
+      spyOn(WebSocket.prototype, 'send').and.callFake(function (outMsg) {
+        console.info(`message: ${outMsg}`);
+        const msg = JSON.parse(outMsg);
         if (msg.id === 'register') {
-          console.info('Simulating server register response: ' + JSON.stringify(registerSuccessResponse));
+          console.info(`Simulating server register response: ${JSON.stringify(registerSuccessResponse)}`);
           this.onmessage(registerSuccessResponse);
         }
       });
       acekurento = new ACEKurento({ acekurentoSignalingUrl: address });
 
-      var eventHandlers = {
-        'registerResponse': function (e) {
+      const eventHandlers = {
+        registerResponse: function (e) {
           console.info('--- Register response:', e || 'Success ---');
           onmessageCallbackSpy(e || 'Success');
         }
@@ -87,14 +87,14 @@ describe("ACEDirect-Kurento before on call", function () {
 
       expect(onmessageCallbackSpy).toHaveBeenCalled();
       expect(onmessageCallbackSpy.calls.count()).toEqual(1);
-      expect(onmessageCallbackSpy).toHaveBeenCalledWith("Success");
+      expect(onmessageCallbackSpy).toHaveBeenCalledWith('Success');
       done();
     });
 
-    describe("when failing authenticating", function () {
-      it("should send a failed event with error", function (done) {
-        spyOn(WebSocket.prototype, "send").and.callFake(function (outMsg) {
-          var msg = JSON.parse(outMsg);
+    describe('when failing authenticating', function () {
+      it('should send a failed event with error', function (done) {
+        spyOn(WebSocket.prototype, 'send').and.callFake(function (outMsg) {
+          const msg = JSON.parse(outMsg);
           if (msg.id === 'register') {
             // console.info(registerErrorResponse)
             this.onmessage(registerErrorResponse);
@@ -115,11 +115,11 @@ describe("ACEDirect-Kurento before on call", function () {
     });
   });
 
-  describe("when inbound call", function () {
-    beforeEach(function (done) {
+  describe('when inbound call', () => {
+    beforeEach((done) => {
       acekurento = new ACEKurento({ acekurentoSignalingUrl: address });
       acekurento.register(username, password, false);
-      setTimeout(function () {
+      setTimeout(() => {
         console.info('Simulate incoming call');
         // TODO
         done();
@@ -134,13 +134,13 @@ describe("ACEDirect-Kurento before on call", function () {
     //   }, 1000);
     // });
 
-    xit("should be able to receive a incoming call event", function (done) {
+    xit('should be able to receive a incoming call event', (_done) => {
     //  TODO
     //   done();
     });
 
-    describe("when receiving an incoming call", function () {
-      xit("should be able to accept", function (done) {
+    describe('when receiving an incoming call', () => {
+      xit('should be able to accept', (_done) => {
         // TODO
       });
     });
