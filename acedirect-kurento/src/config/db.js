@@ -64,7 +64,7 @@ function getConfigVal(param_name) {
   const val = nconf.get(param_name);
   if (typeof val !== 'undefined' && val !== null) {
     // found value for param_name
-    let decodedString = null;
+    var decodedString = null;
     if (clearText) {
       decodedString = val;
     } else {
