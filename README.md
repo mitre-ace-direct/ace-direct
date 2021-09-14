@@ -218,7 +218,7 @@ Install and configure _Redis_. For an overview, read [Redis Quick Start](https:/
     ```bash
     $  cd
     $
-    $  sudo rm -rf cd redis-stable >/dev/null 2>&1
+    $  sudo rm -rf redis-stable >/dev/null 2>&1
     $  wget http://download.redis.io/redis-stable.tar.gz
     $  tar xvzf redis-stable.tar.gz
     $  cd redis-stable
