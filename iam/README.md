@@ -56,7 +56,7 @@ To install OpenAM using default values run the installation `install_openam.sh` 
 ```bash
 $  cd /root/iam
 $
-$  ./install_openam.sh  ace  aceopenam.domain.com  portal.domain.com  7.0.108  # last param is tomcat version
+$  ./install_openam.sh  -b ace  -o aceopenam.domain.com  -n portal.domain.com  -t 7.0.108  # last param is tomcat version
 $
 ```
 
