@@ -31,6 +31,7 @@ ASTERISK_FQDN=`node ./acedirect/tools/parseJson.js servers:asterisk_fqdn ${CONFI
 MAIN_FQDN=`node ./acedirect/tools/parseJson.js servers:main_fqdn ${CONFIG}`
 REDIS_FQDN=`node ./acedirect/tools/parseJson.js servers:redis_fqdn ${CONFIG}`
 NGINX_FQDN=`node ./acedirect/tools/parseJson.js servers:nginx_fqdn ${CONFIG}`
+NGINX_PRIVATE_IP=`node ./acedirect/tools/parseJson.js servers:nginx_private_ip ${CONFIG}`
 OPENAM_PATH=`node ./acedirect/tools/parseJson.js openam:path ${CONFIG}`
 MYSQL_FQDN=`node ./acedirect/tools/parseJson.js servers:mysql_fqdn ${CONFIG}`
 MYSQL_USER=`node ./acedirect/tools/parseJson.js database_servers:mysql:user ${CONFIG}`
@@ -45,9 +46,9 @@ MP_PATH=`node ./acedirect/tools/parseJson.js nginx:mp_path ${CONFIG}`
 AG_ROUTE=`node ./acedirect/tools/parseJson.js nginx:agent_route ${CONFIG}`
 CO_ROUTE=`node ./acedirect/tools/parseJson.js nginx:consumer_route ${CONFIG}`
 
-URL_AGENT="https://localhost${AD_PATH}${AG_ROUTE}"
-URL_CONSUMER="https://localhost${AD_PATH}${CO_ROUTE}"
-URL_MANAGER="https://localhost${MP_PATH}"
+URL_AGENT="https://${NGINX_PRIVATE_IP}${AD_PATH}${AG_ROUTE}"
+URL_CONSUMER="https://${NGINX_PRIVATE_IP}${AD_PATH}${CO_ROUTE}"
+URL_MANAGER="https://${NGINX_PRIVATE_IP}${MP_PATH}"
 
 for ((i = 0; i < 8; ++i)); do
   printf "${IND}pm2 ${i} ${PM2_NAMES[i]}... " 
@@ -212,7 +213,7 @@ else
 fi
 
 printf "${IND}openam server path ${OPENAM_PATH}..."
-OPENAM_STATUS=`curl -I  -k https://localhost/${OPENAM_PATH}/XUI 2>/dev/null  | head -n 1|cut -d$' ' -f2`
+OPENAM_STATUS=`curl -I  -k https://${NGINX_PRIVATE_IP}/${OPENAM_PATH}/XUI 2>/dev/null  | head -n 1|cut -d$' ' -f2`
 if [[ "$OPENAM_STATUS" != "302" ]]
 then
   printf "  ${FG_RED}HTTP status: ${OPENAM_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
