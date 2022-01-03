@@ -812,7 +812,7 @@ $  cd /root/iam/scripts
 $  python keystore.py
 $  cp -p ../ssl/.keystore /opt/tomcat/.keystore
 $  service tomcat start
-$  # on your NGINX servfer, restart nginx
+$  # on your NGINX server, restart nginx
 $  # on your ACE Direct Node server, restart ACE Direct node servers
 $
 ```
