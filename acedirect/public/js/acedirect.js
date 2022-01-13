@@ -410,6 +410,8 @@ function connect_socket() {
           $('#subject').val(data.subject);
           $('#problemdesc').val(data.description);
           $('#ticketId').val(data.zendesk_ticket);
+        }).on('asterisk-is-gone', function (data) {
+          showAlert('danger', 'Error! Asterisk is unreachable.');
         }).on('agent-status-list', function (data) {
           if (data.message === 'success') {
             var tabledata = {
