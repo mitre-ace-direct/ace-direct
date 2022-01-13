@@ -24,6 +24,7 @@ const { MongoClient } = require('mongodb');
 
 let dbConnection = null;
 let dbconn = null;
+let asteriskCheckTimer = null;
 const proxy = require('proxy-agent');
 
 // Credentials needed for Call Recordings
@@ -1218,6 +1219,33 @@ io.sockets.on('connection', (socket) => {
     }, (_err, _res) => { });
   }
 
+  function pingAsterisk() {
+    if (asteriskCheckTimer) {
+      clearTimeout(asteriskCheckTimer);
+    }
+    asteriskCheckTimer = setTimeout(asteriskIsGone, 5000);
+    ami.action({
+      Action: 'Ping',
+      ActionId: 'Asterisk, are you there?'
+    }, (_err, _res) => { 
+      if (asteriskCheckTimer) {
+        clearTimeout(asteriskCheckTimer);
+      }
+      if (_err){
+        console.error('Asterisk AMI Ping error: ' + JSON.stringify(_err));
+        logger.error(`Asterisk AMI Ping error: ${JSON.stringify(_err)}`);
+      }
+      console.log(JSON.stringify(_res));
+    }); 
+  }
+
+  function asteriskIsGone() {
+    // FUTURE: send broadcast messages to browsers to indicate that Asterisk is gone
+    console.error('\n\n**** ERROR: ASTERISK IS GONE ****\n\n');
+    logger.error('\n\n**** ERROR: ASTERISK IS GONE ****\n\n');
+    io.to('my room').emit('asterisk-is-gone', { message: 'error' });
+  }
+
   /*
    * Handler catches a Socket.IO message to pause both queues. Note, we are
    * pausing both queues, but, the extension is the same for both.
@@ -1333,6 +1361,7 @@ io.sockets.on('connection', (socket) => {
    * unpausing both queues, but, the extension is the same for both.
    */
   socket.on('unpause-queues', () => {
+    pingAsterisk(); // check if asterisk is there
     if (token.queue_name) {
       logger.info(`UNPAUSING QUEUE: PJSIP/${token.extension}, queue name ${token.queue_name}`);
       pauseQueue(false, token.extension, token.queue_name);
