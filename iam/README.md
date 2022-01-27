@@ -808,6 +808,8 @@ $  ps -aef | grep tomcat  # make sure tomcat is stopped
 $  rm /root/iam/ssl/.keystore  # remove local keystore in case corrupt
 $  rm /opt/tomcat/.keystore  # remove working keystore to
 $  rm /root/iam/ssl/cert.p12
+$  chmod 644 /root/iam/ssl/cert.pem  # cert.pem must be the updated cert
+$  chmod 644 /root/iam/ssl/key.pem   # key.pem must be the updated cert
 $  cd /root/iam/scripts
 $  python keystore.py
 $  cp -p ../ssl/.keystore /opt/tomcat/.keystore
