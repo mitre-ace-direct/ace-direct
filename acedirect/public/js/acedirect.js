@@ -651,6 +651,10 @@ function connect_socket() {
             $('.config-hide').css('display', 'none');
             $('#transcriptoverlay').css('display', 'none');
             $('#mute-captions').css('display', 'none');
+            $('#agent-webcam').css('height', '100%');
+            $('#agent-captions').hide();
+            $('#agent-divider').hide();
+            document.getElementById('mute-captions-off-icon').style.display = 'block' // this is checked by jssip_agent as an indicator that captions are muted
           }
         }).on('skinny-config', function (data) {
           if (data === 'true') {
