@@ -445,6 +445,10 @@ function connect_socket() {
               $('#mute-captions').css('display', 'none');
               $('#trans-tab').css('display', 'none');
               $('#chat-tab').removeClass('tab active-tab');
+              $('#consumer-webcam').css('height', '100%');
+              $('#consumer-captions').hide();
+              $('#consumer-divider').hide();
+              document.getElementById('mute-captions-off-icon').style.display = 'block'; // used by jssip_consumer.js to see if captions are muted
             }
           })
           .on('skinny-config', (data) => {
