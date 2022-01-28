@@ -56,7 +56,7 @@ To install OpenAM using default values run the installation `install_openam.sh` 
 ```bash
 $  cd /root/iam
 $
-$  ./install_openam.sh  -b ace  -o aceopenam.domain.com  -n portal.domain.com  -t 7.0.108  # last param is tomcat version
+$  ./install_openam.sh  -b ace  -o aceopenam.domain.com  -n portal.domain.com  -t 7.0.109  # last param is tomcat version
 $
 ```
 
@@ -65,7 +65,7 @@ Where...
 * `ace` is the OpenAM base name
 * `aceopenam.domain.com` is the FQDN of the OpenAM server
 * `portal.domain.com` is the FQDN of the NGINX server
-* `7.0.108` is the desired Tomcat version
+* `7.0.109` or `8.0.33` are the desired Tomcat versions. OpenAM 13 is _not_ compatible with versions `8.5.x` or higher.
 
 _To customize your OpenAM installation, follow the manual instructions below._
 
@@ -880,7 +880,10 @@ com.sun.identity.security.AMSecurityPropertiesException: AdminTokenAction: FATAL
 
 #### Solution 13
 
-Resolution: it is likely that the certificates in `/root/iam/ssl/` are expired or invalid. Make sure `cert.pem` and `key.pem` are valid, not expired, and have appropriate permissions. See Solution 10 for the resolution.
+Resolutions:
+
+* It is likely that the certificates in `/root/iam/ssl/` are expired or invalid. Make sure `cert.pem` and `key.pem` are valid, not expired, and have appropriate permissions. See Solution 10 for the resolution.
+* This error also occurs if you use an incompatible version of Tomcat (e.g., 8.5.x). _OpenAM 13 is compatible with Tomcat 7.0.x and Tomcat 8.0.x only_.
 
 ---
 
