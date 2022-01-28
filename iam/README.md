@@ -983,7 +983,10 @@ Access error when accessing OpenAM or ACE Direct through the browser. You may se
 
 #### Solution 17
 
-Make sure a firewall is not blocking incoming access to the OpenAM port (e.g., `8443`). For example, disable `firewalld` on the OpenAM server or add a rule to allow incoming connections to port `8443`.
+Possible solutions:
+
+1. Make sure a firewall is not blocking incoming access to the OpenAM port (e.g., `8443`). For example, disable `firewalld` on the OpenAM server or add a rule to allow incoming connections to port `8443`.
+1. After reinstalling or restarting OpenAM, you must then restart the ACE Direct Node application servers, or else you will see an NGINX error with the double URL in the address bar.
 
 ---
 
