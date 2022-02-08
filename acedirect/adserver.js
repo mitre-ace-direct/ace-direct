@@ -4428,8 +4428,7 @@ app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
         console.log('In valid session');
 
         console.log('Comparing file IDs');
-        // console.log(fileToken[i] + " vs " +req.query.id.split('"')[0]);
-        if (fileToken[i] === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
+        if (fileToken[i].toString() === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
           console.log('allowed to download');
 
           const documentID = req.query.id;
@@ -4454,7 +4453,7 @@ app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
           });
           break;
         } else {
-          console.log('Not authorized to download this file');
+          console.log('Not authorized to download this file, mismatched IDs');
         }
       } else {
         console.log('Not authorized to download');
