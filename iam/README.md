@@ -56,7 +56,7 @@ To install OpenAM using default values run the installation `install_openam.sh` 
 ```bash
 $  cd /root/iam
 $
-$  ./install_openam.sh  -b ace  -o aceopenam.domain.com  -n portal.domain.com  -t 7.0.108  # last param is tomcat version
+$  ./install_openam.sh  -b ace  -o aceopenam.domain.com  -n portal.domain.com  -t 7.0.109  # last param is tomcat version
 $
 ```
 
@@ -65,7 +65,7 @@ Where...
 * `ace` is the OpenAM base name
 * `aceopenam.domain.com` is the FQDN of the OpenAM server
 * `portal.domain.com` is the FQDN of the NGINX server
-* `7.0.108` is the desired Tomcat version
+* `7.0.109` or `8.0.33` are the desired Tomcat versions. OpenAM 13 is _not_ compatible with versions `8.5.x` or higher.
 
 _To customize your OpenAM installation, follow the manual instructions below._
 
@@ -808,6 +808,8 @@ $  ps -aef | grep tomcat  # make sure tomcat is stopped
 $  rm /root/iam/ssl/.keystore  # remove local keystore in case corrupt
 $  rm /opt/tomcat/.keystore  # remove working keystore to
 $  rm /root/iam/ssl/cert.p12
+$  chmod 644 /root/iam/ssl/cert.pem  # cert.pem must be the updated cert
+$  chmod 644 /root/iam/ssl/key.pem   # key.pem must be the updated cert
 $  cd /root/iam/scripts
 $  python keystore.py
 $  cp -p ../ssl/.keystore /opt/tomcat/.keystore
@@ -878,7 +880,10 @@ com.sun.identity.security.AMSecurityPropertiesException: AdminTokenAction: FATAL
 
 #### Solution 13
 
-Resolution: it is likely that the certificates in `/root/iam/ssl/` are expired or invalid. Make sure `cert.pem` and `key.pem` are valid, not expired, and have appropriate permissions. See Solution 10 for the resolution.
+Resolutions:
+
+* It is likely that the certificates in `/root/iam/ssl/` are expired or invalid. Make sure `cert.pem` and `key.pem` are valid, not expired, and have appropriate permissions. See Solution 10 for the resolution.
+* This error also occurs if you use an incompatible version of Tomcat (e.g., 8.5.x). _OpenAM 13 is compatible with Tomcat 7.0.x and Tomcat 8.0.x only_.
 
 ---
 
@@ -978,7 +983,10 @@ Access error when accessing OpenAM or ACE Direct through the browser. You may se
 
 #### Solution 17
 
-Make sure a firewall is not blocking incoming access to the OpenAM port (e.g., `8443`). For example, disable `firewalld` on the OpenAM server or add a rule to allow incoming connections to port `8443`.
+Possible solutions:
+
+1. Make sure a firewall is not blocking incoming access to the OpenAM port (e.g., `8443`). For example, disable `firewalld` on the OpenAM server or add a rule to allow incoming connections to port `8443`.
+1. After reinstalling or restarting OpenAM, you must then restart the ACE Direct Node application servers, or else you will see an NGINX error with the double URL in the address bar.
 
 ---
 
