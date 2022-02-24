@@ -25,7 +25,7 @@
     "event-stream": "^3.3.5",
     "express": "^4.16.4",
     "get-video-duration": "^3.1.0",
-    "jssip": "^3.2.15",
+    "jssip": "3.2.15",
     "jssip-node-websocket": "^3.0.0",
     "kind-of": "^6.0.3",
     "kurento-client": "./vendor/kurento-client-js",
