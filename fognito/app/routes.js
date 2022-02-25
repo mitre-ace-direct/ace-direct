@@ -8,20 +8,29 @@ function isLoggedIn(req, res, next) {
 }
 
 const appRouter = function myFunc(app, passport, _User) {
-  app.get(['/customer', '/client'], isLoggedIn, (req, res) => {
-    if (req.user && req.user.local && req.user.local.role && req.user.local.role !== 'customer') {
-      res.render('login.ejs', { message: req.flash('loginMessage') });
-      return;
-    }
-    res.render('customer.ejs', { displayName: req.user.local.displayName });
-  });
 
-  app.get(['/agent', '/ca'], isLoggedIn, (req, res) => {
+  app.get(['/agent'], isLoggedIn, (req, res) => {
     if (req.user && req.user.local && req.user.local.role && req.user.local.role !== 'agent') {
       res.render('login.ejs', { message: req.flash('loginMessage') });
       return;
     }
-    res.render('agent.ejs', { displayName: req.user.local.displayName });
+    res.render('agent.ejs', { message: '', displayName: req.user.local.displayName });
+  });
+  
+  app.get(['/manager'], isLoggedIn, (req, res) => {
+    if (req.user && req.user.local && req.user.local.role && req.user.local.role !== 'manager') {
+      res.render('login.ejs', { message: req.flash('loginMessage') });
+      return;
+    }
+    res.render('manager.ejs', { message: '', displayName: req.user.local.displayName });
+  });
+    
+  app.get(['/customer'], isLoggedIn, (req, res) => {
+    if (req.user && req.user.local && req.user.local.role && req.user.local.role !== 'customer') {
+      res.render('login.ejs', { message: req.flash('loginMessage') });
+      return;
+    }
+    res.render('customer.ejs', { message: '', displayName: req.user.local.displayName });
   });
 
   app.get(['/foo'], (req, res) => {
@@ -52,6 +61,8 @@ const appRouter = function myFunc(app, passport, _User) {
     if (req.user && req.user.local && req.user.local.role) {
       if (req.user.local.role === 'agent') {
         res.redirect('./agent');
+      } else if (req.user.local.role === 'manager') {
+        res.redirect('./manager');
       } else if (req.user.local.role === 'customer') {
         res.redirect('./customer');
       } else {
