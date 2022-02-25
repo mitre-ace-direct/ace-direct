@@ -46,8 +46,7 @@
     "mongodb": 27017,
     "translation_server": 8005,
     "kurento": 8443,
-    "kmsshare": 3000,
-    "auth-server": 9010
+    "kmsshare": 3000
   },
   "signaling_server": {
     "protocol": "wss",
