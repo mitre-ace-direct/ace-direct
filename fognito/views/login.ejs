@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+  <title>Login</title>
+  <%- include('partials/includes') %>
+</head>
+<style>
+  .vertical-center {
+  min-height: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+}
+.top-buffer { margin-top:20px; }
+</style>
+<body>
+  <!-- show any messages that come back with authentication -->
+  <% if (message.length > 0) { %>
+    <div class="alert alert-danger"><%= message %></div>
+  <% } %>
+
+  <div class="brand-background-img container-fluid">
+    <!-- rows are 12 columns -->
+
+<div class="vertical-center">
+  <div class="container">
+    <div class="row justify-content-start">
+      <div class="col-sm"></div>
+      <div class="shadow-lg jumbotron col-sm-5 text-center" style="background-color: white;">
+        <div class="row">
+          <div class="col-sm display-1 genericName"><h1 id="pageTitle"><i class="far fa-user-circle"></i> ACE White Label</h1></div>
+          <div class="col-sm display-1 acmeName"><h1 id="pageTitle"><i class="fas fa-american-sign-language-interpreting"></i> ACME VRS Suite</h1></div>
+          <div class="col-sm display-1 wasName"><h1 id="pageTitle"><i class="fas fa-football-ball"></i> WAS VRS Team</h1></div>
+          <div class="col-sm display-1 dalName"><h1 id="pageTitle"><i class="fas fa-star"></i> DAL VRS Team</h1></div>
+        </div>
+        <hr>
+        <div class="row"> &nbsp;</div>
+      <!-- LOGIN FORM -->
+      <form action="./login" method="post">
+        <div class="label label-default font-weight-light" style="font-size: larger;">Sign In</div>
+      <div class="form-group top-buffer">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+        </div>
+        <input type="text" class="form-control" placeholder="Username" name="id">
+      </div>
+      </div>
+      <div class="form-group">
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+        </div>
+        <input type="password" class="form-control" placeholder="Password" name="password">
+      </div>
+      </div>
+      <div class="row">
+        <div class="col-sm">
+          <label> <input type="checkbox"> Remember Me </label>
+        </div>
+        <div class="col-sm">
+          <p class="font-weight-lighter" ><a href="#">Forgot Password?</a></p>
+        </div>
+      </div>
+      
+      <button type="submit" class="btn btn-info btn-block my-2 my-sm-0 action-btn-responsive"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Login</button>
+      </form>
+
+      </div>
+      <div class="col-sm"></div>
+    </div>
+    <br><br>
+    </div>
+  </div>
+  </div>
+</body>
+</html>
