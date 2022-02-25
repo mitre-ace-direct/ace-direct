@@ -13,6 +13,17 @@ $  npm run build
 $
 ```
 
+## setup
+
+Creating initial users:
+
+```bash
+$  cd db
+$  vi data/users.csv  # optional
+$  node driver.js
+$
+```
+
 ## running
 
 ```bash
@@ -21,3 +32,9 @@ $
 $  npm run dev  # development
 $
 ```
+
+## website
+
+The default is port `1234`:
+
+[https://localhost:1234/](https://localhost:1234/)
