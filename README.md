@@ -8,6 +8,7 @@ This document describes how to install, configure, and deploy ACE Direct.
 
 ## Prerequisites and assumptions
 
+* The acedirect-kurento signaling server has been tested with JsSIP library version `3.5.1`. All interoperability tests have been completed with this version. **Important**: when upgrading JsSIP library version, the files in `jssip-modifications` must be ported to the next JsSIP version. Ensure that the files are compatible. Complete _diffs_ and make the same changes in the same files in the new JsSIP library version.
 * *Acquire domain names for the servers*. Domain names must be *three-level domain names* with *no special characters*: `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
 * Deploy all servers as Amazon Web Services (AWS) EC2 instances. Use the _Amazon Linux 2_ operating system, unless specified otherwise. Other Linux flavors _may_ work with slight or no changes to the instructions.
 * Set all servers to the _UTC timezone_. Use `chronyd` or `ntp` to synchronize time across all servers.
