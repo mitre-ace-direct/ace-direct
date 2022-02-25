@@ -22,7 +22,6 @@ const replaceMediaEl = async (el, oldEl, newEl) => {
   await el.connect(newEl);
   await newEl.connect(el);
 };
-
 let kurento = null;
 
 const ASTERISK_QUEUE_EXT = [param('asterisk.queues.general.number'), param('asterisk.queues.complaint.number')]; // currently support two queues
@@ -32,6 +31,8 @@ class WebRTCMediaSession extends Events {
     super();
     this._id = uuid.v4();
     this._pipeline = null;
+    this._privacyVideo = null;
+    this._privacyVideoPath = param('media_server.privacy_video_url');
     this._composite = null;
     this._videoCodec = videoCodec.toUpperCase();
     this._participants = new Map();
@@ -39,6 +40,7 @@ class WebRTCMediaSession extends Events {
     this._iceCandidates = new Map();
     this._rtp_max_bitrate = param('kurento.video_rtp_max_bitrate') || 100;
     this._h264Config = param('kurento.h264_config');
+    
     this._virtualPeers = new Map();
     this._lastWebrtcFmtp = null;
     debug('Starting %s video call (%s)', this.id, this._videoCodec);
@@ -71,7 +73,20 @@ class WebRTCMediaSession extends Events {
 
       if (!kurento) throw new Error('Can\'t create kurento client');
       this._pipeline = await kurento.create('MediaPipeline');
+
       await this._pipeline.setLatencyStats(true);
+
+      this._privacyVideo = this._pipeline.create('PlayerEndpoint', {
+        uri: this._privacyVideoPath
+      });
+      this._privacyVideo.on('EndOfStream', () => {
+        this._privacyVideo.play();
+      });
+      this._privacyVideo.on('Error', (err) => {
+        console.log('Player error: %s', err.message || JSON.stringify(err));
+      });
+      this._privacyVideo.play();
+
     } catch (error) {
       debug('Error creating WebRTC session:', error);
     }
@@ -634,26 +649,18 @@ class WebRTCMediaSession extends Events {
     const player = this._pipeline.create('PlayerEndpoint', {
       uri: file
     });
-    p.player = player;
-    player.on('Error', (err) => {
-      debug('Player error: %s', err.message || JSON.stringify(err));
-    });
-    player.on('EndOfStream', () => {
-      p.player && p.player.play();
-    });
-
-    player.play();
+    p.inPrivateMode = true;
 
     if (this.isMultiparty) {
       if (p.port) {
         await p.endpoint.disconnect(p.port);
-        await player.connect(p.port);
+        await this._privacyVideo.connect(p.port);
       }
     } else {
       const other = this.oneToOnePeer(ext);
       if (other) {
         await p.endpoint.disconnect(other.endpoint);
-        await player.connect(other.endpoint);
+        await this._privacyVideo.connect(other.endpoint);
       }
     }
   }
@@ -664,24 +671,54 @@ class WebRTCMediaSession extends Events {
       console.log(`No participant registered for ${ext}`);
       return;
     }
-    if (!p.player) return; // Not in private mode
-    const player = p.player;
-    p.player = null;
+    if (!p.inPrivateMode) return; // Not in private mode
 
     if (this.isMultiparty) {
       if (p.port) {
-        await player.disconnect(p.port);
+        await this._privacyVideo.disconnect(p.port);
         await p.endpoint.connect(p.port);
       }
     } else {
       const other = this.oneToOnePeer(ext);
       if (other) {
-        await player.disconnect(other.endpoint);
+        await this._privacyVideo.disconnect(other.endpoint);
         await p.endpoint.connect(other.endpoint);
       }
     }
-    await player.stop();
-    await player.release();
+    p.inPrivateMode = false;
+  }
+  
+  async generateKeyframe(ext) {
+    const p = this._participants.get(ext);
+    if (!p) {
+      console.log(`No participant registered for ${ext}`);
+      return false;
+    }
+    if (p.inKeyframe) {
+      debug(`${ext} in keyframe mode, no keyframe sent`);
+      return false;
+    }
+
+    p.inKeyframe = true;
+    let endpoint = p.endpoint;
+    if (p.inPrivateMode)
+      endpoint = this._privacyVideo;
+  
+    if (this.isMultiparty) {
+      if (p.port) {
+        await endpoint.disconnect(p.port);
+        await endpoint.connect(p.port);
+      }
+    } else {
+      const other = this.oneToOnePeer(ext);
+      if (other) {
+        await endpoint.disconnect(other.endpoint);
+        await endpoint.connect(other.endpoint);
+      }
+    }
+
+    p.inKeyframe = false;
+    return true;
   }
 
   oneToOnePeer(myExt) {
