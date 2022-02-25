@@ -33,6 +33,12 @@ $  npm run dev  # development
 $
 ```
 
+## customization
+
+1. `config.title1` - primary title on the login page
+1. `config.title2` - secondary title on the login page
+1. [views/partials/footer.ejs](views/partials/footer.ejs)
+
 ## website
 
 The default is port `1234`:

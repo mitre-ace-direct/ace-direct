@@ -8,6 +8,7 @@ config.db = {};
 // general
 config.debug = true;
 config.port = 1234;
+config.title = 'Fognito';
 
 // session
 config.app.session = {};
