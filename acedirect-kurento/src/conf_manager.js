@@ -228,6 +228,19 @@ class ConfManager extends Events {
           call.leave(callerExt);
         }
       });
+      var playing2 = false;
+      session.on('newInfo', evt => {
+        if (evt.originator == 'remote') {
+          const message = evt.request.body;
+          if (message.includes('picture_fast_update')) {
+            if (!playing2) {
+              playing2 = true;
+              callee.keyframe();
+              setTimeout(() => { playing2 = false }, 4000)
+            }
+          }
+        }
+      });
       session.on('confirmed', (evt) => {
         callee.sendSipConfirmedMessage(evt.originator);
       });
@@ -397,13 +410,13 @@ class ConfManager extends Events {
         setTimeout(() => {
           // force pfu at start of the call
           const body = '<?xml version="1.0" encoding="utf-8" ?>'
-          + '<media_control>'
+            + '<media_control>'
             + '<vc_primitive>'
-              + '<to_encoder>'
-                + '<picture_fast_update/>'
-              + '</to_encoder>'
+            + '<to_encoder>'
+            + '<picture_fast_update/>'
+            + '</to_encoder>'
             + '</vc_primitive>'
-          + '</media_control>';
+            + '</media_control>';
 
           session.sendInfo('application/media_control+xml', body);
 
@@ -413,6 +426,21 @@ class ConfManager extends Events {
           }
         }, 1000);
         // end
+      });
+
+
+      var playing1 = false;
+      session.on('newInfo', evt => {
+        if (evt.originator == 'remote') {
+          const message = evt.request.body;
+          if (message.includes('picture_fast_update')) {
+            if (!playing1) {
+              playing1 = true;
+              caller.keyframe();
+              setTimeout(() => { playing1 = false }, 4000)
+            }
+          }
+        }
       });
 
       session.on('accepted', (evt) => {

@@ -4750,6 +4750,11 @@ function ACEKurento(config) {
        * @event {Function} newMessage
        */
       'newMessage': function (e) { },
+      /**
+      * keyframe Event
+      * @event {Function} keyframe
+      */
+      'keyframe': function (e) { },
     },
     /**
      * Connect and call, loopback stream to Kurento
@@ -5024,6 +5029,12 @@ function ACEKurento(config) {
      */
     sendDTMF: function (number) {
       sendMessage({ id: 'senddtmf', number: number });
+    },
+    /**
+     * Try to send a keyframe on demand
+     */
+     generateKeyframe: function () {
+      sendMessage({ id: 'keyframe' });
     },
     /**
      * ICE Restart
@@ -5378,6 +5389,10 @@ function ACEKurento(config) {
         break;
       case 'stoppedRecording':
         acekurento.eventHandlers.stoppedRecording(message);
+        break;
+      case 'keyframe':
+        console.log("KEYFRAME RESPONSE:",message)
+        acekurento.eventHandlers.keyframe(message);
         break;
       case 'ice':
         webRtcPeer.addIceCandidate(message.candidate);
