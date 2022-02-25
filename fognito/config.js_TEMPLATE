@@ -1,0 +1,28 @@
+const config = {};
+
+// sections
+config.app = {};
+config.secure = {};
+config.db = {};
+
+// general
+config.debug = true;
+config.port = 1234;
+
+// session
+config.app.session = {};
+config.app.session.secret = 'super-secret-text-to-create-session';
+
+// certs
+config.secure.cert = './certs/cert.pem';
+config.secure.key = './certs/key.pem';
+
+// Mongo DB
+config.db.mongo = {};
+config.db.mongo.host = 'localhost';
+config.db.mongo.port = 27017;
+config.db.mongo.dbname = 'your-mongo-db';
+config.db.mongo.user = 'your-mongo-user';
+config.db.mongo.pass = 'your-mongo-password';
+
+module.exports = config;
