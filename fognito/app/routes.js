@@ -7,11 +7,12 @@ function isLoggedIn(req, res, next) {
   return res.redirect('./login');
 }
 
-const appRouter = function myFunc(app, passport, _User) {
-
+const appRouter = function myFunc(app, passport, config, _User) {
+  const title1 = config.title1;
+  const title2 = config.title2;
   app.get(['/agent'], isLoggedIn, (req, res) => {
     if (req.user && req.user.local && req.user.local.role && req.user.local.role !== 'agent') {
-      res.render('login.ejs', { message: req.flash('loginMessage') });
+      res.render('login.ejs', { title1, title2, message: req.flash('loginMessage') });
       return;
     }
     res.render('agent.ejs', { message: '', displayName: req.user.local.displayName });
@@ -19,7 +20,7 @@ const appRouter = function myFunc(app, passport, _User) {
   
   app.get(['/manager'], isLoggedIn, (req, res) => {
     if (req.user && req.user.local && req.user.local.role && req.user.local.role !== 'manager') {
-      res.render('login.ejs', { message: req.flash('loginMessage') });
+      res.render('login.ejs', { title1, title2, message: req.flash('loginMessage') });
       return;
     }
     res.render('manager.ejs', { message: '', displayName: req.user.local.displayName });
@@ -27,30 +28,18 @@ const appRouter = function myFunc(app, passport, _User) {
     
   app.get(['/customer'], isLoggedIn, (req, res) => {
     if (req.user && req.user.local && req.user.local.role && req.user.local.role !== 'customer') {
-      res.render('login.ejs', { message: req.flash('loginMessage') });
+      res.render('login.ejs', { title1, title2, message: req.flash('loginMessage') });
       return;
     }
     res.render('customer.ejs', { message: '', displayName: req.user.local.displayName });
   });
 
-  app.get(['/foo'], (req, res) => {
-    res.status(200).send('bar');
-  });
-
   app.get(['/', '/home', '/index', '/login'], (req, res) => {
-    res.render('login.ejs', { message: req.flash('loginMessage') });
+    res.render('login.ejs', { title1, title2, message: req.flash('loginMessage') });
   });
 
   app.get(['/failed'], (req, res) => {
     res.render('failed.ejs', { message: req.flash('loginMessage') });
-  });
-
-  app.get('/user', (req, res) => {
-    res.json({
-      displayName: req.user.local.displayName,
-      phone: req.user.local.phone,
-      extension: req.user.local
-    });
   });
 
   app.post('/login', passport.authenticate('local-login', {
@@ -66,10 +55,10 @@ const appRouter = function myFunc(app, passport, _User) {
       } else if (req.user.local.role === 'customer') {
         res.redirect('./customer');
       } else {
-        res.render('login.ejs', { message: req.flash('loginMessage') });
+        res.render('login.ejs', { title1, title2, message: req.flash('loginMessage') });
       }
     } else {
-      res.render('login.ejs', { message: req.flash('loginMessage') });
+      res.render('login.ejs', { title1, title2, message: req.flash('loginMessage') });
     }
   });
 
