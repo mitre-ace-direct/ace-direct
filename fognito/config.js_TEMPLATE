@@ -9,6 +9,7 @@ config.db = {};
 config.debug = true;
 config.port = 1234;
 config.title = 'Fognito';
+config.logo_image = 'images/custom/login-logo.svg'; // in public folder
 
 // session
 config.app.session = {};
