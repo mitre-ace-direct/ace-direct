@@ -94,7 +94,7 @@ app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
 app.locals = require('./helpers/home');
 
-require('./app/routes')(app, passport, config, User);
+require('./app/routes')(app, passport, config, User, dbConnection);
 
 const httpsServer = https.createServer(credentials, app);
 
