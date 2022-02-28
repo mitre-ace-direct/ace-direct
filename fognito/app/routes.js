@@ -92,6 +92,36 @@ const appRouter = function myFunc(app, passport, config, _User) {
     } else {
       res.redirect('./profile')
     }
+
+    // get application data: role field from agent_data table in MySQL
+    dbConnection.query('SELECT role FROM agent_data WHERE username = ?', req.user.local.id, (err, result) => {
+      if (err) {
+        // lookup error - just go back to login page
+        res.render('login.ejs', { title1, title2, message: req.flash('loginMessage'), logo_image:config.logo_image });
+        return;
+      } else {
+        // success
+        let role = result[0].role;
+        let query = {'local.id': req.user.local.id};
+        User.findOneAndUpdate(query, {'local.role': role}, {upsert: true}, function(err, doc) {
+          if (err) return res.send(500, {error: err});
+          if (req.user && req.user.local && req.user.local.role) {
+            if (req.user.local.role === 'AD Agent') {
+              res.redirect('./agent');
+            } else if (req.user.local.role === 'Manager') {
+              res.redirect('./manager');
+            } else if (req.user.local.role === 'customer') {
+              res.redirect('./customer');
+            } else {
+              res.render('login.ejs', { title1, title2, message: req.flash('loginMessage'), logo_image:config.logo_image });
+            }
+          } else {
+            res.render('login.ejs', { title1, title2, message: req.flash('loginMessage'), logo_image:config.logo_image });
+          }
+        });  
+      }
+    });
+
   });
 
   app.get('/profile', restrict('any'), (req, res) => {
