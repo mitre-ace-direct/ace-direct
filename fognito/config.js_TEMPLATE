@@ -21,10 +21,18 @@ config.secure.key = './certs/key.pem';
 
 // Mongo DB
 config.db.mongo = {};
-config.db.mongo.host = 'localhost';
+config.db.mongo.host = 'your-mongo-db-host';
 config.db.mongo.port = 27017;
 config.db.mongo.dbname = 'your-mongo-db';
 config.db.mongo.user = 'your-mongo-user';
 config.db.mongo.pass = 'your-mongo-password';
+
+// MySQL DB
+config.db.mysql = {};
+config.db.mysql.host = 'your-mysql-db-host';
+config.db.mysql.port = 3306;
+config.db.mysql.dbname = 'your-db-name';
+config.db.mysql.user = 'your-db-user';
+config.db.mysql.pass = 'your-db-password';
 
 module.exports = config;

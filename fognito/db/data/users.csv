@@ -1,10 +1,10 @@
 id,email,password,role,displayName
-customer1,customer1@mail.com,aaa,customer,Jean Grey
-customer2,customer2@mail.com,aaa,customer,Kitty Pryde
-customer3,customer3@mail.com,aaa,customer,Pietro Maximoff
-agent1,agent1@mail.com,aaa,agent,Sam Guthrie
-agent2,agent2@mail.com,aaa,agent,Phoenix Force
-agent3,agent3@mail.com,aaa,agent,Sebastian Shaw
-manager1,manager1@mail.com,aaa,manager,Professor Xavier
-manager2,manager2@mail.com,aaa,manager,Erik Lensherr
-manager3,manager3@mail.com,aaa,manager,Emma Frost
+customer1,customer1@mail.com,aaa,none,Jean Grey
+customer2,customer2@mail.com,aaa,none,Kitty Pryde
+customer3,customer3@mail.com,aaa,none,Pietro Maximoff
+agent1,agent1@mail.com,aaa,none,Sam Guthrie
+agent2,agent2@mail.com,aaa,none,Phoenix Force
+agent3,agent3@mail.com,aaa,none,Sebastian Shaw
+manager1,manager1@mail.com,aaa,none,Professor Xavier
+manager2,manager2@mail.com,aaa,none,Erik Lensherr
+manager3,manager3@mail.com,aaa,none,Emma Frost
