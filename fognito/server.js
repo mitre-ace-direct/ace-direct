@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const favicon = require('serve-favicon');
@@ -49,7 +50,13 @@ mongoose.connect(dbURI, {
   useUnifiedTopology: true
 });
 
-const sessionMiddleware = session({ secret: sessionSecret, resave: true, saveUninitialized: true });
+var store = new MongoDBStore({
+  uri: dbURI,
+ collection: 'mySessions'
+});
+
+//const sessionMiddleware = session({ secret: sessionSecret, resave: true, saveUninitialized: true });
+const sessionMiddleware = session({ secret: sessionSecret, resave: true, saveUninitialized: true, store});
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
