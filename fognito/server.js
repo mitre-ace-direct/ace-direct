@@ -10,9 +10,34 @@ var MongoDBStore = require('connect-mongodb-session')(session);
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const favicon = require('serve-favicon');
+const mysql = require('mysql');
 const config = require('./config');
 require('./config/passport')(passport);
 const User = require('./app/models/user');
+
+let dbConnection = null;
+dbConnection = mysql.createConnection({
+  host: config.db.mysql.host,
+  user: config.db.mysql.user,
+  password: config.db.mysql.pass,
+  database: config.db.mysql.dbname,
+  port: config.db.mysql.port
+});
+
+dbConnection.connect((err) => {
+  if (err !== null) {
+    // MySQL connection ERROR
+    console.error('\n*************************************');
+    console.error('ERROR connecting to MySQL. Exiting...');
+    console.error(err);
+    console.error('*************************************\n');
+  } else {
+    // SUCCESSFUL connection
+  }
+});
+setInterval(() => {
+  dbConnection.ping(); // Keeps connection from Inactivity Timeout
+}, 60000);
 
 // verify config file
 let content = '';
@@ -76,7 +101,7 @@ app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
 app.locals = require('./helpers/home');
 
-require('./app/routes')(app, passport, config, User);
+require('./app/routes')(app, passport, config, User, dbConnection);
 
 const httpsServer = https.createServer(credentials, app);
 
@@ -88,6 +113,11 @@ console.log(`🚀 https://localhost:${config.port}`);
 function handleExit(signal) {
   console.log(`Received ${signal}. Shutting down.`);
   mongoose.connection.close();
+
+  if (dbConnection) {
+    dbConnection.destroy();
+  }
+
   console.log('Process terminated');
   process.exit(0);
 }
