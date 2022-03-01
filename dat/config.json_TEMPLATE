@@ -36,6 +36,7 @@
     "aserver": 9006,
     "videomail": 9007,
     "sswebserver": 9009,
+    "fognito": 9010,
     "nginx": 443,
     "asterisk_ws": 443,
     "asterisk_ami": 5038,
@@ -48,6 +49,9 @@
     "kurento": 8443,
     "kmsshare": 3000
   },
+  "fognito": {
+    "session_secret": "abc.xyz.super.secret.pwd.111"
+  },  
   "signaling_server": {
     "protocol": "wss",
     "path": "/<SOMEUSER>/acedirect-kurento/signaling"
