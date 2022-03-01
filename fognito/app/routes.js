@@ -1,12 +1,8 @@
-const appRouter = function myFunc(app, passport, config, _User) {
+const appRouter = function myFunc(app, passport, User, dbConnection, nginx_params) {
 
 
   // res.local lets you set some vars for ejs to use without having to pass them into the render. 
   app.use(function (req, res, next) {
-    res.locals = {
-      title1: config.title1 || "title 1",
-      title2: config.title2 || "title 2",
-    }
     if (req.user && req.user.local && req.user.local.role) {
       res.locals.site_role = req.user.local.role;
     }
@@ -36,7 +32,7 @@ const appRouter = function myFunc(app, passport, config, _User) {
     if (req.isAuthenticated()) {
       res.redirect('./') // user is already authenticated, send them back home
     } else {
-      res.render('login.ejs', { message: req.flash('loginMessage'), logo_image: config.logo_image });
+      res.render('login.ejs', { message: req.flash('loginMessage') });
     }
   })
 
@@ -70,34 +66,17 @@ const appRouter = function myFunc(app, passport, config, _User) {
   app.post('/login', passport.authenticate('local-login', {
     failureRedirect: './login',
     failureFlash: true
-  }), (req, res) => {
-
-    var redirect = (req.body.redirect == 'on') ? false : true; //default redirect
-
-    console.log(JSON.stringify(req.user, null, 4));
-    if (redirect && req.user && req.user.local && req.user.local.role) {
-      switch (req.user.local.role) {
-        case 'AD Agent':
-          res.redirect('/someuser/ACEDirect/agent');
-          break;
-        case 'Manager':
-          res.redirect('/someuser/ManagementPortal');
-          break;
-        case 'customer': //no customer role yet, place holder
-          res.redirect('/someuser/ACEDirect/call');
-          break;
-        default:
-          res.redirect('./profile'); //send the user somewhere
-      }
-    } else {
-      res.redirect('./profile')
+  }), async (req, res) => {
+    if (!req.user || !req.user.local) {
+      res.render('login.ejs', { message: req.flash('loginMessage') });
+      return;
     }
 
     // get application data: role field from agent_data table in MySQL
     dbConnection.query('SELECT role FROM agent_data WHERE username = ?', req.user.local.id, (err, result) => {
       if (err) {
         // lookup error - just go back to login page
-        res.render('login.ejs', { title1, title2, message: req.flash('loginMessage'), logo_image:config.logo_image });
+        res.render('login.ejs', { message: req.flash('loginMessage') });
         return;
       } else {
         // success
@@ -106,22 +85,33 @@ const appRouter = function myFunc(app, passport, config, _User) {
         User.findOneAndUpdate(query, {'local.role': role}, {upsert: true}, function(err, doc) {
           if (err) return res.send(500, {error: err});
           if (req.user && req.user.local && req.user.local.role) {
-            if (req.user.local.role === 'AD Agent') {
-              res.redirect('./agent');
-            } else if (req.user.local.role === 'Manager') {
-              res.redirect('./manager');
-            } else if (req.user.local.role === 'customer') {
-              res.redirect('./customer');
+            var redirect = (req.body.redirect == 'on') ? false : true; //default redirect
+
+            console.log(JSON.stringify(req.user, null, 4));
+            if (redirect && req.user && req.user.local && req.user.local.role) {
+              switch (req.user.local.role) {
+                case 'AD Agent':
+                  //nginx_params
+                  res.redirect(`${nginx_params.ad_path}${nginx_params.agent_route}`);
+                  break;
+                case 'Manager':
+                  res.redirect(`${nginx_params.mp_path}`);
+                  break;
+                case 'customer': //no customer role yet, place holder
+                  res.redirect(`${nginx_params.ad_path}${consumer_route}`);
+                  break;
+                default:
+                  res.redirect('./profile'); //send the user somewhere
+              }
             } else {
-              res.render('login.ejs', { title1, title2, message: req.flash('loginMessage'), logo_image:config.logo_image });
+              res.redirect('./profile')
             }
           } else {
-            res.render('login.ejs', { title1, title2, message: req.flash('loginMessage'), logo_image:config.logo_image });
+            res.render('login.ejs', { message: req.flash('loginMessage') });
           }
         });  
       }
     });
-
   });
 
   app.get('/profile', restrict('any'), (req, res) => {

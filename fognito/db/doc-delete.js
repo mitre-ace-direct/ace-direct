@@ -1,18 +1,61 @@
 // generic delete documents script
 
 // create a client to access MongoDB
+const fs = require('fs');
+const nconf = require('nconf');
 const { MongoClient } = require('mongodb');
 
 const stdin = process.openStdin();
-const config = require('../config');
+
+// use global AD config file
+const cfile = '../../dat/config.json';
+let clearText = false;
+const content = fs.readFileSync(cfile, 'utf8');
+try {
+  JSON.parse(content);
+  console.log('Valid JSON config file');
+} catch (ex) {
+  console.log('\n*******************************************************');
+  console.log(`Error! Malformed configuration file: ${cfile}`);
+  console.log('Exiting...');
+  console.log('*******************************************************\n');
+  process.exit(1);
+}
+nconf.file({ file: cfile });
+if (typeof (nconf.get('common:cleartext')) !== 'undefined' && nconf.get('common:cleartext') !== '') {
+  clearText = true;
+}
+
+function getConfigVal(paramName) {
+  const val = nconf.get(paramName);
+  let decodedString = null;
+  if (typeof val !== 'undefined' && val !== null) {
+    decodedString = null;
+    if (clearText) {
+      decodedString = val;
+    } else {
+      decodedString = Buffer.alloc(val.length, val, 'base64');
+    }
+  } else {
+    logger.error('\n*******************************************************');
+    logger.error(`ERROR!!! Config parameter is missing: ${paramName}`);
+    logger.error('*******************************************************\n');
+    decodedString = '';
+  }
+  return (decodedString.toString());
+}
 
 // create Mongo URI
+let mongoUser = '';
+let mongoPass = '';
+let mongoHost = getConfigVal('servers:mongodb_fqdn');
+let mongoPort = getConfigVal('app_ports:mongodb');
+let mongoDbname = getConfigVal('database_servers:mongodb:database_name');
 let uri = '';
-if (config.db.mongo.user && config.db.mongo.user.length > 0
-  && config.db.mongo.pass && config.db.mongo.pass.length > 0) {
-  uri = `mongodb://${config.db.mongo.user}:${config.db.mongo.pass}@${config.db.mongo.host}:${config.db.mongo.port}/${config.db.mongo.dbname}`;
+if (mongoUser && mongoUser.length > 0 && mongoPass && mongoPass.length > 0) {
+  uri = `mongodb://${mongoUser}:${mongoPass}@${mongoHost}:${mongoPort}/${mongoDbname}`;
 } else {
-  uri = `mongodb://${config.db.mongo.host}:${config.db.mongo.port}/${config.db.mongo.dbname}`;
+  uri = `mongodb://${mongoHost}:${mongoPort}/${mongoDbname}`;
 }
 
 if (process.argv.length !== 3) {
@@ -27,7 +70,7 @@ const deleteAllDocuments = () => new Promise((resolve, reject) => {
   MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (err, client) => {
     if (err) throw err;
 
-    const dbo = client.db(config.db.mongo.dbname);
+    const dbo = client.db(mongoDbname);
 
     dbo.collection(coll).deleteMany({}, (err1, res) => {
       if (err) {
