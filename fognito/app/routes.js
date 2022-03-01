@@ -82,6 +82,7 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginx_param
         // success
         req.session.isLoggedIn = true;
         req.session.role = result[0].role;
+        req.session.agent_id = result[0].agent_id;
         req.session.firstname = result[0].first_name;
         req.session.lastname = result[0].last_name;
         req.session.phone = result[0].phone;
