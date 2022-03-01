@@ -45,9 +45,9 @@ function getConfigVal(paramName) {
       decodedString = Buffer.alloc(val.length, val, 'base64');
     }
   } else {
-    logger.error('\n*******************************************************');
-    logger.error(`ERROR!!! Config parameter is missing: ${paramName}`);
-    logger.error('*******************************************************\n');
+    console.error('\n*******************************************************');
+    console.error(`ERROR!!! Config parameter is missing: ${paramName}`);
+    console.error('*******************************************************\n');
     decodedString = '';
   }
   return (decodedString.toString());
