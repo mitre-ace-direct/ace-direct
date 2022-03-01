@@ -11,17 +11,76 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const favicon = require('serve-favicon');
 const mysql = require('mysql');
-const config = require('./config');
+const nconf = require('nconf');
 require('./config/passport')(passport);
 const User = require('./app/models/user');
 
+// use global AD config file
+const cfile = '../dat/config.json';
+let clearText = false;
+const content = fs.readFileSync(cfile, 'utf8');
+try {
+  JSON.parse(content);
+  console.log('Valid JSON config file');
+} catch (ex) {
+  console.log('\n*******************************************************');
+  console.log(`Error! Malformed configuration file: ${cfile}`);
+  console.log('Exiting...');
+  console.log('*******************************************************\n');
+  process.exit(1);
+}
+nconf.file({ file: cfile });
+if (typeof (nconf.get('common:cleartext')) !== 'undefined' && nconf.get('common:cleartext') !== '') {
+  clearText = true;
+}
+
+function getConfigVal(paramName) {
+  const val = nconf.get(paramName);
+  let decodedString = null;
+  if (typeof val !== 'undefined' && val !== null) {
+    decodedString = null;
+    if (clearText) {
+      decodedString = val;
+    } else {
+      decodedString = Buffer.alloc(val.length, val, 'base64');
+    }
+  } else {
+    logger.error('\n*******************************************************');
+    logger.error(`ERROR!!! Config parameter is missing: ${paramName}`);
+    logger.error('*******************************************************\n');
+    decodedString = '';
+  }
+  return (decodedString.toString());
+}
+
+// nginx params
+let ad_path = getConfigVal('nginx:ad_path');
+let mp_path = getConfigVal('nginx:mp_path');
+let agent_route = getConfigVal('nginx:agent_route');
+let consumer_route = getConfigVal('nginx:consumer_route');
+let nginx_params = { ad_path, mp_path, agent_route, consumer_route };
+
+// mongo params
+let mongoUser = '';
+let mongoPass = '';
+let mongoHost = getConfigVal('servers:mongodb_fqdn');
+let mongoPort = getConfigVal('app_ports:mongodb');
+let mongoDbname = getConfigVal('database_servers:mongodb:database_name');
+
+// mysql params
+let mysqlUser = getConfigVal('database_servers:mysql:user');
+let mysqlPass = getConfigVal('database_servers:mysql:password');
+let mysqlHost = getConfigVal('servers:mysql_fqdn');
+let mysqlPort = getConfigVal('app_ports:mysql');
+let mysqlDbname = getConfigVal('database_servers:mysql:ad_database_name');
+
 let dbConnection = null;
 dbConnection = mysql.createConnection({
-  host: config.db.mysql.host,
-  user: config.db.mysql.user,
-  password: config.db.mysql.pass,
-  database: config.db.mysql.dbname,
-  port: config.db.mysql.port
+  host: mysqlHost,
+  user: mysqlUser,
+  password: mysqlPass,
+  database: mysqlDbname,
+  port: mysqlPort
 });
 
 dbConnection.connect((err) => {
@@ -47,27 +106,25 @@ try {
   console.log('Valid JSON config file.');
 } catch (ex) {
   console.log('\n***********************************************************');
-  console.log('Error! server.js - Malformed configuration file:  config.js\nExiting...');
+  console.log('Error! server.js - Malformed configuration file:  dat/config.json\nExiting...');
   console.log('***********************************************************\n');
   process.exit(1);
 }
 
 const credentials = {
-  key: fs.readFileSync(config.secure.key),
-  cert: fs.readFileSync(config.secure.cert)
+  key: fs.readFileSync(getConfigVal('common:https:private_key')),
+  cert: fs.readFileSync(getConfigVal('common:https:certificate'))
 };
 
-const sessionSecret = config.app.session.secret;
+const sessionSecret = getConfigVal('fognito:session_secret');
 
 // connect to Mongo
 let dbURI = '';
-if (config.db.mongo.user && config.db.mongo.user.length > 0
-  && config.db.mongo.pass && config.db.mongo.pass.length > 0) {
-  dbURI = `mongodb://${config.db.mongo.host}:${config.db.mongo.port}/${config.db.mongo.dbname}`;
+if (mongoUser && mongoUser.length > 0 && mongoPass && mongoPass.length > 0) {
+  dbURI = `mongodb://${mongoUser}:${mongoPass}@${mongoHost}:${mongoPort}/${mongoDbname}`;
 } else {
-  dbURI = `mongodb://${config.db.mongo.host}:${config.db.mongo.port}/${config.db.mongo.dbname}`;
+  dbURI = `mongodb://${mongoHost}:${mongoPort}/${mongoDbname}`;
 }
-console.log(dbURI);
 const app = express();
 
 mongoose.connect(dbURI, {
@@ -101,14 +158,15 @@ app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
 
 app.locals = require('./helpers/home');
 
-require('./app/routes')(app, passport, config, User, dbConnection);
+require('./app/routes')(app, passport, User, dbConnection, nginx_params);
 
 const httpsServer = https.createServer(credentials, app);
 
-httpsServer.listen(config.port);
+let port = getConfigVal('app_ports:fognito');
+httpsServer.listen(port);
 
 console.log('Running... \n');
-console.log(`🚀 https://localhost:${config.port}`);
+console.log(`🚀 https://localhost:${port}`);
 
 function handleExit(signal) {
   console.log(`Received ${signal}. Shutting down.`);
