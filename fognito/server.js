@@ -98,19 +98,6 @@ setInterval(() => {
   dbConnection.ping(); // Keeps connection from Inactivity Timeout
 }, 60000);
 
-// verify config file
-let content = '';
-try {
-  content = JSON.stringify(config, null, 4);
-  JSON.parse(content);
-  console.log('Valid JSON config file.');
-} catch (ex) {
-  console.log('\n***********************************************************');
-  console.log('Error! server.js - Malformed configuration file:  dat/config.json\nExiting...');
-  console.log('***********************************************************\n');
-  process.exit(1);
-}
-
 const credentials = {
   key: fs.readFileSync(getConfigVal('common:https:private_key')),
   cert: fs.readFileSync(getConfigVal('common:https:certificate'))
