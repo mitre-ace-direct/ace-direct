@@ -3,8 +3,8 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginx_param
 
   // res.local lets you set some vars for ejs to use without having to pass them into the render. 
   app.use(function (req, res, next) {
-    if (req.user && req.user.local && req.user.local.role) {
-      res.locals.site_role = req.user.local.role;
+    if (req.session && req.session.isLoggedIn) {
+      res.locals.user = req.session.user;
     }
     next()
   })
@@ -81,12 +81,13 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginx_param
       } else {
         // success
         req.session.isLoggedIn = true;
-        req.session.role = result[0].role;
-        req.session.agent_id = result[0].agent_id;
-        req.session.firstname = result[0].first_name;
-        req.session.lastname = result[0].last_name;
-        req.session.phone = result[0].phone;
-        req.session.email = result[0].email;
+        req.session.user = {}
+        req.session.user.role = result[0].role;
+        req.session.user.agent_id = result[0].agent_id;
+        req.session.user.firstname = result[0].first_name;
+        req.session.user.lastname = result[0].last_name;
+        req.session.user.phone = result[0].phone;
+        req.session.user.email = result[0].email;
 
         let redirect = (req.body.redirect == 'on') ? false : true; //default redirect
         if (redirect && result[0].role) {
@@ -111,8 +112,30 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginx_param
     });
   });
 
-  app.get('/profile', restrict('any'), (req, res) => {
+  //app.get('/profile', restrict('any'), (req, res) => {
+  app.get('/profile', (req, res) => {
     res.render('profile.ejs');
+  });
+
+  app.post('/updateProfile', restrict('any'), (req, res) => {
+    let first_name = req.body.firstname;
+    let last_name = req.body.lastname;
+    let agent_id = req.session.user.agent_id;
+    if (first_name && last_name && agent_id) {
+      let query = 'UPDATE agent_data SET first_name = ?, last_name = ? WHERE agent_id = ?;'
+      let params = [first_name, last_name, agent_id]
+      dbConnection.query(query, params, (err, result) => {
+        if (err) {
+          res.status(500).send("Internal Error")
+        } else {
+          req.session.user.firstname = first_name;
+          req.session.user.lastname = last_name;
+          res.status(200).send("Update Success")
+        }
+      })
+    } else {
+      res.status(400).send("Missing Parameters")
+    }
   });
 
   app.get('/logout', (req, res) => {
