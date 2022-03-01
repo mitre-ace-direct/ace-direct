@@ -73,43 +73,39 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginx_param
     }
 
     // get application data: role field from agent_data table in MySQL
-    dbConnection.query('SELECT role FROM agent_data WHERE username = ?', req.user.local.id, (err, result) => {
+    dbConnection.query('SELECT * FROM agent_data WHERE username = ?', req.user.local.id, (err, result) => {
       if (err) {
         // lookup error - just go back to login page
         res.render('login.ejs', { message: req.flash('loginMessage') });
         return;
       } else {
         // success
-        let role = result[0].role;
-        let query = {'local.id': req.user.local.id};
-        User.findOneAndUpdate(query, {'local.role': role}, {upsert: true}, function(err, doc) {
-          if (err) return res.send(500, {error: err});
-          if (req.user && req.user.local && req.user.local.role) {
-            var redirect = (req.body.redirect == 'on') ? false : true; //default redirect
+        req.session.isLoggedIn = true;
+        req.session.role = result[0].role;
+        req.session.firstname = result[0].first_name;
+        req.session.lastname = result[0].last_name;
+        req.session.phone = result[0].phone;
+        req.session.email = result[0].email;
 
-            console.log(JSON.stringify(req.user, null, 4));
-            if (redirect && req.user && req.user.local && req.user.local.role) {
-              switch (req.user.local.role) {
-                case 'AD Agent':
-                  //nginx_params
-                  res.redirect(`${nginx_params.ad_path}${nginx_params.agent_route}`);
-                  break;
-                case 'Manager':
-                  res.redirect(`${nginx_params.mp_path}`);
-                  break;
-                case 'customer': //no customer role yet, place holder
-                  res.redirect(`${nginx_params.ad_path}${consumer_route}`);
-                  break;
-                default:
-                  res.redirect('./profile'); //send the user somewhere
-              }
-            } else {
-              res.redirect('./profile')
-            }
-          } else {
-            res.render('login.ejs', { message: req.flash('loginMessage') });
+        let redirect = (req.body.redirect == 'on') ? false : true; //default redirect
+        if (redirect && result[0].role) {
+          switch (result[0].role) {
+            case 'AD Agent':
+              //nginx_params
+              res.redirect(`${nginx_params.ad_path}${nginx_params.agent_route}`);
+              break;
+            case 'Manager':
+              res.redirect(`${nginx_params.mp_path}`);
+              break;
+            case 'customer': //no customer role yet, place holder
+              res.redirect(`${nginx_params.ad_path}${consumer_route}`);
+              break;
+            default:
+              res.redirect('./profile'); //send the user somewhere
           }
-        });  
+        } else {
+          res.redirect('./profile')
+        }
       }
     });
   });
@@ -119,7 +115,8 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginx_param
   });
 
   app.get('/logout', (req, res) => {
-    req.logout();
+    //req.logout();
+    req.session.destroy();
     res.redirect('./login');
   });
 
