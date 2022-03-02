@@ -28,6 +28,15 @@
       "error_file": "./logs/pm2-fendesk-error.log"
     },
     {
+      "name": "fognito",
+      "script": "server.js",
+      "cwd": "./fognito",
+      "restart_delay": 5000,
+      "autorestart": true,
+      "out_file": "./logs/pm2-fognito.log",
+      "error_file": "./logs/pm2-fognito-error.log"
+    },    
+    {
       "name": "acr-cdr",
       "script": "app.js",
       "cwd": "./acr-cdr",
