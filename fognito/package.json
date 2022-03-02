@@ -4,7 +4,7 @@
   "description": "An authentication server that uses Passport.js and redirects authenticated users to authorized pages.",
   "main": "server.js",
   "scripts": {
-    "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -not -path './public/js/*' -print0 | xargs -0 eslint",
+    "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/dist/*'  -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -not -path './public/js/*' -print0 | xargs -0 eslint",
     "build": "npm run clean && npm install",
     "preinstall": "scripts/preinstall.sh",
     "postinstall": "scripts/postinstall.sh",
@@ -36,7 +36,8 @@
     "neat-csv": "^6.0.1",
     "passport": "^0.5.2",
     "passport-local": "^1.0.0",
-    "serve-favicon": "^2.5.0"
+    "serve-favicon": "^2.5.0",
+    "supertest": "^6.2.2"
   },
   "devDependencies": {
     "eslint": "^8.10.0",

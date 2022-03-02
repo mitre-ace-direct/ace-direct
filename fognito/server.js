@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const path = require('path');
 const express = require('express');
 const https = require('https');
@@ -6,7 +7,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const flash = require('connect-flash');
 const session = require('express-session');
-var MongoDBStore = require('connect-mongodb-session')(session);
+const MongoDBStore = require('connect-mongodb-session')(session);
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const favicon = require('serve-favicon');
@@ -54,25 +55,27 @@ function getConfigVal(paramName) {
 }
 
 // nginx params
-let ad_path = getConfigVal('nginx:ad_path');
-let mp_path = getConfigVal('nginx:mp_path');
-let agent_route = getConfigVal('nginx:agent_route');
-let consumer_route = getConfigVal('nginx:consumer_route');
-let nginx_params = { ad_path, mp_path, agent_route, consumer_route };
+const ad_path = getConfigVal('nginx:ad_path');
+const mp_path = getConfigVal('nginx:mp_path');
+const agent_route = getConfigVal('nginx:agent_route');
+const consumer_route = getConfigVal('nginx:consumer_route');
+const nginx_params = {
+  ad_path, mp_path, agent_route, consumer_route
+};
 
 // mongo params
-let mongoUser = '';
-let mongoPass = '';
-let mongoHost = getConfigVal('servers:mongodb_fqdn');
-let mongoPort = getConfigVal('app_ports:mongodb');
-let mongoDbname = getConfigVal('database_servers:mongodb:database_name');
+const mongoUser = '';
+const mongoPass = '';
+const mongoHost = getConfigVal('servers:mongodb_fqdn');
+const mongoPort = getConfigVal('app_ports:mongodb');
+const mongoDbname = getConfigVal('database_servers:mongodb:database_name');
 
 // mysql params
-let mysqlUser = getConfigVal('database_servers:mysql:user');
-let mysqlPass = getConfigVal('database_servers:mysql:password');
-let mysqlHost = getConfigVal('servers:mysql_fqdn');
-let mysqlPort = getConfigVal('app_ports:mysql');
-let mysqlDbname = getConfigVal('database_servers:mysql:ad_database_name');
+const mysqlUser = getConfigVal('database_servers:mysql:user');
+const mysqlPass = getConfigVal('database_servers:mysql:password');
+const mysqlHost = getConfigVal('servers:mysql_fqdn');
+const mysqlPort = getConfigVal('app_ports:mysql');
+const mysqlDbname = getConfigVal('database_servers:mysql:ad_database_name');
 
 let dbConnection = null;
 dbConnection = mysql.createConnection({
@@ -119,13 +122,14 @@ mongoose.connect(dbURI, {
   useUnifiedTopology: true
 });
 
-var store = new MongoDBStore({
+const store = new MongoDBStore({
   uri: dbURI,
- collection: 'mySessions'
+  collection: 'mySessions'
 });
 
-//const sessionMiddleware = session({ secret: sessionSecret, resave: true, saveUninitialized: true });
-const sessionMiddleware = session({ secret: sessionSecret, resave: true, saveUninitialized: true, store});
+const sessionMiddleware = session({
+  secret: sessionSecret, resave: true, saveUninitialized: true, store
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
@@ -149,7 +153,7 @@ require('./app/routes')(app, passport, User, dbConnection, nginx_params);
 
 const httpsServer = https.createServer(credentials, app);
 
-let port = getConfigVal('app_ports:fognito');
+const port = getConfigVal('app_ports:fognito');
 httpsServer.listen(port);
 
 console.log('Running... \n');

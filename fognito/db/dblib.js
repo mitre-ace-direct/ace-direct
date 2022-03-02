@@ -37,20 +37,20 @@ function getConfigVal(paramName) {
       decodedString = Buffer.alloc(val.length, val, 'base64');
     }
   } else {
-    logger.error('\n*******************************************************');
-    logger.error(`ERROR!!! Config parameter is missing: ${paramName}`);
-    logger.error('*******************************************************\n');
+    console.error('\n*******************************************************');
+    console.error(`ERROR!!! Config parameter is missing: ${paramName}`);
+    console.error('*******************************************************\n');
     decodedString = '';
   }
   return (decodedString.toString());
 }
 
 // create Mongo URI
-let mongoUser = '';
-let mongoPass = '';
-let mongoHost = getConfigVal('servers:mongodb_fqdn');
-let mongoPort = getConfigVal('app_ports:mongodb');
-let mongoDbname = getConfigVal('database_servers:mongodb:database_name');
+const mongoUser = '';
+const mongoPass = '';
+const mongoHost = getConfigVal('servers:mongodb_fqdn');
+const mongoPort = getConfigVal('app_ports:mongodb');
+const mongoDbname = getConfigVal('database_servers:mongodb:database_name');
 let uri = '';
 if (mongoUser && mongoUser.length > 0 && mongoPass && mongoPass.length > 0) {
   uri = `mongodb://${mongoUser}:${mongoPass}@${mongoHost}:${mongoPort}/${mongoDbname}`;
