@@ -1,10 +1,11 @@
 # fognito
 
-An authentication server that uses Passport.js and redirects authenticated users to authorized pages.
+The ACE Direct authentication and authorization server.
 
 ## prerequisites
 
 * [Node.js LTS](https://nodejs.org/en/)
+* Uses [../dat/config.json](../dat/config.json) parameters
 
 ## building
 

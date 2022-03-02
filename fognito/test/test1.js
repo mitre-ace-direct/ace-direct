@@ -23,7 +23,8 @@ describe('loading express', () => {
     server.close();
   });
 
-  // no tests yet
-
+  // a test
+  it('responds to /', (done) => {
+    request(server).get('/').expect(302, done);
+  });
 });
-
