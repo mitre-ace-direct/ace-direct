@@ -16,6 +16,15 @@ const nconf = require('nconf');
 require('./config/passport')(passport);
 const User = require('./app/models/user');
 
+let dbConnection = null;
+
+function myCleanup() {
+  if (dbConnection) {
+    dbConnection.destroy();
+  }
+}
+require('./cleanup').Cleanup(myCleanup);
+
 // use global AD config file
 const cfile = '../dat/config.json';
 let clearText = false;
@@ -77,7 +86,6 @@ const mysqlHost = getConfigVal('servers:mysql_fqdn');
 const mysqlPort = getConfigVal('app_ports:mysql');
 const mysqlDbname = getConfigVal('database_servers:mysql:ad_database_name');
 
-let dbConnection = null;
 dbConnection = mysql.createConnection({
   host: mysqlHost,
   user: mysqlUser,
@@ -155,7 +163,7 @@ require('./app/routes')(app, passport, User, dbConnection, nginx_params);
 const httpsServer = https.createServer(credentials, app);
 
 const port = getConfigVal('app_ports:fognito');
-httpsServer.listen(port);
+const appServer = httpsServer.listen(port);
 
 console.log('Running... \n');
 console.log(`🚀 https://localhost:${port}`);
@@ -176,4 +184,6 @@ process.on('SIGQUIT', handleExit);
 process.on('SIGTERM', handleExit);
 
 module.exports = app;
+module.exports = appServer;
+module.exports.myCleanup = myCleanup;
 // END
