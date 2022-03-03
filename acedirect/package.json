@@ -13,6 +13,7 @@
     "body-parser": "^1.19.0",
     "bootstrap-toggle": "^2.2.2",
     "clamscan": "^1.4.2",
+    "connect-mongodb-session": "^3.1.1",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "csurf": "^1.11.0",
