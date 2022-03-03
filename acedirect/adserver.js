@@ -5,7 +5,6 @@ const util = require('util');
 const log4js = require('log4js');
 const fs = require('fs');
 const request = require('request');
-const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
 const socketioJwt = require('socketio-jwt');
 const zendeskApi = require('node-zendesk');
@@ -13,61 +12,30 @@ const https = require('https');
 const redis = require('redis');
 const cookieParser = require('cookie-parser'); // the session is stored in a cookie, so we use this to parse it
 const session = require('express-session');
-const openamAgent = require('@forgerock/openam-agent');
+const MongoDBStore = require('connect-mongodb-session')(session);
 const url = require('url');
-const randomstring = require('randomstring');
 const shortid = require('shortid');
 const csrf = require('csurf');
 const cors = require('cors');
 const mysql = require('mysql');
 const { MongoClient } = require('mongodb');
+const c = require('./app/constants.js')
+const utils = require('./app/utils.js')
 
 let dbConnection = null;
 let dbconn = null;
 let asteriskCheckTimer = null;
-const proxy = require('proxy-agent');
 
-// Credentials needed for Call Recordings
-const AWS = require('aws-sdk');
 
-// Clam AV
-const NodeClam = require('clamscan');
 
-const ClamScan = new NodeClam().init({
-  remove_infected: true, // If true, removes infected files
-  quarantine_infected: false, // False: Don't quarantine, Path: Moves files to this place.
-  scan_log: null, // Path to a writeable log file to write scan results into
-  debug_mode: true, // Whether or not to log info/debug/error msgs to the console
-  file_list: null, // path to file containing list of files to scan (for scan_files method)
-  scan_recursively: true, // If true, deep scan folders recursively
-  clamscan: {
-    path: '/usr/bin/clamscan', // Path to clamscan binary on your server
-    db: null, // Path to a custom virus definition database
-    scan_archives: true, // If true, scan archives (ex. zip, rar, tar, dmg, iso, etc...)
-    active: true // If true, this module will consider using the clamscan binary
-  },
-  clamdscan: {
-    socket: false, // Socket file for connecting via TCP
-    host: false, // IP of host to connect to TCP interface
-    port: false, // Port of host to use when connecting via TCP interface
-    timeout: 60000, // Timeout for scanning files
-    local_fallback: true, // Do no fail over to binary-method of scanning
-    path: '/usr/bin/clamdscan', // Path to the clamdscan binary on your server
-    config_file: null, // Specify config file if it's in an unusual place
-    multiscan: true, // Scan using all available cores! Yay!
-    reload_db: false, // If true, will re-load the DB on every call (slow)
-    active: true, // If true, this module will consider using the clamdscan binary
-    bypass_test: false // Check to see if socket is available when applicable
-  },
-  preference: 'clamdscan' // If clamdscan is found and active, it will be used by default
-});
+
 
 // For fileshare
 // var upload = multer();
 
 // CLEAN UP function; must be at the top!
 // for exits, abnormal ends, signals, uncaught exceptions
-const cleanup = require('./cleanup').Cleanup(myCleanup);
+//const cleanup = require('./cleanup').Cleanup(myCleanup);
 
 function myCleanup() {
   // clean up code on exit, exception, SIGINT, etc.
@@ -97,41 +65,6 @@ let endTimeUTC = '21:30'; // hh:mm in UTC
 
 // Declaration for Asterisk Manager Interface see init_ami()
 let ami = null;
-
-// Contains login name => JSON data passed from browser
-let rStatusMap = 'statusMap';
-
-// Contains the VRS number mapped to the Zendesk ticket number
-let rVrsToZenId = 'vrsToZenId';
-
-// Contains the consumer extension mapped to {"secret":extensionpassword, "inuse":true|false}
-let rConsumerExtensions = 'consumerExtensions';
-
-// Contains the consumer extension(nnnnn) mapped to the VRS number (nnnnnnnnnn)
-// Redis will double map these key values meaning both will exist
-// key:value nnnnn:mmmmmmmmmm and mmmmmmmmmm:nnnnn
-let rExtensionToVrs = 'extensionToVrs';
-
-// Contains the consumer extension(nnnnn) mapped to the preferred language
-let rExtensionToLanguage = 'extensionToLanguage';
-
-// Maps Linphone caller extension to agent extension
-let rLinphoneToAgentMap = 'linphoneToAgentMap';
-
-// Maps consumer extension to CSR extension
-let rConsumerToCsr = 'consumerToCsr';
-
-// Map of Agent information, key agent_id value JSON object
-let rAgentInfoMap = 'agentInfoMap';
-
-// Map of Token to status, key token value {status, date}.
-let rTokenMap = 'tokenMap';
-
-// keeps track of number of consumers in complaint queue, send to agent on login
-let complaintQueueCount = 0;
-
-// keeps track of number of consumers in general queue, send to agent on login
-let generalQueueCount = 0;
 
 // file share
 let sharingAgent = [];
@@ -223,33 +156,7 @@ if (typeof (nconf.get('common:cleartext')) !== 'undefined' && nconf.get('common:
   clearText = true;
 }
 
-AWS.config.update({
-  region: getConfigVal('s3:region'),
-  httpOptions: {
-    agent: proxy(getConfigVal('common:proxy'))
-  }
-});
-
-const s3 = new AWS.S3();
-
-let colorConfigs = {};
-
-// append a suffix to make REDIS maps specific to this server
-let pfx = process.env.LOGNAME;
-if (pfx === undefined) {
-  pfx = '';
-} else {
-  pfx = `${pfx}_`;
-}
-rStatusMap = pfx + rStatusMap;
-rVrsToZenId = pfx + rVrsToZenId;
-rConsumerExtensions = pfx + rConsumerExtensions;
-rExtensionToVrs = pfx + rExtensionToVrs;
-rExtensionToLanguage = pfx + rExtensionToLanguage;
-rLinphoneToAgentMap = pfx + rLinphoneToAgentMap;
-rConsumerToCsr = pfx + rConsumerToCsr;
-rAgentInfoMap = pfx + rAgentInfoMap;
-rTokenMap = pfx + rTokenMap;
+let colorConfigs = utils.loadColorConfigs();
 
 // Set log4js level from the config file
 logger.level = getConfigVal('common:debug_level'); // log level hierarchy: ALL TRACE DEBUG INFO WARN ERROR FATAL OFF
@@ -427,15 +334,15 @@ redisClient.on('connect', () => {
   logger.info('Connected to Redis');
 
   // Delete all values in REDIS maps at startup
-  redisClient.del(rTokenMap);
-  redisClient.del(rStatusMap);
-  redisClient.del(rVrsToZenId);
-  redisClient.del(rConsumerExtensions);
-  redisClient.del(rExtensionToVrs);
-  redisClient.del(rExtensionToLanguage);
-  redisClient.del(rLinphoneToAgentMap);
-  redisClient.del(rConsumerToCsr);
-  redisClient.del(rAgentInfoMap);
+  redisClient.del(c.R_TOKEN_MAP);
+  redisClient.del(c.R_STATUS_MAP);
+  redisClient.del(c.R_VRS_TO_ZEN_ID);
+  redisClient.del(c.R_CONSUMER_EXTENSIONS);
+  redisClient.del(c.R_EXTENSION_TO_VRS);
+  redisClient.del(c.R_EXTENSION_TO_LANGUAGE);
+  redisClient.del(c.R_LINPHONE_TO_AGENT_MAP);
+  redisClient.del(c.R_CONSUMER_TO_CSR);
+  redisClient.del(c.R_AGENT_INFO_MAP);
 
   // Populate the consumerExtensions map
   prepareExtensions();
@@ -595,34 +502,23 @@ const credentials = {
   cert: fs.readFileSync(getConfigVal('common:https:certificate'))
 };
 
-const agent = new openamAgent.PolicyAgent({
-  serverUrl: `https://${getConfigVal('servers:nginx_fqdn')}:${getConfigVal('app_ports:nginx')}/${getConfigVal('openam:path')}`,
-  privateIP: getConfigVal('servers:nginx_private_ip'),
-  errorPage() {
-    return '<html><body><h1>Access Error</h1></body></html>';
-  }
+console.log("..",mongodbUri)
+const sessionStore = new MongoDBStore({
+  uri: mongodbUri,
+  collection: 'mySessions'
 });
-const cookieShield = new openamAgent.CookieShield({
-  getProfiles: false,
-  cdsso: false,
-  noRedirect: false,
-  passThrough: false
+
+const sessionMiddleware = session({
+  secret: getConfigVal('fognito:session_secret'), 
+  resave: true, 
+  saveUninitialized: true, 
+  store: sessionStore
 });
 
 const app = express();
 
 app.use(cookieParser()); // must use cookieParser before expressSession
-app.use(session({
-  secret: getConfigVal('web_security:session:secret_key'),
-  resave: getConfigVal('web_security:session:resave'),
-  rolling: getConfigVal('web_security:session:rolling'),
-  saveUninitialized: getConfigVal('web_security:session:save_uninitialized'),
-  cookie: {
-    maxAge: parseFloat(getConfigVal('web_security:session:max_age')),
-    httpOnly: getConfigVal('web_security:session:http_only'),
-    secure: getConfigVal('web_security:session:secure')
-  }
-}));
+app.use(sessionMiddleware);
 
 app.set('view engine', 'ejs');
 app.use(express.static(`${__dirname}/public`));
@@ -813,7 +709,7 @@ io.sockets.on('connection', (socket) => {
         console.log('last 5 results: ');
         console.log(results.result.slice(Math.max(results.result.length - 5, 0)));
 
-        redisClient.hget(rConsumerToCsr, Number(data.vrs), (_err, _agentExtension) => {
+        redisClient.hget(c.R_CONSUMER_TO_CSR, Number(data.vrs), (_err, _agentExtension) => {
           let vrs = null;
           console.log(`Token is ${JSON.stringify(token)}\n and data is ${JSON.stringify(data)}`);
 
@@ -875,7 +771,7 @@ io.sockets.on('connection', (socket) => {
         console.log('last 5 results: ');
         console.log(results.result.slice(Math.max(results.result.length - 5, 0)));
 
-        redisClient.hget(rConsumerToCsr, Number(data.vrs), (_err, _agentExtension) => {
+        redisClient.hget(c.R_CONSUMER_TO_CSR, Number(data.vrs), (_err, _agentExtension) => {
           let vrs = null;
           console.log(`Token is ${JSON.stringify(token)}\n and data is ${JSON.stringify(data)}`);
 
@@ -933,9 +829,9 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('joiningTransfer', (data) => {
-    redisClient.hset(rStatusMap, token.username, 'INCALL', (_err, _res) => {
+    redisClient.hset(c.R_STATUS_MAP, token.username, 'INCALL', (_err, _res) => {
       sendAgentStatusList(token.username, 'INCALL');
-      redisClient.hset(rTokenMap, token.lightcode, 'INCALL');
+      redisClient.hset(c.R_TOKEN_MAP, token.lightcode, 'INCALL');
     });
     io.to(Number(data.originalExt)).emit('transferJoined');
   });
@@ -972,7 +868,7 @@ io.sockets.on('connection', (socket) => {
         io.to(Number(data.monitorExt)).emit('multiparty-caption', data);
       } else if (data.participants && data.participants.length > 0) {
         data.participants.forEach((p) => {
-          redisClient.hget(rExtensionToVrs, Number(p), (err, vrsNum) => {
+          redisClient.hget(c.R_EXTENSION_TO_VRS, Number(p), (err, vrsNum) => {
             if (!err) {
               // p = (vrsNum) ? vrsNum : p;
               p = (vrsNum) || p;
@@ -1267,18 +1163,18 @@ io.sockets.on('connection', (socket) => {
   // Sets the agent state to READY
   socket.on('ready', () => {
     logger.info(`State: READY - ${token.username}`);
-    redisClient.hset(rStatusMap, token.username, 'READY', (_err, _res) => {
+    redisClient.hset(c.R_STATUS_MAP, token.username, 'READY', (_err, _res) => {
       sendAgentStatusList(token.username, 'READY');
-      redisClient.hset(rTokenMap, token.lightcode, 'READY');
+      redisClient.hset(c.R_TOKEN_MAP, token.lightcode, 'READY');
     });
   });
 
   // Sets the agent state to AWAY
   socket.on('away', () => {
     logger.info(`State: AWAY - ${token.username}`);
-    redisClient.hset(rStatusMap, token.username, 'AWAY', (_err, _res) => {
+    redisClient.hset(c.R_STATUS_MAP, token.username, 'AWAY', (_err, _res) => {
       sendAgentStatusList(token.username, 'AWAY');
-      redisClient.hset(rTokenMap, token.lightcode, 'AWAY');
+      redisClient.hset(c.R_TOKEN_MAP, token.lightcode, 'AWAY');
     });
   });
 
@@ -1288,9 +1184,9 @@ io.sockets.on('connection', (socket) => {
     pauseQueue(true, token.extension, token.queue2_name); // pause agent during wrapup mode
 
     logger.info(`State: WRAPUP - ${token.username}`);
-    redisClient.hset(rStatusMap, token.username, 'WRAPUP', (_err, _res) => {
+    redisClient.hset(c.R_STATUS_MAP, token.username, 'WRAPUP', (_err, _res) => {
       sendAgentStatusList(token.username, 'WRAPUP');
-      redisClient.hset(rTokenMap, token.lightcode, 'WRAPUP');
+      redisClient.hset(c.R_TOKEN_MAP, token.lightcode, 'WRAPUP');
     });
   });
 
@@ -1301,36 +1197,36 @@ io.sockets.on('connection', (socket) => {
       // Dealing with a WebRTC consumer, otherwise, it is a Linphone
       socket.join(Number(data.vrs));
     }
-    redisClient.hset(rStatusMap, token.username, 'INCALL', (_err, _res) => {
+    redisClient.hset(c.R_STATUS_MAP, token.username, 'INCALL', (_err, _res) => {
       sendAgentStatusList(token.username, 'INCALL');
-      redisClient.hset(rTokenMap, token.lightcode, 'INCALL');
+      redisClient.hset(c.R_TOKEN_MAP, token.lightcode, 'INCALL');
     });
   });
 
   // Sets the agent state to INCOMINGCALL
   socket.on('incomingcall', () => {
     logger.info(`State: INCOMINGCALL - ${token.username}`);
-    redisClient.hset(rStatusMap, token.username, 'INCOMINGCALL', (_err, _res) => {
+    redisClient.hset(c.R_STATUS_MAP, token.username, 'INCOMINGCALL', (_err, _res) => {
       sendAgentStatusList(token.username, 'INCOMINGCALL');
-      redisClient.hset(rTokenMap, token.lightcode, 'INCOMINGCALL');
+      redisClient.hset(c.R_TOKEN_MAP, token.lightcode, 'INCOMINGCALL');
     });
   });
 
   // Sets the agent state to TRANSFERRED_CALL
   socket.on('incomingtransferredcall', () => {
     logger.info(`State: TRANSFERRED_CALL - ${token.username}`);
-    redisClient.hset(rStatusMap, token.username, 'TRANSFERRED_CALL', (_err, _res) => {
+    redisClient.hset(c.R_STATUS_MAP, token.username, 'TRANSFERRED_CALL', (_err, _res) => {
       sendAgentStatusList(token.username, 'TRANSFERRED_CALL');
-      redisClient.hset(rTokenMap, token.lightcode, 'TRANSFERRED_CALL');
+      redisClient.hset(c.R_TOKEN_MAP, token.lightcode, 'TRANSFERRED_CALL');
     });
   });
 
   // Sets the agent state to MISSEDCALL
   socket.on('missedcall', () => {
     logger.info(`State: MISSEDCALL - ${token.username}`);
-    redisClient.hset(rStatusMap, token.username, 'MISSEDCALL', (_err, _res) => {
+    redisClient.hset(c.R_STATUS_MAP, token.username, 'MISSEDCALL', (_err, _res) => {
       sendAgentStatusList(token.username, 'MISSEDCALL');
-      redisClient.hset(rTokenMap, token.lightcode, 'MISSEDCALL');
+      redisClient.hset(c.R_TOKEN_MAP, token.lightcode, 'MISSEDCALL');
     });
   });
 
@@ -1374,7 +1270,7 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('get_color_config', () => {
-    loadColorConfigs();
+    sendEmit('lightcode-configs',utils.loadColorConfigs())
   });
   socket.on('send-name', (data) => {
     io.to(Number(data.vrs)).emit('agent-name', data);
@@ -1447,7 +1343,7 @@ io.sockets.on('connection', (socket) => {
 
     // Remove the consumer from the extension map.
     if (token.vrs) {
-      redisClient.hget(rExtensionToVrs, Number(token.vrs), (_err, ext) => {
+      redisClient.hget(c.R_EXTENSION_TO_VRS, Number(token.vrs), (_err, ext) => {
         const regexStr = `/^PJSIP/${ext}-.*$/`;
         ami.action({
           Action: 'Hangup',
@@ -1461,16 +1357,16 @@ io.sockets.on('connection', (socket) => {
           }
         });
 
-        redisClient.hget(rConsumerExtensions, Number(ext), (err, reply) => {
+        redisClient.hget(c.R_CONSUMER_EXTENSIONS, Number(ext), (err, reply) => {
           if (err) {
             logger.error(`Redis Error${err}`);
           } else if (reply) {
             const val = JSON.parse(reply);
             val.inuse = false;
-            redisClient.hset(rConsumerExtensions, Number(ext), JSON.stringify(val));
-            redisClient.hdel(rExtensionToVrs, Number(ext));
-            redisClient.hdel(rExtensionToVrs, Number(token.vrs));
-            redisClient.hdel(rExtensionToLanguage, Number(ext));
+            redisClient.hset(c.R_CONSUMER_EXTENSIONS, Number(ext), JSON.stringify(val));
+            redisClient.hdel(c.R_EXTENSION_TO_VRS, Number(ext));
+            redisClient.hdel(c.R_EXTENSION_TO_VRS, Number(token.vrs));
+            redisClient.hdel(c.R_EXTENSION_TO_LANGUAGE, Number(ext));
           }
         });
       });
@@ -1856,9 +1752,9 @@ io.sockets.on('connection', (socket) => {
   socket.on('input-vrs', (data) => {
     logger.info(`Received input-vrs ${JSON.stringify(data)}, calling vrsAndZenLookup() `);
 
-    // Redis rExtensionToVrs must reverse map
-    redisClient.hset(rExtensionToVrs, Number(data.extension), Number(data.vrs));
-    redisClient.hset(rExtensionToVrs, Number(data.vrs), Number(data.extension));
+    // Redis c.R_EXTENSION_TO_VRS must reverse map
+    redisClient.hset(c.R_EXTENSION_TO_VRS, Number(data.extension), Number(data.vrs));
+    redisClient.hset(c.R_EXTENSION_TO_VRS, Number(data.vrs), Number(data.extension));
 
     vrsAndZenLookup(Number(data.vrs), Number(data.extension));
   });
@@ -2080,7 +1976,7 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('set-agent-language', (data) => {
     console.log('setting language', Number(data.extension), data.language);
-    redisClient.hset(rExtensionToLanguage, Number(data.extension), data.language);
+    redisClient.hset(c.R_EXTENSION_TO_LANGUAGE, Number(data.extension), data.language);
   });
 
   socket.on('translate-caption', (data) => {
@@ -2097,7 +1993,7 @@ io.sockets.on('connection', (socket) => {
     let languageFrom;
     let languageTo;
 
-    redisClient.hgetall(rConsumerToCsr, (errHgeTail, tuples) => {
+    redisClient.hgetall(c.R_CONSUMER_TO_CSR, (errHgeTail, tuples) => {
       if (errHgeTail) {
         logger.error(`Redis Error${errHgeTail}`);
         console.log(`Redis Error${errHgeTail}`);
@@ -2117,7 +2013,7 @@ io.sockets.on('connection', (socket) => {
         }
         const promises = [
           new Promise((resolve, reject) => {
-            redisClient.hget(rExtensionToLanguage, Number(fromNumber), (err, language) => {
+            redisClient.hget(c.R_EXTENSION_TO_LANGUAGE, Number(fromNumber), (err, language) => {
               if (err) {
                 logger.error(`Redis Error${err}`);
                 reject(err);
@@ -2133,7 +2029,7 @@ io.sockets.on('connection', (socket) => {
             });
           }),
           new Promise((resolve, reject) => {
-            redisClient.hget(rExtensionToLanguage, Number(toNumber), (err, language) => {
+            redisClient.hget(c.R_EXTENSION_TO_LANGUAGE, Number(toNumber), (err, language) => {
               if (err) {
                 logger.error(`Redis Error${err}`);
                 reject(err);
@@ -2223,12 +2119,12 @@ io.sockets.on('connection', (socket) => {
  */
 function sendAgentStatusList(agent, value) {
   if (agent) {
-    redisClient.hget(rAgentInfoMap, agent, (_err, agentInfo) => {
+    redisClient.hget(c.R_AGENT_INFO_MAP, agent, (_err, agentInfo) => {
       if (agentInfo) {
         const agentInfoJSON = JSON.parse(agentInfo);
         agentInfoJSON.status = value;
-        redisClient.hset(rAgentInfoMap, agent, JSON.stringify(agentInfoJSON), () => {
-          redisClient.hvals(rAgentInfoMap, (err, values) => {
+        redisClient.hset(c.R_AGENT_INFO_MAP, agent, JSON.stringify(agentInfoJSON), () => {
+          redisClient.hvals(c.R_AGENT_INFO_MAP, (err, values) => {
             const aList = [];
             for (const id in values) {
               aList.push(JSON.parse(values[id]));
@@ -2242,7 +2138,7 @@ function sendAgentStatusList(agent, value) {
       }
     });
   } else { // forces socket emit without an update to user agent status map.
-    redisClient.hvals(rAgentInfoMap, (err, values) => {
+    redisClient.hvals(c.R_AGENT_INFO_MAP, (err, values) => {
       const aList = [];
       for (const id in values) {
         aList.push(JSON.parse(values[id]));
@@ -2421,7 +2317,7 @@ function handleManagerEvent(evt) {
 
           const destExtString = evt.destchannel;
           const destExtension = destExtString.split(/[\/,-]/);
-          redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
+          redisClient.hset(c.R_CONSUMER_TO_CSR, Number(extension[1]), Number(destExtension[1]));
           logger.info(`Populating consumerToCsr: ${extension[1]} => ${destExtension[1]}`);
           logger.info(`Extension number: ${extension[1]}`);
           logger.info(`Dest extension number: ${destExtension[1]}`);
@@ -2433,7 +2329,7 @@ function handleManagerEvent(evt) {
             console.log(`CONSUMER VRS NUMBER ${extension[1]}`);
           }
 
-          redisClient.hget(rExtensionToVrs, Number(extension[1]), (err, vrsNum) => {
+          redisClient.hget(c.R_EXTENSION_TO_VRS, Number(extension[1]), (err, vrsNum) => {
             if (!err && vrsNum) {
               // Call new function
               logger.info(`Calling vrsAndZenLookup with ${vrsNum} and ${destExtension[1]}`);
@@ -2500,7 +2396,7 @@ function handleManagerEvent(evt) {
 
             const destExtString = evt.destchannel;
             const destExtension = destExtString.split(/[\/,-]/);
-            redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
+            redisClient.hset(c.R_CONSUMER_TO_CSR, Number(extension[1]), Number(destExtension[1]));
             logger.info(`Populating consumerToCsr: ${extension[1]} => ${destExtension[1]}`);
             logger.info(`Extension number: ${extension[1]}`);
             logger.info(`Dest extension number: ${destExtension[1]}`);
@@ -2511,7 +2407,7 @@ function handleManagerEvent(evt) {
               popZendesk(evt.destuniqueid, extension[1], destExtension[1], destExtension[1], '', '', '', '');
             }
 
-            redisClient.hget(rExtensionToVrs, Number(extension[1]), (err, vrsNum) => {
+            redisClient.hget(c.R_EXTENSION_TO_VRS, Number(extension[1]), (err, vrsNum) => {
               if (!err && vrsNum) {
                 // Call new function
                 logger.info(`Calling vrsAndZenLookup with ${vrsNum} and ${destExtension[1]}`);
@@ -2542,7 +2438,7 @@ function handleManagerEvent(evt) {
 
             logger.info(`Adding to linphoneToAgentMap: ${Number(linphoneExtension[1])} =>${agentExtension[1]}`);
 
-            redisClient.hset(rLinphoneToAgentMap, Number(linphoneExtension[1]),
+            redisClient.hset(c.R_LINPHONE_TO_AGENT_MAP, Number(linphoneExtension[1]),
               Number(agentExtension[1]));
 
             logger.info(`Sending new-caller-general to agent: ${agentExtension[1]}`);
@@ -2581,7 +2477,7 @@ function handleManagerEvent(evt) {
 
           const destExtString = evt.destchannel;
           const destExtension = destExtString.split(/[\/,-]/);
-          redisClient.hset(rConsumerToCsr, Number(extension[1]), Number(destExtension[1]));
+          redisClient.hset(c.R_CONSUMER_TO_CSR, Number(extension[1]), Number(destExtension[1]));
           logger.info(`Populating consumerToCsr: ${extension[1]} => ${destExtension[1]}`);
           logger.info(`Extension number: ${extension[1]}`);
           logger.info(`Dest extension number: ${destExtension[1]}`);
@@ -2591,7 +2487,7 @@ function handleManagerEvent(evt) {
             popZendesk(evt.destuniqueid, extension[1], destExtension[1], destExtension[1], '', '', '', '');
           }
 
-          redisClient.hget(rExtensionToVrs, Number(extension[1]), (err, vrsNum) => {
+          redisClient.hget(c.R_EXTENSION_TO_VRS, Number(extension[1]), (err, vrsNum) => {
             if (!err && vrsNum) {
               // Call new function
               logger.info(`Calling vrsAndZenLookup with ${vrsNum} and ${destExtension[1]}`);
@@ -2655,13 +2551,13 @@ function handleManagerEvent(evt) {
           // this agent(agentExtension) must now go to away status
           console.log(`${agentExtension} missed a call from the consumer portal`);
           io.to(Number(agentExtension)).emit('new-missed-call', { max_missed: getConfigVal('missed_calls:max_missed_calls') }); // should send missed call number
-          redisClient.hget(rTokenMap, agentExtension, (err, tokenMap) => {
+          redisClient.hget(c.R_TOKEN_MAP, agentExtension, (err, tokenMap) => {
             if (err) {
               logger.error(`Redis Error: ${err}`);
             } else {
               tokenMap = JSON.parse(tokenMap);
               if (tokenMap !== null && tokenMap.token) {
-                redisClient.hset(rTokenMap, tokenMap.token, 'MISSEDCALL');
+                redisClient.hset(c.R_TOKEN_MAP, tokenMap.token, 'MISSEDCALL');
               }
             }
           });
@@ -2674,24 +2570,24 @@ function handleManagerEvent(evt) {
 
           logger.info(`Hangup extension number: ${extension[1]}`);
 
-          redisClient.hget(rConsumerExtensions, Number(extension[1]), (err, reply) => {
+          redisClient.hget(c.R_CONSUMER_EXTENSIONS, Number(extension[1]), (err, reply) => {
             if (err) {
               logger.error(`Redis Error${err}`);
             } else if (reply) {
               const val = JSON.parse(reply);
               val.inuse = false;
-              redisClient.hset(rConsumerExtensions, Number(extension[1]), JSON.stringify(val));
+              redisClient.hset(c.R_CONSUMER_EXTENSIONS, Number(extension[1]), JSON.stringify(val));
             }
           });
 
           logger.info('extensionToVrs contents:');
-          redisClient.hgetall(rExtensionToVrs, (err, reply) => {
+          redisClient.hgetall(c.R_EXTENSION_TO_VRS, (err, reply) => {
             for (const id in reply) {
               logger.info(`${id} => ${reply[id]}`);
             }
           });
 
-          redisClient.hexists(rExtensionToVrs, Number(extension[1]), (err, reply) => {
+          redisClient.hexists(c.R_EXTENSION_TO_VRS, Number(extension[1]), (err, reply) => {
             if (reply === 1) {
               logger.info(`extensionToVrsMap contains ${extension[1]}`);
             } else {
@@ -2699,7 +2595,7 @@ function handleManagerEvent(evt) {
             }
           });
 
-          redisClient.hget(rExtensionToVrs, Number(extension[1]), (err, vrsNum) => {
+          redisClient.hget(c.R_EXTENSION_TO_VRS, Number(extension[1]), (err, vrsNum) => {
             if (!err && vrsNum) {
               logger.info(`Sending chat-leave for socket id ${vrsNum}`);
               io.to(Number(vrsNum)).emit('chat-leave', {
@@ -2707,8 +2603,8 @@ function handleManagerEvent(evt) {
               });
 
               // Remove the extension when we're finished
-              redisClient.hdel(rExtensionToVrs, Number(extension[1]));
-              redisClient.hdel(rExtensionToVrs, Number(vrsNum));
+              redisClient.hdel(c.R_EXTENSION_TO_VRS, Number(extension[1]));
+              redisClient.hdel(c.R_EXTENSION_TO_VRS, Number(vrsNum));
             } else {
               logger.error("Couldn't find VRS number in extensionToVrs map for extension ");
             }
@@ -2728,15 +2624,15 @@ function handleManagerEvent(evt) {
 
         var agentExtension = 0;
 
-        redisClient.hget(rLinphoneToAgentMap, Number(linphoneExtension[1]),
+        redisClient.hget(c.R_LINPHONE_TO_AGENT_MAP, Number(linphoneExtension[1]),
           (err, agentExtension) => {
             if (agentExtension !== null) {
               // Remove the entry
-              redisClient.hdel(rLinphoneToAgentMap, Number(linphoneExtension[1]));
+              redisClient.hdel(c.R_LINPHONE_TO_AGENT_MAP, Number(linphoneExtension[1]));
             } else {
-              redisClient.hget(rConsumerToCsr, Number(evt.calleridnum), (_err, _agentExtension) => {
-                // Remove rConsumerToCsr redis map on hangups.
-                redisClient.hdel(rConsumerToCsr, Number(evt.calleridnum));
+              redisClient.hget(c.R_CONSUMER_TO_CSR, Number(evt.calleridnum), (_err, _agentExtension) => {
+                // Remove c.R_CONSUMER_TO_CSR redis map on hangups.
+                redisClient.hdel(c.R_CONSUMER_TO_CSR, Number(evt.calleridnum));
               });
             }
           });
@@ -2744,24 +2640,24 @@ function handleManagerEvent(evt) {
         logger.info('Processing Hangup from a WebRTC Videomail call (Consumer hangup)');
         logger.info(`VIDEOMAIL WebRTC HANGUP calleridnum: ${evt.calleridnum}`);
 
-        redisClient.hget(rConsumerExtensions, Number(evt.calleridnum), (err, reply) => {
+        redisClient.hget(c.R_CONSUMER_EXTENSIONS, Number(evt.calleridnum), (err, reply) => {
           if (err) {
             logger.error(`Redis Error${err}`);
           } else if (reply) {
             const val = JSON.parse(reply);
             val.inuse = false;
-            redisClient.hset(rConsumerExtensions, Number(evt.calleridnum), JSON.stringify(val));
+            redisClient.hset(c.R_CONSUMER_EXTENSIONS, Number(evt.calleridnum), JSON.stringify(val));
           }
         });
 
         logger.info('extensionToVrs contents:');
-        redisClient.hgetall(rExtensionToVrs, (err, reply) => {
+        redisClient.hgetall(c.R_EXTENSION_TO_VRS, (err, reply) => {
           for (const id in reply) {
             logger.info(`${id} => ${reply[id]}`);
           }
         });
 
-        redisClient.hexists(rExtensionToVrs, Number(evt.calleridnum), (err, reply) => {
+        redisClient.hexists(c.R_EXTENSION_TO_VRS, Number(evt.calleridnum), (err, reply) => {
           if (reply === 1) {
             logger.info(`extensionToVrsMap contains ${evt.calleridnum}`);
           } else {
@@ -2769,14 +2665,14 @@ function handleManagerEvent(evt) {
           }
         });
 
-        redisClient.hget(rExtensionToVrs, Number(evt.calleridnum), (err, vrsNum) => {
+        redisClient.hget(c.R_EXTENSION_TO_VRS, Number(evt.calleridnum), (err, vrsNum) => {
           if (!err && vrsNum) {
             console.log(`VIDOEMAIL WebRTC evt: ${JSON.stringify(evt, null, 2)}`);
             insertCallDataRecord('Videomail', vrsNum, evt.uniqueid, 'D5');
 
             // Remove the extension when we're finished
-            redisClient.hdel(rExtensionToVrs, Number(evt.calleridnum));
-            redisClient.hdel(rExtensionToVrs, Number(vrsNum));
+            redisClient.hdel(c.R_EXTENSION_TO_VRS, Number(evt.calleridnum));
+            redisClient.hdel(c.R_EXTENSION_TO_VRS, Number(vrsNum));
           } else {
             logger.error("Couldn't find VRS number in extensionToVrs map for extension ");
           }
@@ -2805,27 +2701,27 @@ function handleManagerEvent(evt) {
 
           // this agent(agentExtension) must now go to away status
           io.to(Number(agentExtension)).emit('new-missed-call', { max_missed: getConfigVal('missed_calls:max_missed_calls') }); // should send missed call number
-          redisClient.hget(rTokenMap, agentExtension, (err, tokenMap) => {
+          redisClient.hget(c.R_TOKEN_MAP, agentExtension, (err, tokenMap) => {
             if (err) {
               logger.error(`Redis Error: ${err}`);
             } else {
               tokenMap = JSON.parse(tokenMap);
-              if (tokenMap !== null && tokenMap.token) redisClient.hset(rTokenMap, tokenMap.token, 'MISSEDCALL');
+              if (tokenMap !== null && tokenMap.token) redisClient.hset(c.R_TOKEN_MAP, tokenMap.token, 'MISSEDCALL');
             }
           });
         } else {
           // transferred consumer portal call hanging up
-          redisClient.hget(rConsumerExtensions, Number(extension[1]), (err, reply) => {
+          redisClient.hget(c.R_CONSUMER_EXTENSIONS, Number(extension[1]), (err, reply) => {
             if (err) {
               logger.error(`Redis Error${err}`);
             } else if (reply) {
               const val = JSON.parse(reply);
               val.inuse = false;
-              redisClient.hset(rConsumerExtensions, Number(extension[1]), JSON.stringify(val));
+              redisClient.hset(c.R_CONSUMER_EXTENSIONS, Number(extension[1]), JSON.stringify(val));
             }
           });
 
-          redisClient.hget(rExtensionToVrs, Number(extension[1]), (err, vrsNum) => {
+          redisClient.hget(c.R_EXTENSION_TO_VRS, Number(extension[1]), (err, vrsNum) => {
             if (!err && vrsNum) {
               logger.info(`Sending chat-leave for socket id ${vrsNum}`);
               io.to(Number(vrsNum)).emit('chat-leave', {
@@ -2833,8 +2729,8 @@ function handleManagerEvent(evt) {
               });
 
               // Remove the extension when we're finished
-              redisClient.hdel(rExtensionToVrs, Number(extension[1]));
-              redisClient.hdel(rExtensionToVrs, Number(vrsNum));
+              redisClient.hdel(c.R_EXTENSION_TO_VRS, Number(extension[1]));
+              redisClient.hdel(c.R_EXTENSION_TO_VRS, Number(vrsNum));
             } else {
               logger.error("Couldn't find VRS number in extensionToVrs map for extension ");
             }
@@ -2869,7 +2765,7 @@ function handleManagerEvent(evt) {
       logger.info(`Caller extension: ${evt.origtransfererconnectedlinenum}`);
       logger.info(`Queue name: ${evt.transfereecontext}`);
 
-      redisClient.hexists(rConsumerExtensions, Number(evt.origtransfererconnectedlinenum),
+      redisClient.hexists(c.R_CONSUMER_EXTENSIONS, Number(evt.origtransfererconnectedlinenum),
         (errHexists, reply) => {
           if (errHexists) {
             logger.error(`Redis Error${errHexists}`);
@@ -2892,7 +2788,7 @@ function handleManagerEvent(evt) {
             const origExtension = origExtString.split(/[\/,-]/);
 
             // Use the origExtension to look up the VRS number.
-            redisClient.hget(rExtensionToVrs, Number(evt.origtransfererconnectedlinenum),
+            redisClient.hget(c.R_EXTENSION_TO_VRS, Number(evt.origtransfererconnectedlinenum),
               (errHget, vrsNum) => {
                 if (errHget) {
                   logger.error(`Redis Error${errHget}`);
@@ -2944,10 +2840,10 @@ function handleManagerEvent(evt) {
             logger.info(`Sending chat-leave to: ${evt.origtransfererconnectedlinenum}`);
 
             // Need to update the consumerToCsr map so that the chat-leave goes to the right agent
-            redisClient.hexists(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
+            redisClient.hexists(c.R_CONSUMER_TO_CSR, Number(evt.origtransfererconnectedlinenum),
               (err, reply) => {
                 if (reply === 1) {
-                  redisClient.hset(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
+                  redisClient.hset(c.R_CONSUMER_TO_CSR, Number(evt.origtransfererconnectedlinenum),
                     Number(evt.secondtransfererconnectedlinenum));
                   logger.info(`Inside if(), updating consumerToCsr hash with: ${evt.origtransfererconnectedlinenum} => ${evt.secondtransfererconnectedlinenum}`);
                 }
@@ -2979,10 +2875,10 @@ function handleManagerEvent(evt) {
             logger.info(`Sending chat-leave to: ${evt.origtransfererconnectedlinenum}`);
 
             // Need to update the consumerToCsr map so that the chat-leave goes to the right agent
-            redisClient.hexists(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
+            redisClient.hexists(c.R_CONSUMER_TO_CSR, Number(evt.origtransfererconnectedlinenum),
               (err, reply) => {
                 if (reply === 1) {
-                  redisClient.hset(rConsumerToCsr, Number(evt.origtransfererconnectedlinenum),
+                  redisClient.hset(c.R_CONSUMER_TO_CSR, Number(evt.origtransfererconnectedlinenum),
                     Number(evt.secondtransfererconnectedlinenum));
                   logger.info(`Inside if(), updating consumerToCsr hash with: ${evt.origtransfererconnectedlinenum} => ${evt.secondtransfererconnectedlinenum}`);
                 }
@@ -3006,7 +2902,7 @@ function handleManagerEvent(evt) {
         var extension = extString.split(/[\/,-]/)[1];
         const callerExt = evt.connectedlinenum;
 
-        redisClient.hget(rExtensionToVrs, Number(callerExt), (errHget, phoneNum) => {
+        redisClient.hget(c.R_EXTENSION_TO_VRS, Number(callerExt), (errHget, phoneNum) => {
           if (errHget) {
             logger.error(`Redis Error: ${errHget}`);
           } else {
@@ -3016,12 +2912,12 @@ function handleManagerEvent(evt) {
               phoneNumber: phoneNum
             });
 
-            redisClient.hget(rTokenMap, extension, (err, tokenMap) => {
+            redisClient.hget(c.R_TOKEN_MAP, extension, (err, tokenMap) => {
               if (err) {
                 logger.error(`Redis Error: ${err}`);
               } else {
                 tokenMap = JSON.parse(tokenMap);
-                if (tokenMap !== null && tokenMap.token) redisClient.hset(rTokenMap, tokenMap.token, 'INCOMINGCALL');
+                if (tokenMap !== null && tokenMap.token) redisClient.hset(c.R_TOKEN_MAP, tokenMap.token, 'INCOMINGCALL');
               }
             });
           }
@@ -3038,7 +2934,7 @@ function handleManagerEvent(evt) {
 
       const ext = evt.calleridnum;
       let vrs;
-      redisClient.hget(rExtensionToVrs, Number(ext), (err, vrsNum) => {
+      redisClient.hget(c.R_EXTENSION_TO_VRS, Number(ext), (err, vrsNum) => {
         if (!err && vrsNum) {
           logger.info(`ABANDONED WebRTC VRS NUMBER ${vrsNum}`);
           vrs = vrsNum;
@@ -3125,7 +3021,7 @@ init_ami();
 // for the consumer portal when a customer is waiting in queue
 // and no agents are available (i.e., not AWAY)
 setInterval(() => {
-  redisClient.hgetall(rAgentInfoMap, (err, data) => {
+  redisClient.hgetall(c.R_AGENT_INFO_MAP, (err, data) => {
     if (data) {
       let agentsLoggedIn = false;
       for (const prop in data) {
@@ -3175,31 +3071,6 @@ setInterval(() => {
   });
 }, 5000);
 
-/**
- * Calls the RESTful service running on the provider host to verify the agent
- * username and password.
- *
- * @param {type} username Agent username
- * @param {type} callback Returns retrieved JSON
- * @returns {undefined} Not used
- */
-function getUserInfo(username, callback) {
-  const url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/getagentrec/${username}`;
-  request({
-    url,
-    json: true
-  }, (error, response, data) => {
-    if (error) {
-      logger.error(`login ERROR: ${error}`);
-      data = {
-        message: 'failed'
-      };
-    } else {
-      logger.info(`Agent Verify: ${data.message}`);
-    }
-    callback(data);
-  });
-}
 
 /**
  * Removes the interface (e.g. SIP/6001) from Asterisk when the agent logs out.
@@ -3210,9 +3081,9 @@ function getUserInfo(username, callback) {
 function logout(token) {
   // removes username from statusMap
   if (token.username !== null) {
-    redisClient.hdel(rStatusMap, token.username);
-    redisClient.hdel(rAgentInfoMap, token.username);
-    if (token.lightcode) redisClient.hset(rTokenMap, token.lightcode, 'OFFLINE');
+    redisClient.hdel(c.R_STATUS_MAP, token.username);
+    redisClient.hdel(c.R_AGENT_INFO_MAP, token.username);
+    if (token.lightcode) redisClient.hset(c.R_TOKEN_MAP, token.lightcode, 'OFFLINE');
 
     sendAgentStatusList();
 
@@ -3241,58 +3112,6 @@ function logout(token) {
   }
 }
 
-/**
- * Calls the RESTful service running on the provider host to verify VRS number.
- * Note, this is an emulated VRS check.
- *
- * @param {type} phoneNumber
- * @param {type} callback
- * @returns {undefined}
- */
-function getCallerInfo(phoneNumber, callback) {
-  let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}`;
-
-  // remove the leading characters and 1 before the VRS number (if it's there)
-
-  phoneNumber = phoneNumber.toString();
-  while (phoneNumber.length > 10) {
-    phoneNumber = phoneNumber.substring(1);
-  }
-  url += `/vrsverify/?vrsnum=${phoneNumber}`;
-
-  request({
-    url,
-    json: true
-  }, (error, response, data) => {
-    if (error) {
-      logger.error('ERROR: /getAllVrsRecs');
-      var data = {
-        message: 'failed'
-      };
-    }
-    logger.info(`VRS lookup response: ${data.message}`);
-    callback(data);
-  });
-}
-
-/**
- * Looks in the call_block table of the mysql db to see if VRS number is blocked.
- * Reason is irrelevant here.
- *
- * @param {type} phoneNumber
- * @param {type} callback
- * @returns {boolean}
- */
-function checkIfBlocked(phoneNumber, callback) {
-  dbConnection.query('SELECT reason FROM call_block WHERE vrs = ?', phoneNumber, (err, result) => {
-    if (err) {
-      logger.error(`Call block lookup error: ${err.code}`);
-      callback(true); // default to blocked if there is a DB error
-    } else {
-      callback(result.length > 0); // true if at least one row with that number, false otherwise
-    }
-  });
-}
 
 /**
  * Makes a REST call to retrieve the script associated with the specified
@@ -3340,7 +3159,7 @@ function processConsumerRequest(data) {
   logger.info(`processConsumerRequest - incoming ${JSON.stringify(data)}`);
 
   // Do the VRS lookup first
-  getCallerInfo(data.vrs, (vrsinfo) => {
+  utils.getCallerInfo(data.vrs, (vrsinfo) => {
     if (vrsinfo.message === 'success') {
       logger.info('Config lookup:');
       logger.info(`queuesComplaintNumber: ${queuesComplaintNumber}`);
@@ -3405,7 +3224,7 @@ function processConsumerRequest(data) {
         logger.info(`vrsToZenId map addition: ${data.vrs} => ${ticketId}`);
         logger.info(`EMIT: ad-ticket-created: ${JSON.stringify(resultJson)}`);
 
-        redisClient.hset(rVrsToZenId, vrsinfo.data[0].vrs, ticketId);
+        redisClient.hset(c.R_VRS_TO_ZEN_ID, vrsinfo.data[0].vrs, ticketId);
 
         io.to(Number(vrsinfo.data[0].vrs)).emit('ad-ticket-created', resultJson);
       });
@@ -3525,10 +3344,10 @@ function processExtension(data) {
 
           logger.info(`Extension to VRS Mapping: ${nextExtension} => ${data.vrs}`);
 
-          redisClient.hset(rExtensionToVrs, Number(nextExtension), Number(data.vrs));
-          redisClient.hset(rExtensionToVrs, Number(data.vrs), Number(nextExtension));
+          redisClient.hset(c.R_EXTENSION_TO_VRS, Number(nextExtension), Number(data.vrs));
+          redisClient.hset(c.R_EXTENSION_TO_VRS, Number(data.vrs), Number(nextExtension));
           if (data.language) {
-            redisClient.hset(rExtensionToLanguage, Number(nextExtension), data.language);
+            redisClient.hset(c.R_EXTENSION_TO_LANGUAGE, Number(nextExtension), data.language);
           } else {
             logger.error('Language has not been specified for extension', Number(nextExtension));
           }
@@ -3571,22 +3390,6 @@ function handleError(err) {
   process.exit(-1);
 }
 
-/**
- * Loads a new config file color config file into memory.
- *
- * @returns {undefined}
- */
-function loadColorConfigs() {
-  const colorfile = '../dat/color_config.json';
-  try {
-    const content = fs.readFileSync(colorfile, 'utf8');
-    myjson = JSON.parse(content);
-    colorConfigs = myjson.statuses;
-    sendEmit('lightcode-configs', colorConfigs);
-  } catch (ex) {
-    logger.error(`Error in ${colorfile}`);
-  }
-}
 
 /**
  * sends an emit message for all connections.
@@ -3616,7 +3419,7 @@ function prepareExtensions() {
       secret,
       inuse: false
     };
-    redisClient.hset(rConsumerExtensions, Number(num), JSON.stringify(data));
+    redisClient.hset(c.R_CONSUMER_EXTENSIONS, Number(num), JSON.stringify(data));
   }
 }
 
@@ -3628,7 +3431,7 @@ function prepareExtensions() {
  */
 function findNextAvailableExtension(callback) {
   let nextExtension = 0;
-  redisClient.hgetall(rConsumerExtensions, (err, reply) => {
+  redisClient.hgetall(c.R_CONSUMER_EXTENSIONS, (err, reply) => {
     if (err) {
       logger.error(`Redis Error${err}`);
     } else if (reply) {
@@ -3638,7 +3441,7 @@ function findNextAvailableExtension(callback) {
         if (val.inuse === false) {
           logger.info(`Found an open extension in consumerExtensions: ${id}`);
           val.inuse = true;
-          redisClient.hset(rConsumerExtensions, Number(id), JSON.stringify(val));
+          redisClient.hset(c.R_CONSUMER_EXTENSIONS, Number(id), JSON.stringify(val));
           nextExtension = id;
           break;
         }
@@ -3661,7 +3464,7 @@ function findExtensionPassword(extension, callback) {
   const passphrase = shortid.generate();
   let password = 'unknown';
 
-  redisClient.hget(rConsumerExtensions, Number(extension), (err, reply) => {
+  redisClient.hget(c.R_CONSUMER_EXTENSIONS, Number(extension), (err, reply) => {
     if (err) {
       logger.error(`Redis Error${err}`);
     } else if (reply) {
@@ -3690,7 +3493,7 @@ function vrsAndZenLookup(vrsNum, destAgentExtension) {
     logger.info(`Performing VRS lookup for number: ${vrsNum} to agent ${destAgentExtension}`);
     incomingVRS = vrsNum; // for file share
     // Do the VRS lookup
-    getCallerInfo(vrsNum, (vrsinfo) => {
+    utils.getCallerInfo(vrsNum, (vrsinfo) => {
       logger.info(`vrsinfo: ${JSON.stringify(vrsinfo)}`);
 
       if (vrsinfo.message === 'success') {
@@ -3714,7 +3517,7 @@ function vrsAndZenLookup(vrsNum, destAgentExtension) {
     logger.error('Could not find VRS in vrsAndZenLookup()');
   }
 
-  redisClient.hget(rVrsToZenId, vrsNum, (_err, zenTicketId) => {
+  redisClient.hget(c.R_VRS_TO_ZEN_ID, vrsNum, (_err, zenTicketId) => {
     if (zenTicketId) {
       logger.info(`Performing Zendesk ticket lookup for ticket: ${zenTicketId}`);
 
@@ -3770,7 +3573,7 @@ function setInitialLoginAsteriskConfigs(user) {
       queuename: queueList.queue2_name
     });
   }
-  redisClient.hset(rAgentInfoMap, user.username, JSON.stringify(agentInfo));
+  redisClient.hset(c.R_AGENT_INFO_MAP, user.username, JSON.stringify(agentInfo));
   sendAgentStatusList(user.username, 'AWAY');
 }
 
@@ -3809,13 +3612,7 @@ function getAgentsFromProvider(callback) {
   });
 }
 
-function createToken() {
-  // should Check for duplicate tokens
-  return randomstring.generate({
-    length: 12,
-    charset: 'alphabetic'
-  });
-}
+
 
 // Allow cross-origin requests to be received from Management Portal
 // Used for the force logout functionality since we need to send a POST
@@ -3852,44 +3649,10 @@ app.post('/forcelogout', (req, _res) => {
   }
 });
 
-/**
- * Checks to see if the number is blocked and, if it is not blocked,
- * calls the RESTful service to verify the VRS number.
- * If it is blocked, return 401 and send the FCC URL for the front end to redirect to.
- */
-app.post('/consumer_login', (req, res) => {
-  // All responses will be JSON sets response header.
-  res.setHeader('Content-Type', 'application/json');
-  const vrsnum = req.body.vrsnumber;
-  if (/^\d+$/.test(vrsnum)) {
-    checkIfBlocked(vrsnum, (isBlocked) => {
-      if (isBlocked) {
-        res.status(401).json({ message: 'Number blocked', redirectUrl: complaintRedirectUrl });
-      } else {
-        getCallerInfo(vrsnum, (vrs) => {
-          if (vrs.message === 'success') {
-            req.session.role = 'VRS';
-            req.session.vrs = vrs.data[0].vrs;
-            req.session.first_name = vrs.data[0].first_name;
-            req.session.last_name = vrs.data[0].last_name;
-            req.session.email = vrs.data[0].email;
-            res.status(200).json({
-              message: 'success'
-            });
-          } else {
-            res.status(200).json(vrs);
-          }
-        });
-      }
-    });
-  } else {
-    res.status(200).json({
-      message: 'Error: Phone number format incorrect'
-    });
-  }
-});
 
 app.use((req, res, next) => {
+  req.dbConnection = dbConnection;
+  req.redisClient = redisClient;
   res.locals = {
     nginxPath,
     busyLightEnabled,
@@ -3908,640 +3671,17 @@ app.use((req, res, next) => {
     fpsLow,
     fpsMax,
     fpsMin,
-    fpsOptimum
+    fpsOptimum,
+    isOpen,   // move these 3 to util?
+    endTimeUTC,
+    startTimeUTC,
+    csrfToken: req.csrfToken()
   };
   next();
 });
 
-/**
- * Handles all GET request to server
- * determines if user can procede or
- * before openam cookie shield is enforced
- */
-
-// Redirects / to /Complaint
-app.get('/', (req, res, next) => {
-  res.redirect('fcc');
-});
-
-// redirects to the fcc mockup page
-app.get('/fcc', (req, res, next) => {
-  res.render('pages/fcc_mockup');
-});
-
-/**
- * Handles a GET request for /Compaint. Checks user has
- * a valid session and displays page.
- *
- * @param {string} '/Complaint'
- * @param {function} function(req, res)
- */
-app.get(consumerPath, (req, res, next) => {
-  if (req.session.role === 'VRS') {
-    res.render('pages/complaint_form');
-  } else {
-    res.render('pages/complaint_login', {
-      csrfToken: req.csrfToken()
-    });
-  }
-});
-
-/**
- * Handles a GET request for /logout.
- * Destroys Cookies and Sessions for OpenAM and ACEDirect
- *
- * @param {string} '/logout'
- * @param {function} function(req, res)
- */
-
-app.get('/logout', (req, res) => {
-  request({
-    method: 'POST',
-    url: `https://${getConfigVal('servers:nginx_private_ip')}:${getConfigVal('app_ports:nginx')}/${getConfigVal('openam:path')}/json/sessions/?_action-logout`,
-    headers: {
-      host: url.parse(`https://${getConfigVal('servers:nginx_fqdn')}`).hostname,
-      iplanetDirectoryPro: req.session.key,
-      'Content-Type': 'application/json'
-    }
-  }, (error, _response, _data) => {
-    if (error) {
-      logger.error(`logout ERROR: ${error}`);
-    } else {
-      const domaintemp = getConfigVal('servers:nginx_fqdn');
-      const n1 = domaintemp.indexOf('.');
-      res.cookie('iPlanetDirectoryPro', 'cookievalue', {
-        maxAge: 0,
-        domain: domaintemp.substring(n1 + 1),
-        path: '/',
-        value: '',
-        HttpOnly: true,
-        secure: true
-      });
-      req.session.destroy((err) => {
-        if (err) {
-          logger.error(`logout session destroy error: ${err}`);
-        }
-        res.redirect(req.get('referer'));
-      });
-    }
-  });
-});
-
-/**
- * Handles a GET request for token and returnes a valid JWT token
- * for Manager's with a valid session.
- *
- * @param {string} '/token'
- * @param {function} function(req, res)
- */
-app.get('/token', (req, res) => {
-  if (req.session.role === 'VRS') {
-    res.setHeader('Content-Type', 'application/json');
-    const vrsnum = req.session.vrs;
-    if (/^\d+$/.test(vrsnum)) {
-      getCallerInfo(vrsnum, (vrs) => {
-        if (vrs.message === 'success') {
-          // add isOpen flag; notifies Consumers who try to connect after hours
-          vrs.data[0].isOpen = isOpen;
-
-          // add start/end time; operating hours
-          vrs.data[0].startTimeUTC = startTimeUTC; // hh:mm in UTC
-          vrs.data[0].endTimeUTC = endTimeUTC; // hh:mm in UTC
-
-          const token = jwt.sign(vrs.data[0], jwtKey, {
-            expiresIn: '2000'
-          });
-          res.status(200).json({
-            message: 'success',
-            token
-          });
-        } else {
-          res.status(200).json(vrs);
-        }
-      });
-    } else {
-      res.status(200).json({
-        message: 'Error: Phone number format incorrect'
-      });
-    }
-  } else if (req.session.role === 'AD Agent') {
-    const passphrase = shortid.generate();
-    redisClient.set(passphrase, req.session.extensionPassword);
-    redisClient.expire(passphrase, 5); // remove passphrase after 5 seconds.
-
-    const payload = {};
-    payload.agent_id = req.session.agent_id;
-    payload.username = req.session.username;
-    payload.first_name = req.session.first_name;
-    payload.last_name = req.session.last_name;
-    payload.role = req.session.role;
-    payload.email = req.session.email;
-    payload.phone = req.session.phone;
-    payload.organization = req.session.organization;
-    payload.queue_name = req.session.queue_name;
-    payload.queue2_name = req.session.queue2_name;
-    payload.extension = req.session.extension;
-    payload.layout = req.session.layout;
-    payload.lightcode = req.session.lightcode;
-    payload.asteriskPublicHostname = req.session.asteriskPublicHostname;
-    payload.stunServer = req.session.stunServer;
-    payload.wsPort = req.session.wsPort;
-    payload.signalingServerUrl = req.session.signalingServerUrl;
-    payload.queuesComplaintNumber = req.session.queuesComplaintNumber;
-    payload.extensionPassword = passphrase;
-    payload.complaint_queue_count = complaintQueueCount;
-    payload.general_queue_count = generalQueueCount;
-
-    const queueList = {
-      queue_name: payload.queue_name,
-      queue2_name: payload.queue2_name
-    };
-    const agentInfo = {
-      status: 'Away',
-      username: payload.username,
-      name: `${payload.first_name} ${payload.last_name}`,
-      extension: payload.extension,
-      queues: []
-    };
-    if (queueList.queue_name) {
-      agentInfo.queues.push({
-        queuename: queueList.queue_name
-      });
-    }
-    if (queueList.queue2_name) {
-      agentInfo.queues.push({
-        queuename: queueList.queue2_name
-      });
-    }
-    redisClient.hset(rAgentInfoMap, payload.username, JSON.stringify(agentInfo));
-    sendAgentStatusList(payload.username, 'AWAY');
-
-    const token = jwt.sign(payload, jwtKey, {
-      expiresIn: '2000'
-    });
-    res.status(200).json({
-      message: 'success',
-      token
-    });
-  } else {
-    req.session.destroy((_err) => {
-      res.redirect('');
-    });
-  }
-});
-
-/* NGINX location redirect for forcing
- * openam-agent to include NGINX path in parameters.
- *
- * @param {string} '/ACEDirect*'
- * @param {function} 'agent.shield(cookieShield)'
- * @param {function} function(req, res)
- */
-app.get(`${nginxPath}*`, agent.shield(cookieShield), (req, res) => {
-  res.redirect(nginxPath + agentPath);
-});
-
-/**
- * Handles a GET request for /Agent prior to OpenAM Cookie Shield.
- * @param {string} '/Agent'
- * @param {function} function(req, res, next)
- */
-
-app.get(agentPath, (req, res, next) => {
-  if (req.session.data) {
-    if (req.session.data.uid) {
-      return next(); // user is logged in go to next()
-    }
-  }
-  res.redirect(`.${nginxPath}${agentPath}`);
-});
-
-/**
- * Handles a GET request for /agent. Checks user has
- * a valid session and displays page.
- *
- * @param {string} '/agent'
- * @param {function} 'agent.shield(cookieShield)'
- * @param {function} function(req, res)
- */
-app.get(agentPath, agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'AD Agent') {
-    res.render('pages/agent_home');
-  } else {
-    res.redirect('./login');
-  }
-});
-
-/**
- * Handles a GET request for /login prior to OpenAM Cookie Shield.
- * @param {string} '/login'
- * @param {function} function(req, res, next)
- */
-
-app.get('/login', (req, res, next) => {
-  if (req.session.data) {
-    if (req.session.data.uid) {
-      return next(); // user is logged in go to next()
-    }
-  }
-  res.redirect(`.${nginxPath}${agentPath}`);
-});
-
-/**
- * Handles a get request for login. Creates
- * valid session for authenticated users.
- *
- * @param {string} '/login'
- * @param {function} 'agent.shield(cookieShield)'
- * @param {function} function(req, res)
- */
-app.get('/login', agent.shield(cookieShield), (req, res) => {
-  const username = req.session.data.uid;
-  getUserInfo(username, (user) => {
-    if (user.message === 'success') {
-      redisClient.hget(rStatusMap, user.data[0].username, (_err, status) => {
-        if (status !== null) {
-          res.render('pages/agent_duplicate_login', {
-            user: user.data[0].username
-          });
-        } else if (user.data[0].role === 'ACL Agent') {
-          res.redirect(complaintRedirectUrl);
-        } else if (user.data[0].role === 'Manager') {
-          logger.info('Manager');
-          req.session.id = user.data[0].agent_id;
-          req.session.role = user.data[0].role;
-          res.redirect('/ManagementPortal');
-        } else if (user.data[0].role === 'AD Agent') {
-          redisClient.hget(rTokenMap, user.data[0].extension, (err, tokenMap) => {
-            tokenMap = JSON.parse(tokenMap);
-            const d = new Date();
-            const now = d.getTime();
-            // Delete Token if its older than 24 hours
-            if (tokenMap !== null && now > (tokenMap.date + 86400000)) {
-              redisClient.hdel(rTokenMap, tokenMap.token);
-              tokenMap = {};
-            }
-            // Create new token if token didn't exist or expired
-            if (tokenMap === null || Object.keys(tokenMap).length === 0) {
-              const token = createToken();
-              tokenMap = {
-                token,
-                date: now
-              };
-              redisClient.hset(rTokenMap, user.data[0].extension, JSON.stringify(tokenMap));
-            }
-            const asteriskPublicHostname = getConfigVal('servers:asterisk_fqdn');
-            const stunServer = `${getConfigVal('servers:stun_fqdn')}:${getConfigVal('app_ports:stun')}`;
-
-            let wsPort = getConfigVal('app_ports:asterisk_ws');
-            if (wsPort !== '') {
-              wsPort = parseInt(wsPort, 10);
-            }
-
-            const extensionPassword = getConfigVal('asterisk:extensions:secret');
-
-            redisClient.hset(rTokenMap, tokenMap.token, 'AWAY');
-            // Adds user to statusMap.
-            // Tracks if user is already logged in elsewhere
-            redisClient.hset(rStatusMap, user.data[0].username, 'AWAY');
-            // setInitialLoginAsteriskConfigs(user.data[0]); moved to /agent
-            req.session.agent_id = user.data[0].agent_id;
-            req.session.username = user.data[0].username;
-            req.session.first_name = user.data[0].first_name;
-            req.session.last_name = user.data[0].last_name;
-            req.session.role = user.data[0].role;
-            req.session.email = user.data[0].email;
-            req.session.phone = user.data[0].phone;
-            req.session.organization = user.data[0].organization;
-            req.session.queue_name = user.data[0].queue_name;
-            req.session.queue2_name = user.data[0].queue2_name;
-            req.session.extension = user.data[0].extension;
-            req.session.layout = user.data[0].layout;
-            req.session.lightcode = tokenMap.token;
-            req.session.asteriskPublicHostname = asteriskPublicHostname;
-            req.session.stunServer = stunServer;
-            req.session.wsPort = wsPort;
-            req.session.signalingServerUrl = signalingServerUrl;
-            req.session.queuesComplaintNumber = queuesComplaintNumber;
-            req.session.extensionPassword = extensionPassword;
-            req.session.complaint_queue_count = complaintQueueCount;
-            req.session.general_queue_count = generalQueueCount;
-            res.redirect(`.${agentPath}`);
-          });
-        } else {
-          res.render('pages/agent_account_pending', {
-            user: user.data[0].username
-          });
-        }
-      });
-    } else {
-      res.render('pages/agent_account_pending', {
-        user: username
-      });
-    }
-  });
-});
-
-app.get('/updatelightconfigs', (req, res) => {
-  loadColorConfigs();
-  res.send('OK');
-});
-
-/**
- * Handles a GET request for /getVideoamil to retrieve the videomail file
- * @param {string} '/getVideomail'
- * @param {function} function(req, res)
- */
-app.get('/getVideomail', agent.shield(cookieShield), (req, res) => {
-  logger.debug('/getVideomail');
-  const videoId = req.query.id;
-  logger.debug(`id: ${videoId}`);
-  const agentExt = req.session.extension;
-  // Wrap in mysql query
-  dbConnection.query('SELECT video_filepath AS filepath, video_filename AS filename FROM videomail WHERE id = ?', videoId, (err, result) => {
-    if (err) {
-      logger.error(`GET VIDEOMAIL ERROR: ${err.code}`);
-    } else {
-      console.log(`|${result[0].filepath}|`);
-      if (result[0].filepath === 's3') {
-        console.log('s3 videomail');
-        const file = s3.getObject({ Bucket: getConfigVal('s3:bucketname'), Key: result[0].filename });
-
-        res.writeHead(200, {
-          'Content-Type': 'video/webm',
-          'Accept-Ranges': 'bytes'
-        });
-        const filestream = file.createReadStream();
-        filestream.pipe(res);
-      } else {
-        console.log('other videomail ');
-        const videoFile = result[0].filepath + result[0].filename;
-        try {
-          const stat = fs.statSync(videoFile);
-          // Added Accept-Ranges bytes to header so seek bar & setting
-          // video.currentTime works in Chrome without always going to time zero.
-          res.writeHead(200, {
-            'Content-Type': 'video/webm',
-            'Content-Length': stat.size,
-            'Accept-Ranges': 'bytes'
-          });
-          const readStream = fs.createReadStream(videoFile);
-          readStream.pipe(res);
-        } catch (_err) {
-          io.to(Number(agentExt)).emit('videomail-retrieval-error', videoId);
-        }
-      }
-    }
-  });
-});
-
-/**
- * Get the specific recording
- */
-app.get('/getRecording', agent.shield(cookieShield), (req, res) => {
-  console.log(`USING ${req.query.fileName}`);
-  const file = s3.getObject({ Bucket: getConfigVal('s3:bucketname'), Key: req.query.fileName });
-
-  res.attachment(req.query.fileName);
-  const filestream = file.createReadStream();
-  filestream.pipe(res);
-});
-
-// For fileshare
-// TODO Needs middleware for agent and consumer
-// Use app,get for cooki to see if auth,  If not kicked
-const multer = require('multer');
-
-const upload = multer({ dest: 'uploads/' });
-app.post('/fileUpload', upload.single('uploadfile'), (req, res) => {
-  let uploadedBy = req.session.vrs || ((req.session.role === 'AD Agent') ? req.body.vrs : false);
-
-  // sometimes the consumer doesn't have it's vrs number in req.session
-  // also sometimes the req.session doesn't update?? **** This is the issue
-  // this is rare and hard to reproduce, but this will catch it when/if it does
-  if (uploadedBy === undefined) {
-    uploadedBy = req.session.data.valid;
-  }
-
-  console.log(`Uploaded by ${uploadedBy}`);
-  console.log(`SESSION ${JSON.stringify(req.session)}`);
-
-  if (uploadedBy) {
-    console.log(`Valid agent ${uploadedBy}`);
-    const uploadMetadata = {};
-
-    if (uploadedBy === true) {
-      // this means vrs isn't in the req.session
-      // this is a weird workaround that finds the vrs
-      // by looking at the agent extension and finding the vrs associated with it
-
-      const uploadAgentExt = req.session.extension;
-
-      for (let i = 0; i < sharingAgent.length; i += 1) {
-        if (sharingAgent[i] === uploadAgentExt) {
-          uploadMetadata.vrs = sharingConsumer[i];
-          break;
-        }
-      }
-    } else {
-      uploadMetadata.vrs = uploadedBy;
-    }
-    uploadMetadata.filepath = `${__dirname}/${req.file.path}`;
-    uploadMetadata.originalFilename = req.file.originalname;
-    uploadMetadata.filename = req.file.filename;
-    // 'encoding' is deprecated — since July 2015
-    uploadMetadata.encoding = req.file.encoding;
-    uploadMetadata.mimetype = req.file.mimetype;
-    uploadMetadata.size = req.file.size;
-
-    if (getConfigVal('filesharing:virus_scan_enabled') === 'true') {
-      ClamScan.then(async (clamscan) => {
-        try {
-          console.log('scanning', uploadMetadata.filepath, 'as', require('os').userInfo().username, fs.existsSync(uploadMetadata.filepath));
-
-          // You can re-use the `clamscan` object as many times as you want
-          // const version = await clamscan.get_version();
-          // console.log(`ClamAV Version: ${version}`);
-
-          const { isInfected, file, viruses } = await clamscan.isInfected(uploadMetadata.filepath);
-          if (isInfected) {
-            console.log(`${req.file.originalname} is infected with ${viruses}!`);
-            res.status(400).send('Error scanning file i');
-          } else {
-            console.log(`${req.file.originalname} passed inspection!`);
-            request({
-              method: 'POST',
-              url: `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}/storeFileInfo`,
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: uploadMetadata,
-              json: true
-            }, (error, _response, _data) => {
-              if (error) {
-                res.status(500).send('Error');
-              } else {
-                res.status(200).send('Success');
-              }
-            });
-          }
-        } catch (err) {
-          // Handle any errors raised by the code in the try block
-          console.log('Error using Clam AV:', err);
-          res.status(400).send('Error scanning file');
-        }
-      }).catch((err) => {
-        // Handle errors that may have occurred during initialization
-        console.log('Error initializing Clam AV:', err);
-        res.status(400).send('Error scanning file');
-      });
-    } else {
-      console.log('WARNING: VIRUS SCAN IS DISABLED!');
-      request({
-        method: 'POST',
-        url: `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}/storeFileInfo`,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: uploadMetadata,
-        json: true
-      }, (error, _response, _data) => {
-        if (error) {
-          res.status(500).send('Error');
-        } else {
-          res.status(200).send('Success');
-        }
-      });
-    }
-  } else {
-    console.log('Not valid agent');
-    res.status(403).send('Unauthorized');
-  }
-});
-
-// Download
-app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
-  if (sharingAgent !== undefined && sharingConsumer !== undefined) {
-    for (let i = 0; i < sharingAgent.length; i += 1) {
-      // make sure the agent is in a call with the consumer who sent the file
-      if (req.session.extension === sharingAgent[i] || req.session.vrs === sharingConsumer[i]) {
-        console.log('In valid session');
-
-        console.log('Comparing file IDs');
-        if (fileToken[i].toString() === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
-          console.log('allowed to download');
-
-          const documentID = req.query.id;
-          let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}`;
-          url += `/storeFileInfo?documentID=${documentID}`;
-
-          request({
-            url,
-            json: true
-          }, (error, response, data) => {
-            if (error) {
-              res.status(500).send('Error');
-            } else if (data.message === 'Success') {
-              const { filepath } = data;
-              const { filename } = data;
-              const readStream = fs.createReadStream(filepath);
-              res.attachment(filename);
-              readStream.pipe(res);
-            } else {
-              res.status(500).send('Error');
-            }
-          });
-          break;
-        } else {
-          console.log('Not authorized to download this file, mismatched IDs');
-        }
-      } else {
-        console.log('Not authorized to download');
-      }
-    }
-  } else {
-    console.log('Not authorized to download');
-  }
-});
-
-app.get('/getagentstatus/:token', (req, res) => {
-  const resObj = {
-    status: 'Unknown',
-    r: 0,
-    g: 0,
-    b: 0,
-    blink: false,
-    stop: true
-  };
-
-  const { token } = req.params;
-  if (token) {
-    redisClient.hget(rTokenMap, token, (err, status) => {
-      if (err) {
-        logger.error(`ERROR - /getagentstatus: ${err}`);
-        res.status(501).send(resObj);
-      } else if (status !== null) {
-        switch (status) {
-          case 'AWAY':
-            resObj.status = status;
-            resObj.r = 255;
-            resObj.g = 165;
-            resObj.b = 0;
-            resObj.blink = false;
-            resObj.stop = false;
-            break;
-          case 'READY':
-            resObj.status = status;
-            resObj.r = 0;
-            resObj.g = 255;
-            resObj.b = 0;
-            resObj.blink = false;
-            resObj.stop = false;
-            break;
-          case 'INCOMINGCALL':
-            resObj.status = status;
-            resObj.r = 255;
-            resObj.g = 0;
-            resObj.b = 0;
-            resObj.blink = true;
-            resObj.stop = false;
-            break;
-          case 'TRANSFERRED_CALL':
-            resObj.status = status;
-            resObj.r = 255;
-            resObj.g = 255;
-            resObj.b = 255;
-            resObj.blink = true;
-            resObj.stop = false;
-            break;
-          case 'INCALL':
-            resObj.status = status;
-            resObj.r = 255;
-            resObj.g = 0;
-            resObj.b = 0;
-            resObj.blink = false;
-            resObj.stop = false;
-            break;
-          case 'WRAPUP':
-            resObj.status = status;
-            resObj.r = 0;
-            resObj.g = 0;
-            resObj.b = 255;
-            resObj.blink = false;
-            resObj.stop = false;
-            break;
-          default:
-            resObj.status = status;
-        }
-        res.send(resObj);
-      } else {
-        res.status(401).send('Invalid');
-      }
-    });
-  } else {
-    res.send(resObj);
-  }
-});
+const adRoutes = require('./app/routes');
+app.use('/', adRoutes);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -4563,4 +3703,4 @@ app.use((err, req, res, next) => {
 });
 
 // do it here, after socket is established
-loadColorConfigs();
+sendEmit('lightcode-configs', utils.loadColorConfigs());
