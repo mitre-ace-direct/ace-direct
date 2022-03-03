@@ -2,7 +2,7 @@
 const appRouter = function myFunc(app, passport, User, dbConnection, nginxParams) {
   // res.local lets you set some vars for ejs to use without having to pass them into the render.
   app.use((req, res, next) => {
-    if (req.session && req.session.isLoggedIn) {
+    if (req.session.isLoggedIn) {
       res.locals.user = req.session.user;
     }
     next();
@@ -20,7 +20,7 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginxParams
     if (!req.isAuthenticated()) {
       res.redirect('./login');
     } else {
-      res.render('404.ejs');
+      res.redirect('./profile');
     }
   });
 
@@ -74,6 +74,7 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginxParams
         // success
         req.session.isLoggedIn = true;
         req.session.user = {};
+        req.session.user.username = result[0].username;
         req.session.user.role = result[0].role;
         req.session.user.agent_id = result[0].agent_id;
         req.session.user.firstname = result[0].first_name;
