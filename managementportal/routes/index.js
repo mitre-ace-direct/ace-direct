@@ -16,7 +16,9 @@ function restrict(req, res, next) {
   }
 };
 
-
+function generateHash(password) {
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+};
 
 // NGINX path parameter
 let nginxPath = getConfigVal('nginx:mp_path');
@@ -471,7 +473,23 @@ router.post('/UpdateAgent', restrict, (req, res) => {
             logger.info(`Agent updated: ${data.message}`);
 
 
-            localStrategyOperation('updateAgent', username);
+            //localStrategyOperation('updateAgent', username);
+            // cannot update password yet (TODO)
+            let UserModel = req.userModel;
+            let query = {'local.id': agentId};
+            let addUpdate =   { 'local': {
+              email,
+              role
+              }
+            };
+            UserModel.findOneAndUpdate(query, addUpdate, {upsert: true}, function(err, doc) {
+                if (err) {
+                  logger.error(`UserModel update error: ${err}`);
+                } else {
+                  logger.info('Agent password updated in MongoDB User');
+                }
+            });            
+
 
             res.send({
               result: 'success',
