@@ -1,6 +1,7 @@
 // node modules
 let dbconn = null;
 let dbConnection = null;
+let userModel = null;
 const AsteriskManager = require('asterisk-manager');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser'); // the session is stored in a cookie, so we use this to parse it
@@ -8,6 +9,8 @@ const express = require('express');
 const fs = require('fs');
 const https = require('https');
 const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt-nodejs');
 const nconf = require('nconf');
 const request = require('request');
 const session = require('express-session');
@@ -187,6 +190,9 @@ function myCleanup() {
     console.log('Cleaning up MongoDB connection...');
     dbconn.close();
   }
+
+  // Mongoose connection
+  mongoose.connection.close();
 
   console.log('byeee.');
   console.log('');
@@ -399,6 +405,19 @@ if (mongodbUri) {
     console.log('MongoDB Connection Successful');
     dbconn = database;
     mongodb = database.db();
+
+    // monogoose connection
+    mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
+    const userSchema = mongoose.Schema({
+      local: {
+        id: String,
+        email: String,
+        password: String,
+        role: String,
+        displayName: String
+      }
+    });
+    userModel = mongoose.model('User', userSchema);
 
     // Start the application after the database connection is ready
     httpsServer.listen(port);
@@ -1975,6 +1994,7 @@ app.use('/agentassist', (req, res) => {
 
 
 app.use((req, res, next) => {
+  req.userModel = userModel;
   req.dbConnection = dbConnection;
   req.mongoConnection = mongodb
   res.locals = {
