@@ -10,9 +10,9 @@ var c = require('./constants.js')
 var config = require('./../../dat/config.json');
 
 AWS.config.update({
-    region: config.s3.region,
+    region: utils.getConfigVal(config.s3.region),
     httpOptions: {
-        agent: proxy(config.common.proxy)
+        agent: proxy(utils.getConfigVal(config.common.proxy))
     }
 });
 const s3 = new AWS.S3();
@@ -21,7 +21,7 @@ function agentRestrict(req, res, next) {
     if (req.session.isLoggedIn && req.session.user.role === "AD Agent") {
         next()
     } else {
-        res.redirect(config.nginx.fognito_path);
+        res.redirect(utils.getConfigVal(config.nginx.fognito_path));
     }
 };
 
@@ -42,7 +42,7 @@ router.get('/fcc', (req, res) => {
     res.render('pages/fcc_mockup');
 });
 
-router.get(config.nginx.consumer_route, (req, res, next) => {
+router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => {
     if (req.session.user && req.session.user.role === 'VRS') {
         res.render('pages/complaint_form');
     } else {
@@ -104,7 +104,7 @@ router.get('/token', restrict, (req, res) => {
                     vrs.data[0].startTimeUTC = res.locals.startTimeUTC; // hh:mm in UTC
                     vrs.data[0].endTimeUTC = res.locals.endTimeUTC; // hh:mm in UTC
 
-                    const token = jwt.sign(vrs.data[0], config.web_security.json_web_token.secret_key, {
+                    const token = jwt.sign(vrs.data[0], utils.getConfigVal(config.web_security.json_web_token.secret_key), {
                         expiresIn: '2000'
                     });
                     res.status(200).json({
@@ -174,7 +174,7 @@ router.get('/token', restrict, (req, res) => {
         req.redisClient.hset(c.R_AGENT_INFO_MAP, payload.username, JSON.stringify(agentInfo));
         //sendAgentStatusList(payload.username, 'AWAY');
 
-        const token = jwt.sign(payload, config.web_security.json_web_token.secret_key, {
+        const token = jwt.sign(payload, utils.getConfigVal(config.web_security.json_web_token.secret_key), {
             expiresIn: '2000'
         });
         res.status(200).json({
@@ -197,7 +197,7 @@ router.get('/token', restrict, (req, res) => {
    * @param {function} 'agent.shield(cookieShield)'
    * @param {function} function(req, res)
    */
-router.get(config.nginx.agent_route, agentRestrict, (req, res, next) => {
+router.get(utils.getConfigVal(config.nginx.agent_route), agentRestrict, (req, res, next) => {
     if (req.session.user.skipsetup) {
         next();
     } else {
@@ -229,15 +229,15 @@ router.get(config.nginx.agent_route, agentRestrict, (req, res, next) => {
                             };
                             req.redisClient.hset(c.R_TOKEN_MAP, user.data[0].extension, JSON.stringify(tokenMap));
                         }
-                        const asteriskPublicHostname = config.servers.asterisk_fqdn;
-                        const stunServer = `${config.servers.stun_fqdn}:${config.app_ports.stun}`;
+                        const asteriskPublicHostname = utils.getConfigVal(config.servers.asterisk_fqdn);
+                        const stunServer = `${utils.getConfigVal(config.servers.stun_fqdn)}:${utils.getConfigVal(config.app_ports.stun)}`;
 
-                        let wsPort = config.app_ports.asterisk_ws;
+                        let wsPort = utils.getConfigVal(config.app_ports.asterisk_ws);
                         if (wsPort !== '') {
                             wsPort = parseInt(wsPort, 10);
                         }
 
-                        const extensionPassword = config.asterisk.extensions.secret;
+                        const extensionPassword = utils.getConfigVal(config.asterisk.extensions.secret);
 
                         req.redisClient.hset(c.R_TOKEN_MAP, tokenMap.token, 'AWAY');
                         // Adds user to statusMap.
@@ -253,8 +253,8 @@ router.get(config.nginx.agent_route, agentRestrict, (req, res, next) => {
                         req.session.user.asteriskPublicHostname = asteriskPublicHostname;
                         req.session.user.stunServer = stunServer;
                         req.session.user.wsPort = wsPort;
-                        req.session.user.signalingServerUrl = `${config.signaling_server.protocol}://${config.servers.nginx_fqdn}${config.signaling_server.path}`;
-                        req.session.user.queuesComplaintNumber = config.asterisk.queues.complaint.number; //why is this needed?
+                        req.session.user.signalingServerUrl = `${utils.getConfigVal(config.signaling_server.protocol)}://${utils.getConfigVal(config.servers.nginx_fqdn)}${utils.getConfigVal(config.signaling_server.path)}`;
+                        req.session.user.queuesComplaintNumber = utils.getConfigVal(config.asterisk.queues.complaint.number); //why is this needed?
                         req.session.user.extensionPassword = extensionPassword;
                         req.session.user.complaint_queue_count = 0; // complaintQueueCount;
                         req.session.user.general_queue_count = 0; //generalQueueCount;
@@ -277,7 +277,7 @@ router.get(config.nginx.agent_route, agentRestrict, (req, res, next) => {
 * @param {string} '/agent'
 * @param {function} function(req, res)
 */
-router.get(config.nginx.agent_route, agentRestrict, (req, res) => {
+router.get(utils.getConfigVal(config.nginx.agent_route), agentRestrict, (req, res) => {
     res.render('pages/agent_home');
 });
 
@@ -297,7 +297,7 @@ router.get('/getVideomail', agentRestrict, (req, res) => {
         } else {
             console.log(`|${result[0].filepath}|`);
             if (result[0].filepath === 's3') {
-                const file = s3.getObject({ Bucket: config.s3.bucketname, Key: result[0].filename });
+                const file = s3.getObject({ Bucket: utils.getConfigVal(config.s3.bucketname), Key: result[0].filename });
 
                 res.writeHead(200, {
                     'Content-Type': 'video/webm',
@@ -331,7 +331,7 @@ router.get('/getVideomail', agentRestrict, (req, res) => {
    */
 router.get('/getRecording', agentRestrict, (req, res) => {
     console.log(`USING ${req.query.fileName}`);
-    const file = s3.getObject({ Bucket: config.s3.bucketname, Key: req.query.fileName });
+    const file = s3.getObject({ Bucket: utils.getConfigVal(config.s3.bucketname), Key: req.query.fileName });
 
     res.attachment(req.query.fileName);
     const filestream = file.createReadStream();
@@ -346,7 +346,7 @@ router.get('/getRecording', agentRestrict, (req, res) => {
 // Clam AV
 const NodeClam = require('clamscan');
 let ClamScan = null;
-if (config.filesharing.virus_scan_enabled === 'true') {
+if (utils.getConfigVal(config.filesharing.virus_scan_enabled) === 'true') {
   ClamScan = new NodeClam().init({
       remove_infected: true, // If true, removes infected files
       quarantine_infected: false, // False: Don't quarantine, Path: Moves files to this place.
@@ -420,7 +420,7 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
         uploadMetadata.mimetype = req.file.mimetype;
         uploadMetadata.size = req.file.size;
 
-        if (config.filesharing.virus_scan_enabled == 'true') {
+        if (utils.getConfigVal(config.filesharing.virus_scan_enabled) == 'true') {
             ClamScan.then(async (clamscan) => {
                 try {
                     console.log('scanning', uploadMetadata.filepath, 'as', require('os').userInfo().username, fs.existsSync(uploadMetadata.filepath));
@@ -437,7 +437,7 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
                         console.log(`${req.file.originalname} passed inspection!`);
                         request({
                             method: 'POST',
-                            url: `https://${config.servers.main_private_ip}:${config.app_ports.userver}/storeFileInfo`,
+                            url: `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.userver)}/storeFileInfo`,
                             headers: {
                                 'Content-Type': 'application/json'
                             },
@@ -465,7 +465,7 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
             console.log('WARNING: VIRUS SCAN IS DISABLED!');
             request({
                 method: 'POST',
-                url: `https://${config.servers.main_private_ip}:${config.app_ports.userver}/storeFileInfo`,
+                url: `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.userver)}/storeFileInfo`,
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -498,7 +498,7 @@ router.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
                     console.log('allowed to download');
 
                     const documentID = req.query.id;
-                    let url = `https://${config.servers.main_private_ip}:${config.app_ports.userver}`;
+                    let url = `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.userver)}`;
                     url += `/storeFileInfo?documentID=${documentID}`;
 
                     request({
@@ -621,7 +621,7 @@ router.get('/getagentstatus/:token', (req, res) => {
 router.get('/logout', (req, res) => {
     let redirectURL = './'
     if (req.session.user && req.session.user.role == "AD Agent") {
-        redirectURL = config.nginx.fognito_path
+        redirectURL = utils.getConfigVal(config.nginx.fognito_path)
     }
     req.session.destroy();
     res.redirect(req.get('referer'));
