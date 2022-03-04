@@ -9,9 +9,9 @@ const fs = require('fs');
 const https = require('https');
 const { MongoClient } = require('mongodb');
 const nconf = require('nconf');
-const openamAgent = require('@forgerock/openam-agent');
 const request = require('request');
 const session = require('express-session');
+const MongoDBStore = require('connect-mongodb-session')(session);
 const socketioJwt = require('socketio-jwt');
 const tcpp = require('tcp-ping');
 const url = require('url');
@@ -272,32 +272,8 @@ if (nginxPath.length === 0) {
   nginxPath = '/ManagementPortal';
 }
 
-const policyAgent = new openamAgent.PolicyAgent({
-  serverUrl: `https://${getConfigVal(NGINX_FQDN)}:${getConfigVal('app_ports:nginx')}/${getConfigVal('openam:path')}`,
-  privateIP: getConfigVal('servers:nginx_private_ip'),
-  errorPage() {
-    return '<html><body><h1>Access Error</h1></body></html>';
-  }
-});
-const cookieShield = new openamAgent.CookieShield({
-  getProfiles: false,
-  cdsso: false,
-  noRedirect: false,
-  passThrough: false
-});
 
 app.use(cookieParser()); // must use cookieParser before expressSession
-app.use(session({
-  secret: getConfigVal('web_security:session:secret_key'),
-  resave: getConfigVal('web_security:session:resave'),
-  rolling: getConfigVal('web_security:session:rolling'),
-  saveUninitialized: getConfigVal('web_security:session:save_uninitialized'),
-  cookie: {
-    maxAge: parseFloat(getConfigVal('web_security:session:max_age')),
-    httpOnly: getConfigVal('web_security:session:http_only'),
-    secure: getConfigVal('web_security:session:secure')
-  }
-}));
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 app.use(express.static(`${__dirname}/public`));
@@ -382,6 +358,18 @@ if (mongodbCappedCollection) {
 if (typeof mongodbFqdn !== 'undefined' && mongodbFqdn) {
   mongodbUri = `mongodb://${getConfigVal('servers:mongodb_fqdn')}:${getConfigVal('app_ports:mongodb')}/${getConfigVal('database_servers:mongodb:database_name')}${mongodbTls}`;
 }
+
+const sessionStore = new MongoDBStore({
+  uri: mongodbUri,
+  collection: 'mySessions'
+});
+
+app.use(session({
+  secret: getConfigVal('fognito:session_secret'), 
+  resave: true, 
+  saveUninitialized: true, 
+  store: sessionStore
+}));
 
 const logAMIEvents = nconf.get('database_servers:mongodb:logAMIevents');
 const logStats = nconf.get('database_servers:mongodb:logStats');
@@ -766,6 +754,11 @@ io.sockets.on('connection', (socket) => {
       });
     }
   });
+
+  socket.on('reset-all-counters', (data) => {
+  resetAllCounters();
+  mapAgents();
+  })
 
   // Socket for CDR table
   socket.on('cdrtable-get-data', (data) => {
@@ -1896,28 +1889,8 @@ function mapAgents() {
           queues
         };
         AgentMap.set(ext, usr);
-        // console.log(JSON.stringify(AgentMap,undefined,2))
       }
     });
-
-    // for (const i in data.data) {
-    //   if (data.data[i].extension) {
-    //     const ext = data.data[i].extension;
-    //     let queues = '--';
-    //     if (data.data[i].queue_name !== null) {
-    //       queues = data.data[i].queue_name;
-    //       if (data.data[i].queue2_name !== null) {
-    //         queues += `, ${data.data[i].queue2_name}`;
-    //       }
-    //     }
-    //     const usr = {
-    //       name: `${data.data[i].first_name} ${data.data[i].last_name}`,
-    //       queues
-    //     };
-    //     AgentMap.set(ext, usr);
-    //     // console.log(JSON.stringify(AgentMap,undefined,2))
-    //   }
-    // }
   });
 }
 
@@ -1980,38 +1953,6 @@ function getUserInfo(username, callback) {
   });
 }
 
-/**
- * Handles all GET request to server
- * determines if user can procede or
- * before openam cookie shield is enforced
- */
-app.use((req, res, next) => {
-  if (req.path === nginxPath || req.path === '/agentassist') {
-    next();
-  } else if (req.path === '/logout') {
-    next();
-  } else if (req.session !== null && req.session.data) {
-    if (req.session.data !== null && req.session.data.uid) {
-      if (req.session.role) {
-        return next(); // user is logged in go to next()
-      }
-
-      const username = req.session.data.uid;
-      getUserInfo(username, (user) => {
-        if (user.message === 'success') {
-          req.session.agent_id = user.data[0].agent_id;
-          req.session.role = user.data[0].role;
-          req.session.username = user.data[0].username;
-          return next();
-        }
-        return res.redirect('./');
-      });
-    }
-  } else {
-    return res.redirect(`.${nginxPath}`);
-  }
-  return null;
-});
 
 /**
  * Get Call for Agent Assistance
@@ -2032,10 +1973,10 @@ app.use('/agentassist', (req, res) => {
   }
 });
 
-// must come after above function
-// All get requests below are subjected to openam cookieShield
 
 app.use((req, res, next) => {
+  req.dbConnection = dbConnection;
+  req.mongoConnection = mongodb
   res.locals = {
     nginxPath
   };
@@ -2044,47 +1985,4 @@ app.use((req, res, next) => {
 
 app.use('/', require('./routes'));
 
-/**
- * Reset Asterisk stat counters
- * @param {type} param1 Not used
- * @param {function} 'agent.shield(cookieShield)'
- * @param {type} param2 Not used
- */
-app.get('/resetAllCounters', policyAgent.shield(cookieShield), () => {
-  logger.info('GET Call to reset counters');
-  resetAllCounters();
-  mapAgents();
-});
 
-/**
- * Handles a GET request for /getVideoamil to retrieve the videomail file
- * @param {string} '/getVideomail'
- * @param {function} function(req, res)
- */
-app.get('/getVideomail', (req, res) => {
-  console.log('/getVideomail');
-  const videoId = req.query.id;
-  const { agent } = req.query;
-  console.log(`id: ${videoId}`);
-
-  // Wrap in mysql query
-  dbConnection.query('SELECT video_filepath AS filepath, video_filename AS filename FROM videomail WHERE id = ?', videoId, (errQuery, result) => {
-    if (errQuery) {
-      console.log('GET VIDEOMAIL ERROR: ', errQuery.code);
-    } else {
-      try {
-        const videoFile = result[0].filepath + result[0].filename;
-        const stat = fs.statSync(videoFile);
-        res.writeHead(200, {
-          'Content-Type': 'video/webm',
-          'Content-Length': stat.size
-        });
-        const readStream = fs.createReadStream(videoFile);
-        readStream.pipe(res);
-      } catch (err) {
-        console.log(err);
-        io.to(agent).emit('videomail-retrieval-error', videoId);
-      }
-    }
-  });
-});
