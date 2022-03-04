@@ -60,7 +60,8 @@
     "ad_path": "customizable NGINX path for agent/consumer portals",
     "mp_path": "customizable NGINX path for management portal",
     "agent_route": "customizable route for agent portal url",
-    "consumer_route": "customizable route for consumer portal url"
+    "consumer_route": "customizable route for consumer portal url",
+    "fognito_path": "NGINX route for the fognito authentication server"
   },
   "openam": {
     "path": "OpenAM BASE NAME as specified in the OpenAM installation",
