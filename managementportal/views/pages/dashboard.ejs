@@ -420,11 +420,7 @@
 
     function resetAllCounters() {
       console.log("reset counters ####");
-      $.ajax({
-        url: '/resetAllCounters',
-        type: 'GET',
-        dataType: "json"
-      })
+      socket.emit('reset-all-counters', {});
     }
   </script>
 </body>
