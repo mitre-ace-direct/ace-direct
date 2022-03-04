@@ -60,7 +60,8 @@
     "ad_path": "/ACEDirect",
     "mp_path": "/ManagementPortal",
     "agent_route": "/agent",
-    "consumer_route": "/call"
+    "consumer_route": "/call",
+    "fognito_path": "/ace"
   },
   "openam": {
     "path": "ace",
