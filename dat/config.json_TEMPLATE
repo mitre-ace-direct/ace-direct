@@ -50,7 +50,8 @@
     "kmsshare": 3000
   },
   "fognito": {
-    "session_secret": "abc.xyz.super.secret.pwd.111"
+    "session_secret": "abc.xyz.super.secret.pwd.111",
+    "strategy": "local"
   },  
   "signaling_server": {
     "protocol": "wss",
