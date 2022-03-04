@@ -50,7 +50,8 @@
     "kmsshare": "kms-share application port, default is 3000"
   },
   "fognito": {
-    "session_secret": "secret session password for auth server"
+    "session_secret": "secret session password for auth server",
+    "strategy": "authentication strategy; default is 'local' "    
   },
   "signaling_server": {
       "protocol": "wss",
