@@ -407,7 +407,7 @@ if (mongodbUri) {
     mongodb = database.db();
 
     // monogoose connection
-    mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
+    mongoose.connect(mongodbUri, { useNewUrlParser: true, useUnifiedTopology: true });
     const userSchema = mongoose.Schema({
       local: {
         id: String,

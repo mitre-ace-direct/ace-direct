@@ -99,7 +99,7 @@ module.exports.createToken = () => {
 * @param {type} param_name of the config parameter
 * @returns {unresolved} Decoded readable string.
 */
-function getConfigVal(val) {
+module.exports.getConfigVal = (val) => {
     let decodedString = null;
     if (typeof val !== 'undefined' && val !== null) {
         // found value for paramName
