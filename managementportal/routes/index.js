@@ -349,7 +349,32 @@ router.post('/AddAgent', restrict, (req, res) => {
             });
           } else {
             logger.info(`Agent added in aserver: ${data.message}`);
-            // TODO: localStrategyOperation('addAgent', username, password);
+
+            // local strategy agent add
+            if (getConfigVal('fognito:strategy') === 'local') {
+              logger.info(`passport local strategy update: ${username}`);
+              const UserModel = req.userModel;
+              const query = { 'local.id': username };
+              const addUpdate = {
+                local: {
+                  id: username,
+                  password: generateHash(password, req.bcrypt),
+                  email,
+                  role,
+                  displayName: `${firstName} ${lastName}`
+                }
+              };
+              UserModel.findOneAndUpdate(query, addUpdate, {
+                upsert: true,
+                useFindAndModify: false
+              }, (err, _doc) => {
+                if (err) {
+                  logger.error(`UserModel add error: ${err}`);
+                } else {
+                  logger.info('Agent password add in MongoDB User');
+                }
+              });
+            }
 
             res.send({
               result: 'success',
@@ -434,6 +459,7 @@ router.post('/UpdateAgent', restrict, (req, res) => {
           } else {
             logger.info(`Agent updated: ${data.message}`);
 
+            // local authentication agent update
             if (getConfigVal('fognito:strategy') === 'local') {
               logger.info(`passport local strategy update: ${username}`);
               const { password } = req.body;
@@ -507,7 +533,7 @@ router.post('/DeleteAgent', restrict, (req, res) => {
       } else {
         logger.info(`Agent deleteed: ${data.message}`);
 
-        // TODO: localStrategyOperation('deleteAgent', username);
+        // local strategy agent delete
         if (getConfigVal('fognito:strategy') === 'local') {
           logger.info(`passport local strategy update: ${username}`);
           const UserModel = req.userModel;
