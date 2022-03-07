@@ -612,7 +612,7 @@ router.get('/getagentstatus/:token', (req, res) => {
 
 /**
  * Handles a GET request for /logout.
- * Destroys Cookies and Sessions for OpenAM and ACEDirect
+ * Destroys Cookies and Sessions for ACEDirect
  *
  * @param {string} '/logout'
  * @param {function} function(req, res)

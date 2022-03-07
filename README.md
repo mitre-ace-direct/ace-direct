@@ -387,6 +387,8 @@ The ACE Direct application servers are Node.js servers.
             insteadOf = git://
     ```
 
+1. Create initial `fognito` users. See [fognito/README.md](fognito/README.md). Use the same agent and manager usernames found in [dat/acedirectdefault.sql](dat/acedirectdefault.sql) when creating `fognito/db/data/users.csv`.
+
 ##### Build and deploy application servers
 
 1. Build the application servers:

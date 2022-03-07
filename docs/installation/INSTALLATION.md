@@ -12,9 +12,9 @@ Here are important prerequisites to complete _before_ proceeding with an ACE Dir
 
 * *Acquire domain and subdomain names*
   * Contact a domain name registrar to register the desired _domain_ and _subdomain_ names. It may take *several days* to activate the domain after registration.
-  * Domain names **must be three-level domain names**. This is a requirement by our OpenAM identity and access management server.
+  * Domain names **must be three-level domain names**.
   * Do **not** use special characters in the domain names.
-  * Here is the suggested format for the domain names: `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`. Note that `portal` is the only public facing server. The `/etc/hosts` files on all servers should have all other servers' private IP addresses.
+  * Here is the suggested format for the domain names: `acenode.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`. Note that `portal` is the only public facing server. The `/etc/hosts` files on all servers should have all other servers' private IP addresses.
 * *Create _A_ records* - Connect your IP addresses to host names with _A records_ ([link](https://www.godaddy.com/help/add-an-a-record-19238)).
 * *Update provider peering lists* - Contact video/softphone providers to update their peering lists. It could take *two weeks* to fulfill this request.
 * *Create website certificates*
@@ -24,7 +24,7 @@ Here are important prerequisites to complete _before_ proceeding with an ACE Dir
   * If the certificate is new, you may need to execute `restorecon`, for example: `restorecon -R -v cert.pem`
   * _For local testing only_, you can create self-signed certs: `openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out cert.pem`
 * *Create AWS instances for the ACE Direct servers*
-  * Acquire and provision AWS servers for: `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
+  * Acquire and provision AWS servers for: `acenode.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
   * On `acenode`, modify SE Linux: `sudo setsebool -P httpd_can_network_connect 1`. You will need to do this after any reboot of the server.
   * Set all servers to the _UTC timezone_. Use `chronyd` or `ntp` to synchronize time across all servers.
   * Servers should be CentOS, RHEL Linux, or Amazon Linux 2. Other Linux flavors _may_ work with little or no changes to these instructions. For this document, CentOS is assumed.
@@ -59,14 +59,6 @@ This is the NGINX server for ACE Direct. The server acts as a _reverse proxy_, h
 
 * Log into the `portal.domain.com` server.
 * See the [nginx/README.md](../../nginx/README.md) for installation instructions.
-
-### aceopenam
-
-The `aceopenam` server is the _identity and access management_ server, implemented with OpenAM. To install and configure `aceopenam`:
-
-* Log into the `aceopenam.domain.com` server.
-* Copy over the `iam` folder.
-* See [iam/README.md](../../iam/README.md) for detailed installation and configuration instructions.
 
 ### acesip
 
@@ -122,7 +114,6 @@ After rebooting servers, ACE Direct requires starting services in a specific ord
 * `acestun` - STUN
 * `acesip` - Asterisk and ACE Quill
 * `aceproxy` - SIP proxy
-* `aceopenam` - OpenAM
 * `portal` - NGINX
 * `acekms` - media server and `kurento-asterisk-servlet`
 * `acenode` - Node.js
@@ -148,15 +139,15 @@ After rebooting servers, ACE Direct requires starting services in a specific ord
 
 * Set the `common:debug_level` parameter in `/home/acedirect/ace-direct/dat/config.json` to *ALL* to receive all messages in the log files.
 * Check the `logs` folder in each application folder for errors or warnings: `ls /home/acedirect/ace-direct/*/logs/*.log`
-* Verify that OpenAM, Redis, MongoDB, NGINX, and MySQL are running.
-* Verify that there are no firewalls blocking internal ports (e.g., `firewalld` on OpenAM blocking access to `8443`).
+* Verify that Redis, MongoDB, NGINX, and MySQL are running.
+* Verify that there are no firewalls blocking internal ports (e.g., `firewalld` running on any app servers).
 * Does the BusyLight device respond? Try the self-test mode on the BusyLight server app.
 * Verify that the `/etc/hosts` file is configured correctly.
 * Verify that the `/etc/nginx/nginx.conf` file is configured correctly.
 * Verify that `/home/acedirect/ace-direct/dat/config.json` is configured correctly.
 * Check if `asterisk` is publicly accessible: Visit `https://ASTERISK_FQDN/ws`. The page should display `Upgrade Required`.
 * Management Portal installation - for any `lodash` errors, try installing the `lodash` library globally as root: `sudo npm install lodash -g`.
-* NGINX cannot proxy to the NODE server - when using FQDNs for ACEDirect in `/etc/nginx/nginx.conf`, the FQDNs may force traffic through a proxy. To resolve this, map the FQDN to the private IP instead using a private host zone. *Or*, simply use private IP addresses in place of FQDN in `/etc/nginx/nginx.conf` for the ACEDirect, ManagementPortal, and ace (OpenAM) paths.
+* NGINX cannot proxy to the NODE server - when using FQDNs for ACEDirect in `/etc/nginx/nginx.conf`, the FQDNs may force traffic through a proxy. To resolve this, map the FQDN to the private IP instead using a private host zone. *Or*, simply use private IP addresses in place of FQDN in `/etc/nginx/nginx.conf` for the ACEDirect, ManagementPortal, and login (`/ace`) paths.
 * Install MongoDB on RHEL - if the `installer.py` script fails to install MongoDB on RHEL, try `sudo yum install -y mongodb-org` .
 * No CDR records in the Management Portal - Make sure Asterisk is configured to have the MySQL database credentials, CDR database name, and CDR table name. Also make sure that the ODBC C library is installed on the Asterisk server; this library is normally installed by the automated installation script.
 * Consumer portal cannot reach Asterisk; ERR_CONNECTION_REFUSED - make sure Asterisk is configured to use valid certificates.
