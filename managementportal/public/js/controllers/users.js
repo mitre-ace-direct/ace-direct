@@ -94,7 +94,6 @@ $(document).ready(() => {
 
       $('#inputUsername').prop('disabled', true);
       $('#inputPassword').prop('disabled', false);
-      //$('#confirmPassword').hide();
 
       $('#btnUpdateAgent').show();
       $('.glyphicon-eye-open').css('display', 'none'); // HERE
