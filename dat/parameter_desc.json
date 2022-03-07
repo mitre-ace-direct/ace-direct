@@ -64,11 +64,6 @@
     "consumer_route": "customizable route for consumer portal url",
     "fognito_path": "NGINX route for the fognito authentication server"
   },
-  "openam": {
-    "path": "OpenAM BASE NAME as specified in the OpenAM installation",
-    "user": "OpenAM admin user name from the OpenAM installation",
-    "password": "OpenAM admin password from the OpenAM installation"
-  },
   "media_server": {
     "privacy_video_url": "file location of privacy video file on the Kurento media server"
   },
