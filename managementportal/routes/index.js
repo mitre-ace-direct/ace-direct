@@ -402,6 +402,7 @@ router.post('/AddAgent', restrict, (req, res) => {
 router.post('/UpdateAgent', restrict, (req, res) => {
   const agentId = req.body.agent_id;
   const { username } = req.body;
+  const { password } = req.body;
   const firstName = req.body.first_name;
   const lastName = req.body.last_name;
   const { email } = req.body;
@@ -412,6 +413,7 @@ router.post('/UpdateAgent', restrict, (req, res) => {
   const queue2Id = parseInt(req.body.queue2_id, 10);
 
   if (validator.isNameValid(firstName) && validator.isNameValid(lastName)
+    && validator.isPasswordComplex(password)
     && validator.isEmailValid(email) && validator.isPhoneValid(phone)) {
     getAgentInfo(username, (info) => {
       if (info.message !== 'success') {
@@ -462,7 +464,6 @@ router.post('/UpdateAgent', restrict, (req, res) => {
             // local authentication agent update
             if (getConfigVal('fognito:strategy') === 'local') {
               logger.info(`passport local strategy update: ${username}`);
-              const { password } = req.body;
               const UserModel = req.userModel;
               const query = { 'local.id': username };
               const addUpdate = {
