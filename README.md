@@ -9,22 +9,22 @@ This document describes how to install, configure, and deploy ACE Direct.
 ## Prerequisites and assumptions
 
 * The acedirect-kurento signaling server has been tested with JsSIP library version `3.5.1`. All interoperability tests have been completed with this version. **Important**: when upgrading JsSIP library version, the files in `jssip-modifications` must be ported to the next JsSIP version. Ensure that the files are compatible. Complete _diffs_ and make the same changes in the same files in the new JsSIP library version.
-* *Acquire domain names for the servers*. Domain names must be *three-level domain names* with *no special characters*: `acenode.domain.com`, `aceopenam.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
+* _Acquire domain names for the servers_. Domain names must be _three-level domain names_ with _no special characters_: `acenode.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
 * Deploy all servers as Amazon Web Services (AWS) EC2 instances. Use the _Amazon Linux 2_ operating system, unless specified otherwise. Other Linux flavors _may_ work with slight or no changes to the instructions.
 * Set all servers to the _UTC timezone_. Use `chronyd` or `ntp` to synchronize time across all servers.
 * On `acenode.domain.com`, modify SE Linux: `sudo setsebool -P httpd_can_network_connect 1`. You will need to do this after any reboot.
 * The only public facing server is `portal.domain.com`. All other servers only have private IP addresses on the same subnet.
 * Add all server names and private IP addresses to `/etc/hosts` on all servers.
-* *Create A records*. Connect your IP addresses to host names with _A records_ ([link](https://www.godaddy.com/help/add-an-a-record-19238)). Create _private A records_ for all servers. The NGINX server (`portal.domain.com`) also requires a _public A record_. Some other servers require _public A records_. See the installation instructions for those servers for more details.
-* *Update provider peering lists*. For video/softphones, contact providers to update their peering lists.
-* *Acquire website certificates*
+* _Create A records_. Connect your IP addresses to host names with _A records_ ([link](https://www.godaddy.com/help/add-an-a-record-19238)). Create _private A records_ for all servers. The NGINX server (`portal.domain.com`) also requires a _public A record_. Some other servers require _public A records_. See the installation instructions for those servers for more details.
+* _Update provider peering lists_. For video/softphones, contact providers to update their peering lists.
+* _Acquire website certificates_
   
-  * Certificates should be *wildcard* certs to allow domain name flexibility.
+  * Certificates should be _wildcard_ certs to allow domain name flexibility.
   * Name the certificates `cert.pem` and `key.pem`.
   * Place certificates in the expected folders on all the servers: `/etc/ssl/`. Certificates must have `644` permissions.
   * For new certificates, you may need to execute `restorecon`, for example: `restorecon -R -v cert.pem`
 
-* *Internet access*. An Internet connection is required to install, build, and update the ACE Direct software. This allows the build processes to download external software and other dependencies.
+* _Internet access_. An Internet connection is required to install, build, and update the ACE Direct software. This allows the build processes to download external software and other dependencies.
 
 ---
 
@@ -47,14 +47,6 @@ This is the NGINX server for ACE Direct. The server acts as a _reverse proxy_, h
 Install NGINX on `portal.domain.com`.
 
 See [./nginx/README.md](./nginx/README.md) for installation instructions. There is an installation script there.
-
----
-
-## aceopenam
-
-The `aceopenam` server is the _identity and access management_ server, implemented with _OpenAM_. To install and configure `aceopenam`:
-
-Log into the `aceopenam.domain.com` server and follow the instructions in [./iam/README.md](./iam/README.md) for detailed installation and configuration instructions. There is an installation script there.
 
 ---
 
@@ -104,13 +96,12 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 > :warning: **This installer assumes that you already installed:**: Asterisk, STUN, TURN, Kurento, and Kamailio.
 
-For convenience, the automatic installer installs all the core components, as well as _NGINX_ and _OpenAM_ on `acenode`. The recommended instance size for `acenode` is `t3a.medium`. Since NGINX is also deployed on this server, `acenode` requires a public FQDN.
+For convenience, the automatic installer installs all the core components, as well as _NGINX_ on `acenode`. The recommended instance size for `acenode` is `t3a.medium`. Since NGINX is also deployed on this server, `acenode` requires a public FQDN.
 
 The automatic installer script is [install.sh](install.sh). This script will perform the following on `acenode`:
 
 * Install prerequisites
-* Install Redis, MongoDB, MySQL, OpenAM, NGINX, and Node app servers
-* Install OpenAM and NGINX
+* Install Redis, MongoDB, MySQL, NGINX, and Node app servers
 * Populate databases
 * Deploy ACE Direct
 * Perform status checks
@@ -144,7 +135,7 @@ $  ./install.sh -u ec2-user \
 
 After executing this script, try to access the portals. See [Accessing the websites](#accessing-the-websites) .
 
-For manual installation and customization of your ACE Direct deployment, continue to [Manual installation of acenode](#manual-installation-of-acenode). For example, you can follow those instructions to deploy NGINX and OpenAM on separate servers.
+For manual installation and customization of your ACE Direct deployment, continue to [Manual installation of acenode](#manual-installation-of-acenode). For example, you can follow those instructions to deploy NGINX on a separate server.
 
 ### Manual installation of acenode
 
@@ -494,14 +485,13 @@ The enterprise service bus (esb) is an optional component. Use it to integrate w
 
 ## Accessing the websites
 
-The URLs depend on your `~/ace-direct/dat/config.json` settings, specifically `nginx:ad_path`, `nginx:mp_path`, `nginx:agent_route`, and `nginx:consumer_route`.
-
-Refer to the Agent/Manager usernames and passwords from the `aceopenam` installation to log into the Agent and Management portals.
+The URLs depend on your `~/ace-direct/dat/config.json` settings, specifically `nginx:fognito_path`, `nginx:ad_path`, `nginx:mp_path`, `nginx:agent_route`, and `nginx:consumer_route`.
 
 Default Consumer portal numbers are `111-111-1111`, `222-222-2222`, ... `999-999-9999`. However, if ITRS mode is enabled ('user_service:itrs_mode'), you will need a valid VRS phone number.
 
 The default ACE Direct URLs are:
 
+* Universal login: `https://portal.domain.com/ace`
 * Agent portal: `https://portal.domain.com/ACEDirect/agent`
 * Consumer portal: `https://portal.domain.com/ACEDirect/call`
 * Management portal: `https://portal.domain.com/ManagementPortal`
@@ -541,14 +531,14 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 
 * Set the `common:debug_level` parameter in `/home/acedirect/ace-direct/dat/config.json` to `ALL` to see all messages in the application server log files.
 * Check the `logs` folder in each application folder for errors or warnings: `~/ace-direct/*/logs/*.log`
-* Verify that all back end servers (e.g., OpenAM, Redis, MongoDB, NGINX, MySQL, Asterisk, SIP Proxy, ...) are running.
-* Verify that there are _no firewalls_ blocking internal ports (e.g., `firewalld` on OpenAM would block access to port `8443`).
+* Verify that all back end servers (e.g., Redis, MongoDB, NGINX, MySQL, Asterisk, SIP Proxy, ...) are running.
+* Verify that there are _no firewalls_ blocking internal ports (e.g., `firewalld` on `acenode.domain.com` would block access to some internal ports).
 * Does the BusyLight device respond? Try the self-test mode on the BusyLight server app.
 * Verify that the `/etc/hosts` file is configured correctly.
 * Verify that the NGINX `/etc/nginx/nginx.conf` file is configured correctly.
 * Verify that the global `~/ace-direct/dat/config.json` file is configured correctly.
 * Management Portal installation - for any `lodash` errors, try installing the `lodash` library globally as root: `sudo npm install lodash -g`.
-* NGINX cannot proxy to the NODE server - when using FQDNs for ACEDirect in `/etc/nginx/nginx.conf`, the FQDNs may force traffic through a proxy. To resolve this, map the FQDN to the private IP instead, using a private host zone. *Or*, simply use private IP addresses in place of FQDNs in `/etc/nginx/nginx.conf` for the ACEDirect, ManagementPortal, and ace (OpenAM) paths.
+* NGINX cannot proxy to the NODE server - when using FQDNs for ACEDirect in `/etc/nginx/nginx.conf`, the FQDNs may force traffic through a proxy. To resolve this, map the FQDN to the private IP instead, using a private host zone. _Or_, simply use private IP addresses in place of FQDNs in `/etc/nginx/nginx.conf` for the ACEDirect, ManagementPortal, and login (`/ace`) paths.
 * No CDR records in the Management Portal - Make sure Asterisk (`acesip.domain.com`) is configured to have the MySQL database credentials, CDR database name, and CDR table name (see `~/ace-direct/dat/config.json` for database credentials). Also make sure that the _ODBC C_ library is installed on `acesip.domain.com`; this library is normally installed by the automated installation script.
 * Consumer portal cannot reach Asterisk (`acesip.domain.com`); `ERR_CONNECTION_REFUSED` - make sure Asterisk is configured to use valid certificates.
 * Cannot connect to portals - possibly remap the elastic IPs or try running `nslookup` on the NGINX FQDN and verify its public FQDN and public IP.
@@ -559,7 +549,6 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   * `acestun` - STUN
   * `acesip` - Asterisk and ACE Quill
   * `aceproxy` - SIP proxy
-  * `aceopenam` - OpenAM
   * `portal` - NGINX
   * `acekms` - media server
   * `acenode` - Node.js
@@ -610,4 +599,3 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 ---
 
 _fin._
-
