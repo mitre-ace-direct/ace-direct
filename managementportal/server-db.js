@@ -1993,7 +1993,6 @@ app.use('/agentassist', (req, res) => {
 app.use((req, res, next) => {
   req.userModel = userModel;
   req.dbConnection = dbConnection;
-  req.mongoConnection = mongodb;
   req.bcrypt = bcrypt;
   res.locals = {
     nginxPath
