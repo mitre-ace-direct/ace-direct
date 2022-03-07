@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const request = require('request');
-const urlparse = require('url');
+const fs = require('fs');
 const logger = require('../helpers/logger');
 const { getConfigVal } = require('../helpers/utility');
 const validator = require('../utils/validator');
@@ -111,7 +111,6 @@ router.get('/videomail', restrict, (req, res) => {
 router.get('/getVideomail', restrict, (req, res) => {
   console.log('/getVideomail');
   const videoId = req.query.id;
-  const { agent } = req.query;
   console.log(`id: ${videoId}`);
 
   // Wrap in mysql query
@@ -283,7 +282,6 @@ router.get('/logout', (req, res) => {
  * @param {string} '/addAgent'
  * @param {function} function(req, res)
  *
- * TODO: need to add the agent into openAM DB
  */
 router.post('/AddAgent', restrict, (req, res) => {
   const { username } = req.body;
@@ -375,7 +373,6 @@ router.post('/AddAgent', restrict, (req, res) => {
  * @param {string} '/UpdateAgent'
  * @param {function} function(req, res)
  *
- * TODO: need to add the agent into openAM DB
  */
 router.post('/UpdateAgent', restrict, (req, res) => {
   const agentId = req.body.agent_id;
@@ -485,7 +482,6 @@ router.post('/UpdateAgent', restrict, (req, res) => {
  * @param {string} '/DeleteAgent'
  * @param {function} function(req, res)
  *
- * TODO: need to add the agent into openAM DB
  */
 router.post('/DeleteAgent', restrict, (req, res) => {
   const agentId = req.body.id;
@@ -512,6 +508,18 @@ router.post('/DeleteAgent', restrict, (req, res) => {
         logger.info(`Agent deleteed: ${data.message}`);
 
         // TODO: localStrategyOperation('deleteAgent', username);
+        if (getConfigVal('fognito:strategy') === 'local') {
+          logger.info(`passport local strategy update: ${username}`);
+          const UserModel = req.userModel;
+          const query = { 'local.id': username };
+          UserModel.deleteMany(query, (err, _doc) => {
+            if (err) {
+              logger.error(`UserModel delete error: ${err}`);
+            } else {
+              logger.info('Agent deleted in MongoDB User');
+            }
+          });
+        }
 
         res.send({
           result: 'success',
