@@ -91,7 +91,9 @@ module.exports.createToken = () => {
     });
   }
 
-
+  module.exports.getConfigVal = (val) => {
+    return getConfigVal(val)
+  }
 
 /**
 * Function to verify the config parameter name and
@@ -99,7 +101,7 @@ module.exports.createToken = () => {
 * @param {type} param_name of the config parameter
 * @returns {unresolved} Decoded readable string.
 */
-module.exports.getConfigVal = (val) => {
+function getConfigVal(val){
     let decodedString = null;
     if (typeof val !== 'undefined' && val !== null) {
         // found value for paramName
@@ -120,4 +122,5 @@ module.exports.getConfigVal = (val) => {
     console.log(decodedString.toString())
     return (decodedString.toString());
 }
+
 
