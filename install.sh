@@ -16,7 +16,6 @@ printf "\n"
 AD_USER=""
 STUN_FQDN=""
 TURN_FQDN=""
-OPENAM_FQDN=""
 MAIN_FQDN=""
 MAIN_IP=""
 NGINX_FQDN=""
@@ -27,8 +26,6 @@ KURENTO_FQDN=""
 KURENTO_IP=""
 KEY_PEM=""
 CERT_PEM=""
-OPENAM_USER=""
-OPENAM_PASS=""
 
 usage() {
   echo ""
@@ -36,21 +33,17 @@ usage() {
   echo "     $0 -u <AD home username> \\"
   echo "        -s <STUN_FQDN> \\"
   echo "        -t <TURN FQDN> \\"
-  echo "        -o <OpenAM FQDN> \\"  
   echo "        -m <Main FQDN and private IP> \\"
   echo "        -n <NGINX FQDN and private IP> \\"
   echo "        -k <Kurento FQDN and private IP> \\"
   echo "        -a <ASTERISK FQDN and private IP> \\"
   echo "        [-c <ssl cert file path>] \\"
-  echo "        [-y <ssl key file path>] \\"
-  echo "        [-p <OpenAM admin username>] \\"
-  echo "        [-q <OpenAM admin password>]"    
+  echo "        [-y <ssl key file path>]"
   echo ""
   echo "e.g."
   echo "     $0 -u ec2-user \\"
   echo "        -s acestun.domain.com \\"
   echo "        -t aceturn.domain.com \\"
-  echo "        -o portal.domain.com \\"  
   echo "        -m \"acenode.domain.com 1.0.0.1\" \\"
   echo "        -n \"portal.domain.com  1.0.0.2\" \\"
   echo "        -k \"acekms.domain.com  1.0.0.3\" \\"
@@ -61,7 +54,7 @@ usage() {
   exit 1;
 }
 
-while getopts ":u:s:t:o:m:n:k:a:c:y:p:q:" arg; do
+while getopts ":u:s:t:m:n:k:a:c:y:" arg; do
   case "${arg}" in
     u)
       AD_USER=${OPTARG}
@@ -71,15 +64,6 @@ while getopts ":u:s:t:o:m:n:k:a:c:y:p:q:" arg; do
       ;;
     t)
       TURN_FQDN=${OPTARG}
-      ;;            
-    o)
-      OPENAM_FQDN=${OPTARG}
-      ;;
-    p)
-      OPENAM_USER=${OPTARG}
-      ;;
-    q)
-      OPENAM_PASS=${OPTARG}
       ;;            
     m)
       set -f
@@ -122,7 +106,7 @@ while getopts ":u:s:t:o:m:n:k:a:c:y:p:q:" arg; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${AD_USER}" ] || [ -z "${STUN_FQDN}" ] || [ -z "${TURN_FQDN}" ] || [ -z "${OPENAM_FQDN}" ] || [ -z "${MAIN_FQDN}" ] || [ -z "${MAIN_IP}" ] || [ -z "${NGINX_FQDN}" ] || [ -z "${NGINX_IP}" ] || [ -z "${ASTERISK_FQDN}" ] || [ -z "${ASTERISK_IP}" ] || [ -z "${KURENTO_FQDN}" ] || [ -z "${KURENTO_IP}" ]; then
+if [ -z "${AD_USER}" ] || [ -z "${STUN_FQDN}" ] || [ -z "${TURN_FQDN}" ] || [ -z "${MAIN_FQDN}" ] || [ -z "${MAIN_IP}" ] || [ -z "${NGINX_FQDN}" ] || [ -z "${NGINX_IP}" ] || [ -z "${ASTERISK_FQDN}" ] || [ -z "${ASTERISK_IP}" ] || [ -z "${KURENTO_FQDN}" ] || [ -z "${KURENTO_IP}" ]; then
   usage
 fi
 IFS=$OLDIFS
@@ -131,7 +115,6 @@ printf "Your params:\n\n"
 printf "  AD USER:            ${AD_USER}\n"
 printf "  STUN_FQDN:          ${STUN_FQDN}\n"
 printf "  TURN FQDN:          ${TURN_FQDN}\n"
-printf "  OPENAM FQDN:        ${OPENAM_FQDN}\n"
 printf "  MAIN FQDN , IP:     ${MAIN_FQDN} , ${MAIN_IP}\n"
 printf "  NGINX FQDN , IP:    ${NGINX_FQDN}  , ${NGINX_IP}\n"
 printf "  KURENTO FQDN , IP:  ${KURENTO_FQDN}  , ${KURENTO_IP}\n"
@@ -144,7 +127,6 @@ printf "Node servers\n"
 printf "Redis\n"
 printf "MongoDB\n"
 printf "MySQL\n"
-printf "OpenAM\n"
 printf "NGINX\n"
 printf "\n"
 
@@ -298,40 +280,6 @@ do
 done
 printf "\n"
 
-# get OpenAM new creds
-printf "Please select a new OpenAM admin username and password...\n"
-if [ -z "${OPENAM_USER}" ]; then
-  while true
-  do
-    read -p "${Q}Enter an OpenAM Admin username: " -r
-    OPENAM_USER=${REPLY}
-    if [ ! -z "${OPENAM_USER}" ] ; then
-      break
-    fi
-    printf "\n*** ERROR OpenAM Admin userame is blank. Please try again... ***\n"
-  done
-fi
-
-if [ -z "${OPENAM_PASS}" ]; then
-  APASS1=""
-  APASS2=""
-  while true
-  do
-    read -p "${Q}Enter an OpenAM admin password: " -rs
-    APASS1=${REPLY}
-    printf "\n"
-    read -p "${Q}Please re-enter the OpenAM admin password: " -rs
-    APASS2=${REPLY}
-    printf "\n"
-    if [ "$APASS1" == "$APASS2" ] && [ ! -z "${APASS1}" ] ; then
-      OPENAM_PASS=${APASS1}
-      break
-    fi
-    printf "\n*** ERROR Passwords do not match or are empty! Please try again... ***\n"
-  done
-  printf "\n"
-fi
-
 # config file
 
 # back up config if it's there
@@ -478,18 +426,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
   # install NGINX as root
   cd ~/ace-direct/nginx
-  sudo -E ./install_nginx.sh -u ${AD_USER} -o ${OPENAM_FQDN} -a ${MAIN_FQDN}
-fi
-
-read -p "${Q}Install OpenAM (y/n)? " -n 1 -r
-printf "\n"
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  # install OpenAM as root
-  cd ~/ace-direct
-  sudo cp -R iam /root/. >/dev/null 2>&1
-  cd ~/ace-direct/iam
-  sudo -E ./install_openam.sh  -b ace  -o ${OPENAM_FQDN}  -n ${NGINX_FQDN}  -t 7.0.108 -k ${KEY_PEM} -c ${CERT_PEM} -a ${OPENAM_USER} -p ${OPENAM_PASS}
+  sudo -E ./install_nginx.sh -u ${AD_USER} -a ${MAIN_FQDN}
 fi
 
 read -p "${Q}Build ace-direct (y/n)? " -n 1 -r

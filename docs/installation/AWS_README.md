@@ -93,7 +93,6 @@ Other cloud providers (e.g., Google, IBM) have similar configuration options.
   | Kamailio SIP Proxy<sup>[1](#fn1)</sup> | t3.small
   | Kurento Media Server | t3.xlarge | Ubuntu only
   | Node.js/Redis | t3.medium
-  | OpenAM | t3.medium
   | STUN<sup>[1](#fn1)</sup> | t3.micro
   | TURN<sup>[1](#fn1)</sup> | t3.medium
   | strongSwan<sup>[1](#fn1)</sup>| t3.micro
