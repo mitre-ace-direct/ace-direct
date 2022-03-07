@@ -8,6 +8,8 @@ const validator = require('../utils/validator');
 
 const router = express.Router();
 
+const role = 'AD Agent';
+
 function restrict(req, res, next) {
   if (req.session.isLoggedIn && (req.session.user.role === 'Manager' || req.session.user.role === 'Supervisor')) {
     next()
@@ -16,7 +18,7 @@ function restrict(req, res, next) {
   }
 };
 
-function generateHash(password) {
+function generateHash(password, bcrypt) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };
 
@@ -224,7 +226,7 @@ router.get('/users', restrict, (req, res) => {
 
       // only return the info of records with role AD Agent
       res.render('pages/users', {
-        users: info.data.filter((item) => item.role === 'AD Agent')
+        users: info.data.filter((item) => item.role === role)
 
       });
     }
@@ -357,7 +359,7 @@ router.post('/AddAgent', restrict, (req, res) => {
             password,
             first_name: firstName,
             last_name: lastName,
-            role: 'AD Agent',
+            role,
             phone,
             email,
             organization,
@@ -443,7 +445,7 @@ router.post('/UpdateAgent', restrict, (req, res) => {
           agent_id: agentId,
           first_name: firstName,
           last_name: lastName,
-          role: 'AD Agent',
+          role,
           phone,
           email,
           organization,
@@ -472,17 +474,20 @@ router.post('/UpdateAgent', restrict, (req, res) => {
           } else {
             logger.info(`Agent updated: ${data.message}`);
 
-
+            let { password } = req.body;
             //localStrategyOperation('updateAgent', username);
-            // cannot update password yet (TODO)
             let UserModel = req.userModel;
-            let query = {'local.id': agentId};
+            let query = {'local.id': username};
             let addUpdate =   { 'local': {
+              id: username,
+              password: generateHash(password, req.bcrypt),
               email,
-              role
+              role,
+              displayName: `${firstName} ${lastName}`
               }
             };
-            UserModel.findOneAndUpdate(query, addUpdate, {upsert: true}, function(err, doc) {
+
+            UserModel.findOneAndUpdate(query, addUpdate, {upsert: true, useFindAndModify: false}, function(err, doc) {
                 if (err) {
                   logger.error(`UserModel update error: ${err}`);
                 } else {

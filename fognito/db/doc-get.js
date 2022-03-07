@@ -75,6 +75,7 @@ MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (e
     }
     if (res && res.length > 0) {
       console.log(JSON.stringify(res, null, 4));
+      console.log(`num recs: ${res.length}`);
     } else {
       console.log(`No documents in collection: ${coll}`);
     }
