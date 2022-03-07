@@ -12,15 +12,15 @@ const role = 'AD Agent';
 
 function restrict(req, res, next) {
   if (req.session.isLoggedIn && (req.session.user.role === 'Manager' || req.session.user.role === 'Supervisor')) {
-    next()
+    next();
   } else {
     res.redirect(getConfigVal('nginx:fognito_path'));
   }
-};
+}
 
 function generateHash(password, bcrypt) {
   return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-};
+}
 
 // NGINX path parameter
 let nginxPath = getConfigVal('nginx:mp_path');
@@ -53,7 +53,6 @@ router.get('/', restrict, (req, res) => {
 router.get('/dashboard', restrict, (req, res) => {
   res.render('pages/dashboard');
 });
-
 
 /**
  * Handles a GET request for /cdr. Checks user has
@@ -103,14 +102,13 @@ router.get('/videomail', restrict, (req, res) => {
   res.render('pages/videomail');
 });
 
-
 /**
  * Handles a GET request for /getVideoamil to retrieve the videomail file
  * @param {string} '/getVideomail'
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
- router.get('/getVideomail', restrict, (req, res) => {
+router.get('/getVideomail', restrict, (req, res) => {
   console.log('/getVideomail');
   const videoId = req.query.id;
   const { agent } = req.query;
@@ -265,7 +263,6 @@ router.get('/token', restrict, (req, res) => {
     { expiresIn: parseInt(getConfigVal('web_security:json_web_token:timeout'), 10) }
   );
   res.status(200).json({ message: 'success', token });
-
 });
 
 /**
@@ -279,40 +276,6 @@ router.get('/logout', (req, res) => {
   req.session.destroy();
   res.redirect(req.get('referer'));
 });
-
-/**
- * Contains all local strategy related operation to manage agents
- *
- * @param - none
- * @return - none
- *
- * */
-function localStrategyOperation(operation, username, password) {
-  // only update if strategy is local. 
-  if(getConfigVal('fognito:strategy')!=='local')
-    return;
-
-  logger.info(`localStrategyOperation with info: ${operation} ${username}`);
-  switch (operation) {
-    case 'addAgent':
-      logger.info('localStrategy addAgent');
-      // Ed - I tied the mongodb connection to the req object. So we can remove this function all together and just called req.mongoConnection.update.... from inside the route. 
-      //Mongo Add
-      break;
-
-    case 'updateAgent':
-      logger.info('localStrategy updateAgent');
-      //Mongo Update
-      break;
-
-    case 'deleteAgent':
-      logger.info('localStrategy deleteAgent');
-      //Mongo Delete
-      break;
-    default:
-      break;
-  }
-};
 
 /**
  * Handles a POST from front end to add an agent
@@ -388,7 +351,7 @@ router.post('/AddAgent', restrict, (req, res) => {
             });
           } else {
             logger.info(`Agent added in aserver: ${data.message}`);
-            localStrategyOperation('addAgent', username, password);
+            // TODO: localStrategyOperation('addAgent', username, password);
 
             res.send({
               result: 'success',
@@ -474,27 +437,31 @@ router.post('/UpdateAgent', restrict, (req, res) => {
           } else {
             logger.info(`Agent updated: ${data.message}`);
 
-            let { password } = req.body;
-            //localStrategyOperation('updateAgent', username);
-            let UserModel = req.userModel;
-            let query = {'local.id': username};
-            let addUpdate =   { 'local': {
-              id: username,
-              password: generateHash(password, req.bcrypt),
-              email,
-              role,
-              displayName: `${firstName} ${lastName}`
-              }
-            };
-
-            UserModel.findOneAndUpdate(query, addUpdate, {upsert: true, useFindAndModify: false}, function(err, doc) {
+            if (getConfigVal('fognito:strategy') === 'local') {
+              logger.info(`passport local strategy update: ${username}`);
+              const { password } = req.body;
+              const UserModel = req.userModel;
+              const query = { 'local.id': username };
+              const addUpdate = {
+                local: {
+                  id: username,
+                  password: generateHash(password, req.bcrypt),
+                  email,
+                  role,
+                  displayName: `${firstName} ${lastName}`
+                }
+              };
+              UserModel.findOneAndUpdate(query, addUpdate, {
+                upsert: true,
+                useFindAndModify: false
+              }, (err, _doc) => {
                 if (err) {
                   logger.error(`UserModel update error: ${err}`);
                 } else {
                   logger.info('Agent password updated in MongoDB User');
                 }
-            });            
-
+              });
+            }
 
             res.send({
               result: 'success',
@@ -544,7 +511,7 @@ router.post('/DeleteAgent', restrict, (req, res) => {
       } else {
         logger.info(`Agent deleteed: ${data.message}`);
 
-        localStrategyOperation('deleteAgent', username); 
+        // TODO: localStrategyOperation('deleteAgent', username);
 
         res.send({
           result: 'success',
