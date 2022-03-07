@@ -278,7 +278,6 @@ if (nginxPath.length === 0) {
   nginxPath = '/ManagementPortal';
 }
 
-
 app.use(cookieParser()); // must use cookieParser before expressSession
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -371,9 +370,9 @@ const sessionStore = new MongoDBStore({
 });
 
 app.use(session({
-  secret: getConfigVal('fognito:session_secret'), 
-  resave: true, 
-  saveUninitialized: true, 
+  secret: getConfigVal('fognito:session_secret'),
+  resave: true,
+  saveUninitialized: true,
   store: sessionStore
 }));
 
@@ -774,10 +773,10 @@ io.sockets.on('connection', (socket) => {
     }
   });
 
-  socket.on('reset-all-counters', (data) => {
-  resetAllCounters();
-  mapAgents();
-  })
+  socket.on('reset-all-counters', (_data) => {
+    resetAllCounters();
+    mapAgents();
+  });
 
   // Socket for CDR table
   socket.on('cdrtable-get-data', (data) => {
@@ -1972,7 +1971,6 @@ function getUserInfo(username, callback) {
   });
 }
 
-
 /**
  * Get Call for Agent Assistance
  * @param {type} param1 Extension
@@ -1992,7 +1990,6 @@ app.use('/agentassist', (req, res) => {
   }
 });
 
-
 app.use((req, res, next) => {
   req.userModel = userModel;
   req.dbConnection = dbConnection;
@@ -2005,5 +2002,3 @@ app.use((req, res, next) => {
 });
 
 app.use('/', require('./routes'));
-
-
