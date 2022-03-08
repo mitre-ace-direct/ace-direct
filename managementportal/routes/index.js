@@ -272,8 +272,9 @@ router.get('/token', restrict, (req, res) => {
  * @param {function} function(req, res)
  */
 router.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.redirect(req.get('referer'));
+  req.session.destroy(()=>{
+     res.redirect(req.get('referer'));
+  });
 });
 
 /**
