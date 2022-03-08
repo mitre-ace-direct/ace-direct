@@ -619,12 +619,13 @@ router.get('/getagentstatus/:token', (req, res) => {
  */
 
 router.get('/logout', (req, res) => {
-    let redirectURL = './'
-    if (req.session.user && req.session.user.role == "AD Agent") {
-        redirectURL = utils.getConfigVal(config.nginx.fognito_path)
-    }
-    req.session.destroy();
-    res.redirect(req.get('referer'));
+   // let redirectURL = './'
+   // if (req.session.user && req.session.user.role == "AD Agent") {
+   //     redirectURL = utils.getConfigVal(config.nginx.fognito_path)
+   // }
+    req.session.destroy(()=>{
+       res.redirect(req.get('referer'));
+    });
 });
 
 module.exports = router;
