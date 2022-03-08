@@ -64,11 +64,6 @@
     "consumer_route": "/call",
     "fognito_path": "/ace"
   },
-  "openam": {
-    "path": "ace",
-    "user": "adminUsername",
-    "password": "adminPassword"
-  },
   "media_server": {
     "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"
   },

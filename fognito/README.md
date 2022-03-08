@@ -16,12 +16,29 @@ $
 
 ## setup
 
-Creating initial users:
+### Creating initial users
+
+* This only updates the interal MongoDB database for `fognito`.
+* The `User` collection must be in sync with the ACE Direct MySQL `agent_data` table.
+  * The [app/models/users.js](app/models/user.js) contains the `local` _userSchema_. The `id` field is the foreign key into the ACE Direct MySQL `agent_data` table.
+  * The ACE Direct Management Portal maintains the MongoDB _userSchema_.
+
+Add, query, delete users:
 
 ```bash
 $  cd db
-$  vi data/users.csv  # optional
+$
+$  # add/update users info:
+$  vi data/users.csv  # or copy from data/users.csv_TEMPLATE
+$
+$  # add all users in users.csv
 $  node driver.js
+$
+$  # query users
+$  node doc-get.js users
+$
+$  # delete all users
+$  node doc-delete.js users
 $
 ```
 
@@ -40,6 +57,10 @@ $
 
 ## website
 
-The default is port `1234`:
+The default is port `9010`:
 
-[https://localhost:1234/](https://localhost:1234/)
+Local testing:
+[https://localhost:9010/](https://localhost:9010/)
+
+NGINX testing:
+[https://portal.domain.com/ace](https://portal.domain.com/ace)
