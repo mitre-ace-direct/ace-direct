@@ -14,7 +14,6 @@ Full documentation for NGINX is here: [NGINX](https://www.nginx.com).
 * This installation assumes the following servers:
 
   * NGINX: `portal.domain.com`
-  * OpenAM: `aceopenam.domain.com`
   * Application servers: `acenode.domain.com`
 
 * The default `ace-direct` repo installation is assumed.
@@ -55,7 +54,6 @@ $  ./install_nginx.sh  # to see the usage, then execute it with the correct para
 1. Copy [nginx.conf](nginx.conf) from this repo to `/etc/nginx/nginx.conf` on the NGINX server.
 1. Edit the configuration file `sudo vi /etc/nginx/nginx.conf`:
 
-* Globally replace `<OPENAM_FQDN>` with your OpenAM FQDN: `aceopenam.domain.com`
 * Globally replace `<ACE_DIRECT_FQDN>` with your application server FQDN: `acenode.domain.com`
 * Globally replace `<SOMEUSER>` with the ACE Direct user account name, e.g. `ec2-user`.
 
