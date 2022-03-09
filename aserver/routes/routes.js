@@ -1,5 +1,3 @@
-const multer = require('multer');
-
 /**
  * Define the different REST service routes in this file.
  *

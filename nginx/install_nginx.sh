@@ -1,17 +1,13 @@
 #!/bin/bash
 
-OPENAM_FQDN=""
 ACEDIRECT_FQDN=""
 ADUSER=""
 
-usage() { printf "\nusage: $0 [-u <ACE Direct user>] [-o <OpenAM FQDN>] [-a <ACE Direct FQDN>]\n\n" 1>&2; exit 1; }
-while getopts ":u:o:a:" arg; do
+usage() { printf "\nusage: $0 [-u <ACE Direct user>] [-a <ACE Direct FQDN>]\n\n" 1>&2; exit 1; }
+while getopts ":u:a:" arg; do
   case "${arg}" in
     u)
       ADUSER=${OPTARG}
-      ;;
-    o)
-      OPENAM_FQDN=${OPTARG}
       ;;
     a)
       ACEDIRECT_FQDN=${OPTARG}
@@ -23,13 +19,12 @@ while getopts ":u:o:a:" arg; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${ADUSER}" ] || [ -z "${OPENAM_FQDN}" ] || [ -z "${ACEDIRECT_FQDN}" ]; then
+if [ -z "${ADUSER}" ] || [ -z "${ACEDIRECT_FQDN}" ]; then
   usage
 fi
 
 printf "\nUsing params:\n"
 printf "ADUSER=${ADUSER}\n"
-printf "OPENAM_FQDN=${OPENAM_FQDN}\n"
 printf "ACEDIRECT_FQDN=${ACEDIRECT_FQDN}\n"
 printf "\n"
 
@@ -54,9 +49,8 @@ TMP1=/tmp/`date +%s`_${ADUSER}_file1.txt
 TMP2=/tmp/`date +%s`_${ADUSER}_file2.txt
 TMP3=/tmp/`date +%s`_${ADUSER}_file3.txt
 sudo cat /etc/nginx/nginx.conf | sed -e "s/<SOMEUSER>/${ADUSER}/g" > $TMP1
-sudo cat $TMP1 | sed -e "s/<OPENAM_FQDN>/${OPENAM_FQDN}/g" > $TMP2
-sudo cat $TMP2 | sed -e "s/<ACE_DIRECT_FQDN>/${ACEDIRECT_FQDN}/g" > $TMP3
-sudo cp $TMP3 /etc/nginx/nginx.conf
+sudo cat $TMP1 | sed -e "s/<ACE_DIRECT_FQDN>/${ACEDIRECT_FQDN}/g" > $TMP2
+sudo cp $TMP2 /etc/nginx/nginx.conf
 rm $TMP1 $TMP2 $TMP3 >/dev/null 2>&1
 
 # restart NGINX

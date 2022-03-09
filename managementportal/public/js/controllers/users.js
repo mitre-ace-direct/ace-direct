@@ -93,8 +93,7 @@ $(document).ready(() => {
       });
 
       $('#inputUsername').prop('disabled', true);
-      $('#inputPassword').prop('disabled', true);
-      $('#confirmPassword').hide();
+      $('#inputPassword').prop('disabled', false);
 
       $('#btnUpdateAgent').show();
       $('.glyphicon-eye-open').css('display', 'none'); // HERE
@@ -161,6 +160,15 @@ $(document).ready(() => {
   $('#btnUpdateAgent').on('click', (_event) => {
     $('#btnUpdateAgent').prop('disabled', true);
 
+    const pass = $('#inputPassword').val();
+    const pass2 = $('#inputPassword2').val();
+    if (pass !== pass2) {
+      $('#passwordMatchError').attr('hidden', false);
+      $('#btnUpdateAgent').prop('disabled', false);
+      return;
+    }
+    $('#passwordMatchError').attr('hidden', true);
+
     const org = $('#inputOrganization').val().trim();
     if (!org || org.length === 0) {
       $('#errorMessage').text(' Update agent');
@@ -173,6 +181,7 @@ $(document).ready(() => {
     $.post('./UpdateAgent', {
       agent_id: selectedUser,
       username: $('#inputUsername').val(),
+      password: $('#inputPassword').val(),
       first_name: $('#inputFirstname').val(),
       last_name: $('#inputLastname').val(),
       email: $('#inputEmail').val(),

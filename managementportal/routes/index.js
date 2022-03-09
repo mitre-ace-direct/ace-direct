@@ -1,24 +1,26 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const openamAgent = require('@forgerock/openam-agent');
 const request = require('request');
-const urlparse = require('url');
+const fs = require('fs');
 const logger = require('../helpers/logger');
 const { getConfigVal } = require('../helpers/utility');
 const validator = require('../utils/validator');
 
 const router = express.Router();
 
-const agent = new openamAgent.PolicyAgent({
-  serverUrl: `https://${getConfigVal('servers:nginx_fqdn')}:${getConfigVal('app_ports:nginx')}/${getConfigVal('openam:path')}`,
-  privateIP: getConfigVal('servers:nginx_private_ip'),
-  errorPage() {
-    return '<html><body><h1>Access Error</h1></body></html>';
+const role = 'AD Agent';
+
+function restrict(req, res, next) {
+  if (req.session.isLoggedIn && (req.session.user.role === 'Manager' || req.session.user.role === 'Supervisor')) {
+    next();
+  } else {
+    res.redirect(getConfigVal('nginx:fognito_path'));
   }
-});
-const cookieShield = new openamAgent.CookieShield({
-  getProfiles: false, cdsso: false, noRedirect: false, passThrough: false
-});
+}
+
+function generateHash(password, bcrypt) {
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+}
 
 // NGINX path parameter
 let nginxPath = getConfigVal('nginx:mp_path');
@@ -33,15 +35,11 @@ if (nginxPath.length === 0) {
  * display login page.
  *
  * @param {string} '/'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    res.redirect('./dashboard');
-  } else {
-    res.redirect('./Logout');
-  }
+router.get('/', restrict, (req, res) => {
+  res.redirect('./dashboard');
 });
 
 /**
@@ -49,30 +47,11 @@ router.get('/', agent.shield(cookieShield), (req, res) => {
  * a valid session and displays dashboard page.
  *
  * @param {string} '/dashboard'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/dashboard', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    res.render('pages/dashboard');
-  } else if (req.session.role !== undefined) {
-    console.log('bad role');
-    res.redirect('./Logout');
-  } else {
-    res.redirect('./');
-  }
-});
-
-/**
- * Handles a GET request for /dashboard. Checks user has
- * a valid session and displays dashboard page.
- *
- * @param {string} '/dashboard'
- * @param {function} 'agent.shield(cookieShield)'
- * @param {function} function(req, res)
- */
-router.get(nginxPath, agent.shield(cookieShield), (req, res) => {
-  res.redirect(nginxPath);
+router.get('/dashboard', restrict, (req, res) => {
+  res.render('pages/dashboard');
 });
 
 /**
@@ -80,15 +59,11 @@ router.get(nginxPath, agent.shield(cookieShield), (req, res) => {
  * a valid session and displays CDR page.
  *
  * @param {string} '/cdr'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/cdr', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    res.render('pages/cdr');
-  } else {
-    res.redirect('./');
-  }
+router.get('/cdr', restrict, (req, res) => {
+  res.render('pages/cdr');
 });
 
 /**
@@ -96,15 +71,11 @@ router.get('/cdr', agent.shield(cookieShield), (req, res) => {
  * a valid session and displays report page.
  *
  * @param {string} '/report'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/report', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    res.render('pages/report');
-  } else {
-    res.redirect('./');
-  }
+router.get('/report', restrict, (req, res) => {
+  res.render('pages/report');
 });
 
 /**
@@ -112,15 +83,11 @@ router.get('/report', agent.shield(cookieShield), (req, res) => {
  * a valid session and displays report page.
  *
  * @param {string} '/webrtcstats'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/webrtcstats', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    res.render('pages/webrtcstats');
-  } else {
-    res.redirect('./');
-  }
+router.get('/webrtcstats', restrict, (req, res) => {
+  res.render('pages/webrtcstats');
 });
 
 /**
@@ -128,15 +95,43 @@ router.get('/webrtcstats', agent.shield(cookieShield), (req, res) => {
  * a valid session and displays videomail page.
  *
  * @param {string} '/videomail'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/videomail', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    res.render('pages/videomail');
-  } else {
-    res.redirect('./');
-  }
+router.get('/videomail', restrict, (req, res) => {
+  res.render('pages/videomail');
+});
+
+/**
+ * Handles a GET request for /getVideoamil to retrieve the videomail file
+ * @param {string} '/getVideomail'
+ * @param {function} 'restrict'
+ * @param {function} function(req, res)
+ */
+router.get('/getVideomail', restrict, (req, res) => {
+  console.log('/getVideomail');
+  const videoId = req.query.id;
+  console.log(`id: ${videoId}`);
+
+  // Wrap in mysql query
+  req.dbConnection.query('SELECT video_filepath AS filepath, video_filename AS filename FROM videomail WHERE id = ?', videoId, (errQuery, result) => {
+    if (errQuery) {
+      console.log('GET VIDEOMAIL ERROR: ', errQuery.code);
+    } else {
+      try {
+        const videoFile = result[0].filepath + result[0].filename;
+        const stat = fs.statSync(videoFile);
+        res.writeHead(200, {
+          'Content-Type': 'video/webm',
+          'Content-Length': stat.size
+        });
+        const readStream = fs.createReadStream(videoFile);
+        readStream.pipe(res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  });
 });
 
 /**
@@ -144,15 +139,11 @@ router.get('/videomail', agent.shield(cookieShield), (req, res) => {
  * a valid session and displays light page.
  *
  * @param {string} '/light'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/light', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    res.render('pages/light');
-  } else {
-    res.redirect('./');
-  }
+router.get('/light', restrict, (req, res) => {
+  res.render('pages/light');
 });
 
 /**
@@ -160,15 +151,11 @@ router.get('/light', agent.shield(cookieShield), (req, res) => {
  * a valid session and displays Hours page.
  *
  * @param {string} '/hours'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/hours', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    res.render('pages/hours');
-  } else {
-    res.redirect('./');
-  }
+router.get('/hours', restrict, (req, res) => {
+  res.render('pages/hours');
 });
 
 /**
@@ -176,19 +163,13 @@ router.get('/hours', agent.shield(cookieShield), (req, res) => {
  * a valid session and displays Call Blocking page.
  *
  * @param {string} '/callblocking'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/callblocking', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    const data = [];
-
-    res.render('pages/callblocking', {
-      callblocks: data
-    });
-  } else {
-    res.redirect('./');
-  }
+router.get('/callblocking', restrict, (req, res) => {
+  res.render('pages/callblocking', {
+    callblocks: []
+  });
 });
 
 /**
@@ -230,28 +211,23 @@ function getAgentInfo(username, callback) {
  * a valid session and displays Hours page.
  *
  * @param {string} '/users'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  *
  */
-router.get('/users', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    /* TODO: retrieve the current agent list from aserver and populate 'users' */
+router.get('/users', restrict, (req, res) => {
+  /* TODO: retrieve the current agent list from aserver and populate 'users' */
+  getAgentInfo(null, (info) => {
+    if (info.message === 'success') {
+      logger.info(`Returned agent data[0]${info.data[0].username}`);
 
-    getAgentInfo(null, (info) => {
-      if (info.message === 'success') {
-        logger.info(`Returned agent data[0]${info.data[0].username}`);
+      // only return the info of records with role AD Agent
+      res.render('pages/users', {
+        users: info.data.filter((item) => item.role === role)
 
-        // only return the info of records with role AD Agent
-        res.render('pages/users', {
-          users: info.data.filter((item) => item.role === 'AD Agent')
-
-        });
-      }
-    });
-  } else {
-    res.redirect('./');
-  }
+      });
+    }
+  });
 });
 
 /**
@@ -259,20 +235,16 @@ router.get('/users', agent.shield(cookieShield), (req, res) => {
  * a valid session and displays Administration page.
  *
  * @param {string} '/admin'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/admin', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    getAgentInfo(null, (info) => {
-      if (info.message === 'success') {
-        logger.info(`Returned agent data[0]${info.data[0].username}`);
-        res.render('pages/admin');
-      }
-    });
-  } else {
-    res.redirect('./');
-  }
+router.get('/admin', restrict, (req, res) => {
+  getAgentInfo(null, (info) => {
+    if (info.message === 'success') {
+      logger.info(`Returned agent data[0]${info.data[0].username}`);
+      res.render('pages/admin');
+    }
+  });
 });
 
 /**
@@ -280,24 +252,16 @@ router.get('/admin', agent.shield(cookieShield), (req, res) => {
  * for Manager's with a valid session.
  *
  * @param {string} '/token'
- * @param {function} 'agent.shield(cookieShield)'
+ * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/token', agent.shield(cookieShield), (req, res) => {
-  if (req.session.role === 'Manager' || req.session.role === 'Supervisor') {
-    const token = jwt.sign(
-      { id: req.session.agent_id, username: req.session.username },
-      getConfigVal('web_security:json_web_token:secret_key'),
-      // Buffer.from(getConfigVal('web_security:json_web_token:secret_key'),
-      // getConfigVal('web_security:json_web_token:encoding')),
-      { expiresIn: parseInt(getConfigVal('web_security:json_web_token:timeout'), 10) }
-    );
-    res.status(200).json({ message: 'success', token });
-  } else {
-    req.session.destroy((_err) => {
-      res.redirect('./');
-    });
-  }
+router.get('/token', restrict, (req, res) => {
+  const token = jwt.sign(
+    { id: req.session.user.agent_id, username: req.session.user.username },
+    getConfigVal('web_security:json_web_token:secret_key'),
+    { expiresIn: parseInt(getConfigVal('web_security:json_web_token:timeout'), 10) }
+  );
+  res.status(200).json({ message: 'success', token });
 });
 
 /**
@@ -308,218 +272,10 @@ router.get('/token', agent.shield(cookieShield), (req, res) => {
  * @param {function} function(req, res)
  */
 router.get('/logout', (req, res) => {
-  request({
-    method: 'POST',
-    url: `https://${getConfigVal('servers:nginx_private_ip')}:${getConfigVal('app_ports:nginx')}/json/sessions/?_action-logout`,
-    headers: {
-      host: urlparse.parse(`https://${getConfigVal('servers:nginx_fqdn')}`).hostname,
-      iplanetDirectoryPro: req.session.key,
-      'Content-Type': 'application/json'
-    }
-  }, (error) => {
-    if (error) {
-      logger.error(`logout ERROR: ${error}`);
-    } else {
-      const domaintemp = getConfigVal('servers:nginx_fqdn');
-      const n1 = domaintemp.indexOf('.');
-      res.cookie('iPlanetDirectoryPro', 'cookievalue', {
-        maxAge: 0,
-        domain: domaintemp.substring(n1 + 1),
-        path: '/',
-        value: '',
-        HttpOnly: true,
-        secure: true
-      });
-      req.session.destroy((_err) => {
-        res.redirect(req.get('referer'));
-      });
-    }
+  req.session.destroy(()=>{
+     res.redirect(req.get('referer'));
   });
 });
-
-/**
- * Contains all openAM related operation to manage agents
- *
- * @param - none
- * @return - none: this function is invoked after aserver update which
- * drives the response code to front end.
- * openAM API calls do not generate response to front-end
- *
- * */
-function openAMOperation(openAMAgentInfo) {
-  logger.info(`openAMOperation with info: ${JSON.stringify(openAMAgentInfo)}`);
-
-  // Use the approach to access openam from inside the organization network
-  const urlPrefix = `https://${getConfigVal('servers:nginx_private_ip')}:${getConfigVal('app_ports:nginx')}/${getConfigVal('openam:path')}`;
-
-  const openAmLoginSuccess = new Promise(
-    (resolve, reject) => {
-      // authenticate first
-      const url = `${urlPrefix}/json/authenticate`;
-
-      logger.debug(`openam url: ${url}`);
-      request.post({
-        url,
-        json: true,
-        headers: {
-          'X-OpenAM-Username': getConfigVal('openam:user'),
-          'X-OpenAM-Password': getConfigVal('openam:password'),
-          'Content-Type': 'application/json',
-          host: urlparse.parse(`https://${getConfigVal('servers:nginx_fqdn')}`).hostname
-        }
-      }, (error, response, data) => {
-        if (error) {
-          logger.error(`openAM ERROR: ${error}`);
-          reject(new Error('openAM login failed'));
-        } else {
-          logger.info('openAM no error');
-          logger.debug(`openam call data: ${JSON.stringify(data)}`);
-          logger.debug(`openam call response: ${JSON.stringify(response)}`);
-          const openamToken = data.tokenId;
-          logger.info(`openam logged in successfully with tokenid: ${openamToken}`);
-          resolve(openamToken); // resolve Promise with token
-        }
-      });
-    }
-  );
-
-  const openAmChange = function OpenAmChange(succTokenId) {
-    return new Promise(
-      (resolve, _reject) => {
-        let url = '';
-        switch (openAMAgentInfo.operation) {
-          case 'addAgent':
-            logger.info('openam addAgent');
-            url = `${urlPrefix}/json/users/?_action=create`;
-            request.post({
-              url,
-              json: true,
-              headers: {
-                iplanetDirectoryPro: succTokenId,
-                'Content-Type': 'application/json',
-                host: urlparse.parse(`https://${getConfigVal('servers:nginx_fqdn')}`).hostname
-              },
-              body: {
-                username: openAMAgentInfo.username,
-                userpassword: openAMAgentInfo.password,
-                mail: [openAMAgentInfo.email],
-                givenName: [openAMAgentInfo.first_name],
-                sn: [openAMAgentInfo.last_name],
-                cn: [`${openAMAgentInfo.first_name} ${openAMAgentInfo.last_name}`],
-                assignedDashboard: ['Google', 'AgentPortal', 'TicketCenter']
-              }
-            }, (error, response, data) => {
-              if (error) {
-                logger.error(`openAM ERROR addAgent: ${error}`);
-                // even when the operation fails, pass token to proceed to openam logout
-                resolve(succTokenId);
-              } else {
-                logger.debug(`openam call data: ${JSON.stringify(data)}`);
-                logger.debug(`openam call response: ${JSON.stringify(response)}`);
-                logger.info(`openam addAgent success username: ${openAMAgentInfo.username}`);
-                resolve(succTokenId);
-              }
-            });
-
-            break;
-
-          case 'updateAgent':
-            logger.info('openam updateAgent');
-            url = `${urlPrefix}/json/users/${openAMAgentInfo.username}`;
-            request.put({
-              url,
-              json: true,
-              headers: {
-                iplanetDirectoryPro: succTokenId,
-                'Content-Type': 'application/json',
-                host: urlparse.parse(`https://${getConfigVal('servers:nginx_fqdn')}`).hostname
-              },
-              body: { // username and password are not updatable for now
-                mail: [openAMAgentInfo.email],
-                givenName: [openAMAgentInfo.first_name],
-                sn: [openAMAgentInfo.last_name],
-                cn: [`${openAMAgentInfo.first_name} ${openAMAgentInfo.last_name}`]
-              }
-            }, (error, response, data) => {
-              if (error) {
-                logger.error(`openAM ERROR updateAgent: ${error}`);
-                // even when the operation fails, pass token to proceed to openam logout
-                resolve(succTokenId);
-              } else {
-                logger.debug(`openam call data: ${JSON.stringify(data)}`);
-                logger.debug(`openam call response: ${JSON.stringify(response)}`);
-                logger.info(`openam updateAgent success username: ${openAMAgentInfo.username}`);
-                resolve(succTokenId);
-              }
-            });
-
-            break;
-
-          case 'deleteAgent':
-            logger.info('opeam deleteAgent');
-
-            url = `${urlPrefix}/json/users/${openAMAgentInfo.username}`;
-            request.delete({
-              url,
-              json: true,
-              headers: {
-                iplanetDirectoryPro: succTokenId,
-                'Content-Type': 'application/json',
-                host: urlparse.parse(`https://${getConfigVal('servers:nginx_fqdn')}`).hostname
-              }
-            }, (error, response, data) => {
-              if (error) {
-                logger.error(`openAM ERROR deleteAgent: ${error}`);
-                // even when the operation fails, pass token to proceed to openam logout
-                resolve(succTokenId);
-              } else {
-                logger.debug(`openam call data: ${JSON.stringify(data)}`);
-                logger.debug(`openam call response: ${JSON.stringify(response)}`);
-                logger.info(`openam deleteAgent success username: ${openAMAgentInfo.username}`);
-                resolve(succTokenId);
-              }
-            });
-
-            break;
-          default:
-            break;
-        }
-      }
-    );
-  };
-
-  openAmLoginSuccess.then(openAmChange).then(
-    (succTokenId) => {
-      // logout openAM: this part should be hit as long as openAM login is successful
-      // openAMChange() always resolves with the token so proper openAM logout can be performed
-
-      const openamLogout = `${urlPrefix}/json/sessions/?_action=logout`;
-
-      logger.info(`openam url: ${openamLogout}`);
-      request.post({
-        url: openamLogout,
-        json: true,
-        headers: {
-          iplanetDirectoryPro: succTokenId,
-          'Content-Type': 'application/json',
-          host: urlparse.parse(`https://${getConfigVal('servers:nginx_fqdn')}`).hostname
-        }
-      }, (error, response, data) => {
-        if (error) {
-          logger.error(`openAM ERROR: ${error}`);
-        } else {
-          logger.info('openAM logout succ');
-          logger.debug(`openam call data: ${JSON.stringify(data)}`);
-          logger.debug(`openam call response: ${JSON.stringify(response)}`);
-        }
-      });
-    },
-    (error) => {
-      // should only come here if the login fails
-      logger.error(`openAM login failed: ${error}`);
-    }
-  );
-}
 
 /**
  * Handles a POST from front end to add an agent
@@ -527,9 +283,8 @@ function openAMOperation(openAMAgentInfo) {
  * @param {string} '/addAgent'
  * @param {function} function(req, res)
  *
- * TODO: need to add the agent into openAM DB
  */
-router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
+router.post('/AddAgent', restrict, (req, res) => {
   const { username } = req.body;
   const { password } = req.body;
   const firstName = req.body.first_name;
@@ -544,9 +299,9 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
   logger.debug(`Hit AddAgent with data: ${JSON.stringify(req.body)}`);
 
   if (validator.isUsernameValid(username)
-  && validator.isNameValid(firstName) && validator.isNameValid(lastName)
-  && validator.isPasswordComplex(password)
-  && validator.isEmailValid(email) && validator.isPhoneValid(phone)) {
+    && validator.isNameValid(firstName) && validator.isNameValid(lastName)
+    && validator.isPasswordComplex(password)
+    && validator.isEmailValid(email) && validator.isPhoneValid(phone)) {
     getAgentInfo(username, (info) => {
       if (info.message === 'success') {
         console.error(`User already in DB: ${username}`);
@@ -566,7 +321,7 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
             password,
             first_name: firstName,
             last_name: lastName,
-            role: 'AD Agent',
+            role,
             phone,
             email,
             organization,
@@ -596,16 +351,31 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
           } else {
             logger.info(`Agent added in aserver: ${data.message}`);
 
-            // add user and passwd into openAM
-            const openAMAgentInfo = {
-              operation: 'addAgent',
-              username,
-              password,
-              firstName,
-              lastName,
-              email
-            };
-            openAMOperation(openAMAgentInfo);
+            // local strategy agent add
+            if (getConfigVal('fognito:strategy') === 'local') {
+              logger.info(`passport local strategy update: ${username}`);
+              const UserModel = req.userModel;
+              const query = { 'local.id': username };
+              const addUpdate = {
+                local: {
+                  id: username,
+                  password: generateHash(password, req.bcrypt),
+                  email,
+                  role,
+                  displayName: `${firstName} ${lastName}`
+                }
+              };
+              UserModel.findOneAndUpdate(query, addUpdate, {
+                upsert: true,
+                useFindAndModify: false
+              }, (err, _doc) => {
+                if (err) {
+                  logger.error(`UserModel add error: ${err}`);
+                } else {
+                  logger.info('Agent password add in MongoDB User');
+                }
+              });
+            }
 
             res.send({
               result: 'success',
@@ -629,11 +399,11 @@ router.post('/AddAgent', agent.shield(cookieShield), (req, res) => {
  * @param {string} '/UpdateAgent'
  * @param {function} function(req, res)
  *
- * TODO: need to add the agent into openAM DB
  */
-router.post('/UpdateAgent', agent.shield(cookieShield), (req, res) => {
+router.post('/UpdateAgent', restrict, (req, res) => {
   const agentId = req.body.agent_id;
   const { username } = req.body;
+  const { password } = req.body;
   const firstName = req.body.first_name;
   const lastName = req.body.last_name;
   const { email } = req.body;
@@ -644,6 +414,7 @@ router.post('/UpdateAgent', agent.shield(cookieShield), (req, res) => {
   const queue2Id = parseInt(req.body.queue2_id, 10);
 
   if (validator.isNameValid(firstName) && validator.isNameValid(lastName)
+    && validator.isPasswordComplex(password)
     && validator.isEmailValid(email) && validator.isPhoneValid(phone)) {
     getAgentInfo(username, (info) => {
       if (info.message !== 'success') {
@@ -662,7 +433,7 @@ router.post('/UpdateAgent', agent.shield(cookieShield), (req, res) => {
           agent_id: agentId,
           first_name: firstName,
           last_name: lastName,
-          role: 'AD Agent',
+          role,
           phone,
           email,
           organization,
@@ -691,16 +462,31 @@ router.post('/UpdateAgent', agent.shield(cookieShield), (req, res) => {
           } else {
             logger.info(`Agent updated: ${data.message}`);
 
-            // username and password are not changeable now
-            const openAMAgentInfo = {
-              operation: 'updateAgent',
-              username,
-              password: '',
-              firstName,
-              lastName,
-              email
-            };
-            openAMOperation(openAMAgentInfo);
+            // local authentication agent update
+            if (getConfigVal('fognito:strategy') === 'local') {
+              logger.info(`passport local strategy update: ${username}`);
+              const UserModel = req.userModel;
+              const query = { 'local.id': username };
+              const addUpdate = {
+                local: {
+                  id: username,
+                  password: generateHash(password, req.bcrypt),
+                  email,
+                  role,
+                  displayName: `${firstName} ${lastName}`
+                }
+              };
+              UserModel.findOneAndUpdate(query, addUpdate, {
+                upsert: true,
+                useFindAndModify: false
+              }, (err, _doc) => {
+                if (err) {
+                  logger.error(`UserModel update error: ${err}`);
+                } else {
+                  logger.info('Agent password updated in MongoDB User');
+                }
+              });
+            }
 
             res.send({
               result: 'success',
@@ -724,9 +510,8 @@ router.post('/UpdateAgent', agent.shield(cookieShield), (req, res) => {
  * @param {string} '/DeleteAgent'
  * @param {function} function(req, res)
  *
- * TODO: need to add the agent into openAM DB
  */
-router.post('/DeleteAgent', agent.shield(cookieShield), (req, res) => {
+router.post('/DeleteAgent', restrict, (req, res) => {
   const agentId = req.body.id;
   const { username } = req.body;
 
@@ -750,16 +535,19 @@ router.post('/DeleteAgent', agent.shield(cookieShield), (req, res) => {
       } else {
         logger.info(`Agent deleteed: ${data.message}`);
 
-        // delete the user from openAM
-        const openAMAgentInfo = {
-          operation: 'deleteAgent',
-          username,
-          password: '',
-          first_name: '',
-          last_name: '',
-          email: ''
-        };
-        openAMOperation(openAMAgentInfo);
+        // local strategy agent delete
+        if (getConfigVal('fognito:strategy') === 'local') {
+          logger.info(`passport local strategy update: ${username}`);
+          const UserModel = req.userModel;
+          const query = { 'local.id': username };
+          UserModel.deleteMany(query, (err, _doc) => {
+            if (err) {
+              logger.error(`UserModel delete error: ${err}`);
+            } else {
+              logger.info('Agent deleted in MongoDB User');
+            }
+          });
+        }
 
         res.send({
           result: 'success',
@@ -778,11 +566,11 @@ router.post('/DeleteAgent', agent.shield(cookieShield), (req, res) => {
 /**
  * Handles a GET from front end to load an agent data
  *
- * @param {string} '/DeleteAgent'
+ * @param {string} '/GetAgent'
  * @param {function} function(req, res)
  *
  */
-router.get('/GetAgent', agent.shield(cookieShield), (req, res) => {
+router.get('/GetAgent', restrict, (req, res) => {
   const { username } = req.query;
 
   logger.info(`Hit GetAgent with username: ${username}`);
