@@ -96,7 +96,7 @@ const appRouter = (app, connection, itrsMode) => {
     // verify vrs num using the ITRS service
     console.log('VERIFYING vrs num using the ITRS service...');
     const { execFile } = execObj;
-    return execFile('../scripts/itrslookup.sh',  [req.query.vrsnum, 'simple'],
+    return execFile('../scripts/itrslookup.sh', [req.query.vrsnum, 'simple'],
       (error, stdout, _stderr) => {
         if (error !== null) {
           console.log(`ERROR during itrslookup.sh; exec error: ${error}`);
@@ -111,7 +111,7 @@ const appRouter = (app, connection, itrsMode) => {
         for (let sIndex = 0; sIndex < arr.length; sIndex += 1) {
           if (arr[sIndex] === 'sipuri') {
             sIndex += 1;
-            if ( (sIndex < arr.length) && (arr[sIndex].trim().length > 0)) {
+            if ((sIndex < arr.length) && (arr[sIndex].trim().length > 0)) {
               bFound = true;
               break;
             }
