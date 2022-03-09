@@ -1,0 +1,47 @@
+{
+  "name": "fognito",
+  "version": "1.0.0",
+  "description": "An authentication server that uses Passport.js and redirects authenticated users to authorized pages.",
+  "main": "server.js",
+  "scripts": {
+    "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/dist/*'  -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -not -path './public/js/*' -print0 | xargs -0 eslint",
+    "build": "npm run clean && npm install",
+    "preinstall": "scripts/preinstall.sh",
+    "postinstall": "scripts/postinstall.sh",
+    "test": "mocha --exit",
+    "dev": "nodemon node server.js",
+    "start": "node server.js",
+    "clean:logs": "rm logs/*.log* > /dev/null 2>&1",
+    "clean": "rm -rf node_modules >/dev/null 2>&1 && rm -rf public/dist/css > /dev/null 2>&1  && rm -rf public/dist/js > /dev/null 2>&1  && rm -rf public/dist/webfonts > /dev/null 2>&1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "bcrypt-nodejs": "^0.0.3",
+    "bootstrap": "^4.6.1",
+    "connect-flash": "^0.1.1",
+    "connect-mongodb-session": "^3.1.1",
+    "cookie-parser": "^1.4.6",
+    "ejs": "^3.1.6",
+    "express": "^4.17.3",
+    "express-session": "^1.17.2",
+    "https": "^1.0.0",
+    "jquery": "^3.6.0",
+    "mongodb": "^4.3.1",
+    "mongoose": "^6.2.3",
+    "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "nconf": "^0.11.3",
+    "neat-csv": "^6.0.1",
+    "passport": "^0.5.2",
+    "passport-local": "^1.0.0",
+    "serve-favicon": "^2.5.0",
+    "supertest": "^6.2.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.10.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4"
+  }
+}

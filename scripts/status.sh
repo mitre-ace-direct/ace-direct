@@ -32,7 +32,6 @@ MAIN_FQDN=`node ./acedirect/tools/parseJson.js servers:main_fqdn ${CONFIG}`
 REDIS_FQDN=`node ./acedirect/tools/parseJson.js servers:redis_fqdn ${CONFIG}`
 NGINX_FQDN=`node ./acedirect/tools/parseJson.js servers:nginx_fqdn ${CONFIG}`
 NGINX_PRIVATE_IP=`node ./acedirect/tools/parseJson.js servers:nginx_private_ip ${CONFIG}`
-OPENAM_PATH=`node ./acedirect/tools/parseJson.js openam:path ${CONFIG}`
 MYSQL_FQDN=`node ./acedirect/tools/parseJson.js servers:mysql_fqdn ${CONFIG}`
 MYSQL_USER=`node ./acedirect/tools/parseJson.js database_servers:mysql:user ${CONFIG}`
 MYSQL_PASS=`node ./acedirect/tools/parseJson.js database_servers:mysql:password ${CONFIG}`
@@ -210,16 +209,6 @@ else
   else
     printf " ${DISK_USAGE}%%${FR} ${OK_ICON}\n"
   fi
-fi
-
-printf "${IND}openam server path ${OPENAM_PATH}..."
-OPENAM_STATUS=`curl -I  -k https://${NGINX_PRIVATE_IP}/${OPENAM_PATH}/XUI 2>/dev/null  | head -n 1|cut -d$' ' -f2`
-if [[ "$OPENAM_STATUS" != "302" ]]
-then
-  printf "  ${FG_RED}HTTP status: ${OPENAM_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
-  PASSED=false
-else
-  printf "${FR} ${OK_ICON}\n" 
 fi
 
 # Check KMS
