@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+<head>
+  <title>Customer</title>
+  <%- include('partials/includes') %>
+</head>
+<body>
+
+  <!-- show any messages that come back with authentication -->
+  <% if (message && message.length > 0) { %>
+    <div class="alert alert-danger"><%= message %></div>
+  <% } %>
+
+  <div class="brand-background-img container-fluid">
+    <!-- rows are 12 columns -->
+    <br><br>
+    <div class="row">
+      <div class="col-sm-1"></div>
+      <div class="col-sm-11"><h1 id="pageTitle"><i class="fas fa-user"></i> Customer Page</h1></div>
+    </div>
+    <br><br>
+  </div>
+</body>
+</html>

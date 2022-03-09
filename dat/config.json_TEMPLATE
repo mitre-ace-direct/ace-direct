@@ -36,6 +36,7 @@
     "aserver": 9006,
     "videomail": 9007,
     "sswebserver": 9009,
+    "fognito": 9010,
     "nginx": 443,
     "asterisk_ws": 443,
     "asterisk_ami": 5038,
@@ -48,6 +49,10 @@
     "kurento": 8443,
     "kmsshare": 3000
   },
+  "fognito": {
+    "session_secret": "abc.xyz.super.secret.pwd.111",
+    "strategy": "local"
+  },  
   "signaling_server": {
     "protocol": "wss",
     "path": "/<SOMEUSER>/acedirect-kurento/signaling"
@@ -56,12 +61,8 @@
     "ad_path": "/ACEDirect",
     "mp_path": "/ManagementPortal",
     "agent_route": "/agent",
-    "consumer_route": "/call"
-  },
-  "openam": {
-    "path": "ace",
-    "user": "adminUsername",
-    "password": "adminPassword"
+    "consumer_route": "/call",
+    "fognito_path": "/ace"
   },
   "media_server": {
     "privacy_video_url": "file:///home/ubuntu/media/videoPrivacy.webm"

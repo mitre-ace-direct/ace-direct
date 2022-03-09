@@ -91,18 +91,6 @@
                 </div>
               </div>
             </div>
-            <div id="health_openam" class="col-lg-3 col-xs-3">
-              <div class="statusColor small-box bg-yellow">
-                <div class="inner">
-                  <h3 class=''>OpenAM</h3>
-                </div>
-                <div class="icon">
-                  <i class='statusIcon fa fa-spin fa-refresh'></i>
-                </div>
-                <div class="statusText small-box-footer">Pending
-                </div>
-              </div>
-            </div>
             <div id="health_userver" class="col-lg-3 col-xs-3">
               <div class="statusColor small-box bg-yellow">
                 <div class="inner">
@@ -154,7 +142,7 @@
     $("#sidebarsystemhealth").addClass("active");
     var acedirectTimer, aserverTimer, asteriskTimer,
       cdrserverTimer, managementportalTimer, nginxTimer,
-      openamTimer, userverTimer, virtualagentTimer,
+      userverTimer, virtualagentTimer,
       zendeskTimer, socket;
 
     $.ajax({
@@ -195,10 +183,6 @@
               case 'nginx':
                 clearTimeout(nginxTimer);
                 updateResource('#health_nginx', data.result)
-                break;
-              case 'openam':
-                clearTimeout(openamTimer);
-                updateResource('#health_openam', data.result)
                 break;
               case 'userver':
                 clearTimeout(userverTimer);
@@ -242,9 +226,6 @@
       }, timeout);
       nginxTimer = setTimeout(function () {
         updateResource('#health_nginx', status)
-      }, timeout);
-      openamTimer = setTimeout(function () {
-        updateResource('#health_openam', status)
       }, timeout);
       userverTimer = setTimeout(function () {
         updateResource('#health_userver', status)
