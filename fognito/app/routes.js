@@ -133,8 +133,8 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginxParams
 
   app.get('/logout', (req, res) => {
     // req.logout();
-    req.session.destroy(()=>{
-       res.redirect('./login');
+    req.session.destroy(() => {
+      res.redirect('./login');
     });
   });
 
