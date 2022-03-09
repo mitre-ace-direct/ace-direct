@@ -225,6 +225,7 @@ class ConfManager extends Events {
       session.on('ended', (evt) => {
         if (evt.originator === 'remote') {
           clearInterval(callee._sipIntervalTimeout);
+          clearInterval(callee._keyframeInterval)
           call.leave(callerExt);
         }
       });
@@ -243,6 +244,9 @@ class ConfManager extends Events {
       });
       session.on('confirmed', (evt) => {
         callee.sendSipConfirmedMessage(evt.originator);
+	// send keyframe then one every 5 seconds
+	callee.keyframe();
+	callee._keyframeInterval = setInterval(()=>{callee.keyframe();},5000);
       });
       await call.init();
 
@@ -426,7 +430,10 @@ class ConfManager extends Events {
           }
         }, 1000);
         // end
-      });
+	// Send keyframe then send one every 5 seconds afterwards.
+	caller.keyframe()
+	caller._keyframeInterval = setInterval(()=>{caller.keyframe();},5000);
+     });
 
 
       var playing1 = false;
@@ -449,6 +456,7 @@ class ConfManager extends Events {
         call.on('finished', () => {
           this._calls.delete(calleeExt);
           clearInterval(pfuInt);
+	  clearInterval(caller._keyframeInterval)
         });
         call.handleRtpAnswer(calleeExt, evt.response.body, session);
       });
