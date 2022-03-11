@@ -180,6 +180,7 @@ app.use('/operatinghours', require('./routes/aserver.js')(express, connection, a
 app.use('/OperatingHours', require('./routes/aserver.js')(express, connection, asterisk));
 app.use('/UploadVideomail', require('./routes/aserver.js')(express, connection, asterisk));
 
+app.use('/', require('./routes/userver.js')(express, connection, itrsMode));
 app.use('/vrsverify', require('./routes/userver.js')(express, connection, itrsMode));
 app.use('/getallvrsrecs', require('./routes/userver.js')(express, connection, itrsMode));
 app.use('/getuserinfo', require('./routes/userver.js')(express, connection, itrsMode));

@@ -11,6 +11,12 @@ const execObj = require('child_process');
 const appRouter = (express, connection, itrsMode) => {
   const app = express.Router();
 
+  /*
+     * This is just for testing the connection, no APIdoc info required.
+     * GET request; e.g. https://localhost:8085/
+     */
+  app.get('/', (req, res) => res.status(200).send({ message: 'USERVER: Hello.' }));
+
   /**
 * @api {get} /vrsverify Get VRS record for a vrs number.
 * @apiName VRS Verify
