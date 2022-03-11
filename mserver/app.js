@@ -158,19 +158,19 @@ app.use(bodyParser.urlencoded({
 const staticFilePath = path.join(__dirname, '/apidoc');
 app.use(express.static(staticFilePath));
 
-app.use('/', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/agentverify', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/getallagentrecs', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/getagentrec/:username', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/getscript', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/getallscripts', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/updateProfile', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/addAgents', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/DeleteAgent', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/updateLayoutConfig', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/operatinghours', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/OperatingHours', require('./routes/aserver.js')(app, connection, asterisk));
-app.use('/UploadVideomail', require('./routes/aserver.js')(app, connection, asterisk));
+app.use('/', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/agentverify', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/getallagentrecs', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/getagentrec/:username', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/getscript', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/getallscripts', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/updateProfile', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/addAgents', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/DeleteAgent', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/updateLayoutConfig', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/operatinghours', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/OperatingHours', require('./routes/aserver.js')(express, connection, asterisk));
+app.use('/UploadVideomail', require('./routes/aserver.js')(express, connection, asterisk));
 
 const credentials = {
   key: fs.readFileSync(getConfigVal('common:https:private_key')),
