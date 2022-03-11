@@ -2,6 +2,7 @@ const https = require('https');
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const clear = require('clear'); /* new */
 const mysql = require('mysql');
 const AsteriskManager = require('asterisk-manager');
 const log4js = require('log4js');
@@ -114,6 +115,8 @@ function getConfigVal(paramName) {
   return (decodedString.toString());
 }
 
+const cdrTable = getConfigVal('database_servers:mysql:cdr_table_name');
+
 // Set log4js level from the config file
 debugLevel = getConfigVal('common:debug_level');
 logger.level = debugLevel;
@@ -129,6 +132,8 @@ if (debugLevel === 'DEBUG') {
   console.log('Express debugging on!');
   app.use(morgan('dev'));
 }
+
+clear(); // clear console
 
 // Create MySQL connection and connect to it
 connection = mysql.createConnection({
@@ -168,6 +173,7 @@ app.use(bodyParser.json({ type: 'application/vnd/api+json' }));
 
 app.use('/', require('./routes/aserver.js')(connection, asterisk));
 app.use('/', require('./routes/userver.js')(connection, itrsMode));
+app.use('/', require('./routes/cdr.js')(connection, logger, cdrTable));
 
 const credentials = {
   key: fs.readFileSync(getConfigVal('common:https:private_key')),
