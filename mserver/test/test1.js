@@ -23,13 +23,19 @@ describe('loading express', () => {
     server.close();
   });
 
-  // test 1
+  // test
+  it('responds to /', (done) => {
+    request(server).get('/').expect(200, done);
+  });
+  
+  // test
   it('responds to /getallagentrecs', (done) => {
     request(server).get('/getallagentrecs').expect(200, done);
   });
 
-  // test 2
-  it('responds to /', (done) => {
-    request(server).get('/').expect(200, done);
+  // test
+  it('responds to /getallvrsrecs', (done) => {
+    request(server).get('/getallvrsrecs').expect(200, done);
   });
+  
 });

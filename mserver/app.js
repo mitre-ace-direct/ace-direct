@@ -149,6 +149,12 @@ const asterisk = new AsteriskManager(getConfigVal('app_ports:asterisk_ami').toSt
   getConfigVal('asterisk:ami:passwd'), true);
 asterisk.keepConnected();
 
+let itrsMode = getConfigVal('user_service:itrs_mode');
+if (itrsMode.length === 0) {
+  logger.error('error - user_service:itrs_mode param is missing; defaulting to false');
+  itrsMode = 'false';
+}
+
 // Start the server
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -157,6 +163,8 @@ app.use(bodyParser.urlencoded({
 
 const staticFilePath = path.join(__dirname, '/apidoc');
 app.use(express.static(staticFilePath));
+
+app.use(bodyParser.json({ type: 'application/vnd/api+json' }));
 
 app.use('/', require('./routes/aserver.js')(express, connection, asterisk));
 app.use('/agentverify', require('./routes/aserver.js')(express, connection, asterisk));
@@ -171,6 +179,12 @@ app.use('/updateLayoutConfig', require('./routes/aserver.js')(express, connectio
 app.use('/operatinghours', require('./routes/aserver.js')(express, connection, asterisk));
 app.use('/OperatingHours', require('./routes/aserver.js')(express, connection, asterisk));
 app.use('/UploadVideomail', require('./routes/aserver.js')(express, connection, asterisk));
+
+app.use('/vrsverify', require('./routes/userver.js')(express, connection, itrsMode));
+app.use('/getallvrsrecs', require('./routes/userver.js')(express, connection, itrsMode));
+app.use('/getuserinfo', require('./routes/userver.js')(express, connection, itrsMode));
+app.use('/storeFileInfo', require('./routes/userver.js')(express, connection, itrsMode));
+app.use('/fileListByVRS', require('./routes/userver.js')(express, connection, itrsMode));
 
 const credentials = {
   key: fs.readFileSync(getConfigVal('common:https:private_key')),
