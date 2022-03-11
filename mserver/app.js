@@ -14,6 +14,7 @@ const app = express();
 const cfile = '../dat/config.json';
 
 let connection = null;
+let connection2 = null; // asterisk database
 let clearText = false;
 let debugLevel = '';
 
@@ -25,10 +26,18 @@ function myCleanup() {
   console.log('***Exiting***');
 
   // DB cleanup
+
+  // clean up AD database connection
   if (connection) {
     console.log('Cleaning up DB connection...');
     connection.destroy();
   }
+
+  // clean up Asterisk database connection
+  if (connection2) {
+    console.log('Cleaning up DB connection2 (Asterisk database)...');
+    connection2.destroy();
+  }  
 
   console.log('byeee.');
   console.log('');
@@ -135,7 +144,7 @@ if (debugLevel === 'DEBUG') {
 
 clear(); // clear console
 
-// Create MySQL connection and connect to it
+// Create MySQL connection (ACE Direct database) and connect to it
 connection = mysql.createConnection({
   host: getConfigVal('servers:mysql_fqdn'),
   user: getConfigVal('database_servers:mysql:user'),
@@ -147,6 +156,20 @@ connection.connect();
 setInterval(() => {
   connection.ping();
 }, 60000);
+
+// Create MySQL connection2 (Asterisk database) and connect to it
+connection2 = mysql.createConnection({
+  host: getConfigVal('servers:mysql_fqdn'),
+  user: getConfigVal('database_servers:mysql:user'),
+  password: getConfigVal('database_servers:mysql:password'),
+  database: getConfigVal('database_servers:mysql:cdr_database_name')
+});
+connection2.connect();
+// Keeps connection2 from Inactivity Timeout
+setInterval(() => {
+  connection2.ping();
+}, 59000);
+
 
 const asterisk = new AsteriskManager(getConfigVal('app_ports:asterisk_ami').toString(),
   getConfigVal('servers:asterisk_private_ip'),
@@ -173,7 +196,7 @@ app.use(bodyParser.json({ type: 'application/vnd/api+json' }));
 
 app.use('/', require('./routes/aserver.js')(connection, asterisk));
 app.use('/', require('./routes/userver.js')(connection, itrsMode));
-app.use('/', require('./routes/cdr.js')(connection, logger, cdrTable));
+app.use('/', require('./routes/cdr.js')(connection2, logger, cdrTable));
 
 const credentials = {
   key: fs.readFileSync(getConfigVal('common:https:private_key')),
