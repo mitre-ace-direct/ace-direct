@@ -576,7 +576,7 @@ function checkConnection(hosts, callback) {
 function sendResourceStatus() {
   const hostMap = new Map();
   // list of resources to check for status
-  hostMap.set('ACR-CDR', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acr-cdr')}`);
+  hostMap.set('ACR-CDR', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:mserver')}`);
   hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:mserver')}`);
   hostMap.set('ACE Direct', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acedirect')}`);
 
@@ -780,7 +780,7 @@ io.sockets.on('connection', (socket) => {
 
   // Socket for CDR table
   socket.on('cdrtable-get-data', (data) => {
-    let urlGetAllCdrRecs = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acr-cdr')}/getallcdrrecs`;
+    let urlGetAllCdrRecs = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:mserver')}/getallcdrrecs`;
     const { format } = data;
     if (data.start && data.end) {
       urlGetAllCdrRecs += `?start=${data.start}&end=${data.end}`;
