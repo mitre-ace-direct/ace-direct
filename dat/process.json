@@ -82,6 +82,15 @@
       "out_file": "./logs/pm2-server-db.log",
       "error_file": "./logs/pm2-server-db-error.log",
       "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "name": "mserver",
+      "script": "app.js",
+      "cwd": "./mserver",
+      "restart_delay": 5000,
+      "autorestart": true,
+      "out_file": "./logs/pm2-app.log",
+      "error_file": "./logs/pm2-app-error.log"
     }
   ]
 }
