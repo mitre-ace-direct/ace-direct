@@ -186,7 +186,7 @@ app.use('/getuserinfo', require('./routes/userver.js')(express, connection, itrs
 app.use('/addVrsRec', require('./routes/userver.js')(express, connection, itrsMode));
 app.use('/updateVrsRec', require('./routes/userver.js')(express, connection, itrsMode));
 app.use('/storeFileInfo', require('./routes/userver.js')(express, connection, itrsMode));
-//GET: app.use('/storeFileInfo', require('./routes/userver.js')(express, connection, itrsMode));
+app.use('/getStoreFileInfo', require('./routes/userver.js')(express, connection, itrsMode));
 app.use('/fileListByVRS', require('./routes/userver.js')(express, connection, itrsMode));
 
 const credentials = {
