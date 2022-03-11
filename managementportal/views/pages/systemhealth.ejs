@@ -31,10 +31,10 @@
                 </div>
               </div>
             </div>
-            <div id="health_aserver" class="col-lg-3 col-xs-3">
+            <div id="health_mserver" class="col-lg-3 col-xs-3">
               <div class="statusColor small-box bg-yellow">
                 <div class="inner">
-                  <h3 class=''>AServer</h3>
+                  <h3 class=''>MServer</h3>
                 </div>
                 <div class="icon">
                   <i class='statusIcon fa fa-spin fa-refresh'></i>
@@ -91,18 +91,6 @@
                 </div>
               </div>
             </div>
-            <div id="health_userver" class="col-lg-3 col-xs-3">
-              <div class="statusColor small-box bg-yellow">
-                <div class="inner">
-                  <h3 class=''>UServer</h3>
-                </div>
-                <div class="icon">
-                  <i class='statusIcon fa fa-spin fa-refresh'></i>
-                </div>
-                <div class="statusText small-box-footer">Pending
-                </div>
-              </div>
-            </div>
             <div id="health_virtualagent" class="col-lg-3 col-xs-3">
               <div class="statusColor small-box bg-yellow">
                 <div class="inner">
@@ -140,9 +128,9 @@
 
   <script type="text/javascript">
     $("#sidebarsystemhealth").addClass("active");
-    var acedirectTimer, aserverTimer, asteriskTimer,
+    var acedirectTimer, mserverTimer, asteriskTimer,
       cdrserverTimer, managementportalTimer, nginxTimer,
-      userverTimer, virtualagentTimer,
+      virtualagentTimer,
       zendeskTimer, socket;
 
     $.ajax({
@@ -164,9 +152,9 @@
                 clearTimeout(acedirectTimer);
                 updateResource('#health_acedirect', data.result)
                 break;
-              case 'aserver':
-                clearTimeout(aserverTimer);
-                updateResource('#health_aserver', data.result)
+              case 'mserver':
+                clearTimeout(mserverTimer);
+                updateResource('#health_mserver', data.result)
                 break;
               case 'asterisk':
                 clearTimeout(asteriskTimer);
@@ -183,10 +171,6 @@
               case 'nginx':
                 clearTimeout(nginxTimer);
                 updateResource('#health_nginx', data.result)
-                break;
-              case 'userver':
-                clearTimeout(userverTimer);
-                updateResource('#health_userver', data.result)
                 break;
               case 'virtualagent':
                 clearTimeout(virtualagentTimer);
@@ -212,8 +196,8 @@
       acedirectTimer = setTimeout(function () {
         updateResource('#health_acedirect', status)
       }, timeout);
-      aserverTimer = setTimeout(function () {
-        updateResource('#health_aserver', status)
+      mserverTimer = setTimeout(function () {
+        updateResource('#health_mserver', status)
       }, timeout);
       asteriskTimer = setTimeout(function () {
         updateResource('#health_asterisk', status)
@@ -226,9 +210,6 @@
       }, timeout);
       nginxTimer = setTimeout(function () {
         updateResource('#health_nginx', status)
-      }, timeout);
-      userverTimer = setTimeout(function () {
-        updateResource('#health_userver', status)
       }, timeout);
       virtualagentTimer = setTimeout(function () {
         updateResource('#health_virtualagent', status)
