@@ -13,7 +13,7 @@ const appRouter = (express, connection, asterisk) => {
      * This is just for testing the connection, no APIdoc info required.
      * GET request; e.g. https://localhost:8085/
      */
-  app.get('/', (req, res) => res.status(200).send({ message: 'Hello.' }));
+  app.get('/', (req, res) => res.status(200).send({ message: 'ASERVER: Hello.' }));
 
 /**
      * @api {get} /AgentVerify Verify an agent by username.
