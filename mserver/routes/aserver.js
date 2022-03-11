@@ -6,7 +6,8 @@
  * @returns (undefined) Not used
  */
 
-const appRouter = (app, connection, asterisk) => {
+const appRouter = (express, connection, asterisk) => {
+  const app = express.Router();
 
 /*
      * This is just for testing the connection, no APIdoc info required.
@@ -862,6 +863,7 @@ const appRouter = (app, connection, asterisk) => {
       }
     });
   });
+  return app;
 };
 
 module.exports = appRouter;
