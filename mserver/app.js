@@ -183,7 +183,10 @@ app.use('/UploadVideomail', require('./routes/aserver.js')(express, connection, 
 app.use('/vrsverify', require('./routes/userver.js')(express, connection, itrsMode));
 app.use('/getallvrsrecs', require('./routes/userver.js')(express, connection, itrsMode));
 app.use('/getuserinfo', require('./routes/userver.js')(express, connection, itrsMode));
+app.use('/addVrsRec', require('./routes/userver.js')(express, connection, itrsMode));
+app.use('/updateVrsRec', require('./routes/userver.js')(express, connection, itrsMode));
 app.use('/storeFileInfo', require('./routes/userver.js')(express, connection, itrsMode));
+//GET: app.use('/storeFileInfo', require('./routes/userver.js')(express, connection, itrsMode));
 app.use('/fileListByVRS', require('./routes/userver.js')(express, connection, itrsMode));
 
 const credentials = {
