@@ -403,7 +403,7 @@ const appRouter = (express, connection, itrsMode) => {
     });
   });
 
-  app.get('/storeFileInfo', (req, res) => {
+  app.get('/getStoreFileInfo', (req, res) => {
     console.log(`About to return ${req.query.documentID}`);
     const query = 'SELECT original_filename, filepath FROM file_uploads WHERE pk_file_id=?;';
     const params = [req.query.documentID];
