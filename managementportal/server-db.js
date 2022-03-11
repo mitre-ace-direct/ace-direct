@@ -207,7 +207,7 @@ const COMMON_PRIVATE_IP = 'servers:main_private_ip';
 const NGINX_FQDN = 'servers:nginx_fqdn';
 const COLOR_CONFIG_JSON_PATH = '../dat/color_config.json';
 const ASTERISK_SIP_PRIVATE_IP = 'servers:asterisk_private_ip';
-const AGENT_SERVICE_PORT = 'app_ports:aserver';
+const AGENT_SERVICE_PORT = 'app_ports:mserver';
 const ACE_DIRECT_PORT = 'app_ports:acedirect';
 
 const app = express(); // create our app w/ express
@@ -577,7 +577,7 @@ function sendResourceStatus() {
   const hostMap = new Map();
   // list of resources to check for status
   hostMap.set('ACR-CDR', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acr-cdr')}`);
-  hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:userver')}`);
+  hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:mserver')}`);
   hostMap.set('ACE Direct', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acedirect')}`);
 
   hostMap.set('Zendesk', `${getConfigVal('zendesk:protocol')}://${getConfigVal('servers:zendesk_fqdn')}:${getConfigVal('app_ports:zendesk')}/api/v2`);
