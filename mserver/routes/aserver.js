@@ -6,14 +6,9 @@
  * @returns (undefined) Not used
  */
 
-const appRouter = (express, connection, asterisk) => {
+const  express = require('express');
+const appRouter = (connection, asterisk) => {
   const app = express.Router();
-
-/*
-     * This is just for testing the connection, no APIdoc info required.
-     * GET request; e.g. https://localhost:8085/
-     */
-  app.get('/', (req, res) => res.status(200).send({ message: 'ASERVER: Hello.' }));
 
 /**
      * @api {get} /AgentVerify Verify an agent by username.
