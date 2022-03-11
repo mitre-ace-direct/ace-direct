@@ -225,11 +225,28 @@ class ConfManager extends Events {
       session.on('ended', (evt) => {
         if (evt.originator === 'remote') {
           clearInterval(callee._sipIntervalTimeout);
+          clearInterval(callee._keyframeInterval)
           call.leave(callerExt);
+        }
+      });
+      var playing2 = false;
+      session.on('newInfo', evt => {
+        if (evt.originator == 'remote') {
+          const message = evt.request.body;
+          if (message.includes('picture_fast_update')) {
+            if (!playing2) {
+              playing2 = true;
+              callee.keyframe();
+              setTimeout(() => { playing2 = false }, 4000)
+            }
+          }
         }
       });
       session.on('confirmed', (evt) => {
         callee.sendSipConfirmedMessage(evt.originator);
+	// send keyframe then one every 5 seconds
+	callee.keyframe();
+	callee._keyframeInterval = setInterval(()=>{callee.keyframe();},5000);
       });
       await call.init();
 
@@ -397,13 +414,13 @@ class ConfManager extends Events {
         setTimeout(() => {
           // force pfu at start of the call
           const body = '<?xml version="1.0" encoding="utf-8" ?>'
-          + '<media_control>'
+            + '<media_control>'
             + '<vc_primitive>'
-              + '<to_encoder>'
-                + '<picture_fast_update/>'
-              + '</to_encoder>'
+            + '<to_encoder>'
+            + '<picture_fast_update/>'
+            + '</to_encoder>'
             + '</vc_primitive>'
-          + '</media_control>';
+            + '</media_control>';
 
           session.sendInfo('application/media_control+xml', body);
 
@@ -413,6 +430,24 @@ class ConfManager extends Events {
           }
         }, 1000);
         // end
+	// Send keyframe then send one every 5 seconds afterwards.
+	caller.keyframe()
+	caller._keyframeInterval = setInterval(()=>{caller.keyframe();},5000);
+     });
+
+
+      var playing1 = false;
+      session.on('newInfo', evt => {
+        if (evt.originator == 'remote') {
+          const message = evt.request.body;
+          if (message.includes('picture_fast_update')) {
+            if (!playing1) {
+              playing1 = true;
+              caller.keyframe();
+              setTimeout(() => { playing1 = false }, 4000)
+            }
+          }
+        }
       });
 
       session.on('accepted', (evt) => {
@@ -421,6 +456,7 @@ class ConfManager extends Events {
         call.on('finished', () => {
           this._calls.delete(calleeExt);
           clearInterval(pfuInt);
+	  clearInterval(caller._keyframeInterval)
         });
         call.handleRtpAnswer(calleeExt, evt.response.body, session);
       });

@@ -98,6 +98,9 @@ class ClientSession extends Events {
         case 'restartCall':
           this.restartCall(message.sdp);
           break;
+        case 'keyframe':
+          this.keyframe();
+          break;
         case 'accept':
         case 'decline':
           break;
@@ -447,6 +450,18 @@ class ClientSession extends Events {
     } else {
       this._session.disablePrivateMode(this._ext);
     }
+  }
+
+  async keyframe() {
+    debug('generate keyframe');
+    console.log('generate keyframe');
+    let success = false
+    if (this._session)
+      success = await this._session.generateKeyframe(this._ext);
+    this._send({
+      id: 'keyframe',
+      success
+    });
   }
 
   async handleSipInfo() {

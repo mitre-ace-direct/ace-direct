@@ -512,6 +512,7 @@ function toggleSelfview(duration) {
 
 var calibrating = false;
 function calibrateVideo(duration) {
+  return //disable calibrate video
   console.log('Calibrate Video');
   let mediaStream = acekurento.mediaStream();
 
@@ -998,7 +999,9 @@ function unhide_video() {
     selfStream.removeAttribute('hidden');
   }
 }
-
+function generateKeyframe(){
+  acekurento.generateKeyframe()
+}
 function enable_video_privacy() {
   if (acekurento !== null) {
     if (isMonitorInSession) {
