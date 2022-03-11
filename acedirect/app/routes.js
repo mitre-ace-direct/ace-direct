@@ -499,7 +499,7 @@ router.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
 
                     const documentID = req.query.id;
                     let url = `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.mserver)}`;
-                    url += `/storeFileInfo?documentID=${documentID}`;
+                    url += `/getStoreFileInfo?documentID=${documentID}`;
 
                     request({
                         url,
