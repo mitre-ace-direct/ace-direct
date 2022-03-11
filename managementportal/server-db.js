@@ -576,7 +576,7 @@ function checkConnection(hosts, callback) {
 function sendResourceStatus() {
   const hostMap = new Map();
   // list of resources to check for status
-  hostMap.set('ACR-CDR', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:mserver')}`);
+  hostMap.set('MSERVER', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:mserver')}`);
   hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:mserver')}`);
   hostMap.set('ACE Direct', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acedirect')}`);
 
@@ -713,7 +713,7 @@ io.sockets.on('connection', (socket) => {
     }, (err, res, hourData) => {
       const changedHourData = hourData;
       if (err) {
-        logger.error(`Aserver error: ${err}`);
+        logger.error(`Mserver error: ${err}`);
       } else {
         switch (hourData.business_mode) {
           case 0:
@@ -765,7 +765,7 @@ io.sockets.on('connection', (socket) => {
         json: true
       }, (error, response, dataOperatingHours) => {
         if (error) {
-          logger.error(`Aserver error: ${error}`);
+          logger.error(`Mserver error: ${error}`);
         } else {
           io.to(socket.id).emit('hours-of-operation-update-response', dataOperatingHours);
         }
@@ -785,7 +785,7 @@ io.sockets.on('connection', (socket) => {
     if (data.start && data.end) {
       urlGetAllCdrRecs += `?start=${data.start}&end=${data.end}`;
     }
-    // ACR-CDR getallcdrrecs RESTful call to get CDR JSON string.
+    // getallcdrrecs RESTful call to get CDR JSON string.
     console.log('CDRTABLE GET DATA');
     request({
       url: urlGetAllCdrRecs,
