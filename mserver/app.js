@@ -166,29 +166,8 @@ app.use(express.static(staticFilePath));
 
 app.use(bodyParser.json({ type: 'application/vnd/api+json' }));
 
-app.use('/', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/agentverify', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/getallagentrecs', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/getagentrec/:username', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/getscript', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/getallscripts', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/updateProfile', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/addAgents', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/DeleteAgent', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/updateLayoutConfig', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/operatinghours', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/OperatingHours', require('./routes/aserver.js')(express, connection, asterisk));
-app.use('/UploadVideomail', require('./routes/aserver.js')(express, connection, asterisk));
-
-app.use('/', require('./routes/userver.js')(express, connection, itrsMode));
-app.use('/vrsverify', require('./routes/userver.js')(express, connection, itrsMode));
-app.use('/getallvrsrecs', require('./routes/userver.js')(express, connection, itrsMode));
-app.use('/getuserinfo', require('./routes/userver.js')(express, connection, itrsMode));
-app.use('/addVrsRec', require('./routes/userver.js')(express, connection, itrsMode));
-app.use('/updateVrsRec', require('./routes/userver.js')(express, connection, itrsMode));
-app.use('/storeFileInfo', require('./routes/userver.js')(express, connection, itrsMode));
-app.use('/getStoreFileInfo', require('./routes/userver.js')(express, connection, itrsMode));
-app.use('/fileListByVRS', require('./routes/userver.js')(express, connection, itrsMode));
+app.use('/', require('./routes/aserver.js')(connection, asterisk));
+app.use('/', require('./routes/userver.js')(connection, itrsMode));
 
 const credentials = {
   key: fs.readFileSync(getConfigVal('common:https:private_key')),
