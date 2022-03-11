@@ -1,0 +1,7 @@
+{
+	"name"    		:  "MServer",
+	"version" 		:  "1.0.0",
+	"description"	:  "A RESTFul Service for returning App Data.",
+	"title"			:  "MServer API Document",
+	"url" 			:  "<hostname>"
+}
