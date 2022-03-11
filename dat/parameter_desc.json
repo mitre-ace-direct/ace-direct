@@ -31,6 +31,7 @@
     "acedirect": "local HTTPS listen port for ACE direct server; MUST MATCH value in /etc/nginx/nginx.conf on the NGINX server",
     "managementportal": "local HTTPS listen port for management portal server; MUST MATCH value in /etc/nginx/nginx.conf on the NGINX server",
     "zendesk": "local application port for fendesk (or use port from commercial Zendesk instance)",
+    "mserver": "local application port for mserver",    
     "acr-cdr": "local application port for acr-cdr server",
     "userver": "local application port for userver",
     "aserver": "local application port for aserver",
