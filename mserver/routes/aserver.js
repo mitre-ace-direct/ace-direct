@@ -6,11 +6,12 @@
  * @returns (undefined) Not used
  */
 
-const  express = require('express');
+const express = require('express');
+
 const appRouter = (connection, asterisk) => {
   const app = express.Router();
 
-/**
+  /**
      * @api {get} /AgentVerify Verify an agent by username.
      * @apiName AgentVerify
      * @apiGroup AgentVerify
