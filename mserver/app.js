@@ -37,7 +37,7 @@ function myCleanup() {
   if (connection2) {
     console.log('Cleaning up DB connection2 (Asterisk database)...');
     connection2.destroy();
-  }  
+  }
 
   console.log('byeee.');
   console.log('');
@@ -169,7 +169,6 @@ connection2.connect();
 setInterval(() => {
   connection2.ping();
 }, 59000);
-
 
 const asterisk = new AsteriskManager(getConfigVal('app_ports:asterisk_ami').toString(),
   getConfigVal('servers:asterisk_private_ip'),
