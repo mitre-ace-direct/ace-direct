@@ -1,6 +1,7 @@
 // Define the different REST service routes in this file.
 const json2csv = require('json2csv');
 const express = require('express');
+
 const appRouter = (connection, logger, cdrTable) => {
   const app = express.Router();
 
