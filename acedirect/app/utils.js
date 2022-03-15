@@ -15,7 +15,7 @@ const logger = log4js.getLogger('ad_server');
  * @returns {undefined}
  */
 module.exports.getCallerInfo = (phoneNumber, callback) => {
-    let url = `https://${getConfigVal(config.servers.main_private_ip)}:${getConfigVal(config.app_ports.userver)}`;
+    let url = `https://${getConfigVal(config.servers.main_private_ip)}:${getConfigVal(config.app_ports.mserver)}`;
     // remove the leading characters and 1 before the VRS number (if it's there)
     phoneNumber = phoneNumber.toString();
     while (phoneNumber.length > 10) {
@@ -48,7 +48,7 @@ module.exports.getCallerInfo = (phoneNumber, callback) => {
  * @returns {undefined} Not used
  */
 module.exports.getUserInfo = (username, callback) => {
-    const url = `https://${getConfigVal(config.servers.main_private_ip)}:${parseInt(getConfigVal(config.app_ports.aserver), 10)}/getagentrec/${username}`;
+    const url = `https://${getConfigVal(config.servers.main_private_ip)}:${parseInt(getConfigVal(config.app_ports.mserver), 10)}/getagentrec/${username}`;
     request({
         url,
         json: true

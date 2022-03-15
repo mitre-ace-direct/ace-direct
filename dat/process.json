@@ -37,33 +37,6 @@
       "error_file": "./logs/pm2-fognito-error.log"
     },    
     {
-      "name": "acr-cdr",
-      "script": "app.js",
-      "cwd": "./acr-cdr",
-      "restart_delay": 5000,
-      "autorestart": true,
-      "out_file": "./logs/pm2-app.log",
-      "error_file": "./logs/pm2-app-error.log"
-    },
-    {
-      "name": "aserver",
-      "script": "app.js",
-      "cwd": "./aserver",
-      "restart_delay": 5000,
-      "autorestart": true,
-      "out_file": "./logs/pm2-app.log",
-      "error_file": "./logs/pm2-app-error.log"
-    },
-    {
-      "name": "userver",
-      "script": "app.js",
-      "cwd": "./userver",
-      "restart_delay": 5000,
-      "autorestart": true,
-      "out_file": "./logs/pm2-app.log",
-      "error_file": "./logs/pm2-app-error.log"
-    },
-    {
       "name": "acedirect-kurento",
       "script": "src/index.js",
       "cwd": "./acedirect-kurento",
@@ -82,6 +55,15 @@
       "out_file": "./logs/pm2-server-db.log",
       "error_file": "./logs/pm2-server-db-error.log",
       "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "name": "mserver",
+      "script": "app.js",
+      "cwd": "./mserver",
+      "restart_delay": 5000,
+      "autorestart": true,
+      "out_file": "./logs/pm2-app.log",
+      "error_file": "./logs/pm2-app-error.log"
     }
   ]
 }

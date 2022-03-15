@@ -207,7 +207,7 @@ const COMMON_PRIVATE_IP = 'servers:main_private_ip';
 const NGINX_FQDN = 'servers:nginx_fqdn';
 const COLOR_CONFIG_JSON_PATH = '../dat/color_config.json';
 const ASTERISK_SIP_PRIVATE_IP = 'servers:asterisk_private_ip';
-const AGENT_SERVICE_PORT = 'app_ports:aserver';
+const AGENT_SERVICE_PORT = 'app_ports:mserver';
 const ACE_DIRECT_PORT = 'app_ports:acedirect';
 
 const app = express(); // create our app w/ express
@@ -576,8 +576,8 @@ function checkConnection(hosts, callback) {
 function sendResourceStatus() {
   const hostMap = new Map();
   // list of resources to check for status
-  hostMap.set('ACR-CDR', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acr-cdr')}`);
-  hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:userver')}`);
+  hostMap.set('MSERVER', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:mserver')}`);
+  hostMap.set('VRS Lookup', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:mserver')}`);
   hostMap.set('ACE Direct', `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acedirect')}`);
 
   hostMap.set('Zendesk', `${getConfigVal('zendesk:protocol')}://${getConfigVal('servers:zendesk_fqdn')}:${getConfigVal('app_ports:zendesk')}/api/v2`);
@@ -713,7 +713,7 @@ io.sockets.on('connection', (socket) => {
     }, (err, res, hourData) => {
       const changedHourData = hourData;
       if (err) {
-        logger.error(`Aserver error: ${err}`);
+        logger.error(`Mserver error: ${err}`);
       } else {
         switch (hourData.business_mode) {
           case 0:
@@ -765,7 +765,7 @@ io.sockets.on('connection', (socket) => {
         json: true
       }, (error, response, dataOperatingHours) => {
         if (error) {
-          logger.error(`Aserver error: ${error}`);
+          logger.error(`Mserver error: ${error}`);
         } else {
           io.to(socket.id).emit('hours-of-operation-update-response', dataOperatingHours);
         }
@@ -780,12 +780,12 @@ io.sockets.on('connection', (socket) => {
 
   // Socket for CDR table
   socket.on('cdrtable-get-data', (data) => {
-    let urlGetAllCdrRecs = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:acr-cdr')}/getallcdrrecs`;
+    let urlGetAllCdrRecs = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${getConfigVal('app_ports:mserver')}/getallcdrrecs`;
     const { format } = data;
     if (data.start && data.end) {
       urlGetAllCdrRecs += `?start=${data.start}&end=${data.end}`;
     }
-    // ACR-CDR getallcdrrecs RESTful call to get CDR JSON string.
+    // getallcdrrecs RESTful call to get CDR JSON string.
     console.log('CDRTABLE GET DATA');
     request({
       url: urlGetAllCdrRecs,
