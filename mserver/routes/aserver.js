@@ -1,13 +1,17 @@
 /**
- * Define the different REST service routes in this file.
+ * Define the different AGENT REST service routes in this file.
  *
  * @param (type) app Instance of express
  * @param (type) connection Retrieves DB from the MySQL server
  * @returns (undefined) Not used
  */
 
-const appRouter = (app, connection, asterisk) => {
-/**
+const express = require('express');
+
+const appRouter = (connection, asterisk) => {
+  const app = express.Router();
+
+  /**
      * @api {get} /AgentVerify Verify an agent by username.
      * @apiName AgentVerify
      * @apiGroup AgentVerify
@@ -340,13 +344,6 @@ const appRouter = (app, connection, asterisk) => {
       });
     });
   });
-
-  /*
-     * This is just for testing the connection, no APIdoc info required.
-     * GET request; e.g. https://localhost:8085/
-     */
-
-  app.get('/', (req, res) => res.status(200).send({ message: 'Welcome to the agent portal.' }));
 
   /**
      * @api {post} /UpdateProfile Updates an Agent's information in the database.
@@ -862,6 +859,7 @@ const appRouter = (app, connection, asterisk) => {
       }
     });
   });
+  return app;
 };
 
 module.exports = appRouter;

@@ -695,7 +695,7 @@ io.sockets.on('connection', (socket) => {
   socket.on('get-file-list-agent', (data) => {
     console.log('AGENT HAS UPLOADED FILE');
     const vrsNum = (token.vrs) ? token.vrs : data.vrs;
-    let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}`;
+    let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:mserver')}`;
     url += `/fileListByVRS?vrs=${vrsNum}`;
     request({
       url,
@@ -757,7 +757,7 @@ io.sockets.on('connection', (socket) => {
   socket.on('get-file-list-consumer', (data) => {
     console.log('CONSUMER HAS UPLOADED FILE');
     const vrsNum = (token.vrs) ? token.vrs : data.vrs;
-    let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:userver')}`;
+    let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:mserver')}`;
     url += `/fileListByVRS?vrs=${vrsNum}`;
     request({
       url,
@@ -1076,7 +1076,7 @@ io.sockets.on('connection', (socket) => {
     const captionAgent = getConfigVal('caption_mode:agent');
     io.to(token.extension).emit('caption-config', captionAgent);
 
-    let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:aserver')}`;
+    let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:mserver')}`;
     if (url) {
       url += '/getallscripts/';
 
@@ -1281,7 +1281,7 @@ io.sockets.on('connection', (socket) => {
     requestJson.layout = data.gridLayout;
     request({
       method: 'POST',
-      url: `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:aserver')}/updateLayoutConfig`,
+      url: `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:mserver')}/updateLayoutConfig`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -3049,7 +3049,7 @@ setInterval(() => {
 
 setInterval(() => {
   // query for after hours
-  const ohurl = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/operatinghours`;
+  const ohurl = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:mserver'), 10)}/operatinghours`;
   request({
     method: 'GET',
     url: ohurl,
@@ -3123,7 +3123,7 @@ function logout(token) {
  * @returns {undefined} N/A
  */
 function getScriptInfo(queueName, queueType, _callback) {
-  let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:aserver')}`;
+  let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:mserver')}`;
 
   if (queueType && queueName) {
     url += `/getscript/?queue_name=${queueType}&type=${queueName}`;

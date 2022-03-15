@@ -183,9 +183,9 @@ function getAgentInfo(username, callback) {
   let url;
 
   if (username) {
-    url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/getagentrec/${username}`;
+    url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:mserver'), 10)}/getagentrec/${username}`;
   } else {
-    url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/getallagentrecs`;
+    url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:mserver'), 10)}/getallagentrecs`;
   }
   logger.info(`getAgentInfo query URL: ${url}`);
 
@@ -216,7 +216,7 @@ function getAgentInfo(username, callback) {
  *
  */
 router.get('/users', restrict, (req, res) => {
-  /* TODO: retrieve the current agent list from aserver and populate 'users' */
+  /* TODO: retrieve the current agent list from mserver and populate 'users' */
   getAgentInfo(null, (info) => {
     if (info.message === 'success') {
       logger.info(`Returned agent data[0]${info.data[0].username}`);
@@ -311,7 +311,7 @@ router.post('/AddAgent', restrict, (req, res) => {
         });
       } else {
         // prepare added user data
-        const url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/addAgents/`;
+        const url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:mserver'), 10)}/addAgents/`;
 
         // create newAgent JSON object from inputs
 
@@ -340,8 +340,8 @@ router.post('/AddAgent', restrict, (req, res) => {
           json: true,
           body: newAgent
         }, (error, response, data) => {
-          logger.debug(`aserver call response: ${JSON.stringify(response)}`);
-          logger.debug(`aserver call data: ${JSON.stringify(data)}`);
+          logger.debug(`mserver call response: ${JSON.stringify(response)}`);
+          logger.debug(`mserver call data: ${JSON.stringify(data)}`);
           if (error) {
             logger.error(`AddAgent ERROR: ${error}`);
             res.send({
@@ -349,7 +349,7 @@ router.post('/AddAgent', restrict, (req, res) => {
               message: data.message
             });
           } else {
-            logger.info(`Agent added in aserver: ${data.message}`);
+            logger.info(`Agent added in mserver: ${data.message}`);
 
             // local strategy agent add
             if (getConfigVal('fognito:strategy') === 'local') {
@@ -425,7 +425,7 @@ router.post('/UpdateAgent', restrict, (req, res) => {
         });
       } else {
         // prepare user data
-        const url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/UpdateProfile/`;
+        const url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:mserver'), 10)}/UpdateProfile/`;
 
         // create newAgent JSON object from inputs
 
@@ -451,8 +451,8 @@ router.post('/UpdateAgent', restrict, (req, res) => {
           json: true,
           body: newAgent
         }, (error, response, data) => {
-          logger.debug(`aserver call response: ${JSON.stringify(response)}`);
-          logger.debug(`aserver call data: ${JSON.stringify(data)}`);
+          logger.debug(`mserver call response: ${JSON.stringify(response)}`);
+          logger.debug(`mserver call data: ${JSON.stringify(data)}`);
           if (error) {
             logger.error(`UpdateAgent ERROR: ${error}`);
             res.send({
@@ -518,14 +518,14 @@ router.post('/DeleteAgent', restrict, (req, res) => {
   logger.info(`Hit DeleteAgent with agentId: ${agentId}, username: ${username}`);
 
   if (agentId) {
-    const url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:aserver'), 10)}/DeleteAgent/`;
+    const url = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:mserver'), 10)}/DeleteAgent/`;
 
     request.post({
       url,
       json: true,
       body: { agent_id: agentId }
     }, (error, response, data) => {
-      logger.debug(`aserver call response: ${JSON.stringify(response)}`);
+      logger.debug(`mserver call response: ${JSON.stringify(response)}`);
       if (error) {
         logger.error(`DeleteAgent ERROR: ${error}`);
         res.send({

@@ -1,14 +1,9 @@
 // Define the different REST service routes in this file.
 const json2csv = require('json2csv');
+const express = require('express');
 
-const appRouter = (app, connection, logger, cdrTable) => {
-  /**
-  * Get to show server is running. This will not show if APIDoc is run.
-  */
-  app.get('/', (req, res) => {
-    logger.info('GET /');
-    return res.status(200).send({ message: 'Welcome to the CDR report portal.' });
-  });
+const appRouter = (connection, logger, cdrTable) => {
+  const app = express.Router();
 
   /**
    * @api {get} /getallcdrrecs Get all CDR database records
@@ -90,6 +85,7 @@ const appRouter = (app, connection, logger, cdrTable) => {
       return res.status(200).send({ message: 'No cdr records', data: rows });
     });
   });
+  return app;
 };
 
 module.exports = appRouter;

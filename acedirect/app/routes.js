@@ -437,7 +437,7 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
                         console.log(`${req.file.originalname} passed inspection!`);
                         request({
                             method: 'POST',
-                            url: `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.userver)}/storeFileInfo`,
+                            url: `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.mserver)}/storeFileInfo`,
                             headers: {
                                 'Content-Type': 'application/json'
                             },
@@ -465,7 +465,7 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
             console.log('WARNING: VIRUS SCAN IS DISABLED!');
             request({
                 method: 'POST',
-                url: `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.userver)}/storeFileInfo`,
+                url: `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.mserver)}/storeFileInfo`,
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -498,8 +498,8 @@ router.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
                     console.log('allowed to download');
 
                     const documentID = req.query.id;
-                    let url = `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.userver)}`;
-                    url += `/storeFileInfo?documentID=${documentID}`;
+                    let url = `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.mserver)}`;
+                    url += `/getStoreFileInfo?documentID=${documentID}`;
 
                     request({
                         url,
