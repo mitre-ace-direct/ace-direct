@@ -1,5 +1,5 @@
 {
-  "name": "aserver",
+  "name": "mserver",
   "version": "1.0.0",
   "description": "## Installation Instructions ### Configure corporate proxy server 1. npm config set proxy _HTTP-PROXY-URL_ 1. npm config set https-proxy _HTTPS-PROXY-URL_",
   "main": "app.js",
@@ -15,11 +15,12 @@
   "dependencies": {
     "asterisk-manager": "0.1.16",
     "body-parser": "^1.18.3",
-    "clear": "0.0.1",
+    "clear": "^0.0.1",
     "debug": "^2.6.9",
     "express": "^4.16.4",
     "fresh": "^0.5.2",
     "https": "1.0.0",
+    "json2csv": "^5.0.7",
     "log4js": "^3.0.6",
     "mime": "^1.4.1",
     "minimist": "^1.2.5",

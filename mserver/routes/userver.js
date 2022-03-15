@@ -7,8 +7,11 @@
 */
 
 const execObj = require('child_process');
+const express = require('express');
 
-const appRouter = (app, connection, itrsMode) => {
+const appRouter = (connection, itrsMode) => {
+  const app = express.Router();
+
   /**
 * @api {get} /vrsverify Get VRS record for a vrs number.
 * @apiName VRS Verify
@@ -257,11 +260,6 @@ const appRouter = (app, connection, itrsMode) => {
   });
 
   /**
-  * Get to show server is running. This will not show if APIDoc is run.
-  */
-  app.get('/', (req, res) => res.status(200).send({ message: 'Welcome to the Videophone verification portal.' }));
-
-  /**
 * @api {put} /AddVRSRec Adds a VRS Record to the database.
 * @apiName Add VRS Rec
 * @apiGroup AddVRSRec
@@ -406,7 +404,7 @@ const appRouter = (app, connection, itrsMode) => {
     });
   });
 
-  app.get('/storeFileInfo', (req, res) => {
+  app.get('/getStoreFileInfo', (req, res) => {
     console.log(`About to return ${req.query.documentID}`);
     const query = 'SELECT original_filename, filepath FROM file_uploads WHERE pk_file_id=?;';
     const params = [req.query.documentID];
@@ -437,6 +435,7 @@ const appRouter = (app, connection, itrsMode) => {
       });
     });
   });
+  return app;
 };
 
 module.exports = appRouter;
