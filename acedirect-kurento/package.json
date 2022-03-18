@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "audit-fix": "npm audit fix",
     "dev": "DEBUG=ace:*,JsSIP:* nodemon --watch src --exec node src/index",
     "start": "node src/index.js",
     "build": "npm run clean && npm install && node ./build.js",

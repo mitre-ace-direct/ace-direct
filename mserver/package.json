@@ -4,6 +4,7 @@
   "description": "## Installation Instructions ### Configure corporate proxy server 1. npm config set proxy _HTTP-PROXY-URL_ 1. npm config set https-proxy _HTTPS-PROXY-URL_",
   "main": "app.js",
   "scripts": {
+    "audit-fix": "npm audit fix",
     "test": "mocha --exit",
     "clean": "rm -rf node_modules >/dev/null 2>&1 || true",
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
