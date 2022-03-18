@@ -10,6 +10,7 @@
     "url": "TBD"
   },
   "scripts": {
+    "audit-fix": "npm audit fix",
     "test": "echo \"No tests available\" && exit 0",
     "clean": "rm -rf node_modules",
     "start": "node server-db.js",
