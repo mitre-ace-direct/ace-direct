@@ -4,6 +4,7 @@
   "description": "This folder is not required for the Provider portal.",
   "main": "app.js",
   "scripts": {
+    "audit-fix": "npm audit fix",
     "test": "mocha --exit",
     "clean": "rm -rf node_modules >/dev/null 2>&1 || true",
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
