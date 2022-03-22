@@ -3,7 +3,7 @@
 ACEDIRECT_FQDN=""
 ADUSER=""
 
-usage() { printf "\nusage: $0 [-u <ACE Direct user>] [-a <ACE Direct FQDN>]\n\n" 1>&2; exit 1; }
+usage() { printf "\nusage: \ncd ~/ace-direct/nginx\nsudo -E $0 -u <ACE Direct user account> -a <ACE Direct FQDN>\n\n" 1>&2; exit 1; }
 while getopts ":u:a:" arg; do
   case "${arg}" in
     u)
