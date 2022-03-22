@@ -420,15 +420,6 @@ then
   acedirect/install_node.sh -h /home/${AD_USER} -r ${REDIS_AUTH} -p ${ADPASS1} -a ${ASPASS1} -e ${EXPASS1}
 fi
 
-read -p "${Q}Install NGINX (y/n)? " -n 1 -r
-printf "\n"
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  # install NGINX as root
-  cd ~/ace-direct/nginx
-  sudo -E ./install_nginx.sh -u ${AD_USER} -a ${MAIN_FQDN}
-fi
-
 read -p "${Q}Build ace-direct (y/n)? " -n 1 -r
 printf "\n"
 if [[ $REPLY =~ ^[Yy]$ ]]
