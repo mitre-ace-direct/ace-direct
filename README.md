@@ -485,6 +485,10 @@ The enterprise service bus (esb) is an optional component. Use it to integrate w
 
 :checkered_flag: **This completes ACE Direct installation, configuration, and deployment**.
 
+## Creating initial users
+
+Create agent and manager users: [fognito/README.md#creating-initial-users](fognito/README.md#creating-initial-users)
+
 ## Accessing the websites
 
 The URLs depend on your `~/ace-direct/dat/config.json` settings, specifically `nginx:fognito_path`, `nginx:ad_path`, `nginx:mp_path`, `nginx:agent_route`, and `nginx:consumer_route`.
