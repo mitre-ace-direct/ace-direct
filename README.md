@@ -94,14 +94,14 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 ### Automatic installer for acenode
 
-> :warning: **This installer assumes that you already installed:**: Asterisk, STUN, TURN, Kurento, and Kamailio.
+> :warning: **This installer assumes that you already installed:**: Asterisk, NGINX, STUN, TURN, Kurento, and Kamailio.
 
-For convenience, the automatic installer installs all the core components, as well as _NGINX_ on `acenode`. The recommended instance size for `acenode` is `t3a.medium`. Since NGINX is also deployed on this server, `acenode` requires a public FQDN.
+For convenience, the automatic installer installs all the core components on `acenode`. The recommended instance size for `acenode` is `t3a.medium`. `acenode` should not have a public FQDN.
 
 The automatic installer script is [install.sh](install.sh). This script will perform the following on `acenode`:
 
 * Install prerequisites
-* Install Redis, MongoDB, MySQL, NGINX, and Node app servers
+* Install Redis, MongoDB, MySQL, and Node app servers
 * Populate databases
 * Deploy ACE Direct
 * Perform status checks
@@ -135,7 +135,7 @@ $  ./install.sh -u ec2-user \
 
 After executing this script, try to access the portals. See [Accessing the websites](#accessing-the-websites) .
 
-For manual installation and customization of your ACE Direct deployment, continue to [Manual installation of acenode](#manual-installation-of-acenode). For example, you can follow those instructions to deploy NGINX on a separate server.
+For manual installation and customization of your ACE Direct deployment, continue to [Manual installation of acenode](#manual-installation-of-acenode).
 
 ### Manual installation of acenode
 
