@@ -18,17 +18,23 @@ $
 
 ### Creating initial users
 
+* The `../dat/config.json` must be configured before creating users.
+* MongoDB must be deployed and running.
 * This only updates the interal MongoDB database for `fognito`.
 * The `User` collection must be in sync with the ACE Direct MySQL `agent_data` table.
   * The [app/models/users.js](app/models/user.js) contains the `local` _userSchema_. The `id` field is the foreign key into the ACE Direct MySQL `agent_data` table.
   * The ACE Direct Management Portal maintains the MongoDB _userSchema_.
+* Use the manager users to administer agents in the Management Portal.
 
-Add, query, delete users:
+#### Add, query, delete users
 
 ```bash
-$  cd db
+$  #install software
+$  cd fognito
+$  npm install
 $
 $  # add/update users info:
+$  cd db
 $  vi data/users.csv  # or copy from data/users.csv_TEMPLATE
 $
 $  # add all users in users.csv
@@ -37,7 +43,7 @@ $
 $  # query users
 $  node doc-get.js users
 $
-$  # delete all users
+$  # delete all users (if needed)
 $  node doc-delete.js users
 $
 ```

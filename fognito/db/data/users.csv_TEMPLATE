@@ -1,7 +1,4 @@
 id,email,password,role,displayName
-customer1,customer1@mail.com,aaa,none,Kitty Pryde
-customer2,customer2@mail.com,aaa,none,Kitty Pryde
-customer3,customer3@mail.com,aaa,none,Kitty Pryde
 dagent1,dagent1@mail.com,aaa,none,Sebastian Shaw
 dagent2,dagent2@mail.com,aaa,none,Sebastian Shaw
 dagent3,dagent3@mail.com,aaa,none,Sebastian Shaw
