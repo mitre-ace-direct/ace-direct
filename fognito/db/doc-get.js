@@ -1,55 +1,18 @@
 // generic get documents for all collections
 
 // create a client to access MongoDB
-const fs = require('fs');
-const nconf = require('nconf');
+const path = require('path');
 const { MongoClient } = require('mongodb');
+const getconfig = require('./getconfig');
 
-// create Mongo URI
-// use global AD config file
-const cfile = '../../dat/config.json';
-let clearText = false;
-const content = fs.readFileSync(cfile, 'utf8');
-try {
-  JSON.parse(content);
-  console.log('Valid JSON config file');
-} catch (ex) {
-  console.log('\n*******************************************************');
-  console.log(`Error! Malformed configuration file: ${cfile}`);
-  console.log('Exiting...');
-  console.log('*******************************************************\n');
-  process.exit(1);
-}
-nconf.file({ file: cfile });
-if (typeof (nconf.get('common:cleartext')) !== 'undefined' && nconf.get('common:cleartext') !== '') {
-  clearText = true;
-}
-
-function getConfigVal(paramName) {
-  const val = nconf.get(paramName);
-  let decodedString = null;
-  if (typeof val !== 'undefined' && val !== null) {
-    decodedString = null;
-    if (clearText) {
-      decodedString = val;
-    } else {
-      decodedString = Buffer.alloc(val.length, val, 'base64');
-    }
-  } else {
-    console.error('\n*******************************************************');
-    console.error(`ERROR!!! Config parameter is missing: ${paramName}`);
-    console.error('*******************************************************\n');
-    decodedString = '';
-  }
-  return (decodedString.toString());
-}
+const programName = path.basename(process.argv[1]);
 
 // create Mongo URI
 const mongoUser = '';
 const mongoPass = '';
-const mongoHost = getConfigVal('servers:mongodb_fqdn');
-const mongoPort = getConfigVal('app_ports:mongodb');
-const mongoDbname = getConfigVal('database_servers:mongodb:database_name');
+const mongoHost = getconfig.getConfigVal('servers:mongodb_fqdn');
+const mongoPort = getconfig.getConfigVal('app_ports:mongodb');
+const mongoDbname = getconfig.getConfigVal('database_servers:mongodb:database_name');
 let uri = '';
 if (mongoUser && mongoUser.length > 0 && mongoPass && mongoPass.length > 0) {
   uri = `mongodb://${mongoUser}:${mongoPass}@${mongoHost}:${mongoPort}/${mongoDbname}`;
@@ -58,7 +21,7 @@ if (mongoUser && mongoUser.length > 0 && mongoPass && mongoPass.length > 0) {
 }
 
 if (process.argv.length !== 3) {
-  console.log('usage: node doc_get.js <collection name>');
+  console.log(`usage: node ${programName} <collection name>`);
   process.exit(99);
 }
 

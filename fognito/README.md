@@ -18,7 +18,7 @@ $
 
 ### Creating initial users
 
-* The `../dat/config.json` must be configured before creating users.
+* The `../dat/config.json` **must be configured** before creating users.
 * MongoDB must be deployed and running.
 * This only updates the interal MongoDB database for `fognito`.
 * The `User` collection must be in sync with the ACE Direct MySQL `agent_data` table.
@@ -26,25 +26,48 @@ $
   * The ACE Direct Management Portal maintains the MongoDB _userSchema_.
 * Use the manager users to administer agents in the Management Portal.
 
-#### Add, query, delete users
+#### Managing All Users
 
 ```bash
 $  #install software
 $  cd fognito
 $  npm install
 $
-$  # add/update users info:
+$  # add/update all users info:
 $  cd db
-$  vi data/users.csv  # or copy from data/users.csv_TEMPLATE
+$  cp data/users.csv_TEMPLATE data/users.csv
+$  vi data/users.csv  # make your edits 
 $
 $  # add all users in users.csv
 $  node driver.js
+$
+$  # delete users.csv
+$  rm data/users.csv
 $
 $  # query users
 $  node doc-get.js users
 $
 $  # delete all users (if needed)
 $  node doc-delete.js users
+$
+```
+
+#### Managing One User
+
+Here is how to add an agent or manager from the command line. This is also useful for changing an users's password. Note that this only adds the user to the `fognito` database. The user must also be in MySQL for login to work.
+
+```bash
+$  #install software
+$  cd fognito
+$  npm install
+$
+$  cd db
+$
+$  # add an agent 
+$  node create-users.js dagent99 somepassword "AD Agent" dagent99@mail.com "Alice Jones"
+$
+$  # add a manager
+$  node create-users.js manager4 somepassword "Manager" manager4@mail.com "Grace Hopper"
 $
 ```
 

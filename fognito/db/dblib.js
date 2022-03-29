@@ -2,55 +2,17 @@
 const { MongoClient } = require('mongodb');
 const fs = require('fs');
 const neatCsv = require('neat-csv');
-const nconf = require('nconf');
 const User = require('../app/models/user');
+const getconfig = require('./getconfig');
 
 const userObj = new User();
-
-// use global AD config file
-const cfile = '../../dat/config.json';
-let clearText = false;
-const content = fs.readFileSync(cfile, 'utf8');
-try {
-  JSON.parse(content);
-  console.log('Valid JSON config file');
-} catch (ex) {
-  console.log('\n*******************************************************');
-  console.log(`Error! Malformed configuration file: ${cfile}`);
-  console.log('Exiting...');
-  console.log('*******************************************************\n');
-  process.exit(1);
-}
-nconf.file({ file: cfile });
-if (typeof (nconf.get('common:cleartext')) !== 'undefined' && nconf.get('common:cleartext') !== '') {
-  clearText = true;
-}
-
-function getConfigVal(paramName) {
-  const val = nconf.get(paramName);
-  let decodedString = null;
-  if (typeof val !== 'undefined' && val !== null) {
-    decodedString = null;
-    if (clearText) {
-      decodedString = val;
-    } else {
-      decodedString = Buffer.alloc(val.length, val, 'base64');
-    }
-  } else {
-    console.error('\n*******************************************************');
-    console.error(`ERROR!!! Config parameter is missing: ${paramName}`);
-    console.error('*******************************************************\n');
-    decodedString = '';
-  }
-  return (decodedString.toString());
-}
 
 // create Mongo URI
 const mongoUser = '';
 const mongoPass = '';
-const mongoHost = getConfigVal('servers:mongodb_fqdn');
-const mongoPort = getConfigVal('app_ports:mongodb');
-const mongoDbname = getConfigVal('database_servers:mongodb:database_name');
+const mongoHost = getconfig.getConfigVal('servers:mongodb_fqdn');
+const mongoPort = getconfig.getConfigVal('app_ports:mongodb');
+const mongoDbname = getconfig.getConfigVal('database_servers:mongodb:database_name');
 let uri = '';
 if (mongoUser && mongoUser.length > 0 && mongoPass && mongoPass.length > 0) {
   uri = `mongodb://${mongoUser}:${mongoPass}@${mongoHost}:${mongoPort}/${mongoDbname}`;
@@ -67,6 +29,7 @@ module.exports = {
       const dbo = client.db(mongoDbname);
       return dbo.collection(collName).find({}).toArray((err1, res) => {
         if (err1) {
+          client.close();
           reject(new Error(`Error: ${err1}`));
           return;
         }
@@ -85,6 +48,7 @@ module.exports = {
       const dbo = client.db(mongoDbname);
       return dbo.collection(collUsers).find({ 'local.id': id }).toArray((err1, res) => {
         if (err1) {
+          client.close();
           reject(new Error(`Error: ${err1}`));
           return;
         }
@@ -103,13 +67,14 @@ module.exports = {
       const dbo = client.db(mongoDbname);
       return dbo.collection(collName).deleteMany({}, (err1, res) => {
         if (err1) {
-          reject(new Error(`Error: ${err1}`));
           client.close();
+          reject(new Error(`Error: ${err1}`));
           return;
         }
         if (res && res.result && res.result.n > 0) {
-          resolve(res.result.n);
+          const count = res.result.n;
           client.close();
+          resolve(count);
           return;
         }
         client.close();
@@ -129,8 +94,9 @@ module.exports = {
           return;
         }
         if (res && res.result && res.result.n > 0) {
-          resolve(res.result.n);
+          const count = res.result.n;
           client.close();
+          resolve(count);
           return;
         }
         client.close();
@@ -144,13 +110,14 @@ module.exports = {
       const dbo = client.db(mongoDbname);
       return dbo.collection(collUsers).insertMany(userArray, (err1, res) => {
         if (err1) {
-          reject(new Error(`Error: ${err1}`));
           client.close();
+          reject(new Error(`Error: ${err1}`));
           return;
         }
         if (res && res.insertedCount > 0) {
-          resolve(res.insertedCount);
+          const count = res.insertedCount;
           client.close();
+          resolve(count);
           return;
         }
         client.close();
