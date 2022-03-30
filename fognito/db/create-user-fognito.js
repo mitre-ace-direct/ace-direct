@@ -124,15 +124,9 @@ const getUser = (id) => new Promise((resolve, reject) => {
 });
 
 const go = async () => {
-  const resp = await deleteUser(idArg);
-  console.log(`${resp}`);
-
-  const resp2 = await addUser(idArg, passArg, roleArg, emailArg, dnameArg);
-  console.log(`${resp2}`);
-
-  const resp3 = await getUser(idArg);
-  console.log(`${resp3}`);
-
+  await deleteUser(idArg);
+  await addUser(idArg, passArg, roleArg, emailArg, dnameArg);
+  await getUser(idArg);
   process.exit(0);
 };
 
