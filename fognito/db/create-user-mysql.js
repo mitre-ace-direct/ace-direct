@@ -128,8 +128,7 @@ const addUser = (obj, extId, queue1Id, queue2Id) => new Promise((resolve, reject
   const params = [obj.username, obj.first_name, obj.last_name, obj.role, obj.phone, obj.email, obj.organization, 1, 1, extId, queue1Id, queue2Id, ''];
   connection.query(extQuery, params, (err, rows) => {
     if (err) {
-      console.log(err);
-      reject(new Error('add user query failed.'));
+      reject(new Error(err.sqlMessage));
       return;
     }
     if (rows.affectedRows > 0) {
@@ -178,9 +177,10 @@ const go = async () => {
 
   resp = await deleteUser(jsonObj.username);
 
-  resp = await addUser(jsonObj, extId, queue1Id, queue2Id);
-  if (!resp) {
-    console.log('error adding user.');
+  try {
+    resp = await addUser(jsonObj, extId, queue1Id, queue2Id);
+  } catch(e) {
+    console.log(e.message);
     cleanUp(-1);
   }
 
