@@ -179,7 +179,7 @@ const go = async () => {
 
   try {
     resp = await addUser(jsonObj, extId, queue1Id, queue2Id);
-  } catch(e) {
+  } catch (e) {
     console.log(e.message);
     cleanUp(-1);
   }
