@@ -18,6 +18,7 @@ QUEUE1=""
 QUEUE2=""
 PASSWORD=""
 TEMP_RESPONSE=""
+INTERACTIVE="false"
 AROLE="AD Agent"
 MROLE="Manager"
 
@@ -71,9 +72,6 @@ getPasswordInput() {
   done
 }
 
-
-
-
 usage() {
   printf "\nusage:  $0 -u <username> [-p <password>] [-f <first name>] [-l <last name>] [-r <${AROLE}|${MROLE}>] [-n <phone>] [-e <email>] [-o <organization>] [-x <extension>] [-y <queue1>] [-z <queue2>] [-i]\n\n"
   printf "  e.g.  $0 -i  # interactive mode\n\n"
@@ -82,7 +80,7 @@ usage() {
   exit 1;
 }
 
-while getopts "u:p:f:l:r:n:e:o:x:y:z:" arg; do
+while getopts "u:p:f:l:r:n:e:o:x:y:z:i" arg; do
   case "${arg}" in
     u)
       USERNAME=${OPTARG}
@@ -128,9 +126,12 @@ while getopts "u:p:f:l:r:n:e:o:x:y:z:" arg; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${USERNAME}" ]; then
-  usage
-  exit 99
+# if no args and not interactive mode, show usage
+if [ "$#" -eq 0 ]; then
+  if [ "$INTERACTIVE" == "false" ]; then
+    usage
+    exit 0
+  fi
 fi
 
 echo ""
@@ -175,32 +176,34 @@ fi
 getPasswordInput " $PASSWORD " 'Enter a password'
 PASSWORD=$TEMP_RESPONSE
 
-echo ""
-echo "Values:"
-echo ""
-echo "  ${USERNAME}"
-echo "  ${FNAME}"
-echo "  ${LNAME}"
-echo "  ${ROLE}"
-echo "  ${PHONE}"
-echo "  ${EMAIL}"
-echo "  ${ORG}"
-if [ "$ROLE" == "$AROLE" ]; then
-  echo "  ${EXT}"
-  echo "  ${QUEUE1}"
-  echo "  ${QUEUE2}"
-fi
-echo "  (hidden)"
-echo ""
+if [ "$INTERACTIVE" == "true" ]; then
+  echo ""
+  echo "Values:"
+  echo ""
+  echo "  ${USERNAME}"
+  echo "  ${FNAME}"
+  echo "  ${LNAME}"
+  echo "  ${ROLE}"
+  echo "  ${PHONE}"
+  echo "  ${EMAIL}"
+  echo "  ${ORG}"
+  if [ "$ROLE" == "$AROLE" ]; then
+    echo "  ${EXT}"
+    echo "  ${QUEUE1}"
+    echo "  ${QUEUE2}"
+  fi
+  echo "  (hidden)"
+  echo ""
 
-read -p "${Q}OK to continue (y/n)? " -n 1 -r
-printf "\n"
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  printf ""
-else
-  printf "Aborting... \n\n"
-  exit 1
+  read -p "${Q}OK to continue (y/n)? " -n 1 -r
+  printf "\n"
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    printf "\n"
+  else
+    printf "Aborting... \n\n"
+    exit 1
+  fi
 fi
 
 # add to MySQL
@@ -212,10 +215,17 @@ else
   # add manager
   THEARG='{"username":"'${USERNAME}'", "first_name":"'${FNAME}'", "last_name":"'${LNAME}'", "role":"'${ROLE}'", "phone":"'${PHONE}'", "email":"'${EMAIL}'", "organization":"'${ORG}'"}'
 fi
-node create-user-mysql.js "${THEARG}"
+if node create-user-mysql.js "${THEARG}"; then
+  # add to fognito
+  if node create-user-fognito.js ${USERNAME} ${PASSWORD} "${ROLE}" ${EMAIL}  "${FNAME} ${LNAME}"; then
+    printf "success.\n\n"
+  else
+    printf "error adding to fognito.\n\n"
+    exit 99
+  fi
+else
+  printf "error adding to mysql.\n\n"
+  exit 99
+fi
 
-# add to fognito
-node create-user-fognito.js ${USERNAME} ${PASSWORD} "${ROLE}" ${EMAIL}  "${FNAME} ${LNAME}"
-
-printf "\ndone.\n"
 exit 0
