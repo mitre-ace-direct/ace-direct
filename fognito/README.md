@@ -34,7 +34,10 @@ $  cd db
 $
 $  ./create-user.sh -u "dagent1"  # follow the prompts
 $
-$  ./create-user.sh -h  # help
+$  ./create-user.sh -u dagent1 -p yourpassword -f Alice -l Jones -r "AD Agent" -n 888-888-8888 -e aj@mail.com -o "The Org" -x 33001 -y ComplaintsQueue -z GeneralQuestionsQueue  # full batch mode
+$
+$  ./create-user.sh  -i  # interactive option
+$  ./create-user.sh  # help
 $
 ```
 
