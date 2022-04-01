@@ -34,12 +34,7 @@ function restrict(req, res, next) {
 };
 
 router.get('/', (req, res) => {
-    res.redirect('fcc');
-});
-
-// redirects to the fcc mockup page
-router.get('/fcc', (req, res) => {
-    res.render('pages/fcc_mockup');
+    res.redirect('agent');
 });
 
 router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => {
