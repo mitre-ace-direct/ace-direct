@@ -2,7 +2,7 @@
   "common": {
     "cleartext": "true",
     "version": "6.0",
-    "year": "2021",
+    "year": "2022",
     "debug_level": "ERROR",
     "proxy": "http://0.0.0.0:1234",
     "https": {
