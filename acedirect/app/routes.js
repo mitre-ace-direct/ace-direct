@@ -34,7 +34,7 @@ function restrict(req, res, next) {
 };
 
 router.get('/', (req, res) => {
-    res.redirect('agent');
+  res.redirect(utils.getConfigVal(config.nginx.ad_path) + utils.getConfigVal(config.nginx.consumer_route));
 });
 
 router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => {
