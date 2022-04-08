@@ -1,7 +1,74 @@
 <!DOCTYPE html>
 <html lang='en-us'>
-<head><title>AD</title></head>
-<body>
-Sample Page.
-</body>
+
+<%- include("../partials/agent_page_header") %>
+
+  <body>
+    <div class="container" id="vrslogincontainer">
+      <div class="row">
+        <div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-6 col-sm-offset-3">
+          <div class="account-wall">
+            <form class="form-login" id="form-login">
+              <div class="alert alert-danger" id="message" hidden></div>
+              <div class="row margin" style="margin-left: 0;">
+                <label>Please Enter your Videophone Number: </label>
+              </div>
+              <div id="input-group" class="input-group">
+                <div class="input-group-addon">
+                  <i class="fa fa-phone"></i>
+                </div>
+                <input type="text" class="form-control input-lg" id="vrs_number" placeholder="Videophone Number"
+                  data-inputmask="'mask': '(999) 999-9999'" data-mask required>
+              </div>
+          </div>
+          <div align="center" class="margin">
+            <div class="row">
+              <button class="btn btn-lg btn-primary" type="submit"> Continue </button>
+            </div>
+          </div>
+          </form>
+        </div>
+      </div>
+      <div class="row" style=" margin-top: 30px; font-style: italic;">
+        <div class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2">
+          <p>You are entering an Official United States Government System, which may be used only for authorized
+            purposes. The Government may monitor and audit usage of this system, and all persons are hereby notified
+            that use of this system constitutes consent to such monitoring and auditing. Unauthorized attempts to
+            upload or change information on this web site is prohibited.</p>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      var nginxPath = '<%= nginxPath %>';
+
+      $.ajax({
+        url: './token',
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+          if (data.message === "success") {
+            socket = io.connect('https://' + window.location.host, {
+              path: nginxPath + '/socket.io',
+              query: 'token=' + data.token,
+              forceNew: true
+            });
+
+            //update version in footer
+            socket.on('adversion', function (data) {
+              $('#ad-version').text(data.version);
+              $('#ad-year').text(data.year);
+            });
+          }
+        },
+        error: function (xhr, status, error) {
+          console.log('Error');
+          $('#message').text('An Error Occured.');
+        }
+      });
+    </script>
+
+  </body>
+  <%- include("../partials/acedirect_footer") %>
+
 </html>
