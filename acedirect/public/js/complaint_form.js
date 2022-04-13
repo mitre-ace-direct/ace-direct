@@ -222,12 +222,6 @@ function connect_socket() {
           forceNew: true
         });
 
-        // update the version and year in the footer
-        socket.on('adversion', (data) => {
-          $('#ad-version').text(data.version);
-          $('#ad-year').text(data.year);
-        });
-
         socket.on('connect', () => {
           const payload = jwt_decode(data.token);
           // get the start/end time strings for the after hours dialog

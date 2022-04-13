@@ -143,8 +143,6 @@
     <script type="text/javascript">
       var nginxPath = '<%= nginxPath %>';
 
-      //TODO This ajax call no longer loads the version and year
-      //Needs to be updated to pull from an ejs variable
       $.ajax({
         url: './token',
         type: 'GET',
@@ -155,13 +153,6 @@
               path: nginxPath + '/socket.io',
               query: 'token=' + data.token,
               forceNew: true
-            });
-
-            //update version in footer
-            socket.on('adversion', function (data) {
-              console.log("GOT DATA " + JSON.stringify(data));
-              $('#ad-version').text(data.version);
-              $('#ad-year').text(data.year);
             });
           }
         },
