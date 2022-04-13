@@ -600,9 +600,6 @@ io.sockets.on('connection', (socket) => {
     });
   });
 
-  // emit AD version and year to clients
-  socket.emit('adversion', { version, year });
-
   // emit
   if (getConfigVal('translation_server:enabled') === 'true') {
     socket.emit('enable-translation');
@@ -3675,7 +3672,9 @@ app.use((req, res, next) => {
     isOpen,   // move these 3 to util?
     endTimeUTC,
     startTimeUTC,
-    csrfToken: req.csrfToken()
+    csrfToken: req.csrfToken(),
+    version,
+    year
   };
   next();
 });
