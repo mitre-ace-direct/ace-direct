@@ -175,12 +175,6 @@ function connect_socket() {
 
         updateShortcutTable();
 
-        // update the version and year in the footer
-        socket.on('adversion', function (data) {
-          $('#ad-version').text(data.version);
-          $('#ad-year').text(data.year);
-        });
-
         socket.on('connect', function () {
           debugtxt('connect', {
             no: 'data'
