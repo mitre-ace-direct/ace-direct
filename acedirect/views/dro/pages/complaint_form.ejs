@@ -3,7 +3,33 @@
 <%- include("../partials/agent_page_header") %>
 
   <body>
-    Sample Page.
+    <div class="container" id="pageContainer">
+      <div class="row">
+        <div id="callVideoColumn" class="col-md-8 text-center" style="border : 5px solid black">
+          TODO Add video boxes and in call features here
+        </div>
+        <div id="callFeaturesColumn" class="col-md-4" style="border : 5px solid black">
+          TODO Add chat and sidebar features here
+        </div>
+      </div>
+    </div>
+
+    <style>
+      #pageContainer {
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+        width: 98vw !important;
+      }
+
+      #callVideoColumn {
+        height : 86vh;
+      }
+
+      #callFeaturesColumn {
+        height : 86vh;
+      }
+
+    </style>
   </body>
   <%- include("../partials/acedirect_footer") %>
 
