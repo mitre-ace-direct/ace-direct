@@ -82,7 +82,8 @@ function login () {
         });
     } else {
         $('#input-group').addClass('has-error');
-        $('#message').text('Invalid phone number format');
+        $('#message').text('Invalid phone number');
+        $('#message').css({'color' : 'red'});
         $('#message').show();
     }
 }
