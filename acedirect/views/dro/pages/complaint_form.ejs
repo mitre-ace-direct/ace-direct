@@ -6,7 +6,46 @@
     <div class="container" id="pageContainer">
       <div class="row">
         <div id="callVideoColumn" class="col-md-8 text-center" style="border : 5px solid black">
-          TODO Add video boxes and in call features here
+          <!--Only appear outside of a call-->
+          <div id="noCallPoster" hidden>
+            <img  id="heroLogo" src="dro/images/acedirect-logo.png" alt="heroLogo">
+          </div>
+          <!--END Only appear outside of a call-->
+          <!--Appear inside of a call-->
+          <div id="inCallSection">
+            <div id="callButtonsRow" class="row">
+              <span>TODO min</span>
+              <button id="mute-audio" type="button" class="btn btn-gray circleButton" onclick="muteAudio()">
+                <i id="mute-audio-icon" class="call-btn-icon fa fa-microphone"></i>
+              </button>
+              <button id="hide-video" type="button" class="btn btn-gray circleButton" onclick="enableVideoPrivacy()">
+                <i id="mute-camera-off-icon" class="call-btn-icon fa fa-video-camera"></i>
+              </button>
+              <button type="button" class="btn btn-gray circleButton" onclick="enterFullscreen()">
+                <i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
+              </button>
+              <button type="button" class="btn btn-gray" id="startScreenshare">
+                <i class="call-btn-icon fa fa-desktop"></i> Start Screenshare
+              </button>
+              <button id="end-call" type="button" class="btn btn-danger" onclick="terminateCall()">
+                <i class="call-btn-icon fa fa-phone fa-rotate-135"></i> End Call
+              </button>
+            </div>
+
+            <div id="speakingToRow" class="row">
+              You are communicating with TODO
+            </div>
+
+            <div id="callVideosRow" class="row">
+              <div class="col-md-4" id="selfViewCol">
+                <video id="selfView" autoplay muted="true" class="mirror-mode"></video>
+              </div>
+              <div class="col-md-8" id="remoteViewCol">
+                <video id="remoteView" autoplay></video>
+              </div>
+            </div>
+          </div>
+          <!--END Appear inside of a call-->
         </div>
         <div id="callFeaturesColumn" class="col-md-4" style="border : 5px solid black">
           TODO Add chat and sidebar features here
@@ -27,6 +66,40 @@
 
       #callFeaturesColumn {
         height : 86vh;
+      }
+
+      #callButtonsRow {
+        background-color: darkgray;
+      }
+
+      #speakingToRow {
+        background-color: lightgray;
+      }
+
+      #remoteViewCol {
+        background-color: black;
+      }
+
+      #end-call {
+        float: right;
+        margin-top: 1%;
+        margin-right: 1%;
+      }
+
+      .circleButton {
+        border-radius: 50% !important;
+        border: none;
+        height : 45px;
+        width : 45px !important;
+        margin : 5px;
+        margin-left: 15px;
+        background-color: #073863 !important;
+        color: white;
+      }
+
+      #startScreenshare {
+        background-color: #073863 !important;
+        color: white;
       }
 
     </style>
