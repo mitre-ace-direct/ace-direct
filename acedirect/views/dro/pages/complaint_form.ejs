@@ -116,6 +116,12 @@
         border:2px solid lightgrey
       }
 
+      .fileshareButton {
+        border-radius: 50%;
+        color: black;
+        font-size: 15px;
+      }
+
     </style>
   </head>
   <%- include("../partials/agent_page_header") %>
@@ -169,6 +175,7 @@
           <div class="col-xs-9">
             <!-- Tab panes -->
             <div class="tab-content">
+              <!--Chat pane-->
               <div class="tab-pane active" id="chatBody">
                 <div class="box-header" style="overflow: hidden;">
                   <h2 style="float:left">Chat</h2>
@@ -252,7 +259,56 @@
                   </div>
                 </div>
               </div>
-              <div class="tab-pane" id="fileBody">File Tab.</div>
+              <!-- end chat pane-->
+              <!--File Share Pane-->
+              <div class="tab-pane" id="fileBody">
+                <div class="box-header" style="overflow: hidden;">
+                  <h2 style="float:left">File Sharing</h2>
+                  <p style="float:right">TODO font fize</p>
+                </div>
+                <hr />
+                <div class="box-body" style="height:70vh">
+                  <!-- Conversations are loaded here -->
+                  <!--Hard coding messages for now-->
+                  <div id="file-share-body" style="height:70vh;">
+                    <p>Select a file to send by clicking 'Choose File'; send the file by clicking 'Send'.</p>
+                    <p>View sent files in the 'Sent File(s)' section, and view or download received files in the 'Received File(s)' section.</p>
+                    <br>
+                    <br>
+                    <!--file selection section-->
+                    <div class="btn-group">
+                      <input type="file" id="fileInput" name="fileInput"
+                        class="form-control-file btn btn-default"
+                        style="background-color:transparent; border: transparent;" disabled>
+                    </div>
+                    <button class="btn btn-primary pull-right" id="shareFileConsumer" onclick="shareFileConsumer()" disabled>Send</button>
+                    <!--end file selection section-->
+                    <br>
+                    <br>
+                    <!--send files section-->
+                    <h3>Sent File(s)</h3>
+                    <hr style="border:1px solid grey"/>
+                    <span>Example_picture.png</span>
+                    <button class="btn btn-secondary pull-right fileshareButton"><i class="fa fa-eye"></i></button>
+                    <!--end sent files section-->
+                    <br>
+                    <br>
+                    <!--received files section-->
+                    <h3>Received File(s)</h3>
+                    <hr style="border:1px solid grey"/>
+                    <span>Documentation.doc</span>
+                    <button class="btn btn-secondary pull-right fileshareButton"><i class="fa fa-download"></i></button>
+                    <button class="btn btn-secondary pull-right fileshareButton"><i class="fa fa-eye"></i></button>
+                    <hr/>
+                    <span>Image for you to look at.IMG</span>
+                    <button class="btn btn-secondary pull-right fileshareButton"><i class="fa fa-download"></i></button>
+                    <button class="btn btn-secondary pull-right fileshareButton"><i class="fa fa-eye"></i></button>
+                    <hr/>
+                    <!--end received files section-->
+                  </div>
+                </div>
+              </div>
+              <!--end file share pane-->
             </div>
           </div>
           <div class="col-xs-3">
