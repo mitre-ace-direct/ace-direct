@@ -145,6 +145,11 @@
         font-size: 15px;
       }
 
+      .fontSizeButtons {
+        border:1px solid grey !important;
+        height:100%;
+      }
+
     </style>
   </head>
   <%- include("../partials/agent_page_header") %>
@@ -202,7 +207,11 @@
               <div class="tab-pane active" id="chatBody">
                 <div class="box-header" style="overflow: hidden;">
                   <h2 style="float:left">Chat</h2>
-                  <p style="float:right">TODO font fize</p>
+                  <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
+                    <button type="button" class="btn btn-secondary fontSizeButtons" style="font-size:smaller;">A</button>
+                    <button type="button" class="btn btn-secondary fontSizeButtons" style="background-color: white; pointer-events: none;">100%</button>
+                    <button type="button" class="btn btn-secondary fontSizeButtons" style="font-size:large;">A</button>
+                  </div>
                 </div>
                 <hr />
                 <div class="box-body" style="height:70vh">
@@ -287,7 +296,11 @@
               <div class="tab-pane" id="fileBody">
                 <div class="box-header" style="overflow: hidden;">
                   <h2 style="float:left">File Sharing</h2>
-                  <p style="float:right">TODO font fize</p>
+                  <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
+                    <button type="button" class="btn btn-secondary fontSizeButtons" style="font-size:smaller;">A</button>
+                    <button type="button" class="btn btn-secondary fontSizeButtons" style="background-color: white; pointer-events: none;">100%</button>
+                    <button type="button" class="btn btn-secondary fontSizeButtons" style="font-size:large;">A</button>
+                  </div>
                 </div>
                 <hr />
                 <div class="box-body" style="height:70vh">
