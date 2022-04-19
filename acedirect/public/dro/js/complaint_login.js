@@ -90,12 +90,12 @@ function login () {
 
 function fnBrowserDetect(){
     let userAgent = navigator.userAgent;
-    let isChromeorEdge = false;
+    let isChrome = false;
     let browserName;
     console.log("BROWSER IS " + userAgent)
     
     if(userAgent.match(/chrome|chromium|crios/i)) {
-        isChromeorEdge = true;
+        isChrome = true;
     } else if(userAgent.match(/firefox|fxios/i)) {
         browserName = "Firefox";
     }  else if(userAgent.match(/safari/i)) {
@@ -103,12 +103,12 @@ function fnBrowserDetect(){
     } else if(userAgent.match(/opr\//i)) {
         browserName = "Opera";
     } else if(userAgent.match(/edg/i)) {
-        isChromeorEdge = true;
+        browserName = "Edge"
     } else {
         browserName="Unknown Browser";
     }
 
-    if (!isChromeorEdge) {
+    if (!isChrome) {
         // show modal
         $('#browserType').text(browserName);
         $("#notChromeModal").modal("show");
@@ -117,8 +117,12 @@ function fnBrowserDetect(){
 
 function copyURL() {
     navigator.clipboard.writeText(window.location.href).then(function() {
-        /* clipboard write success */ 
+        /* clipboard write success */
+        $('#clipboardStatus').text('Successfully copied support portal link to clipboard.')
+        $('#clipboardStatus').show();
     }, function() {
         /* clipboard write failure */
+        $('#clipboardStatus').text('Error copying support portal link to clipboard.')
+        $('#clipboardStatus').show();
     });
 }
