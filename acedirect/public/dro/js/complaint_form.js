@@ -4,9 +4,14 @@ let selfStream = document.getElementById('selfView');
 const muteAudioButton = document.getElementById('mute-audio');
 const hideVideoButton = document.getElementById('hide-video');
 let inCall = false;
+let vrs;
+let acekurento = null;
+let ua = null;
+let videomailflag = false;
 
 $(document).ready(() => {
     $('#optionsModal').modal('show');
+    connect_socket();
 });
 
 function connect_socket() {
@@ -34,13 +39,14 @@ function connect_socket() {
             socket.on('connect', () => {
             const payload = jwt_decode(data.token);
             // get the start/end time strings for the after hours dialog
-            const tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
+            //const tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
             console.log('got connect');
             console.log('authenticated');
 
             $('#firstName').val(payload.first_name);
             $('#lastName').val(payload.last_name);
             $('#callerPhone').val(payload.vrs);
+            vrs = payload.vrs;
             $('#callerEmail').val(payload.email);
             $('#displayname').val(`${payload.first_name} ${payload.last_name}`);
             isOpen = payload.isOpen;
@@ -50,10 +56,10 @@ function connect_socket() {
                 console.log(`after hours modal suppressed. isOpen: ${isOpen}`);
             }
 
-            startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); // start time in UTC
-            endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); // end time in UTC
-            $('#ah-start-time').text(startTimeUTC);
-            $('#ah-end-time').text(`${endTimeUTC} ${tz}`);
+           // startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); // start time in UTC
+            //endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); // end time in UTC
+           // $('#ah-start-time').text(startTimeUTC);
+           // $('#ah-end-time').text(`${endTimeUTC} ${tz}`);
 
             socket.emit('register-client', {
                 hello: 'hello'
@@ -80,9 +86,9 @@ function connect_socket() {
                 console.log('got extension-created');
                 if (data.message === 'success') {
                 globalData = data;
-                $('#outOfExtensionsModal').modal('hide');
+                //$('#outOfExtensionsModal').modal('hide');
                 exten = data.extension;
-                $('#display_name').val(data.extension);
+                //$('#display_name').val(data.extension);
 
                 // is this a videomail call or complaint call?
                 if (videomailflag) {
@@ -183,7 +189,7 @@ function connect_socket() {
                 } else if (data.message === 'OutOfExtensions') {
                 console.log('out of extensions...');
                 // Try again in 10 seconds.
-                $('#outOfExtensionsModal').modal({
+               /* $('#outOfExtensionsModal').modal({
                     show: true,
                     backdrop: 'static',
                     keyboard: false
@@ -193,7 +199,7 @@ function connect_socket() {
 
                     document.getElementById('newExtensionRetryCounter').innerHTML = i;
                     i -= 1 || (clearInterval(newExtensionRetryCounter), extensionRetry());
-                }, 1000);
+                }, 1000);*/
                 } else {
                 console.log('Something went wrong when getting an extension');
                 }
@@ -291,16 +297,16 @@ function connect_socket() {
             })
             .on('queue-caller-join', (data) => {
                 if (data.extension === exten && data.queue === 'ComplaintsQueue') {
-                setQueueText(data.position -= 1); // subtract because asterisk wording is off by one
+                //setQueueText(data.position -= 1); // subtract because asterisk wording is off by one
                 }
                 console.log('queue caller join');
             })
             .on('queue-caller-leave', (data) => {
                 var currentPosition = $('#pos-in-queue').text();
                 if (data.queue === 'ComplaintsQueue') {
-                if (!abandonedCaller) { // abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
+                /*if (!abandonedCaller) { // abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
                     setQueueText(currentPosition -= 1);
-                }
+                }*/
                 console.log('queue caller leave');
                 abandonedCaller = false;
                 }
@@ -311,7 +317,7 @@ function connect_socket() {
                 currentPosition += 1;
                 if (currentPosition > data.position) { // checks if the abandoned caller was ahead of you
                     currentPosition = $('#pos-in-queue').text();
-                    setQueueText(currentPosition -= 1);
+                    //setQueueText(currentPosition -= 1);
                 }
                 console.log('queue caller abandon');
                 abandonedCaller = true;
@@ -320,7 +326,7 @@ function connect_socket() {
             .on('agent-name', (data) => {
                 if (data.agent_name !== null || data.agent_name !== '' || data.agent_name !== undefined) {
                 const firstname = data.agent_name.split(' ');
-                $('#agent-name').text(firstname[0]);
+                $('#agent-name').text(firstname[0]); // TODO add to communicating header
                 $('#agent-name-box').show();
                 console.log(`AGENT NUMBER IS ${data.vrs}`);
                 agentExtension = data.vrs;
@@ -401,7 +407,7 @@ function connect_socket() {
             })
             .on('enable-translation', () => {
                 // Activate flag/language dropdown
-                $('#language-select').msDropDown(
+               /* $('#language-select').msDropDown(
                 {
                     on: {
                     open: (data, ui) => {
@@ -413,7 +419,7 @@ function connect_socket() {
                 );
                 $('#languageSelectModal').modal('show');
                 // Align flags and labels to left
-                $('#language-select_msdd').css('text-align', 'left');
+                $('#language-select_msdd').css('text-align', 'left');*/
             })
             .on('consumer-multiparty-hangup', () => {
                 // show 'One Moment Please'
@@ -459,20 +465,202 @@ function connect_socket() {
     });
 }
 
+// setup for the call. creates and starts the User Agent (UA) and registers event handlers
+// This uses the new ACE Kurento object rather than JsSIP
+function registerJssip(myExtension, myPassword) {
+    const eventHandlers = {
+      connected: (e) => {
+        console.log(`--- WV: Connected ---\n${e}`);
+        callTerminated = false;
+      },
+      accepted: (e) => {
+        console.log(`--- WV: UA accepted ---\n${e}`);
+      },
+      newMessage: (e) => {
+        console.log('--- WV: New Message ---\n');
+        const consumerLanguage = sessionStorage.consumerLanguage;
+  
+        console.log(`Consumer's selected language is ${consumerLanguage}`);
+  
+        try {
+          if (e.msg === 'STARTRECORDING') {
+            startRecordProgress();
+            enableVideoPrivacy();
+            setTimeout(() => {
+              disableVideoPrivacy();
+            }, 1000);
+          } else {
+            const transcripts = JSON.parse(e.msg);
+            if (transcripts.transcript && !acekurento.isMultiparty) {
+              // Acedirect will skip translation service if languages are the same
+              console.log('sending caption:', transcripts.transcript, myExtension);
+              socket.emit('translate-caption', {
+                transcripts,
+                callerNumber: myExtension
+              });
+              // acedirect.js is listening for 'caption-translated' and will call
+              // updateConsumerCaptions directly with the translation
+            }
+          }
+        } catch (err) {
+          console.log(err);
+        }
+      },
+      registerResponse: (error) => {
+        console.log('--- WV: Register response:', error || 'Success ---');
+        if (!error) {
+          // empty
+        }
+      },
+      pausedQueue: (e) => {
+        console.log(`--- WV: Paused Agent Member in Queue ---\n${e}`);
+      },
+      unpausedQueue: (e) => {
+        console.log(`--- WV: Unpaused Agent Member in Queue ---\n${e}`);
+      },
+      callResponse: (e) => {
+        console.log(`--- WV: Call response ---\n${e}`);
+      },
+      incomingCall: (call) => {
+        console.log(`--- WV: Incoming call ---\n${call}`);
+      },
+      progress: (e) => {
+        console.log(`--- WV: Calling... ---\n${e}`);
+      },
+      startedRecording: (e) => {
+        console.log('--- WV: Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
+        if (e.success) {
+          // empty
+        }
+      },
+      stoppedRecording: (e) => {
+        console.log('--- WV: Stopped Recording:', (e.success) ? 'Success ---' : 'Error ---');
+        if (e.success) {
+          // empty
+        }
+      },
+      failed: (e) => {
+        console.log(`--- WV: Failed ---\n${e}`);
+      },
+      restartCallResponse: (e) => {
+        console.log(`--- WV: restartCallResponse ---\n${JSON.stringify(e)}`);
+        if (selfStream && selfStream.srcObject) {
+          selfStream.srcObject.getVideoTracks()[0].onended = () => {
+            console.log('screensharing ended self');
+            $('#startScreenshare').hide();
+  
+            if (monitorExt) {
+              // force monitor to leave the session first
+              socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
+  
+              setTimeout(() => {
+                screenShareEnabled = false;
+                if (acekurento) acekurento.screenshare(false);
+              }, 500);
+            } else {
+              if (acekurento) {
+                acekurento.screenshare(false);
+              }
+            }
+          };
+        }
+        if (remoteStream && remoteStream.srcObject) {
+          remoteStream.srcObject.getVideoTracks()[0].onended = () => {
+            console.log('screensharing ended remote');
+            $('#startScreenshare').hide();
+          };
+        }
+  
+        if (monitorExt) {
+          // bring the monitor back to the session
+          socket.emit('reinvite-monitor', { monitorExt });
+        }
+      },
+      ended: (e) => {
+        console.log(`--- WV: Call ended ---\n${e}`);
+  
+        $('#startScreenshare').hide();
+  
+        terminateCall();
+        //clearScreen();
+        //disableChatButtons();
+       // enableInitialButtons();
+        $('#start-call-buttons').show();
+        $('#agent-name-box').hide();
+        $('#agent-name').text('');
+        $('#end-call').attr('onclick', 'terminateCall()');
+      },
+      participantsUpdate: (e) => {
+        const partCount = e.participants.filter((t) => t.type === 'participant:webrtc').length;
+        console.log('--- WV: Participants Update ---\n');
+        console.log(`--- WV: ${JSON.stringify(e)}`);
+        console.log(`--- WV: e.participants.length: ${e.participants.length}`);
+  
+        console.log(`--- WV: partCount: ${partCount}`);
+  
+        for (let i = 0; i < e.participants.length; i += 1) {
+          if (e.participants[i].isMonitor) {
+            monitorExt = e.participants[i].ext;
+          }
+        }
+  
+        if (partCount >= 2 || videomailflag) {
+          console.log('--- WV: CONNECTED');
+          $('#queueModal').modal('hide');
+        }
+      }
+    };
+    console.log('Registering...');
+    acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
+    acekurento.register(myExtension, myPassword, false);
+  }
+
+  // terminates the call (if present) and unregisters the ua
+function unregisterJssip() {
+    terminateCall();
+    if (ua) {
+      ua.unregister();
+      ua.terminateSessions();
+      ua.stop();
+    }
+    localStorage.clear();
+    sessionStorage.clear();
+  }
+
 //CALL FLOW FUNCTIONS
 
 function enterQueue() {
-    const language = { "language" : "en"};
+    const language = "en";
     socket.emit('call-initiated', {
         language,
         vrs
     });
 }
+// makes a call
+/*
+* Use acekurento object to make the call. Not sure about the extension
+*/
+function startCall(otherSipUri) {
+    document.getElementById("noCallPoster").style.display = "none";
+    document.getElementById("inCallSection").style.display = "block";
 
+    console.log(`startCall: ${otherSipUri}`);
+    selfStream.removeAttribute('hidden');
+    //if (!captionsMuted()) {
+    //  showCaptions();
+    //}
+  
+    $('#screenshareButton').removeAttr('disabled');
+    $('#fileInput').removeAttr('disabled');
+    $('#shareFileConsumer').removeAttr('disabled');
+    // acekurento.call(globalData.queues_complaint_number, false);
+    acekurento.call(otherSipUri, false);
+  }
+/*
 function startCall(){
     document.getElementById("noCallPoster").style.display = "none";
     document.getElementById("inCallSection").style.display = "block";
-}
+}*/
 
 function terminateCall() {
     if (acekurento !== null) {
@@ -480,17 +668,17 @@ function terminateCall() {
         acekurento = null;
     }
     callTerminated = true;
-    monitorExt = null;
+   // monitorExt = null;
 
-    $('#fileInput').prop('disabled', true);
-    $('#shareFileConsumer').prop('disabled', true);
-    clearScreen();
-    removeVideo();
-    disableChatButtons();
-    enableInitialButtons();
-    exitFullscreen();
-    $('#transcriptoverlay').html('');
-    hideCaptions();
+  //  $('#fileInput').prop('disabled', true);
+   // $('#shareFileConsumer').prop('disabled', true);
+   // clearScreen();
+  //  removeVideo();
+   // disableChatButtons();
+  //  enableInitialButtons();
+  //  exitFullscreen();
+   // $('#transcriptoverlay').html('');
+   // hideCaptions();
 
     // remove file sharing
     socket.emit('call-ended', { agentExt: '' });
