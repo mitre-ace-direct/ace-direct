@@ -381,7 +381,7 @@
 
                       <i class="fa fa-user big-icon"></i>
                       <div class="button-area text-center">
-                        <button type="button" class="btn btn-primary btn-style" data-dismiss="modal">Call</button>
+                        <button type="button" class="btn btn-primary btn-style" data-dismiss="modal" onclick="enterQueue()">Call</button>
                       </div>
                     </div>
                     
@@ -415,4 +415,20 @@
   <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 	<script type="text/javascript" src="/assets/js/bootstrap.js"></script>
   <script type="text/javascript" src="/dro/js/complaint_form.js"></script>
+  <script type="text/javascript" src="/assets/js/jwt-decode.js"></script>
+  <script src="/js/ACEKurento-1.0.0.js"></script>
+  <script>
+		var nginxPath = '<%= nginxPath %>';
+		var stunFQDN = '<%= stunFQDN %>';
+		var stunPort = '<%= stunPort %>';
+		var turnFQDN = '<%= turnFQDN %>';
+		var turnPort = '<%= turnPort %>';
+		var turnUser = '<%= turnUser %>';
+		var turnCred = '<%= turnCred %>';
+
+		//not instrumenting complaint web page right now
+		var logWebRTCStats = false;
+		var logWebRTCStatsFreq = 60000;
+		var logWebRTCMongo = '';
+	</script>
 </html>
