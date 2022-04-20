@@ -503,7 +503,7 @@ function connect_socket() {
                 monitorCall: monitorAvailability(data.agents[i].status, data.agents[i].name, data.agents[i].extension),
                 transferCall: transferAvailability(data.agents[i].status, data.agents[i].name, data.agents[i].extension),
                 multipartyInvite : (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $('#agentname-sidebar').text() != data.agents[i].name)
-                ? '<Button class=\"demo-btn\" onClick=multipartyinvite(" + data.agents[i].extension + ")><i class=\"fa fa-users\"></i></Button>'
+                ? '<Button class=\"demo-btn\" onClick=multipartyinvite(' + data.agents[i].extension + ')><i class=\"fa fa-users\"></i></Button>'
                 : '<Button class=\"secondary\" disabled><i class=\"fa fa-users\"></i></Button>',
                 chat: '<Button class=\"demo-btn\" onClick="showChatMessage(\'' + data.agents[i].extension + '\',\'' + data.agents[i].name + '\')"><i class=\"fa fa-comments\"></i></Button>'
               });
