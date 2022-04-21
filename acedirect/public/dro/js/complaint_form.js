@@ -635,6 +635,7 @@ function enterQueue() {
         language,
         vrs
     });
+    $('#waitingModal').modal('show');
 }
 // makes a call
 /*
