@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var request = require('request');
 const jwt = require('jsonwebtoken');
 const shortid = require('shortid');
 const AWS = require('aws-sdk');
@@ -8,6 +9,7 @@ const fs = require('fs');
 var utils = require('./utils.js')
 var c = require('./constants.js')
 var config = require('./../../dat/config.json');
+const path = require('path');
 
 AWS.config.update({
     region: utils.getConfigVal(config.s3.region),
@@ -409,7 +411,7 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
         } else {
             uploadMetadata.vrs = uploadedBy;
         }
-        uploadMetadata.filepath = `${__dirname}/${req.file.path}`;
+        uploadMetadata.filepath = path.join(__dirname, '..', req.file.path);
         uploadMetadata.originalFilename = req.file.originalname;
         uploadMetadata.filename = req.file.filename;
         // 'encoding' is deprecated — since July 2015
@@ -426,7 +428,7 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
                     // const version = await clamscan.get_version();
                     // console.log(`ClamAV Version: ${version}`);
 
-                    const { isInfected, file, viruses } = await clamscan.isInfected(uploadMetadata.filepath);
+                    const { isInfected, file, viruses } = await clamscan.is_infected(uploadMetadata.filepath);
                     if (isInfected) {
                         console.log(`${req.file.originalname} is infected with ${viruses}!`);
                         res.status(400).send('Error scanning file i');
