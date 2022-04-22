@@ -1888,13 +1888,13 @@ io.sockets.on('connection', (socket) => {
     }
 
     const recordingSqlQuery = `${recordingSqlSelect} ${recordingSqlWhere} ${recordingSqlOrder};`;
-    console.log(`QUERY IS ${recordingSqlQuery}`);
+    logger.debug(`QUERY IS ${recordingSqlQuery}`);
     dbConnection.query(recordingSqlQuery, recordingSqlParams, (err, result) => {
       if (err) {
         logger.error(`RECORDING-ERROR: ${err.code}`);
         console.log(`Got recording error: ${err}`);
       } else {
-        console.log(`GOT RESULTS ${JSON.stringify(result)}`);
+        logger.debug(`GOT RESULTS ${JSON.stringify(result)}`);
         io.to(token.extension).emit('got-call-recordings', result);
       }
     });
@@ -3681,6 +3681,49 @@ app.use((req, res, next) => {
 
 const adRoutes = require('./app/routes');
 app.use('/', adRoutes);
+
+// Download depends on globals; define this route here
+app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
+    if (sharingAgent !== undefined && sharingConsumer !== undefined) {
+        for (let i = 0; i < sharingAgent.length; i += 1) {
+            // make sure the agent is in a call with the consumer who sent the file
+            if (req.session.user.extension === sharingAgent[i] || req.session.user.vrs === sharingConsumer[i]) {
+                console.log('In valid session');
+
+                if (fileToken[i].toString() === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
+                    console.log('allowed to download');
+
+                    const documentID = req.query.id;
+                    let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:mserver')}`;
+                    url += `/getStoreFileInfo?documentID=${documentID}`;
+                    request({
+                        url,
+                        json: true
+                    }, (error, response, data) => {
+                        if (error) {
+                            res.status(500).send('Error');
+                        } else if (data.message === 'Success') {
+                            const { filepath } = data;
+                            const { filename } = data;
+                            const readStream = fs.createReadStream(filepath);
+                            res.attachment(filename);
+                            readStream.pipe(res);
+                        } else {
+                            res.status(500).send('Error');
+                        }
+                    });
+                    break;
+                } else {
+                    console.log('Not authorized to download this file, mismatched IDs');
+                }
+            } else {
+                console.log('Not authorized to download');
+            }
+        }
+    } else {
+        console.log('Not authorized to download');
+    }
+});
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

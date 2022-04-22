@@ -35,10 +35,6 @@ function restrict(req, res, next) {
     }
 };
 
-router.get('/', (req, res) => {
-  res.redirect(utils.getConfigVal(config.nginx.ad_path) + utils.getConfigVal(config.nginx.consumer_route));
-});
-
 router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => {
     if (req.session.user && req.session.user.role === 'VRS') {
         res.render('pages/complaint_form');
@@ -483,52 +479,6 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
         res.status(403).send('Unauthorized');
     }
 });
-
-// Download
-router.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
-    if (sharingAgent !== undefined && sharingConsumer !== undefined) {
-        for (let i = 0; i < sharingAgent.length; i += 1) {
-            // make sure the agent is in a call with the consumer who sent the file
-            if (req.session.user.extension === sharingAgent[i] || req.session.user.vrs === sharingConsumer[i]) {
-                console.log('In valid session');
-
-                console.log('Comparing file IDs');
-                if (fileToken[i].toString() === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
-                    console.log('allowed to download');
-
-                    const documentID = req.query.id;
-                    let url = `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.mserver)}`;
-                    url += `/getStoreFileInfo?documentID=${documentID}`;
-
-                    request({
-                        url,
-                        json: true
-                    }, (error, response, data) => {
-                        if (error) {
-                            res.status(500).send('Error');
-                        } else if (data.message === 'Success') {
-                            const { filepath } = data;
-                            const { filename } = data;
-                            const readStream = fs.createReadStream(filepath);
-                            res.attachment(filename);
-                            readStream.pipe(res);
-                        } else {
-                            res.status(500).send('Error');
-                        }
-                    });
-                    break;
-                } else {
-                    console.log('Not authorized to download this file, mismatched IDs');
-                }
-            } else {
-                console.log('Not authorized to download');
-            }
-        }
-    } else {
-        console.log('Not authorized to download');
-    }
-});
-
 
 router.get('/getagentstatus/:token', (req, res) => {
     let resObj = {
