@@ -3,6 +3,7 @@ let remoteStream = document.getElementById('remoteView');
 let selfStream = document.getElementById('selfView');
 const muteAudioButton = document.getElementById('mute-audio');
 const hideVideoButton = document.getElementById('hide-video');
+let callTimer = 0;
 let inCall = false;
 let vrs;
 let acekurento = null;
@@ -47,13 +48,15 @@ function connect_socket() {
             $('#lastName').val(payload.last_name);
             $('#callerPhone').val(payload.vrs);
             vrs = payload.vrs;
-            $('#callerEmail').val(payload.email);
+            //$('#callerEmail').val(payload.email);
             $('#displayname').val(`${payload.first_name} ${payload.last_name}`);
             isOpen = payload.isOpen;
             if (!isOpen) { // after hours processing; if after hours, then show this modal
+              //TODO Review potentially having config variable to determine if enabled per user
+              //DO NOT enable for dro
                 // $("#afterHoursModal").modal({ backdrop: "static" });
                 // $("#afterHoursModal").modal("show");
-                console.log(`after hours modal suppressed. isOpen: ${isOpen}`);
+                //console.log(`after hours modal suppressed. isOpen: ${isOpen}`);
             }
 
            // startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); // start time in UTC
@@ -70,7 +73,7 @@ function connect_socket() {
             })
             .on('ad-ticket-created', (data) => {
                 console.log('got ad-ticket-created');
-                $('#userformoverlay').removeClass('overlay').hide();
+                /*$('#userformoverlay').removeClass('overlay').hide();
                 if (data.zendesk_ticket) {
                 $('#firstName').val(data.first_name);
                 $('#lastName').val(data.last_name);
@@ -80,7 +83,7 @@ function connect_socket() {
                 } else {
                 $('#ZenDeskOutageModal').modal('show');
                 $('#userformbtn').prop('disabled', false);
-                }
+                }*/
             })
             .on('extension-created', (data) => {
                 console.log('got extension-created');
@@ -260,6 +263,7 @@ function connect_socket() {
                 document.getElementById('mute-captions-off-icon').style.display = 'block'; // used by jssip_consumer.js to see if captions are muted
                 }
             })
+            //TODO Rename skinny mode references to base configuration
             .on('skinny-config', (data) => {
                 if (data === 'true') {
                 $('#ticket-section').attr('hidden', true);
@@ -327,8 +331,8 @@ function connect_socket() {
                 if (data.agent_name !== null || data.agent_name !== '' || data.agent_name !== undefined) {
                 const firstname = data.agent_name.split(' ');
                 $('#agent-name').text(firstname[0]); // TODO add to communicating header
-                $('#agent-name-box').show();
-                console.log(`AGENT NUMBER IS ${data.vrs}`);
+                $('#CommunicationText').text('You are communicating with ' + firstname[0]); 
+                //$('#agent-name-box').show();
                 agentExtension = data.vrs;
                 }
             })
@@ -641,8 +645,15 @@ function enterQueue() {
 * Use acekurento object to make the call. Not sure about the extension
 */
 function startCall(otherSipUri) {
+    let minutes;
     document.getElementById("noCallPoster").style.display = "none";
     document.getElementById("inCallSection").style.display = "block";
+    //Set the timer
+    callTimer = setInterval(() => {
+      callTimer = callTimer + 1;
+      minutes = Math.floor((callTimer / 60)) > 0 ? Math.floor(callTimer / 60) : 0;
+      $('#callTime').text(minutes + ":" + (callTimer - minutes * 60) + " min");
+    }, 1000);
 
     console.log(`startCall: ${otherSipUri}`);
     selfStream.removeAttribute('hidden');
@@ -656,11 +667,7 @@ function startCall(otherSipUri) {
     // acekurento.call(globalData.queues_complaint_number, false);
     acekurento.call(otherSipUri, false);
   }
-/*
-function startCall(){
-    document.getElementById("noCallPoster").style.display = "none";
-    document.getElementById("inCallSection").style.display = "block";
-}*/
+
 
 function terminateCall() {
     if (acekurento !== null) {

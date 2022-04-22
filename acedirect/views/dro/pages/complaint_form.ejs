@@ -3,6 +3,15 @@
   <head>
     <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
     <style>
+
+      #selfView {
+        width : 200px;
+      }
+
+      #remoteView {
+        width: -webkit-fill-available;
+      }
+
       #pageContainer {
         padding-left: 0px !important;
         padding-right: 0px !important;
@@ -159,14 +168,14 @@
       <div class="row">
         <div id="callVideoColumn" class="col-md-8 text-center" style="border : 5px solid black">
           <!--Only appear outside of a call-->
-          <div id="noCallPoster" hidden>
+          <div id="noCallPoster">
             <img  id="heroLogo" src="dro/images/acedirect-logo.png" alt="heroLogo">
           </div>
           <!--END Only appear outside of a call-->
           <!--Appear inside of a call-->
-          <div id="inCallSection">
+          <div id="inCallSection" hidden>
             <div id="callButtonsRow" class="row">
-              <span>TODO min</span>
+              <span id="callTime"></span>
               <button id="mute-audio" type="button" class="btn btn-gray circleButton" onclick="muteAudio()">
                 <i id="mute-audio-icon" class="call-btn-icon fa fa-microphone"></i>
               </button>
@@ -185,14 +194,14 @@
             </div>
 
             <div id="speakingToRow" class="row">
-              You are communicating with TODO
+              <span id="CommunicationText"></span>
             </div>
 
             <div id="callVideosRow" class="row">
-              <div class="col-md-4" id="selfViewCol">
+              <div class="col-md-3" id="selfViewCol">
                 <video id="selfView" autoplay muted="true" class="mirror-mode"></video>
               </div>
-              <div class="col-md-8" id="remoteViewCol">
+              <div class="col-md-9" id="remoteViewCol">
                 <video id="remoteView" autoplay></video>
               </div>
             </div>
