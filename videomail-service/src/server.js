@@ -1,4 +1,3 @@
-
 // Imports of internal dependencies.
 const config = require('./configuration.js');
 const registry = require('./registry.js');
@@ -539,7 +538,7 @@ function createMediaElements(ext, pipeline, callback) {
             mediaPipeline: pipeline,
             mediaProfile: callee.incomingMediaProfile,
             stopOnEndOfStream: true,
-            uri: `file:/${config.kmsMediaPath}videomail_${date}${recordExtension}`
+            uri: `file://${config.kmsMediaPath}videomail_${date}${recordExtension}`
         };
         console.log(recordParams)
         callee.recordingFile = 'videomail_' + date + recordExtension;
