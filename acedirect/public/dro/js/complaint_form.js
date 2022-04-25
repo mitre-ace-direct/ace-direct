@@ -13,6 +13,9 @@ let videomailflag = false;
 $(document).ready(() => {
     $('#optionsModal').modal('show');
     connect_socket();
+    $('[data-toggle="tooltip"]').tooltip({
+        trigger: 'hover'
+    });
 });
 
 function connect_socket() {
@@ -765,4 +768,9 @@ function logout() {
     }
     // display the login screen to the user.
     window.location.href = './logout';
+}
+
+function showFileShareConfirmation() {
+  //just showing a confirmation to demo UI 
+  $('#fileSent').show();
 }
