@@ -529,7 +529,7 @@ class WebRTCMediaSession extends Events {
         const date = this.getTimestampString();
         fileName = `rec_${ext}_${date}.mp4`;
         const mediaPath = param('kurento.mediapath');
-        const filePath = `file:/${mediaPath}/recordings/${fileName}`;
+        const filePath = `file:/${mediaPath}recordings/${fileName}`;
         debug(`${ext} recording to  ${filePath}`);
 
         const recorder = await this._pipeline.create('RecorderEndpoint', {

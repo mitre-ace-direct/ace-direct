@@ -80,6 +80,7 @@ usage() {
   exit 1;
 }
 
+NUM_ARGS="$#"
 while getopts "u:p:f:l:r:n:e:o:x:y:z:i" arg; do
   case "${arg}" in
     u)
@@ -127,7 +128,7 @@ done
 shift $((OPTIND-1))
 
 # if no args and not interactive mode, show usage
-if [ "$#" -eq 0 ]; then
+if [ "$NUM_ARGS" -eq 0 ]; then
   if [ "$INTERACTIVE" == "false" ]; then
     usage
     exit 0
@@ -156,7 +157,7 @@ fi
 getInput " $PHONE " 'Enter a phone' '111-222-3333'
 PHONE=$TEMP_RESPONSE
 
-getInput " $EMAIL " 'Enter an email' 'dagent1@mail.com'
+getInput " $EMAIL " 'Enter an email' "${USERNAME}@mail.com"
 EMAIL=$TEMP_RESPONSE
 
 getInput " $ORG " 'Enter an organization' 'ABC Org.'
