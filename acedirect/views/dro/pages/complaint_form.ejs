@@ -168,6 +168,30 @@
         background-color: transparent !important;
       }
 
+      .modal-outline-btn {
+        color: #337ab7 !important;
+      }
+
+      .rotate-phone {
+        -webkit-transform: rotate(137deg);
+        -ms-transform: rotate(137deg);
+        transform: rotate(137deg);
+      }
+
+      .separator {
+        content: '';
+        display: inline-block;
+        background: #888;
+        margin: 0px 4px;
+        height: 18px;
+        width: 1px;
+        vertical-align: top;
+      }
+
+      .second-or {
+        margin-top: 9px;
+      }
+
     </style>
   </head>
   <%- include("../partials/agent_page_header") %>
@@ -473,6 +497,18 @@
           <div class="row">
             <div class="col-xs-12 text-center">
                 If you do not wish to wait for an agent, you may:
+            </div>
+          </div>
+          <br />
+          <div class="row">
+            <div class="col-xs-5">
+              <button type="button" class="btn btn-default modal-outline-btn"><i class="fa fa-envelope"></i><span class="separator"></span> Leave Videomail</button>
+            </div>
+            <div class="col-xs-2 second-or">
+              -OR-
+            </div>
+            <div class="col-xs-5">
+              <button type="button" class="btn btn-default modal-outline-btn"><i class="fa fa-phone rotate-phone"></i><span class="separator"></span> Hang Up</button>
             </div>
           </div>
 
