@@ -249,7 +249,7 @@
       }
     },
     "conference_max_participants": 4,
-    "mediapath": "location of the kms-share media folder. default: /home/ubuntu/kms-share/media"
+    "mediapath": "location of the kms-share media folder. default: /home/ubuntu/kms-share/media/"
 
   },
   "videomailss": {

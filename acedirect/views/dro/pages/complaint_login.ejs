@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<%- include("../partials/agent_page_header") %>
+  <head>
+    <link rel="stylesheet" href="/assets/css/inputmask.css">
+  </head>
+  <body id="consumerBackground">
+    <div id="logoContainer">
+      <img src="dro/images/DVC2.png" style="margin-right: 3%;" width="20%" alt="DVC">
+      <img src="dro/images/fcc-logo.jpg" width="7%" alt="FCClogo">
+    </div>
+    <img  id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100vw" alt="heroLogo">
+
+    <div id="VRSlogincontainer">
+      <div id="VRScontent">
+        <p id="headerBox"><b>Videophone Number</b></p>
+        <p font-size="14px">Please enter your videophone number below to proceed to the FCC consumer support portal.</p><br/>
+        <div id="input-group" class="input-group">
+          <input type="text" class="form-control input-lg" id="vrs_number"
+            data-inputmask="'mask': '(999) 999-9999'" data-mask required>
+            <div class="input-group-addon" id="continueButton" onclick="login()">
+              <b>Continue >></b>
+            </div>
+        </div>
+        <div id="message" hidden></div>
+      </div>
+
+      <div id="infoBox">
+        <p font-size="14px">You are entering an Official United States Government System, which may be used only for authorized
+          purposes. The Government may monitor and audit usage of this system, and all persons are hereby notified
+          that use of this system constitutes consent to such monitoring and auditing. Unauthorized attempts to
+          upload or change information on this web site is prohibited.</p>
+      </div>
+    </div>
+
+    <!--Incorrect Browser Modal-->
+    <div class="modal fade" id="notChromeModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header text-center">
+            <h2>Recommended Browser</h2>
+          </div>
+          <div class="modal-body">
+            <div class="row justify-content-md-center">
+              <div class="col-8 text-center align-self-center">
+                <h4> For the best experience, visit this site using Google Chrome or Microsoft Edge.</h4>
+                <h4>You are using <span id="browserType"></span>.</h4>
+                <div class="btn-group-lg" role="group">
+                  <button id="continue-btn" type="button" class="btn btn-light btn-lg"
+                    style="background-color: #073863; color: white;"
+                    data-dismiss="modal">Continue to Support Portal</button>
+                  <button id="copy-btn" type="button" class="btn btn-light btn-lg"
+                    style="color:#073863; background-color: white; border:2px solid #073863;"
+                    onclick="copyURL()">Copy Support Portal Link</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <div class="row">
+              <div class="col-xs-12 text-center">
+                <a href="https://www.fcc.gov/accessibility"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <style>
+        #VRSlogincontainer {
+          position: fixed;
+          z-index: 1;
+          left: 0;
+          right: 0;
+          top: 0;
+          width: 34%;
+          height: 50%;
+          text-align: center;
+          margin: auto;
+        }
+
+        #VRScontent {
+          background-color: rgba(255, 255, 255, 0.85);
+          margin-top: 45%;
+          padding: 20px;
+          border: 1px solid #888;
+        }
+
+        #infoBox {
+          background-color: rgba(255, 255, 255, 0.85);
+          margin-top: 2%;
+          padding: 20px;
+          border: 1px solid #888;
+        }
+
+        #consumerBackground{
+          background-color: lightgray;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        #logoContainer {
+          background-color: white;
+          text-align: center;
+          padding: 1%;
+        }
+
+        #continueButton{
+          background-color: #073863 !important;
+          color: white !important;
+        }
+
+        #headerBox {
+          font-size: 20px;
+        }
+
+        #vrslogincontainer {
+            z-index: 100;
+            position: absolute;
+            background-color: white;
+            border: 1px solid darkgray;
+            top: 35vh;
+            width: 50vw;
+        }
+
+        #heroLogo {
+            min-width: 100vw;
+            margin: auto;
+            object-fit: fill;
+            background-size: cover;
+        }
+    </style>
+
+    <!-- jQuery v2.1.4 -->
+    <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+    <!-- Bootstrap 3.3.5 -->
+    <script type="text/javascript" src="/assets/js/bootstrap.js"></script>
+    <script type="text/javascript" src="dro/js/complaint_login.js"></script>
+    <script type="text/javascript" src="/assets/js/inputmask.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.inputmask.min.js"></script>
+  </body>
+
+  <%- include("../partials/acedirect_footer") %>
+
+</html>
