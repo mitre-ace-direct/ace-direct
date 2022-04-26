@@ -169,20 +169,35 @@
       }
 
       .modal-outline-btn {
-        color: #337ab7 !important;
+        color: #073863 !important;
+        border-color: #073863 !important;
+        border-width: 2px  !important;
+        font-weight: bold !important;
+        padding-top: 10px !important;
+        padding-bottom: 10px !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        width: 190px !important;
+      }
+
+      .modal-outline-btn:hover {
+        background-color:#e6ebef;
       }
 
       .rotate-phone {
         -webkit-transform: rotate(137deg);
         -ms-transform: rotate(137deg);
         transform: rotate(137deg);
+        font-size: 18px !important;
+        top: 2px !important;
+        position: relative;
       }
 
       .separator {
         content: '';
         display: inline-block;
-        background: #888;
-        margin: 0px 4px;
+        background: #073863;
+        margin: 1px 12px;
         height: 18px;
         width: 1px;
         vertical-align: top;
@@ -190,6 +205,23 @@
 
       .second-or {
         margin-top: 9px;
+      }
+
+      .my-body {
+        padding-bottom: 20px !important;
+      }
+
+      .button-row {
+        width: 90%;
+        margin-left: 5% !important;
+      }
+
+      .waiting-header {
+        margin-bottom: 30px;
+      }
+
+      #placeholderImage {
+        margin-bottom: 8px;
       }
 
     </style>
@@ -488,11 +520,11 @@
 		<div class="modal-dialog modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header text-center">
-          <h3>Waiting for the next available agent...</h3>
+          <h3 class="waiting-header">Waiting for the next available agent...</h3>
           <hr />
 					<img  id="placeholderImage" src="/dro/images/placeholder.png" width="100%" alt="Video placeholder">
 				</div>
-				<div class="modal-body text-center">
+				<div class="modal-body text-center my-body">
 					
           <div class="row">
             <div class="col-xs-12 text-center">
@@ -500,15 +532,15 @@
             </div>
           </div>
           <br />
-          <div class="row">
+          <div class="row button-row">
             <div class="col-xs-5">
-              <button type="button" class="btn btn-default modal-outline-btn"><i class="fa fa-envelope"></i><span class="separator"></span> Leave Videomail</button>
+              <button type="button" class="btn btn-default modal-outline-btn"><i class="fa fa-envelope"></i><span class="separator"></span>Leave Videomail</button>
             </div>
             <div class="col-xs-2 second-or">
-              -OR-
+              - OR -
             </div>
             <div class="col-xs-5">
-              <button type="button" class="btn btn-default modal-outline-btn"><i class="fa fa-phone rotate-phone"></i><span class="separator"></span> Hang Up</button>
+              <button type="button" class="btn btn-default modal-outline-btn"><i class="fa fa-phone rotate-phone"></i><span class="separator"></span>Hang Up</button>
             </div>
           </div>
 
