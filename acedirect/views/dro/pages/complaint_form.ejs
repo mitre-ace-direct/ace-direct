@@ -114,19 +114,13 @@
 
       .tabs-right {
         border-bottom: 1px solid #ddd;
-        padding-top: 2px;
-      }
-    
-      .tabs-right {
         border-left: 1px solid #ddd;
+        padding-top: 2px;
       }
     
       .tabs-right>li {
         float: none;
         margin-bottom: 2px;
-      }
-    
-      .tabs-right>li {
         margin-left: -1px;
       }
     
@@ -135,6 +129,7 @@
       .tabs-right>li.active>a:focus {
         border-bottom: 1px solid #ddd !important;
         border-left-color: transparent !important;
+        border-right-color: transparent !important;
       }
     
       .tabs-right>li>a {
@@ -157,6 +152,44 @@
       .fontSizeButtons {
         border:1px solid grey !important;
         height:100%;
+      }
+
+      .chooseFileGroup input.fileInput::-webkit-file-upload-button {
+        border: none;
+        color: black;
+        font-weight: 500;
+        background: lightgrey;
+        padding: 9px 18px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .collapseTab:hover {
+        background-color: transparent !important;
+      }
+
+      .modal-outline-btn {
+        color: #337ab7 !important;
+      }
+
+      .rotate-phone {
+        -webkit-transform: rotate(137deg);
+        -ms-transform: rotate(137deg);
+        transform: rotate(137deg);
+      }
+
+      .separator {
+        content: '';
+        display: inline-block;
+        background: #888;
+        margin: 0px 4px;
+        height: 18px;
+        width: 1px;
+        vertical-align: top;
+      }
+
+      .second-or {
+        margin-top: 9px;
       }
 
     </style>
@@ -208,7 +241,7 @@
           </div>
           <!--END Appear inside of a call-->
         </div>
-        <div id="callFeaturesColumn" class="col-md-4">
+        <div id="callFeaturesColumn" class="col-md-4" style="border-left:1px solid #ddd; height:100%">
           <div class="col-xs-9">
             <!-- Tab panes -->
             <div class="tab-content">
@@ -227,7 +260,7 @@
                   <!-- Conversations are loaded here -->
                   <!--Hard coding messages for now-->
                   <div id="chat-body" style="height:70vh;">
-                    <div class="direct-chat-messages fixed-bottom" id="chat-messages">
+                    <div class="direct-chat-messages" id="chat-messages" style="padding-top:110%">
                       <div class="alert alert-secondary" role="alert"
                         style="background-color: lightgray !important; color: black; border-radius: 25px;">
                         <p><b>Agent</b> 12:00pm</p>
@@ -235,21 +268,20 @@
                       </div>
                       <div class="alert alert-info" role="alert" style="color: black; border-radius: 25px;">
                         <p><b>You</b> 12:01pm</p>
-                        <p>This is a message from the Consumer. These messages need to move to the bottom of the chat box</p>
+                        <p>This is a message from the Consumer.</p>
                       </div>
                     </div>
                   </div>
         
-                  <div id="chat-footer" class="box-footer">
+                  <div id="chat-footer" class="box-footer" style="padding-top:10px">
                     <form name="chatsend" id="chatsend">
                       <div class="input-group">
                         <span class="input-group-btn">
+                          <span class="dropup">
                           <button id="chat-emoji" class="btn btn-primary btn-flat" type="button" data-toggle="dropdown"
-                            animation="true" style="background-color: #073863 !important;" disabled>&#128512;</button>
+                            animation="true" style="background-color: #073863 !important;">&#128512;</button>
                           <div class="dropdown-menu dropdown-multicol" id="emoji-selector" aria-labelledby="dropdownMenuButton"
-                            style="height:150px; overflow-y: scroll;">
-                            <li role="presentation" class="dropdown-header">Select an Emoji</li>
-                            <li role="presentation" class="divider"></li>
+                            style="height:fit-content; overflow-y: scroll;">
                             <div class="dropdown-row">
                               <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
                                 onclick="addEmoji(this.value)" value="&#128512;">&#128512;</button>
@@ -285,13 +317,14 @@
         
                           </div>
                         </span>
+                        </span>
                         <input type="hidden" id="displayname">
-                        <input type="text" id="newchatmessage" placeholder="Chat disabled" class="form-control" maxlength="500"
-                          autocomplete="off" required disabled>
+                        <input type="text" id="newchatmessage" placeholder="Type a message" class="form-control" maxlength="500"
+                          autocomplete="off" required>
         
                         <span class="input-group-btn">
                           <button id="chat-send" class="btn btn-primary btn-flat" type="submit"
-                            style="background-color: #073863 !important;" disabled>Send</button>
+                            style="background-color: #073863 !important;">Send</button>
                         </span>
                       </div>
                     </form>
@@ -321,12 +354,18 @@
                     <br>
                     <br>
                     <!--file selection section-->
-                    <div class="btn-group">
+                    <div class="btn-group chooseFileGroup">
                       <input type="file" id="fileInput" name="fileInput"
-                        class="form-control-file btn btn-default"
-                        style="background-color:transparent; border: transparent;" disabled>
+                        class="form-control-file btn btn-default fileInput"
+                        style="background-color:transparent; border: transparent; padding-left: 0px;">
                     </div>
-                    <button class="btn btn-primary pull-right" id="shareFileConsumer" onclick="shareFileConsumer()" disabled>Send</button>
+                    <button class="btn btn-primary pull-right" id="shareFileConsumer" onclick="showFileShareConfirmation()" style="background-color:#073863 !important">Send</button>
+                    <div class="row">
+                      <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
+                          <span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
+                          <strong>Success!</strong>  File Sent
+                      </div>
+                  </div>
                     <!--end file selection section-->
                     <br>
                     <br>
@@ -334,7 +373,7 @@
                     <h3>Sent File(s)</h3>
                     <hr style="border:1px solid grey"/>
                     <span>Example_picture.png</span>
-                    <button class="btn btn-secondary pull-right fileshareButton"><i class="fa fa-eye"></i></button>
+                    <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></button>
                     <!--end sent files section-->
                     <br>
                     <br>
@@ -342,12 +381,16 @@
                     <h3>Received File(s)</h3>
                     <hr style="border:1px solid grey"/>
                     <span>Documentation.doc</span>
-                    <button class="btn btn-secondary pull-right fileshareButton"><i class="fa fa-download"></i></button>
-                    <button class="btn btn-secondary pull-right fileshareButton"><i class="fa fa-eye"></i></button>
+                    <span class="btn-toolbar pull-right" role="toolbar">
+                      <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="Download"><i class="fa fa-download"></i></button>
+                      <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></button>
+                    </span>
                     <hr/>
                     <span>Image for you to look at.IMG</span>
-                    <button class="btn btn-secondary pull-right fileshareButton"><i class="fa fa-download"></i></button>
-                    <button class="btn btn-secondary pull-right fileshareButton"><i class="fa fa-eye"></i></button>
+                    <span class="btn-toolbar pull-right" role="toolbar">
+                      <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="Download"><i class="fa fa-download"></i></button>
+                      <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></button>
+                    </span>
                     <hr/>
                     <!--end received files section-->
                   </div>
@@ -359,11 +402,31 @@
           <div class="col-xs-3">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs tabs-right" style="height: 90vh;">
-              <li><a data-toggle="tab"><button id="collapseButton"><i class="fa fa-angle-double-right fa-2x"></i></button></a>
+              <li id="collapseTab" class="collapseTab">
+                <a class="collapseTab" style="padding-bottom: 20px; padding-top:20px; width:8vw; padding-left: 50%; border:solid 1px transparent;">
+                  <button id="collapseButton" data-toggle="tooltip" title="Collapse">
+                    <i class="fa fa-angle-double-right fa-lg" style="padding:3px">
+                    </i>
+                  </button>
+                </a>
               </li>
-              <li class="active"><a href="#chatBody" data-toggle="tab"><i class="fa fa-comments fa-2x"
-                    style="color: #073863"></i></a></li>
-              <li><a href="#fileBody" data-toggle="tab"><i class="fa fa-file fa-2x" style="color: #073863"></i></a></li>
+              <li class="active" data-toggle="tooltip" title="Chat">
+                <a href="#chatBody" data-toggle="tab"  style="width:8vw">
+                  <i class="fa fa-comments fa-2x"
+                    style="color: #073863; padding-top:10px; padding-bottom: 10px; padding-left: 50%;">
+                  </i>
+                  <br>
+                  <p style="color: #073863; padding-left: 50%">Chat</p>
+                </a>
+              </li>
+              <li data-toggle="tooltip" title="File Share">
+                <a href="#fileBody" data-toggle="tab" style="width:8vw">
+                  <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px; padding-left: 50%;">
+                  </i>
+                  <br>
+                    <p style="color: #073863; padding-left:35%">File Share</p>
+                </a>
+              </li>
             </ul>
           </div>
         </div>
@@ -411,6 +474,41 @@
                 </div>
                 
             </div>
+            </div>
+          </div>
+
+				</div>
+				<div class="modal-footer">
+          <a href="#" onclick="logout()"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
+				</div>
+			</div>
+		</div>
+	</div>
+  <div id="waitingModal" class="modal fade">
+		<div class="modal-dialog modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header text-center">
+          <h3>Waiting for the next available agent...</h3>
+          <hr />
+					<img  id="placeholderImage" src="/dro/images/placeholder.png" width="100%" alt="Video placeholder">
+				</div>
+				<div class="modal-body text-center">
+					
+          <div class="row">
+            <div class="col-xs-12 text-center">
+                If you do not wish to wait for an agent, you may:
+            </div>
+          </div>
+          <br />
+          <div class="row">
+            <div class="col-xs-5">
+              <button type="button" class="btn btn-default modal-outline-btn"><i class="fa fa-envelope"></i><span class="separator"></span> Leave Videomail</button>
+            </div>
+            <div class="col-xs-2 second-or">
+              -OR-
+            </div>
+            <div class="col-xs-5">
+              <button type="button" class="btn btn-default modal-outline-btn"><i class="fa fa-phone rotate-phone"></i><span class="separator"></span> Hang Up</button>
             </div>
           </div>
 
