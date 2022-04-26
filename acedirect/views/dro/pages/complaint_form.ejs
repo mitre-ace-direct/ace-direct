@@ -168,6 +168,19 @@
         background-color: transparent !important;
       }
 
+      /* Center modals vertically */
+      .modal-dialog {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow-y: auto;
+        min-height: calc(100vh - 60px);
+        @media (max-width: 767px) {
+          min-height: calc(100vh - 20px);
+        }
+      }
+
+
       .modal-outline-btn {
         color: #073863 !important;
         border-color: #073863 !important;
