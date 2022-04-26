@@ -775,3 +775,27 @@ function showFileShareConfirmation() {
   //just showing a confirmation to demo UI 
   $('#fileSent').show();
 }
+
+$('#newchatmessage').on("keyup", function() {
+  this.style.height = this.scrollHeight + 'px';
+  if($('#newchatmessage').val() == "") {
+    this.style.height = '34px';
+  }
+})
+
+$('#fileInput').on('change', function () {
+  if ($('#fileInput')[0].value == "") {
+    console.log('no file chosen')
+    $('#shareFileConsumer').prop( "disabled", true );
+    $('#removeFileBtn').css('display','none');
+  } else {
+    console.log('file chosen!')
+    $('#shareFileConsumer').prop( "disabled", false );
+    $('#removeFileBtn').css('display','block');
+  }
+})
+
+function removeFile() {
+  $('#fileInput')[0].value = "";
+  $('#shareFileConsumer').prop( "disabled", true );
+}
