@@ -20,7 +20,7 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginxParams
     if (!req.isAuthenticated()) {
       res.redirect('./login');
     } else {
-      res.redirect('./profile');
+      res.redirect('./logout');
     }
   });
 
@@ -96,18 +96,13 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginxParams
               res.redirect(`${nginxParams.ad_path}${nginxParams.consumer_route}`);
               break;
             default:
-              res.redirect('./profile'); // send the user somewhere
+              res.redirect('./logout'); // send the user somewhere
           }
         } else {
-          res.redirect('./profile');
+          res.redirect('./logout');
         }
       }
     });
-  });
-
-  // app.get('/profile', restrict('any'), (req, res) => {
-  app.get('/profile', (req, res) => {
-    res.render('profile.ejs');
   });
 
   app.post('/updateProfile', restrict('any'), (req, res) => {
