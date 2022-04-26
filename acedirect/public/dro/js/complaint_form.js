@@ -697,19 +697,25 @@ function terminateCall() {
 
 // mutes self audio so remote cannot hear you
 function muteAudio() {
-    if (acekurento !== null) {
-      acekurento.enableDisableTrack(false, true); // mute audio
-    }
+  $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone').addClass('call-btn-icon fa fa-microphone-slash');
+  $('#mute-audio').attr("onclick","unmuteAudio()");
+  if (acekurento !== null) {
+    acekurento.enableDisableTrack(false, true); // mute audio
   }
+}
   
 // unmutes self audio so remote can hear you
 function unmuteAudio() {
-    if (acekurento !== null) {
-        acekurento.enableDisableTrack(true, true); // unmute audio
-    }
+  $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone-slash').addClass('call-btn-icon fa fa-microphone');
+  $("#mute-audio").attr("onclick","muteAudio()");
+  if (acekurento !== null) {
+      acekurento.enableDisableTrack(true, true); // unmute audio
+  }
 }
 
 function enableVideoPrivacy() {
+  $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa fa-video-camera-slash');
+  $("#hide-video").attr("onclick","disableVideoPrivacy()");
     if (acekurento !== null) {
         if (acekurento.isMonitoring) {
         socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -732,6 +738,8 @@ function enableVideoPrivacy() {
 }
 
 function disableVideoPrivacy() {
+  $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera-slash').addClass('call-btn-icon fa fa-video-camera');
+  $("#hide-video").attr("onclick","enableVideoPrivacy()");
     if (acekurento !== null) {
         if (acekurento.isMonitoring) {
         socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
