@@ -168,6 +168,19 @@
         background-color: transparent !important;
       }
 
+      /* Center modals vertically */
+      .modal-dialog {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow-y: auto;
+        min-height: calc(100vh - 60px);
+        @media (max-width: 767px) {
+          min-height: calc(100vh - 20px);
+        }
+      }
+
+
       .modal-outline-btn {
         color: #073863 !important;
         border-color: #073863 !important;
@@ -222,6 +235,27 @@
 
       #placeholderImage {
         margin-bottom: 8px;
+      }
+
+
+      #emptyChat {
+        color:lightgrey;
+        display: inline-block;
+        margin-top:75%
+      }
+
+      #newchatmessage {
+        height:34px;
+        resize:none;
+       /* position: absolute;*/
+        bottom:0;
+        min-height:34px !important
+      }
+
+      .emojiButtons {
+        background-color:transparent;
+        border:none;
+        font-size: large;
       }
 
     </style>
@@ -288,12 +322,14 @@
                   </div>
                 </div>
                 <hr />
-                <div class="box-body" style="height:70vh">
+                <div class="box-body" style="height:75vh; display:flex; flex-direction: column;">
                   <!-- Conversations are loaded here -->
                   <!--Hard coding messages for now-->
-                  <div id="chat-body" style="height:70vh;">
-                    <div class="direct-chat-messages" id="chat-messages" style="padding-top:110%">
-                      <div class="alert alert-secondary" role="alert"
+                  <div id="chat-body" style="height:75vh;">
+                    <div class="direct-chat-messages" id="chat-messages" style="text-align:center">
+                    <span id="emptyChat"><b>This is the start of your chat with CSR <span id="agentName">Agent</span>. No messages yet to display</b></span>
+                       <!--  ****keep this until chat is functional****
+                       <div class="alert alert-secondary" role="alert"
                         style="background-color: lightgray !important; color: black; border-radius: 25px;">
                         <p><b>Agent</b> 12:00pm</p>
                         <p>This is a message from the Agent to demonstrate the chat style.</p>
@@ -301,62 +337,61 @@
                       <div class="alert alert-info" role="alert" style="color: black; border-radius: 25px;">
                         <p><b>You</b> 12:01pm</p>
                         <p>This is a message from the Consumer.</p>
-                      </div>
+                      </div>-->
                     </div>
                   </div>
         
-                  <div id="chat-footer" class="box-footer" style="padding-top:10px">
+                  <div id="chat-footer" class="box-footer" style="padding-top:10px;">
                     <form name="chatsend" id="chatsend">
                       <div class="input-group">
                         <span class="input-group-btn">
-                          <span class="dropup">
+                          <span class="dropup pull-left">
                           <button id="chat-emoji" class="btn btn-primary btn-flat" type="button" data-toggle="dropdown"
-                            animation="true" style="background-color: #073863 !important;">&#128512;</button>
+                            animation="true" style="background-color: #073863 !important; margin-right: 10px">&#128512;</button>
                           <div class="dropdown-menu dropdown-multicol" id="emoji-selector" aria-labelledby="dropdownMenuButton"
-                            style="height:fit-content; overflow-y: scroll;">
+                            style="height:fit-content; overflow-y: scroll; text-align: center;">
                             <div class="dropdown-row">
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128512;">&#128512;</button>
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128513;">&#128513;</button>
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128516;">&#128516;</button>
                             </div>
                             <div class="dropdown-row">
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128547;">&#128547;</button>
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128577;">&#128577;</button>
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#129320;">&#129320;</button>
                             </div>
                             <div class="dropdown-row">
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128077;">&#128077;</button>
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128078;">&#128078;</button>
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128075;">&#128075;</button>
                             </div>
                             <div class="dropdown-row">
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128263;">&#128263;</button>
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128264;">&#128264;</button>
-                              <button class="dropdown-item" type="button" style="background-color:transparent; border:none"
+                              <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128266;">&#128266;</button>
                             </div>
         
                           </div>
                         </span>
                         </span>
-                        <input type="hidden" id="displayname">
-                        <input type="text" id="newchatmessage" placeholder="Type a message" class="form-control" maxlength="500"
-                          autocomplete="off" required>
+                        <textarea id="newchatmessage" placeholder="Type a message" class="form-control col-xs-1" maxlength="500"
+                          autocomplete="off" required></textarea>
         
                         <span class="input-group-btn">
-                          <button id="chat-send" class="btn btn-primary btn-flat" type="submit"
-                            style="background-color: #073863 !important;">Send</button>
+                          <button id="chat-send" class="btn btn-primary btn-flat"
+                            style="background-color: #073863 !important; margin-left: 10px; border-radius: 6px;">Send</button>
                         </span>
                       </div>
                     </form>
@@ -390,8 +425,10 @@
                       <input type="file" id="fileInput" name="fileInput"
                         class="form-control-file btn btn-default fileInput"
                         style="background-color:transparent; border: transparent; padding-left: 0px;">
+                        <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;">x</span>
                     </div>
-                    <button class="btn btn-primary pull-right" id="shareFileConsumer" onclick="showFileShareConfirmation()" style="background-color:#073863 !important">Send</button>
+                    <button class="btn btn-primary pull-right" id="shareFileConsumer" onclick="showFileShareConfirmation()"
+                      style="background-color:#073863 !important" disabled>Send</button>
                     <div class="row">
                       <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
                           <span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
@@ -435,28 +472,28 @@
             <!-- Nav tabs -->
             <ul class="nav nav-tabs tabs-right" style="height: 90vh;">
               <li id="collapseTab" class="collapseTab">
-                <a class="collapseTab" style="padding-bottom: 20px; padding-top:20px; width:8vw; padding-left: 50%; border:solid 1px transparent;">
+                <a class="collapseTab" style="padding-bottom: 20px; padding-top:20px; width:8vw; border:solid 1px transparent; text-align: center;">
                   <button id="collapseButton" data-toggle="tooltip" title="Collapse">
-                    <i class="fa fa-angle-double-right fa-lg" style="padding:3px">
+                    <i class="fa fa-angle-double-right fa-lg" style="vertical-align: -10% !important;">
                     </i>
                   </button>
                 </a>
               </li>
-              <li class="active" data-toggle="tooltip" title="Chat">
-                <a href="#chatBody" data-toggle="tab"  style="width:8vw">
+              <li class="active">
+                <a href="#chatBody" data-toggle="tab"  style="width:8vw; text-align: center;">
                   <i class="fa fa-comments fa-2x"
-                    style="color: #073863; padding-top:10px; padding-bottom: 10px; padding-left: 50%;">
+                    style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
                   <br>
-                  <p style="color: #073863; padding-left: 50%">Chat</p>
+                  <p style="color: #073863;">Chat</p>
                 </a>
               </li>
-              <li data-toggle="tooltip" title="File Share">
-                <a href="#fileBody" data-toggle="tab" style="width:8vw">
-                  <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px; padding-left: 50%;">
+              <li>
+                <a href="#fileBody" data-toggle="tab" style="width:8vw; text-align: center;">
+                  <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
                   <br>
-                    <p style="color: #073863; padding-left:35%">File Share</p>
+                    <p style="color: #073863;">File Share</p>
                 </a>
               </li>
             </ul>
