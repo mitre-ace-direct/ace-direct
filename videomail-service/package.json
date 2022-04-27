@@ -28,7 +28,7 @@
     "lodash": "^4.17.12",
     "lodash.merge": "^4.6.2",
     "mini-stack": "^1.0.6",
-    "minimist": "^1.2.3",
+    "minimist": "^1.2.6",
     "mysql": "^2.17.1",
     "nconf": "^0.10.0",
     "proxy-agent": "^4.0.1",
