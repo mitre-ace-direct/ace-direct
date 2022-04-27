@@ -698,13 +698,18 @@ class WebRTCMediaSession extends Events {
       debug(`${ext} in keyframe mode, no keyframe sent`);
       return false;
     }
+    
+    if(this.isMultiparty){  // Patch until multiparty keyframe bug is resolved.
+      console.log(`--Multiparty call do not send keyframe.`);
+      return false;
+    }
 
     p.inKeyframe = true;
     let endpoint = p.endpoint;
     if (p.inPrivateMode)
       endpoint = this._privacyVideo;
   
-    if (this.isMultiparty) {
+    if (this.isMultiparty) {  //TODO: bug in multiparty that causes agent video to blink when a keyframe is forced.
       if (p.port) {
         await endpoint.disconnect(p.port);
         await endpoint.connect(p.port);
