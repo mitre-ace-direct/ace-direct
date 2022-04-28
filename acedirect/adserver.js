@@ -2519,6 +2519,19 @@ function handleManagerEvent(evt) {
       logger.info(`HANGUP RECEIVED: evt.context:${evt.context} , evt.channel:${evt.channel}`);
       logger.info(`HANGUP RECEIVED calleridnum: ${evt.calleridnum}`);
 
+        if(extension[1] && !isNaN(extension[1])){
+        redisClient.hget(c.R_CONSUMER_EXTENSIONS, Number(extension[1]), (err, reply) => {
+            if (err) {
+              logger.error(`Redis Error${err}`);
+            } else if (reply) {
+              console.log(extension[1] + " available for reuse.")
+              const val = JSON.parse(reply);
+              val.inuse = false;
+              redisClient.hset(c.R_CONSUMER_EXTENSIONS, Number(extension[1]), JSON.stringify(val));
+	    }
+          });
+        }
+
       if (evt.context === 'Provider_Videomail') {
         console.log(`VIDOEMAIL evt: ${JSON.stringify(evt, null, 2)}`);
         insertCallDataRecord('Videomail', evt.calleridnum, evt.uniqueid, 'D4');
