@@ -248,9 +248,9 @@ function connectIncomingCall(ext, sdpOffer, callback) {
             callee.pipeline = pipeline;
 
             // Check the incoming sdp to determine the correct incomingMediaProfile
-            //callee.incomingMediaProfile = 'WEBM_VIDEO_ONLY';//getMediaProfile(sdpOffer, ext);
+            callee.incomingMediaProfile = 'WEBM_VIDEO_ONLY';//getMediaProfile(sdpOffer, ext);
             //callee.incomingMediaProfile = 'MP4_VIDEO_ONLY';//getMediaProfile(sdpOffer, ext);
-            callee.incomingMediaProfile = getMediaProfile(sdpOffer, ext);
+            //callee.incomingMediaProfile = getMediaProfile(sdpOffer, ext);
             log(callee.ext, "Detected Incoming Media Profile: " + callee.incomingMediaProfile);
 
             // Create the Endpoints.
