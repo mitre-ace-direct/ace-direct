@@ -58,7 +58,8 @@ function post(callinfo) {
           console.log("file has ended, upload the file", callinfo.incomingCaller)
           fs.readFile(filepath, function (err, fileData) {
             let mimeType = execSync('file --mime-type -b "' + filepath + '"').toString().trim();
-            if (mimeType === 'video/mp4') {
+            //MW if (mimeType === 'video/mp4') {
+            if (mimeType === 'video/webm') {
               getVideoDurationInSeconds(filepath).then((duration) => {
                 var uploadParams = { Bucket: config.awsS3Bucket, Key: callinfo.recordingFile, Body: "" };
                 console.log("uploadParams", JSON.stringify(uploadParams))
