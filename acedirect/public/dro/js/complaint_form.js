@@ -614,6 +614,9 @@ function registerJssip(myExtension, myPassword) {
         if (partCount >= 2 || videomailflag) {
           console.log('--- WV: CONNECTED');
           $('#queueModal').modal('hide');
+          $('#waitingModal').modal('hide');
+          document.getElementById("noCallPoster").style.display = "none";
+          document.getElementById("inCallSection").style.display = "block";
         }
       }
     };
@@ -650,8 +653,6 @@ function enterQueue() {
 */
 function startCall(otherSipUri) {
     let minutes;
-    document.getElementById("noCallPoster").style.display = "none";
-    document.getElementById("inCallSection").style.display = "block";
     //Set the timer
     callTimer = setInterval(() => {
       callTimer = callTimer + 1;
@@ -734,8 +735,6 @@ function enableVideoPrivacy() {
         } else {
         selfStream.classList.remove('mirror-mode');
         acekurento.enableDisableTrack(false, false); // mute video
-        hideVideoButton.setAttribute('onclick', 'javascript: disableVideoPrivacy();');
-        hideVideoIcon.style.display = 'block';
         acekurento.privateMode(true, privacyVideoUrl);
         }
     }
@@ -759,10 +758,7 @@ function disableVideoPrivacy() {
         } else {
         selfStream.classList.add('mirror-mode');
         acekurento.enableDisableTrack(true, false); // unmute video
-        hideVideoButton.setAttribute('onclick', 'javascript: enableVideoPrivacy();');
-        hideVideoIcon.style.display = 'none';
         acekurento.privateMode(false);
-        hideVideoIcon.style.display = 'none';
         }
     }
 }
