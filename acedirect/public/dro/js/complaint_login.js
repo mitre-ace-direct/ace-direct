@@ -45,6 +45,12 @@ $(window).on('load',function () {
         });
 });
 
+$(document).keyup(function(event) {
+    if (event.which === 13) {
+        login();
+    }
+});
+
 function login () {
     $('#message').hide();
     $('#message').text('');
