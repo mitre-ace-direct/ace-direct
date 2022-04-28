@@ -30,6 +30,7 @@ const FONT = [
 
 const JS = [
   'bootstrap/dist/js/bootstrap.js',
+  'bootstrap/dist/js/bootstrap.min.js',
   'bootstrap-toggle/js/bootstrap-toggle.js',
   'jquery/dist/jquery.min.js',
   'inputmask/dist/min/inputmask/inputmask.min.js',
