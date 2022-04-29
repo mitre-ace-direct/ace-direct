@@ -50,7 +50,14 @@ class RecordingManager extends Events {
     const fileRequest = `http://${param('servers.kurento_private_ip')}:${param('app_ports.kmsshare')}/recordings/${filename}`;
     const filepath = `media/${filename}`;
     const record = fs.createWriteStream(filepath);
-    request(fileRequest).pipe(record);
+    request(fileRequest, (error, response, data) => {
+      if (error) {
+        console.error("\n\n ****  ERROR ACCESSING kms-share on Kurento!! Is it running?  ****\n");
+        console.error(`path: ${fileRequest} `);
+        console.error(`${error}\n`);
+        console.error(" **********************************\n");
+      }
+    }).pipe(record);
     record.on('finish', () => {
       fs.readFile(filepath, (err, fileData) => {
         uploadParams.Body = fileData;
