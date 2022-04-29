@@ -149,6 +149,9 @@ function register_jssip() {
       if (acekurento.activeAgentList.length === participants.length) {
         allAgentCall = true;
         beingMonitored = false;
+        // consumer left the call. end the call for remaining agents
+        terminate_call();
+        /* 
         // disable chat, file share, and screenshare buttons
         disable_chat_buttons();
         document.getElementById('fileInput').disabled = true;
@@ -158,6 +161,7 @@ function register_jssip() {
         document.getElementById('screenShareButton').removeAttribute('class');
         document.getElementById('screenShareButton').disabled = true;
         document.getElementById('screenShareButton').removeAttribute('style');
+        */
         $('#end-call').attr('onclick', 'terminate_call()');
       } else {
         allAgentCall = false;
