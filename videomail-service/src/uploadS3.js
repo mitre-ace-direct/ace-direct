@@ -30,7 +30,15 @@ function post(callinfo) {
   let fileRequest = config.kmsMediaPathURL + callinfo.recordingFile;
   const filepath = 'media/videomails/' + callinfo.recordingFile
   let vm = fs.createWriteStream(filepath);
-  request(fileRequest).pipe(vm);
+  request(fileRequest, (error, response, data) => {
+    if (error) {
+      console.error("\n\n ****  ERROR ACCESSING kms-share on Kurento!! Is it running?  ****\n");
+      console.error(`path: ${fileRequest} `);
+      console.error(`${error}\n`);
+      console.error(" **********************************\n");
+    }
+  }
+  ).pipe(vm);
 
   vm.on('finish', function () {
     fs.stat(filepath, function (err, stat) {
