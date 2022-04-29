@@ -1390,6 +1390,7 @@ function recordScreen() {
   } else if (recording == true) {
     console.log('Stopping record');
     acekurento.stopRecording();
+    showAlert('info', 'This video recording was stopped.');
     $('#recordIcon').attr('class', 'fa fa-circle text-red');
     recording = false;
   }
