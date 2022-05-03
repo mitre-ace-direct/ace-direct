@@ -1224,7 +1224,7 @@ $('#chatsend').submit(function (evt) {
   var displayname = $('#displayname').val();
   var vrs = $('#callerPhone').val();
   var date = moment();
-  var timestamp = date.format('D MMM h:mm a');
+  var timestamp = date.format('h:mm a');
 
   // var language = 'en';
   var language = $('#language-select').val();
@@ -1267,7 +1267,7 @@ $('#agent-chat-send').on('click',function (evt) {
     var displayname = $('#agentname-sidebar').html();
     var ext = $('#agent-ext').html();
     var date = moment();
-    var timestamp = date.format('D MMM h:mm a');
+    var timestamp = date.format('h:mm a');
     var destname = $('#chatHeader').html();
     var exactTime = Date.now();
 

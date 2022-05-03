@@ -258,6 +258,36 @@
         font-size: large;
       }
 
+      .emptyMessages {
+        text-align: center;
+      }
+
+      .populatedMessages {
+        overflow-y: scroll;
+        position: relative;
+        height:fit-content;
+        max-height:70vh;
+        margin-top:auto;
+        margin-bottom: 5vh;
+      }
+
+      .sentChat {
+        border-radius: 25px !important;
+        color: black !important;
+        overflow-wrap: break-word;
+      }
+
+      .receivedChat {
+        border-radius: 25px !important;
+        color: black !important;
+        background-color: lightgray !important;
+        overflow-wrap: break-word;
+      }
+      .direct-chat-name {
+        font-weight: bold;
+        margin-right: 1rem;
+      }
+
     </style>
   </head>
   <%- include("../partials/agent_page_header") %>
@@ -322,26 +352,17 @@
                   </div>
                 </div>
                 <hr />
-                <div class="box-body" style="height:75vh; display:flex; flex-direction: column;">
+                <div class="box-body" style="height:75vh; display:flex; flex-direction: column; overflow: scroll;">
                   <!-- Conversations are loaded here -->
                   <!--Hard coding messages for now-->
-                  <div id="chat-body" style="height:75vh;">
-                    <div class="direct-chat-messages" id="chat-messages" style="text-align:center">
+                  <div id="chat-body" style="height:75vh; flex-direction: column; display: flex;">
+                    <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
                     <span id="emptyChat"><b>This is the start of your chat with CSR <span id="agentName">Agent</span>. No messages yet to display</b></span>
-                       <!--  ****keep this until chat is functional****
-                       <div class="alert alert-secondary" role="alert"
-                        style="background-color: lightgray !important; color: black; border-radius: 25px;">
-                        <p><b>Agent</b> 12:00pm</p>
-                        <p>This is a message from the Agent to demonstrate the chat style.</p>
-                      </div>
-                      <div class="alert alert-info" role="alert" style="color: black; border-radius: 25px;">
-                        <p><b>You</b> 12:01pm</p>
-                        <p>This is a message from the Consumer.</p>
-                      </div>-->
                     </div>
                   </div>
         
-                  <div id="chat-footer" class="box-footer" style="padding-top:10px;">
+                  <div id="chat-footer" class="box-footer" style="padding-top:10px; bottom:0; position:absolute;">
+                    <input type="hidden" id="displayname">
                     <form name="chatsend" id="chatsend">
                       <div class="input-group">
                         <span class="input-group-btn" style="vertical-align: bottom;">
@@ -421,14 +442,16 @@
                     <br>
                     <br>
                     <!--file selection section-->
-                    <div class="btn-group chooseFileGroup">
+                    <div style="overflow:hidden">
+                    <div class="btn-group chooseFileGroup" style="width: 70%;">
                       <input type="file" id="fileInput" name="fileInput"
                         class="form-control-file btn btn-default fileInput"
-                        style="background-color:transparent; border: transparent; padding-left: 0px;">
+                        style="background-color:transparent; border: transparent; padding-left: 0px; width:100%">
                         <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;">x</span>
                     </div>
                     <button class="btn btn-primary pull-right" id="shareFileConsumer" onclick="showFileShareConfirmation()"
                       style="background-color:#073863 !important" disabled>Send</button>
+                  </div>
                     <div class="row">
                       <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
                           <span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
@@ -592,6 +615,7 @@
 	<script type="text/javascript" src="/assets/js/bootstrap.js"></script>
   <script type="text/javascript" src="/dro/js/complaint_form.js"></script>
   <script type="text/javascript" src="/assets/js/jwt-decode.js"></script>
+  <script type="text/javascript" src='/assets/js/moment.js'></script>
   <script src="/js/ACEKurento-1.0.0.js"></script>
   <script>
 		var nginxPath = '<%= nginxPath %>';
