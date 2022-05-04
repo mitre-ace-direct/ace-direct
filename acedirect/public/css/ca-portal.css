@@ -616,6 +616,13 @@ However, delay the fade out process for 2.5 seconds */
   background-color: #205493 !important;
 }
 
+.btn-secondary {
+  background-color: #fff !important;
+}
+.btn-secondary:hover {
+  background-color:#e6ebef !important;
+}
+
 .btn-danger /*standards from US gov: https://standards.usa.gov/components/buttons/ */
 {
   background-color: #e31c3d !important;
