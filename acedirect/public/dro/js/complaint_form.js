@@ -386,7 +386,9 @@ function connect_socket() {
             })
             .on('fileListAgent', (data) => {
                 // file sent confirmation
+                addFileToSentList(data);
                 $('#fileInput').val('');
+                $('#shareFileConsumer').prop('disabled', true);
             })
             .on('screenshareResponse', (data) => {
                 console.log(`screen request received ${data.permission}`);
@@ -819,6 +821,12 @@ function removeFile() {
   $('#fileInput')[0].value = "";
   $('#shareFileConsumer').prop( "disabled", true );
 }
+$('#removeFileBtn').on('keyup', function(evt) {
+  evt.preventDefault();
+  if (evt.keyCode === 13) {
+    $('#removeFileBtn').click();
+  }
+})
 
 // in-call chat logic
 $('#chatsend').submit((evt) => {
@@ -903,4 +911,71 @@ function newChatMessage(data) {
     $(msgblock).addClass('alert alert-secondary receivedChat').appendTo($('#chat-messages'));
   }
   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+}
+
+// file share logic
+// Fileshare for consumer portal
+function shareFileConsumer() {
+  $('#fileSent').hide();
+  $('#fileSentError').hide();
+  if ($('#fileInput')[0].files[0]) {
+    const formData = new FormData();
+    console.log('uploading:');
+    console.log($('#fileInput')[0].files[0]);
+    formData.append('uploadfile', $('#fileInput')[0].files[0]);
+    $.ajax({
+      url: './fileUpload',
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: (data) => {
+        //fileSentSuccess(data);
+        console.log(JSON.stringify(data, null, 2));
+        socket.emit('get-file-list-consumer', { vrs: vrs.toString().replace(/^1|[^\d]/g, '') });
+        console.log('file successfully sent');
+        $('#fileSent').show();
+      },
+      error: (jXHR, textStatus, errorThrown) => {
+        console.log(`ERROR: ${jXHR} ${textStatus} ${errorThrown}`);
+        $('#fileSentError').show();
+      }
+    });
+  }
+}
+
+function addFileToDownloadList(data) {
+  $('#noReceivedFiles').attr('hidden', true)
+
+  $('#receivedFilesList').append(
+    (`<span>${data.original_filename}</span>
+    <span class="btn-toolbar pull-right" role="toolbar">
+      <button class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download"><i class="fa fa-download"></i></button>
+      <button class="btn pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></button>
+    </span>
+    <hr/>`)
+  );
+
+  // need to call this every time we add a new tooltip
+  $('[data-toggle="tooltip"]').tooltip({
+    trigger: 'hover'
+});
+}
+
+function addFileToSentList(data) {
+  $('#noSentFiles').attr('hidden', true);
+
+  // add to sent files list
+  $('#sentFilesList').append(
+    (`<span>${data.original_filename}</span>
+    <button class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" href="./downloadFile?id=${data.id}"><i class="fa fa-eye"></i></button>
+    <hr/>`)
+  );
+
+  // need to call this every time we add a new tooltip
+  $('[data-toggle="tooltip"]').tooltip({
+    trigger: 'hover'
+});
+
+
 }
