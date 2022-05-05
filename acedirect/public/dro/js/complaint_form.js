@@ -1,4 +1,6 @@
 let socket;
+var nginxPath = '<%= nginxPath %>';
+const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` ? `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` : "";
 let remoteStream = document.getElementById('remoteView');
 let selfStream = document.getElementById('selfView');
 const muteAudioButton = document.getElementById('mute-audio');
@@ -657,7 +659,11 @@ function startCall(otherSipUri) {
     callTimer = setInterval(() => {
       callTimer = callTimer + 1;
       minutes = Math.floor((callTimer / 60)) > 0 ? Math.floor(callTimer / 60) : 0;
-      $('#callTime').text(minutes + ":" + (callTimer - minutes * 60) + " min");
+      seconds = (callTimer - minutes * 60)
+      if(seconds < 10){
+        seconds = "0" + seconds;
+      }
+      $('#callTime').text(minutes + ":" + seconds + " min");
     }, 1000);
 
     console.log(`startCall: ${otherSipUri}`);
