@@ -305,6 +305,16 @@
         margin-right: 1rem;
       }
 
+      .noFiles {
+        font-style: italic;
+        color: grey;
+      }
+
+      .filesList {
+        max-height: 20%;
+        overflow: scroll;
+      }
+
     </style>
   </head>
   <%- include("../partials/agent_page_header") %>
@@ -363,9 +373,9 @@
                 <div class="box-header" style="overflow: hidden;">
                   <h2 style="float:left">Chat</h2>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
-                    <button type="button" class="btn btn-secondary fontSizeButtons" style="font-size:smaller;">A</button>
+                    <button type="button" class="btn fontSizeButtons" style="font-size:smaller;">A</button>
                     <button type="button" class="btn btn-secondary fontSizeButtons" style="background-color: white; pointer-events: none;">100%</button>
-                    <button type="button" class="btn btn-secondary fontSizeButtons" style="font-size:large;">A</button>
+                    <button type="button" class="btn fontSizeButtons" style="font-size:large;">A</button>
                   </div>
                 </div>
                 <hr />
@@ -384,8 +394,8 @@
                       <div class="input-group">
                         <span class="input-group-btn" style="vertical-align: bottom;">
                           <span class="dropup pull-left">
-                          <button id="chat-emoji" class="btn btn-primary btn-flat" type="button" data-toggle="dropdown"
-                            animation="true" style="background-color: #e6ebef !important; border:1px solid #073863; margin-right: 10px">&#128512;</button>
+                          <button id="chat-emoji" class="btn btn-flat" type="button" data-toggle="dropdown"
+                            animation="true" style="border:2px solid lightgrey; margin-right: 10px">&#128512;</button>
                           <div class="dropdown-menu dropdown-multicol" id="emoji-selector" aria-labelledby="dropdownMenuButton"
                             style="height:fit-content; overflow-y: scroll; text-align: center;">
                             <div class="dropdown-row">
@@ -444,9 +454,9 @@
                 <div class="box-header" style="overflow: hidden;">
                   <h2 style="float:left">File Sharing</h2>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
-                    <button type="button" class="btn btn-secondary fontSizeButtons" style="font-size:smaller;">A</button>
+                    <button type="button" class="btn fontSizeButtons" style="font-size:smaller;">A</button>
                     <button type="button" class="btn btn-secondary fontSizeButtons" style="background-color: white; pointer-events: none;">100%</button>
-                    <button type="button" class="btn btn-secondary fontSizeButtons" style="font-size:large;">A</button>
+                    <button type="button" class="btn fontSizeButtons" style="font-size:large;">A</button>
                   </div>
                 </div>
                 <hr />
@@ -463,10 +473,10 @@
                     <div class="btn-group chooseFileGroup" style="width: 70%;">
                       <input type="file" id="fileInput" name="fileInput"
                         class="form-control-file btn btn-default fileInput"
-                        style="background-color:transparent; border: transparent; padding-left: 0px; width:100%">
-                        <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;">x</span>
+                        style="background-color:transparent; border: transparent; padding-left: 0px; width:80%">
+                        <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;" tabindex="0">x</span>
                     </div>
-                    <button class="btn btn-primary pull-right" id="shareFileConsumer" onclick="showFileShareConfirmation()"
+                    <button class="btn btn-primary pull-right" id="shareFileConsumer" onclick="shareFileConsumer()"
                       style="background-color:#073863 !important" disabled>Send</button>
                   </div>
                     <div class="row">
@@ -474,6 +484,10 @@
                           <span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
                           <strong>Success!</strong>  File Sent
                       </div>
+                      <div class="alert alert-danger"  alert-dismissable id="fileSentError" style="margin-top: 10px;" hidden>
+                        <span class="close" onclick="$('#fileSentError').hide();" style="text-decoration:none">×</span>
+                        <strong>Error!</strong>  Error sending file.
+                    </div>
                   </div>
                     <!--end file selection section-->
                     <br>
@@ -481,14 +495,24 @@
                     <!--send files section-->
                     <h3>Sent File(s)</h3>
                     <hr style="border:1px solid grey"/>
+                    
+                    <div id="sentFilesList" class="filesList">
+                      <span id="noSentFiles" class="noFiles">None</span>
+                    </div>
+                    <!--
                     <span>Example_picture.png</span>
                     <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></button>
+                    -->
                     <!--end sent files section-->
                     <br>
                     <br>
                     <!--received files section-->
                     <h3>Received File(s)</h3>
                     <hr style="border:1px solid grey"/>
+                    <div id="receivedFilesList" class="filesList">
+                      <span id="noReceivedFiles" class="noFiles">None</span>
+                    </div>
+                    <!--
                     <span>Documentation.doc</span>
                     <span class="btn-toolbar pull-right" role="toolbar">
                       <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="Download"><i class="fa fa-download"></i></button>
@@ -501,6 +525,7 @@
                       <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></button>
                     </span>
                     <hr/>
+                    -->
                     <!--end received files section-->
                   </div>
                 </div>
