@@ -213,6 +213,9 @@ function connect_socket() {
                 }
             })
             .on('chat-message-new', (data) => {
+              console.log(data)
+              newChatMessage(data);
+              /*
                 // debugtxt('chat-message-new', data);
 
                 // Translate incoming message
@@ -225,6 +228,7 @@ function connect_socket() {
                 } else {
                 socket.emit('translate', data);
                 }
+                */
             })
             .on('chat-message-new-translated', (data) => {
                 newChatMessage(data);
@@ -786,7 +790,13 @@ function showFileShareConfirmation() {
   $('#fileSent').show();
 }
 
-$('#newchatmessage').on("keyup", function() {
+$('#newchatmessage').on("keyup change keydown paste input", function(evt) {
+  if (evt.keyCode === 13) {
+    evt.preventDefault();
+    if ($('#newchatmessage').val() !== "") {
+      $('#chatsend').submit();
+    }
+  }
   this.style.height = this.scrollHeight + 'px';
   if($('#newchatmessage').val() == "") {
     this.style.height = '34px';
@@ -808,4 +818,89 @@ $('#fileInput').on('change', function () {
 function removeFile() {
   $('#fileInput')[0].value = "";
   $('#shareFileConsumer').prop( "disabled", true );
+}
+
+// in-call chat logic
+$('#chatsend').submit((evt) => {
+  evt.preventDefault();
+
+  const msg = $('#newchatmessage').val();
+  const displayname = $('#displayname').val();
+  const date = moment();
+  const timestamp = date.format('h:mm a');
+
+  //const language = sessionStorage.consumerLanguage;
+  const language = 'en';
+  
+  $('#newchatmessage').val('');
+  $('#chatcounter').text('500');
+  console.log('sent message with language', language);
+  isTyping = false;
+  socket.emit('chat-message', {
+    message: msg,
+    timestamp,
+    displayname,
+    fromLanguage: language
+  });
+});
+
+function addEmoji(emoji) {
+  let value = $('#newchatmessage').val();
+  const displayname = $('#displayname').val();
+  // update the character count
+  const messageCount = Array.from($('#newchatmessage').val()).length; // reads the emoji as one character
+  let left = 500 - messageCount;
+
+  value += emoji;
+  $('#newchatmessage').val(value);
+
+  // update rtt
+  socket.emit('chat-typing', {
+    displayname,
+    rttmsg: value
+  });
+
+  if (left < 0) {
+    left = 0;
+  }
+
+  $('#chatcounter').text(left);
+  $('#newchatmessage').focus();
+}
+
+function newChatMessage(data) {
+  let msg = data.message;
+  const displayname = data.displayname;
+  const timestamp = data.timestamp;
+  const msgblock = document.createElement('div');
+  const msginfo = document.createElement('div');
+  const msgsender = document.createElement('span');
+  const msgtime = document.createElement('span');
+  const msgtext = document.createElement('div');
+  console.log(`Data is ${JSON.stringify(data)}`);
+  console.log(`Also ${data.displayname} ${data.timestamp}`);
+
+  msg = msg.replace(/:\)/, '<i class="fa fa-smile-o fa-2x"></i>');
+  msg = msg.replace(/:\(/, '<i class="fa fa-frown-o fa-2x"></i>');
+
+  if ($('#chat-messages').hasClass('emptyMessages')) {
+    $('#emptyChat').text('');
+    $('#chat-messages').removeClass('emptyMessages');
+    $('#chat-messages').addClass('populatedMessages');
+    $('#emptyChat').css('margin-top', '0px')
+  }
+
+  $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
+  $(msgtime).addClass('direct-chat-timestamp').html(' ' + timestamp).appendTo(msginfo);
+  $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
+  $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
+
+  if ($('#displayname').val() === displayname) {
+    $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
+  } else {
+    $('#chat-messages').remove($('#rtt-typing'));
+    $('#rtt-typing').html('').removeClass('direct-chat-text');
+    $(msgblock).addClass('alert alert-secondary receivedChat').appendTo($('#chat-messages'));
+  }
+  $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 }
