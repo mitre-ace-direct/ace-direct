@@ -37,7 +37,8 @@ function restrict(req, res, next) {
 
 router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => {
     if (req.session.user && req.session.user.role === 'VRS') {
-        res.render('pages/complaint_form');
+        // res.render('pages/complaint_form');
+        res.render('dro/pages/complaint_form');
     } else {
         //TODO This is the old path to the previous consumer portal
         //res.render('pages/complaint_login');
