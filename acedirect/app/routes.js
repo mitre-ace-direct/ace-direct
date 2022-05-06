@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var request = require('request');
 const jwt = require('jsonwebtoken');
 const shortid = require('shortid');
 const AWS = require('aws-sdk');
@@ -8,6 +9,7 @@ const fs = require('fs');
 var utils = require('./utils.js')
 var c = require('./constants.js')
 var config = require('./../../dat/config.json');
+const path = require('path');
 
 AWS.config.update({
     region: utils.getConfigVal(config.s3.region),
@@ -32,10 +34,6 @@ function restrict(req, res, next) {
         res.redirect('./');
     }
 };
-
-router.get('/', (req, res) => {
-  res.redirect(utils.getConfigVal(config.nginx.ad_path) + utils.getConfigVal(config.nginx.consumer_route));
-});
 
 router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => {
     if (req.session.user && req.session.user.role === 'VRS') {
@@ -410,7 +408,7 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
         } else {
             uploadMetadata.vrs = uploadedBy;
         }
-        uploadMetadata.filepath = `${__dirname}/${req.file.path}`;
+        uploadMetadata.filepath = path.join(__dirname, '..', req.file.path);
         uploadMetadata.originalFilename = req.file.originalname;
         uploadMetadata.filename = req.file.filename;
         // 'encoding' is deprecated — since July 2015
@@ -427,7 +425,7 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
                     // const version = await clamscan.get_version();
                     // console.log(`ClamAV Version: ${version}`);
 
-                    const { isInfected, file, viruses } = await clamscan.isInfected(uploadMetadata.filepath);
+                    const { isInfected, file, viruses } = await clamscan.is_infected(uploadMetadata.filepath);
                     if (isInfected) {
                         console.log(`${req.file.originalname} is infected with ${viruses}!`);
                         res.status(400).send('Error scanning file i');
@@ -482,52 +480,6 @@ router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => 
         res.status(403).send('Unauthorized');
     }
 });
-
-// Download
-router.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
-    if (sharingAgent !== undefined && sharingConsumer !== undefined) {
-        for (let i = 0; i < sharingAgent.length; i += 1) {
-            // make sure the agent is in a call with the consumer who sent the file
-            if (req.session.user.extension === sharingAgent[i] || req.session.user.vrs === sharingConsumer[i]) {
-                console.log('In valid session');
-
-                console.log('Comparing file IDs');
-                if (fileToken[i].toString() === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
-                    console.log('allowed to download');
-
-                    const documentID = req.query.id;
-                    let url = `https://${utils.getConfigVal(config.servers.main_private_ip)}:${utils.getConfigVal(config.app_ports.mserver)}`;
-                    url += `/getStoreFileInfo?documentID=${documentID}`;
-
-                    request({
-                        url,
-                        json: true
-                    }, (error, response, data) => {
-                        if (error) {
-                            res.status(500).send('Error');
-                        } else if (data.message === 'Success') {
-                            const { filepath } = data;
-                            const { filename } = data;
-                            const readStream = fs.createReadStream(filepath);
-                            res.attachment(filename);
-                            readStream.pipe(res);
-                        } else {
-                            res.status(500).send('Error');
-                        }
-                    });
-                    break;
-                } else {
-                    console.log('Not authorized to download this file, mismatched IDs');
-                }
-            } else {
-                console.log('Not authorized to download');
-            }
-        }
-    } else {
-        console.log('Not authorized to download');
-    }
-});
-
 
 router.get('/getagentstatus/:token', (req, res) => {
     let resObj = {
