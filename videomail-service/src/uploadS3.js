@@ -30,7 +30,15 @@ function post(callinfo) {
   let fileRequest = config.kmsMediaPathURL + callinfo.recordingFile;
   const filepath = 'media/videomails/' + callinfo.recordingFile
   let vm = fs.createWriteStream(filepath);
-  request(fileRequest).pipe(vm);
+  request(fileRequest, (error, response, data) => {
+    if (error) {
+      console.error("\n\n ****  ERROR ACCESSING kms-share on Kurento!! Is it running?  ****\n");
+      console.error(`path: ${fileRequest} `);
+      console.error(`${error}\n`);
+      console.error(" **********************************\n");
+    }
+  }
+  ).pipe(vm);
 
   vm.on('finish', function () {
     fs.stat(filepath, function (err, stat) {
@@ -58,7 +66,8 @@ function post(callinfo) {
           console.log("file has ended, upload the file", callinfo.incomingCaller)
           fs.readFile(filepath, function (err, fileData) {
             let mimeType = execSync('file --mime-type -b "' + filepath + '"').toString().trim();
-            if (mimeType === 'video/mp4') {
+            //MW if (mimeType === 'video/mp4') {
+            if (mimeType === 'video/webm') {
               getVideoDurationInSeconds(filepath).then((duration) => {
                 var uploadParams = { Bucket: config.awsS3Bucket, Key: callinfo.recordingFile, Body: "" };
                 console.log("uploadParams", JSON.stringify(uploadParams))

@@ -1,4 +1,3 @@
-
 // Imports of internal dependencies.
 const config = require('./configuration.js');
 const registry = require('./registry.js');
@@ -249,9 +248,9 @@ function connectIncomingCall(ext, sdpOffer, callback) {
             callee.pipeline = pipeline;
 
             // Check the incoming sdp to determine the correct incomingMediaProfile
-            //callee.incomingMediaProfile = 'WEBM_VIDEO_ONLY';//getMediaProfile(sdpOffer, ext);
+            callee.incomingMediaProfile = 'WEBM_VIDEO_ONLY';//getMediaProfile(sdpOffer, ext);
             //callee.incomingMediaProfile = 'MP4_VIDEO_ONLY';//getMediaProfile(sdpOffer, ext);
-            callee.incomingMediaProfile = getMediaProfile(sdpOffer, ext);
+            //callee.incomingMediaProfile = getMediaProfile(sdpOffer, ext);
             log(callee.ext, "Detected Incoming Media Profile: " + callee.incomingMediaProfile);
 
             // Create the Endpoints.
@@ -539,7 +538,7 @@ function createMediaElements(ext, pipeline, callback) {
             mediaPipeline: pipeline,
             mediaProfile: callee.incomingMediaProfile,
             stopOnEndOfStream: true,
-            uri: `file:/${config.kmsMediaPath}videomail_${date}${recordExtension}`
+            uri: `file://${config.kmsMediaPath}videomail_${date}${recordExtension}`
         };
         console.log(recordParams)
         callee.recordingFile = 'videomail_' + date + recordExtension;
