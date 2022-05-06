@@ -269,7 +269,6 @@ function connect_socket() {
                 $('#consumer-webcam').css('height', '100%');
                 $('#consumer-captions').hide();
                 $('#consumer-divider').hide();
-                document.getElementById('mute-captions-off-icon').style.display = 'block'; // used by jssip_consumer.js to see if captions are muted
                 }
             })
             //TODO Rename skinny mode references to base configuration
