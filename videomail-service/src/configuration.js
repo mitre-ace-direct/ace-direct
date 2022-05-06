@@ -16,9 +16,9 @@ var config = {
 		path: dC.kurento.path,
 		kmsshareport: dC.app_ports.kmsshare
 	},
-	aserver: {
+	mserver: {
 		fqdn: dC.servers.main_private_ip,
-		port: dC.app_ports.aserver
+		port: dC.app_ports.mserver
 	},
 	videomail: {
 		fqdn: dC.servers.main_private_ip,
@@ -48,7 +48,7 @@ if (config.clearText == false) {
 }
 
 config.kurentoServer = config.kurento.protocol+"://"+config.kurento.fqdn+":"+config.kurento.port+config.kurento.path;
-config.uploadServer = "https://"+config.aserver.fqdn+":"+config.aserver.port;
+config.uploadServer = "https://"+config.mserver.fqdn+":"+config.mserver.port;
 config.kmsMediaPathURL = "http://"+config.kurento.ip+":"+config.kurento.kmsshareport+"/recordings/";
 config.kmsMediaPath = config.kmsMediaPath+"recordings/";
 config.videomailServer = "http://"+config.videomail.fqdn+":"+config.videomail.port + "/";

@@ -10,7 +10,7 @@ PASSED=true
 
 printf "${RS}ACE DIRECT SELF-TEST:\n\n"
 CONFIG="dat/config.json"
-printf "${IND}${CONFIG}... "
+printf "${IND}${CONFIG} "
 # Check config file
 if jsonlint ${CONFIG} >/dev/null 2>&1
 then
@@ -19,7 +19,7 @@ else
   CONFIG_ERROR=`jsonlint ${CONFIG} 2>&1 | head -n1`
   printf " ${FG_RED}is malformed! ${CONFIG_ERROR}${RS}${FR} ${NOTOK_ICON}\n"
   PASSED=false
-  printf "${IND}Aborting status check...\n\n"
+  printf "${IND}Aborting status check\n\n"
   printf "\n\n"
   exit 99
 fi
@@ -49,8 +49,9 @@ URL_AGENT="https://${NGINX_PRIVATE_IP}${AD_PATH}${AG_ROUTE}"
 URL_CONSUMER="https://${NGINX_PRIVATE_IP}${AD_PATH}${CO_ROUTE}"
 URL_MANAGER="https://${NGINX_PRIVATE_IP}${MP_PATH}"
 
-for ((i = 0; i < 8; ++i)); do
-  printf "${IND}pm2 ${i} ${PM2_NAMES[i]}... " 
+NUM_PM2_SVCS=7
+for ((i = 0; i < ${NUM_PM2_SVCS} ; ++i)); do
+  printf "${IND}pm2 ${i} ${PM2_NAMES[i]} " 
   PM2_STATUS=`pm2 show ${i} | grep status | awk '{ print $4 }' | sed 's/ //g'`
   if [[ "$PM2_STATUS" != "online" ]]
   then
@@ -61,8 +62,8 @@ for ((i = 0; i < 8; ++i)); do
   fi
 done
 
-printf "${IND}main server ${MAIN_FQDN}...${FR} ${OK_ICON}\n"
-printf "${IND}main server disk usage..."
+printf "${IND}main server ${MAIN_FQDN}${FR} ${OK_ICON}\n"
+printf "${IND}main server disk usage"
 # Check MAIN
 DISK_USAGE=`ssh "${USER}@${MAIN_FQDN}" df -k --output='pcent' / 2>/dev/null | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
@@ -79,7 +80,7 @@ else
 fi
 
 # Check STUN
-printf "${IND}stun server ${STUN_FQDN}..."
+printf "${IND}stun server ${STUN_FQDN}"
 STUN_RET=`ssh "${USER}@${STUN_FQDN}" sudo netstat -tnlp  2>/dev/null  | grep 3478`
 if [ -z "${STUN_RET}" ]
 then
@@ -88,7 +89,7 @@ then
 else
   printf "${FR} ${OK_ICON}\n"
 fi
-printf "${IND}stun disk usage..."
+printf "${IND}stun disk usage"
 DISK_USAGE=`ssh "${USER}@${STUN_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -104,7 +105,7 @@ else
 fi
 
 # Check TURN 
-printf "${IND}turn server ${TURN_FQDN}..."
+printf "${IND}turn server ${TURN_FQDN}"
 TURN_RET=`ssh "${USER}@${TURN_FQDN}" sudo netstat -tnlp 2>/dev/null  | grep 3478`
 if [ -z "${TURN_RET}" ]
 then
@@ -114,7 +115,7 @@ else
   printf "${FR} ${OK_ICON}\n"
 fi
 
-printf "${IND}turn server disk usage..."
+printf "${IND}turn server disk usage"
 DISK_USAGE=`ssh "${USER}@${TURN_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -130,7 +131,7 @@ else
 fi
 
 # Check Asterisk
-printf "${IND}asterisk server ${ASTERISK_FQDN}..."
+printf "${IND}asterisk server ${ASTERISK_FQDN}"
 if ssh "${USER}@${ASTERISK_FQDN}" sudo systemctl status asterisk  >/dev/null 2>&1
 then
   printf "${FR} ${OK_ICON}\n"
@@ -138,7 +139,7 @@ else
   printf "   ${FG_RED}service is down or unreachable${RS}${FR} ${NOTOK_ICON}\n"
   PASSED=false
 fi
-printf "${IND}asterisk server disk usage..."
+printf "${IND}asterisk server disk usage"
 DISK_USAGE=`ssh "${USER}@${ASTERISK_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -154,7 +155,7 @@ else
 fi
 
 # Check Asterisk AMI
-printf "${IND}asterisk AMI..."
+printf "${IND}asterisk AMI"
 if node ./acedirect/tools/pingAsterisk.js >/dev/null 2>&1 ${CONFIG}
 then
   printf "${FR} ${OK_ICON}\n"
@@ -164,7 +165,7 @@ else
 fi
 
 # Check REDIS
-printf "${IND}redis server ${REDIS_FQDN}..."
+printf "${IND}redis server ${REDIS_FQDN}"
 if ssh "${USER}@${REDIS_FQDN}" sudo systemctl status redis >/dev/null 2>&1
 then
   printf "${FR} ${OK_ICON}\n"
@@ -172,7 +173,7 @@ else
   printf "   ${FG_RED}service is down or unreachable${RS}${FR} ${NOTOK_ICON}\n"
   PASSED=false
 fi
-printf "${IND}redis server disk usage..."
+printf "${IND}redis server disk usage"
 DISK_USAGE=`ssh "${USER}@${REDIS_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -188,7 +189,7 @@ else
 fi
 
 # Check NGINX
-printf "${IND}nginx server ${NGINX_FQDN}..."
+printf "${IND}nginx server ${NGINX_FQDN}"
 if ssh "${USER}@${NGINX_FQDN}" sudo systemctl status nginx  >/dev/null 2>&1
 then
   printf "${FR} ${OK_ICON}\n"
@@ -196,7 +197,7 @@ else
   printf "   ${FG_RED}service is down or unreachable${RS}${FR} ${NOTOK_ICON}\n"
   PASSED=false
 fi
-printf "${IND}nginx server disk usage..."
+printf "${IND}nginx server disk usage"
 DISK_USAGE=`ssh "${USER}@${NGINX_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -211,8 +212,19 @@ else
   fi
 fi
 
+# Check kms-share
+printf "${IND}kms share ${KURENTO_FQDN}"
+KMSS_STATUS=`pm2 show 0 | grep status | awk '{ print $4 }' | sed 's/ //g'`
+if [[ "$KMSS_STATUS" != "online" ]]
+then
+  printf " ${FG_RED}${KMSS_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
+  PASSED=false
+else
+  printf "${FR} ${OK_ICON}\n"
+fi 
+
 # Check KMS
-printf "${IND}kms server ${KURENTO_FQDN}..."
+printf "${IND}kms server ${KURENTO_FQDN}"
 if ssh "${USER}@${KURENTO_FQDN}" sudo systemctl status kurento-media-server  >/dev/null 2>&1
 then
   printf "${FR} ${OK_ICON}\n"
@@ -220,7 +232,7 @@ else
   printf "   ${FG_RED}service is down or unreachable${RS}${FR} ${NOTOK_ICON}\n"
   PASSED=false
 fi
-printf "${IND}kms server disk usage..."
+printf "${IND}kms server disk usage"
 DISK_USAGE=`ssh "${USER}@${KURENTO_FQDN}" df -k --output='pcent' / 2>/dev/null  | tail -1 | sed -e 's/%//g'`
 if [ -z "${DISK_USAGE}" ]
 then
@@ -235,8 +247,25 @@ else
   fi
 fi
 
+printf "${IND}kms server load "
+KMS_LOAD=`ssh "${USER}@${KURENTO_FQDN}" uptime | awk -F',' '{print $4}' 2>/dev/null`
+KMS_LOAD=`echo "$KMS_LOAD" | xargs`
+KMS_LOAD=`echo "$KMS_LOAD > 1.0" | bc`
+if [ -z "${KMS_LOAD}" ]
+then
+  printf "   ${FG_RED}unable to get load${RS}${FR} ${NOTOK_ICON}\n"
+  PASSED=false
+else
+  if (( $KMS_LOAD > 0 )); then
+    printf "   ${FG_RED}HIGH ${RS}${FR} ${NOTOK_ICON}\n"
+    PASSED=false
+  else
+    printf " LOW${FR} ${OK_ICON}\n"
+  fi
+fi
+
 # MySQL check
-printf "${IND}mysql server ${MYSQL_FQDN}..."
+printf "${IND}mysql server ${MYSQL_FQDN}"
 MYSQL_RC=`node ./acedirect/tools/checkMysql.js ${MYSQL_FQDN} ${MYSQL_USER} ${MYSQL_PASS} ${MYSQL_DB}` 
 if [[ "$MYSQL_RC" != "0" ]] 
 then
@@ -247,7 +276,7 @@ else
 fi
 
 # Check MongoDB
-printf "${IND}mongo server ${MONGO_FQDN}..."
+printf "${IND}mongo server ${MONGO_FQDN}"
 if mongo --eval 'db.runCommand("ping").ok' ${MONGO_FQDN}:${MONGO_PORT} --quiet >/dev/null 2>&1
 then
   printf "${FR} ${OK_ICON}\n"
@@ -257,7 +286,7 @@ else
 fi
 
 # Check certs
-printf "${IND}local certs ${CERT}..."
+printf "${IND}local certs ${CERT}"
 if openssl x509 -checkend 86400 -noout -in ${CERT} >/dev/null 2>&1
 then
   printf "${FR} ${OK_ICON}\n"
@@ -266,7 +295,7 @@ else
   PASSED=false
 fi
 
-printf "${IND}Agent URL ${URL_AGENT}..."
+printf "${IND}Agent URL ${URL_AGENT}"
 URL_STATUS=`curl -I  -k ${URL_AGENT} 2>/dev/null  | head -n 1|cut -d$' ' -f2`
 if [ "$URL_STATUS" != "200" ] && [ "$URL_STATUS" != "301" ] && [ "$URL_STATUS" != "302" ];
 then
@@ -276,7 +305,7 @@ else
   printf "${FR} ${OK_ICON}\n" 
 fi
 
-printf "${IND}Consumer URL ${URL_CONSUMER}..."
+printf "${IND}Consumer URL ${URL_CONSUMER}"
 URL_STATUS=`curl -I  -k ${URL_CONSUMER} 2>/dev/null  | head -n 1|cut -d$' ' -f2`
 if [ "$URL_STATUS" != "200" ] && [ "$URL_STATUS" != "301" ] && [ "$URL_STATUS" != "302" ];
 then
@@ -286,7 +315,7 @@ else
   printf "${FR} ${OK_ICON}\n" 
 fi
 
-printf "${IND}Manager URL ${URL_MANAGER}..."
+printf "${IND}Manager URL ${URL_MANAGER}"
 URL_STATUS=`curl -I  -k ${URL_MANAGER} 2>/dev/null  | head -n 1|cut -d$' ' -f2`
 if [ "$URL_STATUS" != "200" ] && [ "$URL_STATUS" != "301" ] && [ "$URL_STATUS" != "302" ];
 then
