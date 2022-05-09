@@ -342,6 +342,7 @@ function connect_socket() {
                 $('#CommunicationText').text('You are communicating with ' + firstname[0]); 
                 //$('#agent-name-box').show();
                 agentExtension = data.vrs;
+                $('#agentChatName').text(' with ' +firstname[0]);
                 }
             })
             .on('agents', (data) => {
