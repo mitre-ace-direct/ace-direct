@@ -382,12 +382,11 @@
                   </div>
                 </div>
                 <hr />
-                <div class="box-body" style="height:75vh; display:flex; flex-direction: column; overflow: scroll;">
+                <div class="box-body" style="height:75vh; display:flex; flex-direction: column; overflow: hidden;">
                   <!-- Conversations are loaded here -->
-                  <!--Hard coding messages for now-->
                   <div id="chat-body" style="height:75vh; flex-direction: column; display: flex;">
                     <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
-                    <span id="emptyChat"><b>This is the start of your chat with CSR <span id="agentName">Agent</span>. No messages yet to display</b></span>
+                    <span id="emptyChat"><b>This is the start of your chat<span id="agentChatName"></span>. No messages yet to display</b></span>
                     </div>
                   </div>
         
@@ -466,9 +465,9 @@
                 <div class="box-body" style="height:70vh">
                   <!-- Conversations are loaded here -->
                   <!--Hard coding messages for now-->
-                  <div id="file-share-body" style="height:70vh;">
+                  <div id="file-share-body" style="height:70vh; overflow-y: scroll;">
                     <p>Select a file to send by clicking 'Choose File'; send the file by clicking 'Send'.</p>
-                    <p>View sent files in the 'Sent File(s)' section, and view or download received files in the 'Received File(s)' section.</p>
+                    <p>View sent files in the 'Sent' section, and view or download received files in the 'Received' section.</p>
                     <br>
                     <br>
                     <!--file selection section-->
@@ -482,7 +481,7 @@
                     <button class="btn btn-primary pull-right" id="shareFileConsumer" onclick="shareFileConsumer()"
                       style="background-color:#073863 !important" disabled>Send</button>
                   </div>
-                    <div class="row">
+                    <div class="row" style="max-width: 100%; display: contents;">
                       <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
                           <span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
                           <strong>Success!</strong>  File Sent
@@ -496,39 +495,21 @@
                     <br>
                     <br>
                     <!--send files section-->
-                    <h3>Sent File(s)</h3>
+                    <h3>Sent</h3>
                     <hr style="border:1px solid grey"/>
                     
-                    <div id="sentFilesList" class="filesList">
+                    <div id="sentFilesList">
                       <span id="noSentFiles" class="noFiles">None</span>
                     </div>
-                    <!--
-                    <span>Example_picture.png</span>
-                    <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></button>
-                    -->
                     <!--end sent files section-->
                     <br>
                     <br>
                     <!--received files section-->
-                    <h3>Received File(s)</h3>
+                    <h3>Received</h3>
                     <hr style="border:1px solid grey"/>
-                    <div id="receivedFilesList" class="filesList">
+                    <div id="receivedFilesList">
                       <span id="noReceivedFiles" class="noFiles">None</span>
                     </div>
-                    <!--
-                    <span>Documentation.doc</span>
-                    <span class="btn-toolbar pull-right" role="toolbar">
-                      <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="Download"><i class="fa fa-download"></i></button>
-                      <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></button>
-                    </span>
-                    <hr/>
-                    <span>Image for you to look at.IMG</span>
-                    <span class="btn-toolbar pull-right" role="toolbar">
-                      <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="Download"><i class="fa fa-download"></i></button>
-                      <button class="btn btn-secondary pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></button>
-                    </span>
-                    <hr/>
-                    -->
                     <!--end received files section-->
                   </div>
                 </div>
