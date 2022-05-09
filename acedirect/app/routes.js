@@ -578,4 +578,22 @@ router.get('/logout', (req, res) => {
     });
 });
 
+router.get('/videomailexamplepage', (req, res) => {  //add restrict. this is for testing only
+    res.render('dro/pages/videomailexample');
+});
+
+router.post('/videomailupload', upload.single('uploadfile'), (req, res) => { //add restrict. this is for testing only
+
+    let uploadMetadata = {};
+    uploadMetadata.vrs = '7777777777';
+    uploadMetadata.filepath = `${__dirname}/${req.file.path}`;
+    uploadMetadata.originalFilename = req.file.originalname;
+    uploadMetadata.filename = req.file.filename;
+    uploadMetadata.mimetype = req.file.mimetype;
+    uploadMetadata.size = req.file.size;
+
+    res.status(200).send('Success');
+
+});
+
 module.exports = router;
