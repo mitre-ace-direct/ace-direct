@@ -283,12 +283,13 @@
       }
 
       .populatedMessages {
-        overflow-y: scroll;
+        overflow-y: auto;
         position: relative;
         height:fit-content;
         max-height:70vh;
         margin-top:auto;
         margin-bottom: 5vh;
+        padding-right: 2rem;
       }
 
       .sentChat {
@@ -316,6 +317,13 @@
       .filesList {
         max-height: 20%;
         overflow: scroll;
+      }
+
+      .tabFontSize {
+        font-size: 100%;
+      }
+      .buttonFontSize {
+        font-size: 14px;
       }
 
     </style>
@@ -372,13 +380,13 @@
             <!-- Tab panes -->
             <div class="tab-content">
               <!--Chat pane-->
-              <div class="tab-pane active" id="chatBody">
+              <div class="tab-pane active tabFontSize" id="chatBody">
                 <div class="box-header" style="overflow: hidden;">
                   <h2 style="float:left">Chat</h2>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
-                    <button type="button" class="btn fontSizeButtons" style="font-size:smaller;">A</button>
-                    <button type="button" class="btn btn-secondary fontSizeButtons" style="background-color: white; pointer-events: none;">100%</button>
-                    <button type="button" class="btn fontSizeButtons" style="font-size:large;">A</button>
+                    <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)">A</button>
+                    <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize" style="background-color: white; pointer-events: none;">100%</button>
+                    <button type="button" class="btn fontSizeButtons" style="font-size:large;" onclick="setFontSize(10)">A</button>
                   </div>
                 </div>
                 <hr />
@@ -386,7 +394,7 @@
                   <!-- Conversations are loaded here -->
                   <div id="chat-body" style="height:75vh; flex-direction: column; display: flex;">
                     <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
-                    <span id="emptyChat"><b>This is the start of your chat<span id="agentChatName"></span>. No messages yet to display</b></span>
+                    <span id="emptyChat">This is the start of your chat<span id="agentChatName"></span>. No messages yet to display</span>
                     </div>
                   </div>
         
@@ -396,10 +404,10 @@
                       <div class="input-group">
                         <span class="input-group-btn" style="vertical-align: bottom;">
                           <span class="dropup pull-left">
-                          <button id="chat-emoji" class="btn btn-flat" type="button" data-toggle="dropdown"
+                          <button id="chat-emoji" class="btn btn-flat buttonFontSize" type="button" data-toggle="dropdown"
                             animation="true" style="border:2px solid lightgrey; margin-right: 10px">&#128512;</button>
                           <div class="dropdown-menu dropdown-multicol" id="emoji-selector" aria-labelledby="dropdownMenuButton"
-                            style="height:fit-content; overflow-y: scroll; text-align: center;">
+                            style="height:fit-content; overflow-y: auto; text-align: center;">
                             <div class="dropdown-row">
                               <button class="dropdown-item emojiButtons" type="button"
                                 onclick="addEmoji(this.value)" value="&#128512;">&#128512;</button>
@@ -436,11 +444,11 @@
                           </div>
                         </span>
                         </span>
-                        <textarea id="newchatmessage" placeholder="Type a message" class="form-control col-xs-1" maxlength="500"
+                        <textarea id="newchatmessage" placeholder="Type a message" class="form-control col-xs-1 buttonFontSize" maxlength="500"
                           autocomplete="off" required></textarea>
         
                         <span class="input-group-btn" style="vertical-align: bottom;">
-                          <button id="chat-send" class="btn btn-primary btn-flat"
+                          <button id="chat-send" class="btn btn-primary btn-flat buttonFontSize"
                             style="background-color: #073863 !important; margin-left: 10px; border-radius: 6px;">Send</button>
                         </span>
                       </div>
@@ -452,33 +460,33 @@
               </div>
               <!-- end chat pane-->
               <!--File Share Pane-->
-              <div class="tab-pane" id="fileBody">
+              <div class="tab-pane tabFontSize" id="fileBody">
                 <div class="box-header" style="overflow: hidden;">
                   <h2 style="float:left">File Sharing</h2>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
-                    <button type="button" class="btn fontSizeButtons" style="font-size:smaller;">A</button>
-                    <button type="button" class="btn btn-secondary fontSizeButtons" style="background-color: white; pointer-events: none;">100%</button>
-                    <button type="button" class="btn fontSizeButtons" style="font-size:large;">A</button>
+                    <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)">A</button>
+                    <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize" style="background-color: white; pointer-events: none;">100%</button>
+                    <button type="button" class="btn fontSizeButtons" style="font-size:large;" onclick="setFontSize(10)">A</button>
                   </div>
                 </div>
                 <hr />
                 <div class="box-body" style="height:70vh">
                   <!-- Conversations are loaded here -->
                   <!--Hard coding messages for now-->
-                  <div id="file-share-body" style="height:70vh; overflow-y: scroll;">
-                    <p>Select a file to send by clicking 'Choose File'; send the file by clicking 'Send'.</p>
-                    <p>View sent files in the 'Sent' section, and view or download received files in the 'Received' section.</p>
+                  <div id="file-share-body" style="height:75vh; overflow-y: auto; padding-right: 2rem;">
+                    <p style="line-height: inherit;">Select a file to send by clicking 'Choose File'; send the file by clicking 'Send'.</p>
+                    <p style="line-height: inherit;">View sent files in the 'Sent' section, and view or download received files in the 'Received' section.</p>
                     <br>
                     <br>
                     <!--file selection section-->
                     <div style="overflow:hidden">
                     <div class="btn-group chooseFileGroup" style="width: 70%;">
                       <input type="file" id="fileInput" name="fileInput"
-                        class="form-control-file btn btn-default fileInput"
-                        style="background-color:transparent; border: transparent; padding-left: 0px; width:80%">
+                        class="form-control-file btn btn-default fileInput buttonFontSize"
+                        style="background-color:transparent; border: transparent; padding-left: 0px; width: 80%; padding-right: 0px;">
                         <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;" tabindex="0">x</span>
                     </div>
-                    <button class="btn btn-primary pull-right" id="shareFileConsumer" onclick="shareFileConsumer()"
+                    <button class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer" onclick="shareFileConsumer()"
                       style="background-color:#073863 !important" disabled>Send</button>
                   </div>
                     <div class="row" style="max-width: 100%; display: contents;">
