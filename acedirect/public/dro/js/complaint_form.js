@@ -976,6 +976,31 @@ function addFileToSentList(data) {
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
 });
+}
 
+function setFontSize(size) {
+  let currentFontSize = $('.currentFontSize').text().split('%')[0];
+  let newFontSize = Number(currentFontSize) + size;
 
+  if (newFontSize >= 50 && size === -10 || newFontSize <= 200 && size === 10) {
+    if (newFontSize >= 80 && newFontSize <= 150 ) {
+      setOtherFontSize(size);
+    }
+
+    $('.tabFontSize').css('font-size', newFontSize.toString() + "%");
+    $('.currentFontSize').text(newFontSize.toString() + "%");
+  }
+}
+
+function setOtherFontSize(size) {
+  // sets font sizes for buttons/text input
+  console.log('size: ' +size)
+  let originalFont = Number($('.currentFontSize').text().split('%')[0]);
+  let temp = (originalFont + size) / 100;
+
+  console.log('setting new button font-size to: ' +(14 * temp).toString() + "px");
+  console.log('setting new header font-size to: ' +(30 * temp).toString() + "px");
+  $('.buttonFontSize').css('font-size', (Number(14) * temp).toString() + "px");
+
+  $('#newchatmessage').css('height', $('#chat-send').css('height'));
 }
