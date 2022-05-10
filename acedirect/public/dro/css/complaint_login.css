@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   top: 0;
-  width: 34%;
+  /* width: 34%; */
   height: 50%;
   text-align: center;
   margin: auto;
@@ -27,7 +27,9 @@
 #consumerBackground {
   background-color: lightgray;
   height: 100%;
-  overflow: hidden;
+  overflow-y: hidden;
+  overflow-x: auto;
+  /* min-width: 992px; */
 }
 
 #logoContainer {
