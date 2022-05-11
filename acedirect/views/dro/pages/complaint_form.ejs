@@ -394,12 +394,14 @@
                   <!-- Conversations are loaded here -->
                   <div id="chat-body" style="height:75vh; flex-direction: column; display: flex;">
                     <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
-                    <span id="emptyChat">This is the start of your chat<span id="agentChatName"></span>. No messages yet to display</span>
+                    <div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px; display: none; overflow-wrap: break-word;"></div>
+                    <span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No messages yet to display</span>
                     </div>
                   </div>
         
                   <div id="chat-footer" class="box-footer" style="padding-top:10px; bottom:0; position:absolute;">
                     <input type="hidden" id="displayname">
+                    <input type="hidden" class="agentChatName">
                     <form name="chatsend" id="chatsend">
                       <div class="input-group">
                         <span class="input-group-btn" style="vertical-align: bottom;">
