@@ -11,6 +11,8 @@ let vrs;
 let acekurento = null;
 let ua = null;
 let videomailflag = false;
+let hasMessages = false;
+let isAgentTyping = false;
 
 $(document).ready(() => {
     $('#optionsModal').modal('show');
@@ -238,17 +240,45 @@ function connect_socket() {
                 console.error('Translation error:', error);
             })
             .on('typing', (data) => {
-                if ($('#displayname').val() !== data.displayname) {
-                /* there's still some weird spacing between agent messages on the first call */
-                $('#rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
-                $('#rtt-typing').appendTo($('#chat-messages'));
+              if ($('#displayname').val() !== data.displayname) {
+                if ($('#chat-messages').hasClass('emptyMessages')  && !isAgentTyping) {
+                  $('#emptyChat').text('');
+                  $('#chat-messages').removeClass('emptyMessages');
+                  $('#chat-messages').addClass('populatedMessages');
+                  $('#rtt-typing').css('display', 'block');
+                  setTimeout(() => {
+                    $('#rtt-typing').css('display', 'block');
+                    $('#rtt-typing').html('<b>'+data.displayname+'</b>' + '<br/>' + data.rttmsg).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+                    $('#rtt-typing').appendTo($('#chat-messages'));
+                    $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+                  },100);
+                } else {
+                  $('#rtt-typing').css('display', 'block');
+                  $('#rtt-typing').html('<b>'+data.displayname+'</b>' + '<br/>' + data.rttmsg).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+                  $('#rtt-typing').appendTo($('#chat-messages'));
+                  $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
                 }
+                isAgentTyping = true;
+              }
             })
             .on('typing-clear', (data) => {
-                if ($('#displayname').val() !== data.displayname) {
+              if ($('#displayname').val() !== data.displayname) {
+                isAgentTyping = false;
+                if (!hasMessages) {
+                  console.log($('.agentChatName').text())
+                  $('#chat-messages').removeClass('populatedMessages');
+                  $('#chat-messages').addClass('emptyMessages');
+                  $('#emptyChat').text('This is the start of your chat' +$('.agentChatName').text()+'. No messages yet to display');
+                  $('#chat-messages').css('padding-top', '75% !important');
+                } else {
+                  $('#emptyChat').css('margin-top', '0px')
+                }
+                console.log('typing clear')
+                $('#rtt-typing').css('display', 'none');
                 $('#chat-messages').remove($('#rtt-typing'));
                 $('#rtt-typing').html('').removeClass('direct-chat-text').removeClass('direct-chat-timestamp text-bold');
-                }
+                $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+              }
             })
             .on('disconnect', () => {
                 console.log('disconnected');
@@ -342,7 +372,7 @@ function connect_socket() {
                 $('#CommunicationText').text('You are communicating with ' + firstname[0]); 
                 //$('#agent-name-box').show();
                 agentExtension = data.vrs;
-                $('#agentChatName').text(' with ' +firstname[0]);
+                $('.agentChatName').text(' with ' +firstname[0]);
                 }
             })
             .on('agents', (data) => {
@@ -799,6 +829,21 @@ $('#newchatmessage').on("keyup change keydown paste input", function(evt) {
       $('#chatsend').submit();
     }
   }
+
+  // rtt
+  let value = $('#newchatmessage').val();
+  const displayname = $('#displayname').val();
+  if (value.length > 0) {
+    socket.emit('chat-typing', {
+      displayname,
+      rttmsg: value
+    });
+  } else {
+    socket.emit('chat-typing-clear', {
+      displayname
+    });
+  }
+
   this.style.height = this.scrollHeight + 'px';
   if($('#newchatmessage').val() == "") {
     this.style.height = '34px';
@@ -877,6 +922,7 @@ function addEmoji(emoji) {
 }
 
 function newChatMessage(data) {
+  hasMessages = true;
   let msg = data.message;
   const displayname = data.displayname;
   const timestamp = data.timestamp;
@@ -905,7 +951,13 @@ function newChatMessage(data) {
 
   if ($('#displayname').val() === displayname) {
     $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
+    if (isAgentTyping) {
+      // keep the rtt at the bottom of the the chat pane
+      $('#rtt-typing').appendTo($('#chat-messages'));
+    }
   } else {
+    isAgentTyping = false;
+    $('#rtt-typing').css('display', 'none');
     $('#chat-messages').remove($('#rtt-typing'));
     $('#rtt-typing').html('').removeClass('direct-chat-text');
     $(msgblock).addClass('alert alert-secondary receivedChat').appendTo($('#chat-messages'));
