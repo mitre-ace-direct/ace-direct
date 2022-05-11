@@ -29,7 +29,7 @@
   height: 100%;
   overflow-y: hidden;
   overflow-x: auto;
-  /* min-width: 992px; */
+  min-width: 992px;
 }
 
 #logoContainer {
@@ -58,7 +58,7 @@
 }
 
 #heroLogo {
-  min-width: 100vw;
+  min-width: 100%;
   margin: auto;
   object-fit: fill;
   background-size: cover;
