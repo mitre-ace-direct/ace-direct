@@ -248,7 +248,7 @@ else
 fi
 
 printf "${IND}kms server load "
-KMS_LOAD=`ssh "${USER}@${KURENTO_FQDN}" uptime | awk -F',' '{print $4}' 2>/dev/null`
+KMS_LOAD=`ssh "${USER}@${KURENTO_FQDN}" uptime | sed 's/,/ /g' | awk -F' ' '{print $(NF-1)}'   2>/dev/null`
 KMS_LOAD=`echo "$KMS_LOAD" | xargs`
 KMS_LOAD=`echo "$KMS_LOAD > 1.0" | bc`
 if [ -z "${KMS_LOAD}" ]
