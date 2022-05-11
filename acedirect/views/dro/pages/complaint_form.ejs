@@ -304,6 +304,13 @@
         background-color: lightgray !important;
         overflow-wrap: break-word;
       }
+      .rttChatBubble {
+        border-radius: 25px !important;
+        color: #737373 !important;
+        background-color: #f9f9f9 !important;
+        overflow-wrap: break-word;
+      }
+
       .direct-chat-name {
         font-weight: bold;
         margin-right: 1rem;
@@ -394,7 +401,7 @@
                   <!-- Conversations are loaded here -->
                   <div id="chat-body" style="height:75vh; flex-direction: column; display: flex;">
                     <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
-                    <div class="direct-chat-timestamp text-bold" id="rtt-typing" style="margin-left: 10px; min-height: 20px; display: none; overflow-wrap: break-word;"></div>
+                    <div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble" id="rtt-typing" style="min-height: 20px; display: none;"></div>
                     <span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No messages yet to display</span>
                     </div>
                   </div>

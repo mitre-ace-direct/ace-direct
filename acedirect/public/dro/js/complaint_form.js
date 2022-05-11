@@ -248,13 +248,13 @@ function connect_socket() {
                   $('#rtt-typing').css('display', 'block');
                   setTimeout(() => {
                     $('#rtt-typing').css('display', 'block');
-                    $('#rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+                    $('#rtt-typing').html('<b>'+data.displayname+'</b>' + '<br/>' + data.rttmsg).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
                     $('#rtt-typing').appendTo($('#chat-messages'));
                     $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
                   },100);
                 } else {
                   $('#rtt-typing').css('display', 'block');
-                  $('#rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+                  $('#rtt-typing').html('<b>'+data.displayname+'</b>' + '<br/>' + data.rttmsg).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
                   $('#rtt-typing').appendTo($('#chat-messages'));
                   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
                 }
