@@ -188,6 +188,8 @@ function setQueueText(position) {
 
 function addFileToDownloadList(data) {
   $('#consumer-file-group').show();
+  //only show latest file
+  $('#consumer-file-list').empty();
   $('#consumer-file-list ').append(
     $('<li class="list-group-item btn-primary btn btn-flat">')
       .append(`<a style="color:white;display:block;" target="_blank" href="./downloadFile?id=${data.id}">${data.original_filename}</a>`)
