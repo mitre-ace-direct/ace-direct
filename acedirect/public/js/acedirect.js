@@ -3809,6 +3809,8 @@ function clearAgentDownloadList() {
 
 function addFileToAgentDownloadList(data) {
   $('#agent-file-group').show();
+  //only show latest file
+  $('#agent-file-list').empty();
   $('#agent-file-list').append(
     $('<li class="list-group-item btn-primary btn btn-flat">')
     .append('<a style="color:white;display:block;" target="_blank" href="./downloadFile?id=' + data.id + '">' + data.original_filename + '</a>')
