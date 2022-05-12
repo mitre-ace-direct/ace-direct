@@ -10,6 +10,7 @@ var utils = require('./utils.js')
 var c = require('./constants.js')
 var config = require('./../../dat/config.json');
 const path = require('path');
+const formidable = require('formidable');
 
 AWS.config.update({
     region: utils.getConfigVal(config.s3.region),
@@ -293,6 +294,7 @@ router.get('/getVideomail', agentRestrict, (req, res) => {
         } else {
             console.log(`|${result[0].filepath}|`);
             if (result[0].filepath === 's3') {
+                console.log(result[0].filename)
                 const file = s3.getObject({ Bucket: utils.getConfigVal(config.s3.bucketname), Key: result[0].filename });
 
                 res.writeHead(200, {
@@ -582,17 +584,74 @@ router.get('/videomailexamplepage', (req, res) => {  //add restrict. this is for
     res.render('dro/pages/videomailexample');
 });
 
-router.post('/videomailupload', upload.single('uploadfile'), (req, res) => { //add restrict. this is for testing only
+router.get('/videomail', restrict, (req, res) => {  //add restrict. this is for testing only
+    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url)});
+});
 
-    let uploadMetadata = {};
-    uploadMetadata.vrs = '7777777777';
-    uploadMetadata.filepath = `${__dirname}/${req.file.path}`;
-    uploadMetadata.originalFilename = req.file.originalname;
-    uploadMetadata.filename = req.file.filename;
-    uploadMetadata.mimetype = req.file.mimetype;
-    uploadMetadata.size = req.file.size;
+router.post('/videomailupload', restrict,  (req, res) => { //add restrict. this is for testing only
+    const form = new formidable.IncomingForm();
+    const dir = process.platform.match(/^win/) ? '\\..\\uploads\\videomails\\' : '/../uploads/videomails/';
+    form.uploadDir = path.join(__dirname, dir);
+    form.keepExtensions = true;
+    form.maxFieldsSize = 10 * 1024 * 1024;
+    form.maxFields = 1000;
+    form.multiples = false;
+  
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        error.error('oh no an error', err);
+        res.writeHead(200, {
+          'content-type': 'text/plain',
+        });
+        res.write('an error occurred');
+      } else {
+          console.log(JSON.stringify(files.file))
+          var filepath = files.file.filepath;
+        fs.readFile(filepath, function (err, fileData) {
+            if (files.file.mimetype === 'video/webm') {
+            var uploadParams = { Bucket: '***REMOVED***-recordings', Key: files.file.newFilename+'.webm', Body: "" };
+            console.log("uploadParams", JSON.stringify(uploadParams))
+            uploadParams.Body = fileData;
+            s3.upload(uploadParams, function (err) {
+              if (err) {
+                console.log("Error!:", err);
+                return
+              }
+              try {
+                //fs.unlinkSync(filepath)
+              } catch (err) {
+                console.error(err)
+              }
 
-    res.status(200).send('Success');
+
+
+        request({
+            method: 'POST',
+            url: 'https://***REMOVED***:9014/UploadVideomail',
+            rejectUnauthorized: false,
+            form: {
+              ext: '12321',
+              duration: Math.floor(fields.duration),
+              phoneNumber: '2345679000',
+              filename: files.file.newFilename+'.webm'
+            },
+          }, function (error, response, data) {
+            if (error) {
+              console.log("Error", error);
+              console.log("Could not upload:", new Date());
+            } else {
+              console.log("Successful video upload:", new Date());
+            }
+          });
+
+});
+            }
+        })
+    }
+
+});
+          
+
 
 });
 
