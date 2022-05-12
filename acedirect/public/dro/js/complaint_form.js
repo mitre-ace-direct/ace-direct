@@ -1013,7 +1013,7 @@ function addFileToDownloadList(data) {
     (`<span>${data.original_filename}</span>
     <span class="btn-toolbar pull-right" role="toolbar">
       <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}"><i class="fa fa-download"></i></a>
-      <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></a>
+      <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}"><i class="fa fa-eye"></i></a>
     </span>
     <hr/>`)
   );
@@ -1030,7 +1030,7 @@ function addFileToSentList(data) {
   // add to sent files list
   $('#sentFilesList').append(
     (`<span>${data.original_filename}</span>
-    <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View"><i class="fa fa-eye"></i></a>
+    <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}"><i class="fa fa-eye"></i></a>
     <hr/>`)
   );
 
