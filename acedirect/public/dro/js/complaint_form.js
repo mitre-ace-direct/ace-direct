@@ -1,6 +1,4 @@
 let socket;
-let nginxPath = '<%= nginxPath %>';
-let consumerPath = '<%= consumerPath %>';
 
 const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` ? `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` : '';
 const remoteStream = document.getElementById('remoteView');
