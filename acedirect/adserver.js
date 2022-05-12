@@ -69,7 +69,7 @@ let ami = null;
 // file share
 let sharingAgent = [];
 let sharingConsumer = [];
-let fileToken = [];
+let fileToken = [[]];
 let incomingVRS;
 
 // Initialize log4js
@@ -629,20 +629,23 @@ io.sockets.on('connection', (socket) => {
       // first element
       sharingAgent[0] = token.extension;
       sharingConsumer[0] = incomingVRS;
-      fileToken[0] = '';
+      fileToken[0][0] = '';
+      fileToken[0][1] = '';
     } else {
       for (let i = 0; i <= sharingAgent.length; i += 1) {
         if (i === sharingAgent.length) {
           // end of the list
           sharingAgent[i] = token.extension;
           sharingConsumer[i] = incomingVRS;
-          fileToken[i] = '';
+          fileToken[i][0] = '';
+          fileToken[i][1] = '';
           break;
         } else if (sharingAgent[i] === '') {
           // fil any gaps
           sharingAgent[i] = token.extension;
           sharingConsumer[i] = incomingVRS;
-          fileToken[i] = '';
+          fileToken[i][0] = '';
+          fileToken[i][1] = '';
           break;
         }
       }
@@ -667,7 +670,8 @@ io.sockets.on('connection', (socket) => {
         // empty
         sharingAgent[i] = '';
         sharingConsumer[i] = '';
-        fileToken[i] = '';
+        fileToken[i][0] = '';
+        fileToken[i][1] = '';
       }
     }
     // check if the whole array is ''
@@ -681,7 +685,7 @@ io.sockets.on('connection', (socket) => {
     if (isEmpty) {
       sharingAgent = [];
       sharingConsumer = [];
-      fileToken = [];
+      fileToken = [[]];
     }
     // console.log(sharingAgent);
     // console.log(sharingConsumer);
@@ -722,7 +726,7 @@ io.sockets.on('connection', (socket) => {
             // console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
             // console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
             if (sharingAgent[i] === uploader) {
-              fileToken[i] = latestResult.id;
+              fileToken[i][1] = latestResult.id;
               console.log(`${sharingAgent[i]} shared file`);
               console.log('with id: ');
               console.log(fileToken[i]);
@@ -784,7 +788,7 @@ io.sockets.on('connection', (socket) => {
             // console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
             // console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
             if (sharingConsumer[i] === uploader) {
-              fileToken[i] = latestResult.id;
+              fileToken[i][0] = latestResult.id;
               console.log(`${sharingConsumer[i]} shared file`);
               console.log('with id: ');
               console.log(fileToken[i]);
@@ -3703,7 +3707,7 @@ app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
             if (req.session.user.extension === sharingAgent[i] || req.session.user.vrs === sharingConsumer[i]) {
                 console.log('In valid session');
 
-                if (fileToken[i].toString() === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
+                if (fileToken[i][0].toString() === (req.query.id).split('"')[0] || fileToken[i][1].toString() === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
                     console.log('allowed to download');
 
                     const documentID = req.query.id;
