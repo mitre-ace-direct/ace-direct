@@ -3743,6 +3743,49 @@ app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
     }
 });
 
+
+app.get('/viewFile', /* agent.shield(cookieShield) , */(req, res) => {
+  if (sharingAgent !== undefined && sharingConsumer !== undefined) {
+      for (let i = 0; i < sharingAgent.length; i += 1) {
+          // make sure the agent is in a call with the consumer who sent the file
+          if (req.session.user.extension === sharingAgent[i] || req.session.user.vrs === sharingConsumer[i]) {
+              console.log('In valid session');
+
+              if (fileToken[i][0].toString() === (req.query.id).split('"')[0] || fileToken[i][1].toString() === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
+                  console.log('allowed to view');
+
+                  const documentID = req.query.id;
+                  let url = `https://${getConfigVal('servers:main_private_ip')}:${getConfigVal('app_ports:mserver')}`;
+                  url += `/getStoreFileInfo?documentID=${documentID}`;
+                  request({
+                      url,
+                      json: true
+                  }, (error, response, data) => {
+                      if (error) {
+                          res.status(500).send('Error');
+                      } else if (data.message === 'Success') {
+                          const { filepath } = data;
+                          const { filename } = data;
+                          const readStream = fs.createReadStream(filepath);
+                          res.attachment(filename);
+                          res.setHeader('Content-disposition', 'inline');
+                          readStream.pipe(res);
+                      } else {
+                          res.status(500).send('Error');
+                      }
+                  });
+                  break;
+              } else {
+                  console.log('Not authorized to view this file, mismatched IDs');
+              }
+          } else {
+              console.log('Not authorized to view');
+          }
+      }
+  } else {
+      console.log('Not authorized to view');
+  }
+});
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
   const err = new Error('Not Found');
