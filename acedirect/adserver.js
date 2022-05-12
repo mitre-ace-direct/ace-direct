@@ -3665,6 +3665,7 @@ app.use((req, res, next) => {
   req.redisClient = redisClient;
   res.locals = {
     nginxPath,
+    consumerPath,
     busyLightEnabled,
     awayBlink,
     outVidTimeout,

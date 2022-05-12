@@ -1,5 +1,7 @@
 let socket;
 let nginxPath = '<%= nginxPath %>';
+let consumerPath = '<%= consumerPath %>';
+
 const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` ? `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` : '';
 const remoteStream = document.getElementById('remoteView');
 const selfStream = document.getElementById('selfView');
@@ -678,17 +680,20 @@ function enterQueue() {
 
 function endCall() {
   terminateCall();
+
+  // TODO: this redirects, but we need the new redirect modal here
   if (complaintRedirectActive) {
-    $('#callEndedModal').modal('show');
+    $('#callEndedModal').modal('show'); // TODO - does not exist at the moment
     setTimeout(() => {
       window.location = complaintRedirectUrl;
-    }, 500);
+    }, 5000);
   }
 }
 
 function exitQueue() {
-  $('#waitingModal').modal('hide');
   endCall();
+  $('#waitingModal').modal('hide');
+  window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
 }
 
 // makes a call
