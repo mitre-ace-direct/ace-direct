@@ -1,5 +1,5 @@
 let socket;
-const nginxPath = '<%= nginxPath %>';
+let nginxPath = '<%= nginxPath %>';
 const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` ? `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` : '';
 const remoteStream = document.getElementById('remoteView');
 const selfStream = document.getElementById('selfView');

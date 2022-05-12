@@ -583,7 +583,7 @@
     
   </body>
   <%- include("../partials/acedirect_footer") %>
-  <div id="optionsModal" class="modal fade">
+  <div id="optionsModal" class="modal fade"  data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -630,7 +630,7 @@
 			</div>
 		</div>
 	</div>
-  <div id="waitingModal" class="modal fade">
+  <div id="waitingModal" class="modal fade"  data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header text-center">
@@ -673,7 +673,7 @@
   <script type="text/javascript" src="./socket.io/socket.io.js"></script>
   <script src="/js/ACEKurento-1.0.0.js"></script>
   <script>
-		var nginxPath = '<%= nginxPath %>';
+		nginxPath = '<%= nginxPath %>';
 		var stunFQDN = '<%= stunFQDN %>';
 		var stunPort = '<%= stunPort %>';
 		var turnFQDN = '<%= turnFQDN %>';
