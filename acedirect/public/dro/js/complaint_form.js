@@ -685,6 +685,22 @@ function enterQueue() {
     });
     $('#waitingModal').modal('show');
 }
+
+function endCall() {
+  terminateCall();
+  if (complaintRedirectActive) {
+    $('#callEndedModal').modal('show');
+    setTimeout(() => {
+      window.location = complaintRedirectUrl;
+    }, 500);
+  }
+}
+
+function exitQueue() {
+  $('#waitingModal').modal('hide');
+  endCall();
+}
+
 // makes a call
 /*
 * Use acekurento object to make the call. Not sure about the extension
