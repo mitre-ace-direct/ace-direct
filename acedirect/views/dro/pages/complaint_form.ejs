@@ -583,7 +583,7 @@
     
   </body>
   <%- include("../partials/acedirect_footer") %>
-  <div id="optionsModal" class="modal fade">
+  <div id="optionsModal" class="modal fade"  data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -630,7 +630,7 @@
 			</div>
 		</div>
 	</div>
-  <div id="waitingModal" class="modal fade">
+  <div id="waitingModal" class="modal fade"  data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header text-center">
@@ -654,7 +654,7 @@
               - OR -
             </div>
             <div class="col-xs-5">
-              <button type="button" class="btn btn-secondary modal-outline-btn"><i class="fa fa-phone rotate-phone"></i><span class="separator"></span>Hang Up</button>
+              <button type="button" class="btn btn-secondary modal-outline-btn" onclick="exitQueue()"><i class="fa fa-phone rotate-phone"></i><span class="separator"></span>Hang Up</button>
             </div>
           </div>
 
@@ -665,25 +665,28 @@
 			</div>
 		</div>
 	</div>
+
+  <script>
+  let nginxPath = '<%= nginxPath %>';
+  let consumerPath = '<%= consumerPath %>';
+  let stunFQDN = '<%= stunFQDN %>';
+  let stunPort = '<%= stunPort %>';
+  let turnFQDN = '<%= turnFQDN %>';
+  let turnPort = '<%= turnPort %>';
+  let turnUser = '<%= turnUser %>';
+  let turnCred = '<%= turnCred %>';
+
+  //not instrumenting complaint web page right now
+  let logWebRTCStats = false;
+  let logWebRTCStatsFreq = 60000;
+  let logWebRTCMongo = '';
+  </script>
+
   <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
-	<script type="text/javascript" src="/assets/js/bootstrap.js"></script>
+  <script type="text/javascript" src="/assets/js/bootstrap.js"></script>
   <script type="text/javascript" src="/dro/js/complaint_form.js"></script>
   <script type="text/javascript" src="/assets/js/jwt-decode.js"></script>
   <script type="text/javascript" src='/assets/js/moment.js'></script>
   <script type="text/javascript" src="./socket.io/socket.io.js"></script>
   <script src="/js/ACEKurento-1.0.0.js"></script>
-  <script>
-		var nginxPath = '<%= nginxPath %>';
-		var stunFQDN = '<%= stunFQDN %>';
-		var stunPort = '<%= stunPort %>';
-		var turnFQDN = '<%= turnFQDN %>';
-		var turnPort = '<%= turnPort %>';
-		var turnUser = '<%= turnUser %>';
-		var turnCred = '<%= turnCred %>';
-
-		//not instrumenting complaint web page right now
-		var logWebRTCStats = false;
-		var logWebRTCStatsFreq = 60000;
-		var logWebRTCMongo = '';
-	</script>
 </html>
