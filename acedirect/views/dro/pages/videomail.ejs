@@ -91,6 +91,13 @@
       -ms-transform: translate(-50%, -50%);
       transform: translate(-50%, -50%);
     }
+    .greeting-button {
+        width: 100%;
+        background-color: #073863 !important;
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+        font-weight: bold !important;
+      }
   </style>
 </head>
 
@@ -103,7 +110,7 @@
             <i class="fa fa-play fa-2x" aria-hidden="true" id="greetingPlayPauseBtn"></i>
             <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span>
             <div id="custom-seekbar"><span></span></div>
-            <button class="btn btn-secondary" onclick="skipGreeting();">Skip Greeting&nbsp;<i
+            <button class="btn .greeting-button" onclick="skipGreeting();">Skip Greeting&nbsp;<i
                 class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
           </div>
         </div>
