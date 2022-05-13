@@ -28,6 +28,14 @@ function agentRestrict(req, res, next) {
     }
 };
 
+function consumerRestrict(req, res, next) {
+    if (req.session.user && req.session.user.role === 'VRS' ) {
+        next()
+    } else {
+        res.redirect('.'+utils.getConfigVal(config.nginx.consumer_route));
+    }
+};
+
 function restrict(req, res, next) {
     if (req.session.user && req.session.user.role) {
         next()
@@ -35,6 +43,10 @@ function restrict(req, res, next) {
         res.redirect('./');
     }
 };
+
+router.get('/',  (req, res, next) => {
+    res.redirect("."+utils.getConfigVal(config.nginx.consumer_route))
+});
 
 router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => {
     if (req.session.user && req.session.user.role === 'VRS') {
@@ -571,24 +583,17 @@ router.get('/getagentstatus/:token', (req, res) => {
  */
 
 router.get('/logout', (req, res) => {
-   // let redirectURL = './'
-   // if (req.session.user && req.session.user.role == "AD Agent") {
-   //     redirectURL = utils.getConfigVal(config.nginx.fognito_path)
-   // }
     req.session.destroy(()=>{
        res.redirect(req.get('referer'));
     });
 });
 
-router.get('/videomailexamplepage', (req, res) => {  //add restrict. this is for testing only
-    res.render('dro/pages/videomailexample');
+
+router.get('/videomail', consumerRestrict, (req, res) => {  
+    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs)});
 });
 
-router.get('/videomail', restrict, (req, res) => {  //add restrict. this is for testing only
-    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url)});
-});
-
-router.post('/videomailupload', restrict,  (req, res) => { //add restrict. this is for testing only
+router.post('/videomailupload', consumerRestrict,  (req, res) => { //add restrict. this is for testing only
     const form = new formidable.IncomingForm();
     const dir = process.platform.match(/^win/) ? '\\..\\uploads\\videomails\\' : '/../uploads/videomails/';
     form.uploadDir = path.join(__dirname, dir);
@@ -605,12 +610,10 @@ router.post('/videomailupload', restrict,  (req, res) => { //add restrict. this 
         });
         res.write('an error occurred');
       } else {
-          console.log(JSON.stringify(files.file))
           var filepath = files.file.filepath;
         fs.readFile(filepath, function (err, fileData) {
             if (files.file.mimetype === 'video/webm') {
             var uploadParams = { Bucket: '***REMOVED***-recordings', Key: files.file.newFilename+'.webm', Body: "" };
-            console.log("uploadParams", JSON.stringify(uploadParams))
             uploadParams.Body = fileData;
             s3.upload(uploadParams, function (err) {
               if (err) {
@@ -618,7 +621,7 @@ router.post('/videomailupload', restrict,  (req, res) => { //add restrict. this 
                 return
               }
               try {
-                //fs.unlinkSync(filepath)
+                fs.unlinkSync(filepath)
               } catch (err) {
                 console.error(err)
               }
@@ -630,9 +633,9 @@ router.post('/videomailupload', restrict,  (req, res) => { //add restrict. this 
             url: 'https://***REMOVED***:9014/UploadVideomail',
             rejectUnauthorized: false,
             form: {
-              ext: '12321',
+              ext: '88888', //
               duration: Math.floor(fields.duration),
-              phoneNumber: '2345679000',
+              phoneNumber: req.session.user.phone,
               filename: files.file.newFilename+'.webm'
             },
           }, function (error, response, data) {

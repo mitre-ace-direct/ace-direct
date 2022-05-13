@@ -97,13 +97,13 @@
 <body>
   <%- include("../partials/agent_page_header") %>
     <div class="container ad-container">
-      <div class="row" id="greetingDiv" style="dispdlay:none">
+      <div class="row" id="greetingDiv">
         <div class="row  greeting-controls">
           <div class="col-12 text-center align-self-center">
             <i class="fa fa-play fa-2x" aria-hidden="true" id="greetingPlayPauseBtn"></i>
             <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span>
             <div id="custom-seekbar"><span></span></div>
-            <button class="btn btn-primary" onclick="skipGreeting();">Skip Greeting&nbsp;<i
+            <button class="btn btn-secondary" onclick="skipGreeting();">Skip Greeting&nbsp;<i
                 class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
           </div>
         </div>
@@ -118,16 +118,23 @@
       <div class="row text-center" style="display:none" id="countDownDiv">
 
         <div class="col-12 text-center align-self-center">
+          <br /><br /><br /><br /><br />
           Recording will start in:<br /><span id="recordingCountdown">3</span>
         </div>
       </div>
 
-      <div class="row text-center" style="display:none" id="recordingDiv">
-        <div class="col-12">
+      <div class="row" style="display:none" id="recordingDiv">
+        <div class="col-12 text-center">
           <div class="row  recording-controls">
-            <div class="col-12">
+            <div class="col-md-3">
               <span class="text-danger" id="recordingTime"></span>
-              <button class="btn btn-primary" onclick="sendVideomail();"><i class="fa fa-paper-plane"
+            </div>
+            <div class="col-md-6 text-center">
+              <span><i class="fa fa-microphone-slash" aria-hidden="true"></i>&nbsp;Microphone is muted | <i
+                  class="fa fa-video-camera" aria-hidden="true"></i>&nbsp;Video is ON</span>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-primary pull-right" onclick="sendVideomail();"><i class="fa fa-paper-plane"
                   aria-hidden="true"></i> Send Videomail</button>
             </div>
           </div>
@@ -231,11 +238,11 @@
 
   $('#greetingVideo').on('play', (evt) => {
     console.log("playing")
-    $('#greetingVideo').attr("title","Pause Video");
+    $('#greetingVideo').attr("title", "Pause Video");
     $("#greetingPlayPauseBtn").removeClass('fa-play').addClass('fa-pause');
   }).on('pause', (evt) => {
     console.log("pause")
-    $('#greetingVideo').attr("title","Play Video");
+    $('#greetingVideo').attr("title", "Play Video");
     $("#greetingPlayPauseBtn").removeClass('fa-pause').addClass('fa-play');
   }).on('ended', (evt) => {
     console.log("ended")
@@ -288,7 +295,7 @@
 
   function startVideomailTimer() {
     let rTime = 0;
-    let maxTime = 5;
+    let maxTime = <%= maxRecordSeconds %>;
     let d = new Date(0);
     d.setSeconds(maxTime); // specify value for SECONDS here
     let mTimeFormatted = d.toISOString().substr(15, 4);
@@ -362,6 +369,9 @@
   }
 
   function redirect() {
+    var req = new XMLHttpRequest();
+    req.open("GET", './logout', true);
+    req.send();
     sessionStorage.clear();
     window.location = $('#redirectSiteURL').html();
   }
@@ -370,10 +380,6 @@
     sessionStorage.clear();
     window.location.href = './logout';
   }
-
-  //$('#goodbyeModal').modal()
-  //endVideomail()
- // startVideomail();
 
 </script>
 
