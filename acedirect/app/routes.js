@@ -10,6 +10,7 @@ var utils = require('./utils.js')
 var c = require('./constants.js')
 var config = require('./../../dat/config.json');
 const path = require('path');
+const formidable = require('formidable');
 
 AWS.config.update({
     region: utils.getConfigVal(config.s3.region),
@@ -27,6 +28,14 @@ function agentRestrict(req, res, next) {
     }
 };
 
+function consumerRestrict(req, res, next) {
+    if (req.session.user && req.session.user.role === 'VRS' ) {
+        next()
+    } else {
+        res.redirect('.'+utils.getConfigVal(config.nginx.consumer_route));
+    }
+};
+
 function restrict(req, res, next) {
     if (req.session.user && req.session.user.role) {
         next()
@@ -34,6 +43,10 @@ function restrict(req, res, next) {
         res.redirect('./');
     }
 };
+
+router.get('/',  (req, res, next) => {
+    res.redirect("."+utils.getConfigVal(config.nginx.consumer_route))
+});
 
 router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => {
     if (req.session.user && req.session.user.role === 'VRS') {
@@ -293,6 +306,7 @@ router.get('/getVideomail', agentRestrict, (req, res) => {
         } else {
             console.log(`|${result[0].filepath}|`);
             if (result[0].filepath === 's3') {
+                console.log(result[0].filename)
                 const file = s3.getObject({ Bucket: utils.getConfigVal(config.s3.bucketname), Key: result[0].filename });
 
                 res.writeHead(200, {
@@ -569,13 +583,79 @@ router.get('/getagentstatus/:token', (req, res) => {
  */
 
 router.get('/logout', (req, res) => {
-   // let redirectURL = './'
-   // if (req.session.user && req.session.user.role == "AD Agent") {
-   //     redirectURL = utils.getConfigVal(config.nginx.fognito_path)
-   // }
     req.session.destroy(()=>{
        res.redirect(req.get('referer'));
     });
+});
+
+
+router.get('/videomail', consumerRestrict, (req, res) => {  
+    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs)});
+});
+
+router.post('/videomailupload', consumerRestrict,  (req, res) => { //add restrict. this is for testing only
+    const form = new formidable.IncomingForm();
+    const dir = process.platform.match(/^win/) ? '\\..\\uploads\\videomails\\' : '/../uploads/videomails/';
+    form.uploadDir = path.join(__dirname, dir);
+    form.keepExtensions = true;
+    form.maxFieldsSize = 10 * 1024 * 1024;
+    form.maxFields = 1000;
+    form.multiples = false;
+  
+    form.parse(req, (err, fields, files) => {
+      if (err) {
+        error.error('oh no an error', err);
+        res.writeHead(200, {
+          'content-type': 'text/plain',
+        });
+        res.write('an error occurred');
+      } else {
+          var filepath = files.file.filepath;
+        fs.readFile(filepath, function (err, fileData) {
+            if (files.file.mimetype === 'video/webm') {
+            var uploadParams = { Bucket: '***REMOVED***-recordings', Key: files.file.newFilename+'.webm', Body: "" };
+            uploadParams.Body = fileData;
+            s3.upload(uploadParams, function (err) {
+              if (err) {
+                console.log("Error!:", err);
+                return
+              }
+              try {
+                fs.unlinkSync(filepath)
+              } catch (err) {
+                console.error(err)
+              }
+
+
+
+        request({
+            method: 'POST',
+            url: 'https://***REMOVED***:9014/UploadVideomail',
+            rejectUnauthorized: false,
+            form: {
+              ext: '88888', //
+              duration: Math.floor(fields.duration),
+              phoneNumber: req.session.user.phone,
+              filename: files.file.newFilename+'.webm'
+            },
+          }, function (error, response, data) {
+            if (error) {
+              console.log("Error", error);
+              console.log("Could not upload:", new Date());
+            } else {
+              console.log("Successful video upload:", new Date());
+            }
+          });
+
+});
+            }
+        })
+    }
+
+});
+          
+
+
 });
 
 module.exports = router;
