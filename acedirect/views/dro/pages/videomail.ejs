@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang='en-us'>
+
+<head>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/css/ca-portal.css">
+  <style>
+    .ad-container {
+      width: 100% !important;
+      position: absolute;
+    }
+
+    .greeting-controls {
+      background-color: lightgray;
+      height: 100%;
+      color: #000000;
+      padding: 0.6em 2.6em 0.6em 2.6em;
+    }
+
+    .video-element {
+      height: 100%;
+      width: 100%;
+      object-fit: fill;
+      cursor: pointer;
+    }
+
+    #greetingPlayPauseBtn {
+      cursor: pointer;
+    }
+
+    #custom-seekbar {
+      cursor: pointer;
+      background-color: #839CB1;
+      height: 5px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      position: relative;
+      width: 75%;
+      display: inline-block;
+      padding-left: 1em;
+    }
+
+    #custom-seekbar span {
+      background-color: #073863;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 5px;
+      width: 0px;
+    }
+
+    #recordingCountdown {
+      font-size: xxx-large;
+    }
+
+    .recording-controls {
+      background-color: lightgray;
+      height: 100%;
+      color: #000000;
+      padding: 0.6em 2.6em 0.6em 2.6em;
+    }
+
+    #recordingTimer {
+      background-color: #fdeeec;
+      height: 25px;
+      margin-bottom: 0px;
+      overflow: hidden;
+      position: relative;
+      width: 100%;
+      display: inline-block;
+      padding-left: 1em;
+      border: #000000;
+      border-width: 1em;
+    }
+
+    #recordingTimer span {
+      background-color: #ef5343;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 0px;
+    }
+
+    .center {
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      -ms-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+    }
+    .greeting-button {
+        width: 100%;
+        background-color: #073863 !important;
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+        font-weight: bold !important;
+      }
+  </style>
+</head>
+
+<body>
+  <%- include("../partials/agent_page_header") %>
+    <div class="container ad-container">
+      <div class="row" id="greetingDiv">
+        <div class="row  greeting-controls">
+          <div class="col-12 text-center align-self-center">
+            <i class="fa fa-play fa-2x" aria-hidden="true" id="greetingPlayPauseBtn"></i>
+            <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span>
+            <div id="custom-seekbar"><span></span></div>
+            <button class="btn .greeting-button" onclick="skipGreeting();">Skip Greeting&nbsp;<i
+                class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <video class="video-element" id="greetingVideo" title="Play Video">
+              <source src="/media/videomailGreeting.mp4" type="video/mp4">
+            </video>
+          </div>
+        </div>
+      </div>
+      <div class="row text-center" style="display:none" id="countDownDiv">
+
+        <div class="col-12 text-center align-self-center">
+          <br /><br /><br /><br /><br />
+          Recording will start in:<br /><span id="recordingCountdown">3</span>
+        </div>
+      </div>
+
+      <div class="row" style="display:none" id="recordingDiv">
+        <div class="col-12 text-center">
+          <div class="row  recording-controls">
+            <div class="col-md-3">
+              <span class="text-danger" id="recordingTime"></span>
+            </div>
+            <div class="col-md-6 text-center">
+              <span><i class="fa fa-microphone-slash" aria-hidden="true"></i>&nbsp;Microphone is muted | <i
+                  class="fa fa-video-camera" aria-hidden="true"></i>&nbsp;Video is ON</span>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-primary pull-right" onclick="sendVideomail();"><i class="fa fa-paper-plane"
+                  aria-hidden="true"></i> Send Videomail</button>
+            </div>
+          </div>
+          <div class="row  recording-timer-bar">
+            <div class="col-12">
+              <div id="recordingTimer"><span></span></div>
+            </div>
+          </div>
+          <video autoplay="true" id="selfVideo">
+
+          </video>
+        </div>
+      </div>
+    </div>
+
+
+    <%- include("../partials/acedirect_footer") %>
+
+      <!-- MODALS -->
+      <div id="goodbyeModal" class="modal fade">
+        <div class="modal-dialog modal-dialog-csentered" role="document">
+          <div class="modal-content">
+            <div class="modal-body" style="position: relative;min-height:300px;">
+              <div class="center text-center" style="width: 75%;">
+                <i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>
+                <br /><br />
+                <p style="font-size: 1.5em;">Thank you for leaving videomail. An agent will review your videomail
+                  message.</p>
+                <hr class="text-black" style="width:50%;height:2px;background-color:black;border:none;">
+                <p>You are being redirected in <b>5</b> seconds to <b id='redirectSiteURL'>
+                    <%= redirectURL%>
+                  </b></p>
+
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div class="text-center">
+                <a href="#" onclick="logout()"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+</body>
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/js/bootstrap.js"></script>
+<script type="text/javascript" src='/assets/js/moment.js'></script>
+<script type="text/javascript" src="/assets/js/RecordRTC.min.js"></script>
+<script>
+
+  function skipGreeting() {
+    gotoCountDown();
+  }
+  function gotoCountDown() {
+    $('#greetingDiv').hide();
+    $('#countDownDiv').show();
+    countdown();
+  }
+
+  function gotoRecording() {
+    $('#countDownDiv').hide();
+    $('#recordingDiv').show();
+    startVideomail();
+  }
+
+  function countdown() {
+    let s = $('#recordingCountdown').html()
+    setTimeout(() => {
+      if (s > 0) {
+        s = s - 1
+        $('#recordingCountdown').html(s)
+        countdown(s);
+      } else {
+        gotoRecording()
+      }
+    }, 1000)
+
+  }
+
+  $("#greetingPlayPauseBtn").click(function () {
+    if (document.getElementById('greetingVideo').paused) {
+      document.getElementById('greetingVideo').play();
+    } else {
+      document.getElementById('greetingVideo').pause();
+    }
+  });
+
+
+  $("#custom-seekbar").on("click", function (e) {
+    let offset = $(this).offset();
+    let left = (e.pageX - offset.left);
+    let totalWidth = $("#custom-seekbar").width();
+    let percentage = (left / totalWidth);
+    let vidTime = $('#greetingVideo')[0].duration * percentage;
+    $('#greetingVideo')[0].currentTime = vidTime;
+  });
+
+  $('#greetingVideo').on('play', (evt) => {
+    console.log("playing")
+    $('#greetingVideo').attr("title", "Pause Video");
+    $("#greetingPlayPauseBtn").removeClass('fa-play').addClass('fa-pause');
+  }).on('pause', (evt) => {
+    console.log("pause")
+    $('#greetingVideo').attr("title", "Play Video");
+    $("#greetingPlayPauseBtn").removeClass('fa-pause').addClass('fa-play');
+  }).on('ended', (evt) => {
+    console.log("ended")
+    gotoCountDown()
+  }).on('timeupdate', (evt) => {
+    let cTime = $('#greetingVideo')[0].currentTime
+    let dur = $('#greetingVideo')[0].duration
+    let percentage = (cTime / dur) * 100;
+    $("#custom-seekbar span").css("width", percentage + "%");
+    let date = new Date(0);
+    date.setSeconds(cTime); // specify value for SECONDS here
+    let timeString = date.toISOString().substr(15, 4);
+    $('#greetingCurrentTime').html(timeString)
+  }).on('loadedmetadata', (evt) => {
+    let date = new Date(0);
+    date.setSeconds($('#greetingVideo')[0].duration); // specify value for SECONDS here
+    let timeString = date.toISOString().substr(15, 4);
+    $('#greetingDuration').html(timeString)
+  }).on('click', (evt) => {
+    if ($('#greetingVideo').get(0).paused == false) {
+      $('#greetingVideo').get(0).pause();
+    } else {
+      $('#greetingVideo').get(0).play();
+    }
+  });
+
+  function startVideomail() {
+    startWebcam();
+  }
+
+  var selfVideo = document.querySelector("#selfVideo");
+  function startWebcam() {
+
+    if (navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({video: true, audio: false})
+        .then(function (stream) {
+          selfVideo.srcObject = stream;
+        })
+        .catch(function (error) {
+          console.log("Something went wrong!");
+        });
+    }
+  }
+
+  $('#selfVideo').on('play', (evt) => {
+    console.log("playing")
+    startVideomailTimer();
+    startRecording();
+  });
+
+  function startVideomailTimer() {
+    let rTime = 0;
+    let maxTime = <%= maxRecordSeconds %>;
+    let d = new Date(0);
+    d.setSeconds(maxTime); // specify value for SECONDS here
+    let mTimeFormatted = d.toISOString().substr(15, 4);
+    $('#recordingTime').html("<i class='fa fa-circle' aria-hidden='true'></i> Recording | 0:00 / " + mTimeFormatted)
+    var recTimerInterval = setInterval(function () {
+      rTime = rTime + 0.1;
+      let percentage = (rTime / maxTime) * 100;
+      $("#recordingTimer span").css("width", percentage + "%");
+      if (rTime % 1 != 0) {
+        let date = new Date(0);
+        date.setSeconds(rTime); // specify value for SECONDS here
+        let timeString = date.toISOString().substr(15, 4);
+        $('#recordingTime').html("<i class='fa fa-circle' aria-hidden='true'></i> Recording | " + timeString + " / " + mTimeFormatted);
+        if (rTime > maxTime) {
+          clearInterval(recTimerInterval)
+          sendVideomail();
+        }
+      }
+
+    }, 100)
+  }
+  var recorder = null;
+  function startRecording() {
+    recorder = new RecordRTCPromisesHandler(selfVideo.srcObject, {
+      type: 'video'
+    });
+    recorder.startRecording();
+  }
+
+  async function sendVideomail() {
+    console.log("sendVideomail")
+    console.log("selfVideo.currentTime" + selfVideo.currentTime)
+    if (recorder != null) {
+      await recorder.stopRecording();
+      let blob = await recorder.getBlob()
+      console.log(blob)
+      let formData = new FormData();
+      var file = new File([blob], "videomailfile.webm", {
+        type: 'video/webm'
+      });
+      formData.append('file', file)
+      formData.append('duration', selfVideo.currentTime)
+      var request = new XMLHttpRequest();
+      request.onreadystatechange = function () {
+        if (request.readyState == 4 && request.status == 200) {
+          console.log(location.href + request.responseText);
+          endVideomail()
+        }
+      };
+      endVideomail()
+      request.open('POST', './videomailupload');
+      request.send(formData);
+    } else {
+      console.log("Recorder never set up");
+    }
+  }
+
+  function endVideomail() {
+    if (selfVideo) {
+      selfVideo.pause();
+      selfVideo.src = "";
+      if (selfVideo.srcObject)
+        selfVideo.srcObject.getTracks()[0].stop();
+    }
+
+    $('#recordingDiv').hide();
+    $('#goodbyeModal').modal()
+    setTimeout(() => {
+      redirect();
+    }, 5000)
+  }
+
+  function redirect() {
+    var req = new XMLHttpRequest();
+    req.open("GET", './logout', true);
+    req.send();
+    sessionStorage.clear();
+    window.location = $('#redirectSiteURL').html();
+  }
+
+  function logout() {
+    sessionStorage.clear();
+    window.location.href = './logout';
+  }
+
+</script>
+
+</html>
