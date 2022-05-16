@@ -13,6 +13,7 @@ const ua = null;
 const videomailflag = false;
 let hasMessages = false;
 let isAgentTyping = false;
+let isSidebarCollapsed = false;
 
 $(document).ready(() => {
   $('#optionsModal').modal('show');
@@ -1089,6 +1090,10 @@ function collapseSidebar() {
     $('#collapseButton').attr('data-original-title', "Collapse").parent().find('.tooltip-inner').html('Collapse');;
     $('#collapseButtonIcon').removeClass('fa fa-angle-double-left');
     $('#collapseButtonIcon').addClass('fa fa-angle-double-right');
+
+    $('#remoteViewCol').css('height', '');
+    $('#remoteView').css('height','');
+    $('#remoteView').css('width', '');
   } else {
     // close the sidebar
     isSidebarCollapsed = true;
@@ -1108,6 +1113,11 @@ function collapseSidebar() {
     $('#collapseButton').attr('data-original-title', "Expand").parent().find('.tooltip-inner').html('Expand');;
     $('#collapseButtonIcon').removeClass('fa fa-angle-double-right');
     $('#collapseButtonIcon').addClass('fa fa-angle-double-left');
+
+    // make sure remote video doesn't expand past footer 
+    $('#remoteViewCol').css('height', '75vh');
+    $('#remoteView').css('height','100%');
+    $('#remoteView').css('width', '100% !important');
   }
 }
 
