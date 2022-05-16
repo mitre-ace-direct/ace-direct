@@ -423,7 +423,7 @@
                     <input type="hidden" class="agentChatName">
                     <form name="chatsend" id="chatsend">
                       <div class="input-group">
-                        <span class="input-group-btn" style="vertical-align: bottom;">
+                        <span class="input-group-btn" style="vertical-align: top;">
                           <span class="dropup pull-left">
                           <button id="chat-emoji" class="btn btn-flat buttonFontSize" type="button" data-toggle="dropdown"
                             animation="true" style="border:2px solid lightgrey; margin-right: 10px">&#128512;</button>
@@ -468,7 +468,7 @@
                         <textarea id="newchatmessage" placeholder="Type a message" class="form-control col-xs-1 buttonFontSize" maxlength="500"
                           autocomplete="off" required></textarea>
         
-                        <span class="input-group-btn" style="vertical-align: bottom;">
+                        <span class="input-group-btn" style="vertical-align: top;">
                           <button id="chat-send" class="btn btn-primary btn-flat buttonFontSize"
                             style="background-color: #073863 !important; margin-left: 10px; border-radius: 6px;">Send</button>
                         </span>
@@ -508,7 +508,7 @@
                         <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;" tabindex="0">x</span>
                     </div>
                     <button class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer" onclick="shareFileConsumer()"
-                      style="background-color:#073863 !important" disabled>Send</button>
+                      style="background-color:#073863 !important; margin-top: 5px; margin-bottom: 5px;" disabled>Send</button>
                   </div>
                     <div class="row" style="max-width: 100%; display: contents;">
                       <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
@@ -550,15 +550,15 @@
             <!-- Nav tabs -->
             <ul class="nav nav-tabs tabs-right" style="height: 90vh;">
               <li id="collapseTab" class="collapseTab">
-                <a class="collapseTab" style="padding-bottom: 20px; padding-top:20px; width:8vw; border:solid 1px transparent; text-align: center;">
+                <a class="collapseTab sidebarTab" style="padding-bottom: 20px; padding-top:20px; width:8vw; border:solid 1px transparent; text-align: center;">
                   <button id="collapseButton" data-toggle="tooltip" title="Collapse" onclick="collapseSidebar()">
                     <i id="collapseButtonIcon" class="fa fa-angle-double-right fa-lg" style="vertical-align: -10% !important;">
                     </i>
                   </button>
                 </a>
               </li>
-              <li class="active">
-                <a href="#chatBody" data-toggle="tab"  style="width:8vw; text-align: center;" onclick="toggleTab('chat')">
+              <li id="chatTab" class="active">
+                <a href="#chatBody" data-toggle="tab" class="sidebarTab" style="width:8vw; text-align: center;" onclick="toggleTab('chat')">
                   <i class="fa fa-comments fa-2x"
                     style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
@@ -567,7 +567,7 @@
                 </a>
               </li>
               <li>
-                <a href="#fileBody" data-toggle="tab" style="width:8vw; text-align: center;" onclick="toggleTab('fileShare')">
+                <a href="#fileBody" data-toggle="tab" class="sidebarTab" style="width:8vw; text-align: center;" onclick="toggleTab('fileShare')">
                   <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
                   <br>

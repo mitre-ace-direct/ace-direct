@@ -1077,6 +1077,8 @@ function collapseSidebar() {
     $('.tab-content').attr('hidden', false);
     $('#tab-pane').attr('hidden', false)
     $('#tab-options').css('padding-left', '');
+    $('#chatTab').addClass('active');
+    $('sidebarTab').css('width', '8vw');
 
     $('#callFeaturesColumn').removeClass('col-md-1');
     $('#callFeaturesColumn').addClass('col-md-4');
@@ -1086,8 +1088,7 @@ function collapseSidebar() {
     $('#callFeaturesColumn').css('border-left', '1px solid #ddd');
     $('#callFeaturesColumn').css('padding-left', '')
 
-    $('#collapseButton').attr('title', "Collapse");
-    $('#collapseButton').attr('data-original-title', "Collapse").parent().find('.tooltip-inner').html('Collapse');;
+    $('#collapseButton').attr('data-original-title', "Collapse").parent().find('.tooltip-inner').html('Collapse');
     $('#collapseButtonIcon').removeClass('fa fa-angle-double-left');
     $('#collapseButtonIcon').addClass('fa fa-angle-double-right');
 
@@ -1100,6 +1101,8 @@ function collapseSidebar() {
     $('.tab-content').attr('hidden', true);
     $('#tab-pane').attr('hidden', true);
     $('#tab-options').css('padding-left', '0px');
+    $('li').removeClass('active');
+    $('.sidebarTab').css('width', '8.8vw')
 
     $('#callFeaturesColumn').removeClass('col-md-4');
     $('#callFeaturesColumn').addClass('col-md-1');
@@ -1109,8 +1112,7 @@ function collapseSidebar() {
     $('#callFeaturesColumn').css('border-left', '');
     $('#callFeaturesColumn').css('padding-left', '0px');
 
-    $('#collapseButton').attr('title', "Expand");
-    $('#collapseButton').attr('data-original-title', "Expand").parent().find('.tooltip-inner').html('Expand');;
+    $('#collapseButton').attr('data-original-title', "Expand").parent().find('.tooltip-inner').html('Expand');
     $('#collapseButtonIcon').removeClass('fa fa-angle-double-right');
     $('#collapseButtonIcon').addClass('fa fa-angle-double-left');
 
