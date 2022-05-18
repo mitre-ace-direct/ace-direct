@@ -15,6 +15,19 @@ let hasMessages = false;
 let isAgentTyping = false;
 let isSidebarCollapsed = false;
 
+// this list may be incomplete
+const viewableFileTypes = [
+  "png",
+  "jpg",
+  "jpeg",
+  "gif",
+  "pdf",
+  "md",
+  "txt",
+  "json",
+  "html"
+];
+
 $(document).ready(() => {
   $('#optionsModal').modal('show');
   connect_socket();
@@ -411,7 +424,7 @@ function connect_socket() {
             // file sent confirmation
             addFileToSentList(data);
             $('#fileInput').val('');
-            $('#shareFileConsumer').prop('disabled', true);
+            $('#shareFileConsumer').attr('disabled', true);
           })
           .on('screenshareResponse', (data) => {
             console.log(`screen request received ${data.permission}`);
@@ -720,7 +733,6 @@ function startCall(otherSipUri) {
 
   $('#screenshareButton').removeAttr('disabled');
   $('#fileInput').removeAttr('disabled');
-  $('#shareFileConsumer').removeAttr('disabled');
   // acekurento.call(globalData.queues_complaint_number, false);
   acekurento.call(otherSipUri, false);
 }
@@ -862,19 +874,32 @@ $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
 $('#fileInput').on('change', () => {
   if ($('#fileInput')[0].value == '') {
     console.log('no file chosen');
-    $('#shareFileConsumer').prop('disabled', true);
+    $('#shareFileConsumer').attr('disabled', true);
     $('#removeFileBtn').css('display', 'none');
+    // add tooltip to send button
+    $('#shareFileConsumer').attr('data-original-title', "You must choose a file").parent().find('.tooltip-inner').html('You must choose a file');
   } else {
     console.log('file chosen!');
-    $('#shareFileConsumer').prop('disabled', false);
+    $('#shareFileConsumer').attr('disabled', false);
     $('#removeFileBtn').css('display', 'block');
+    // remove tooltip on send button
+    $('#shareFileConsumer').attr('data-original-title', "").parent().find('.tooltip-inner').html('');
   }
+  $('[data-toggle="tooltip"]').tooltip({
+    trigger: 'hover'
+  });
 });
 
 function removeFile() {
   $('#fileInput')[0].value = '';
-  $('#shareFileConsumer').prop('disabled', true);
+  $('#shareFileConsumer').attr('disabled', true);
+  $('#removeFileBtn').css('display', 'none');
+  $('#shareFileConsumer').attr('data-original-title', "You must choose a file").parent().find('.tooltip-inner').html('You must choose a file');
+  $('[data-toggle="tooltip"]').tooltip({
+    trigger: 'hover'
+  });
 }
+
 $('#removeFileBtn').on('keyup', (evt) => {
   evt.preventDefault();
   if (evt.keyCode === 13) {
@@ -996,6 +1021,8 @@ function shareFileConsumer() {
         socket.emit('get-file-list-consumer', { vrs: vrs.toString().replace(/^1|[^\d]/g, '') });
         console.log('file successfully sent');
         $('#fileSent').show();
+        $('#removeFileBtn').hide();
+        $('#shareFileConsumer').attr('data-original-title', "You must choose a file").parent().find('.tooltip-inner').html('You must choose a file');
       },
       error: (jXHR, textStatus, errorThrown) => {
         console.log(`ERROR: ${jXHR} ${textStatus} ${errorThrown}`);
@@ -1008,16 +1035,40 @@ function shareFileConsumer() {
 
 function addFileToDownloadList(data) {
   $('#noReceivedFiles').attr('hidden', true);
-  // only show latest file
-  $('#receivedFilesList').empty();
-  $('#receivedFilesList').append(
-    (`<span>${data.original_filename}</span>
-    <span class="btn-toolbar pull-right" role="toolbar">
-      <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}"><i class="fa fa-download"></i></a>
-      <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}"><i class="fa fa-eye"></i></a>
-    </span>
-    <hr/>`)
-  );
+  let fileType = data.original_filename.split('.')[1];
+  if (fileType) {
+    if (viewableFileTypes.includes(fileType)) {
+      // we can open this file in a new tab without downloading it
+      $('#receivedFilesList').append(
+        (`<span>${data.original_filename}</span>
+        <span class="btn-toolbar pull-right" role="toolbar">
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}"><i class="fa fa-eye fileShareIcon"></i></a>
+        </span>
+        <hr/>`)
+      );
+    } else {
+      // cannot view without downloading
+      $('#receivedFilesList').append(
+        (`<span>${data.original_filename}</span>
+        <span class="btn-toolbar pull-right" role="toolbar">
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="You need to download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+        </span>
+        <hr/>`)
+      );
+    }
+  } else {
+    // file type not in file name-- cannot view without downloading
+    $('#receivedFilesList').append(
+      (`<span>${data.original_filename}</span>
+      <span class="btn-toolbar pull-right" role="toolbar">
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}"><i class="fa fa-download fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="You need to download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+      </span>
+      <hr/>`)
+    );
+  }
 
   // need to call this every time we add a new tooltip
   $('[data-toggle="tooltip"]').tooltip({
@@ -1027,13 +1078,35 @@ function addFileToDownloadList(data) {
 
 function addFileToSentList(data) {
   $('#noSentFiles').attr('hidden', true);
+  let fileType = data.original_filename.split('.')[1];
 
-  // add to sent files list
-  $('#sentFilesList').append(
-    (`<span>${data.original_filename}</span>
-    <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}"><i class="fa fa-eye"></i></a>
-    <hr/>`)
-  );
+  if (fileType) {
+    if (viewableFileTypes.includes(fileType)) {
+      // we can open this file in a tab without downloading it
+      // add to sent files list
+      $('#sentFilesList').append(
+        (`<span>${data.original_filename}</span>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}"><i class="fa fa-eye fileShareIcon"></i></a>
+        <hr/>`)
+      );
+    } else {
+      // we cannot open this file in a tab without downloading it
+      // add to sent files list
+      $('#sentFilesList').append(
+        (`<span>${data.original_filename}</span>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Cannot view this file type" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+        <hr/>`)
+      );
+    }
+  } else {
+    // file type isn't in the file name-- cannot open the file in a new tab
+    // add to sent files list
+    $('#sentFilesList').append(
+      (`<span>${data.original_filename}</span>
+      <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Cannot view this file type" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+      <hr/>`)
+    );
+  }
 
   // need to call this every time we add a new tooltip
   $('[data-toggle="tooltip"]').tooltip({
