@@ -629,23 +629,23 @@ io.sockets.on('connection', (socket) => {
       // first element
       sharingAgent[0] = token.extension;
       sharingConsumer[0] = incomingVRS;
-      fileToken[0][0] = '';
-      fileToken[0][1] = '';
+      fileToken[0] = [];
+      fileToken[0] = [];
     } else {
       for (let i = 0; i <= sharingAgent.length; i += 1) {
         if (i === sharingAgent.length) {
           // end of the list
           sharingAgent[i] = token.extension;
           sharingConsumer[i] = incomingVRS;
-          fileToken[i][0] = '';
-          fileToken[i][1] = '';
+          fileToken[i] = [];
+          fileToken[i] = [];
           break;
         } else if (sharingAgent[i] === '') {
           // fil any gaps
           sharingAgent[i] = token.extension;
           sharingConsumer[i] = incomingVRS;
-          fileToken[i][0] = '';
-          fileToken[i][1] = '';
+          fileToken[i] = [];
+          fileToken[i] = [];
           break;
         }
       }
@@ -670,8 +670,8 @@ io.sockets.on('connection', (socket) => {
         // empty
         sharingAgent[i] = '';
         sharingConsumer[i] = '';
-        fileToken[i][0] = '';
-        fileToken[i][1] = '';
+        fileToken[i] = [];
+        fileToken[i] = [];
       }
     }
     // check if the whole array is ''
@@ -726,7 +726,7 @@ io.sockets.on('connection', (socket) => {
             // console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
             // console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
             if (sharingAgent[i] === uploader) {
-              fileToken[i][1] = latestResult.id;
+              fileToken[i].push(latestResult.id);
               console.log(`${sharingAgent[i]} shared file`);
               console.log('with id: ');
               console.log(fileToken[i]);
@@ -788,7 +788,7 @@ io.sockets.on('connection', (socket) => {
             // console.log('comparing ' + sharingAgent[i] + ' to ' +uploader);
             // console.log('and ' +sharingConsumer[i]+ ' to ' +uploader);
             if (sharingConsumer[i] === uploader) {
-              fileToken[i][0] = latestResult.id;
+              fileToken[i].push(latestResult.id);
               console.log(`${sharingConsumer[i]} shared file`);
               console.log('with id: ');
               console.log(fileToken[i]);
@@ -3707,8 +3707,8 @@ app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
             // make sure the agent is in a call with the consumer who sent the file
             if (req.session.user.extension === sharingAgent[i] || req.session.user.vrs === sharingConsumer[i]) {
                 console.log('In valid session');
-
-                if (fileToken[i][0].toString() === (req.query.id).split('"')[0] || fileToken[i][1].toString() === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
+                let tempFileToken = fileToken[i].toString();
+                if (tempFileToken.includes((req.query.id).split('"')[0])) { // remove the filename from the ID if it's there
                     console.log('allowed to download');
 
                     const documentID = req.query.id;
@@ -3750,8 +3750,8 @@ app.get('/viewFile', /* agent.shield(cookieShield) , */(req, res) => {
           // make sure the agent is in a call with the consumer who sent the file
           if (req.session.user.extension === sharingAgent[i] || req.session.user.vrs === sharingConsumer[i]) {
               console.log('In valid session');
-
-              if (fileToken[i][0].toString() === (req.query.id).split('"')[0] || fileToken[i][1].toString() === (req.query.id).split('"')[0]) { // remove the filename from the ID if it's there
+              let tempFileToken = fileToken[i].toString();
+              if (tempFileToken.includes((req.query.id).split('"')[0])) { // remove the filename from the ID if it's there
                   console.log('allowed to view');
 
                   const documentID = req.query.id;
