@@ -171,6 +171,10 @@
         font-size: 15px;
         background-color: lightgrey;
       }
+      .fileShareIcon {
+        margin-top:4px;
+        margin-bottom: 4px;
+      }
 
       .fontSizeButtons {
         border:1px solid grey !important;
@@ -185,6 +189,12 @@
         padding: 9px 18px;
         border-radius: 5px;
         cursor: pointer;
+      }
+
+      .chooseFileGroup input.fileInput:active {
+        outline: none;
+        box-shadow: none;
+        background-color: white;
       }
 
       .collapseTab:hover {
@@ -507,8 +517,10 @@
                         style="background-color:transparent; border: transparent; padding-left: 0px; width: 80%; padding-right: 0px;">
                         <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;" tabindex="0">x</span>
                     </div>
-                    <button class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer" onclick="shareFileConsumer()"
-                      style="background-color:#073863 !important; margin-top: 5px; margin-bottom: 5px;" disabled>Send</button>
+                    <a class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer" onclick="shareFileConsumer()"
+                      style="background-color:#073863 !important; margin-top: 5px; margin-bottom: 5px;"
+                      data-toggle="tooltip" title="You must choose a file" disabled>Send</a>
+
                   </div>
                     <div class="row" style="max-width: 100%; display: contents;">
                       <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
@@ -525,7 +537,7 @@
                     <br>
                     <!--send files section-->
                     <h3>Sent</h3>
-                    <hr style="border:1px solid grey"/>
+                    <hr style="border:1px solid grey; background-color: grey;"/>
                     
                     <div id="sentFilesList">
                       <span id="noSentFiles" class="noFiles">None</span>
@@ -535,7 +547,7 @@
                     <br>
                     <!--received files section-->
                     <h3>Received</h3>
-                    <hr style="border:1px solid grey"/>
+                    <hr style="border:1px solid grey; background-color: grey;"/>
                     <div id="receivedFilesList">
                       <span id="noReceivedFiles" class="noFiles">None</span>
                     </div>
