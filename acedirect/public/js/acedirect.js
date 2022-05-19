@@ -2470,43 +2470,6 @@ function change_play_button() {
   document.getElementById('play-video-icon').classList.add('fa-play');
   document.getElementById('play-video-icon').classList.remove('fa-pause');
 }
-/*
-// Seekbar functionality
-var seekBar = document.getElementById('seek-bar');
-
-// Event listener for the seek bar
-seekBar.addEventListener('change', function() {
-  // Calculate the new time
-  var time = remoteView.duration * (seekBar.value / 100);
-
-  // Update the video time
-  remoteView.currentTime = time;
-});
-
-// Update the seek bar as the video plays
-remoteView.addEventListener('timeupdate', function () {
-  // Calculate the slider value
-  var value = (100 / remoteView.duration) * remoteView.currentTime;
-
-  // Update the slider value
-  seekBar.value = value;
-
-  //update the current time info
-  updateVideoTime(remoteView.currentTime, 'vmail-current-time');
-});
-
-// Pause the video when the seek handle is being dragged
-seekBar.addEventListener('mousedown', function() {
-  // remoteView.pause();
-  play_video()
-});
-
-// Play the video when the seek handle is dropped
-seekBar.addEventListener('mouseup', function() {
-  // remoteView.play();
-  play_video();
-});
-*/
 // Event listener for the full-screen button
 function enterFullscreen() {
   var webcam_container = document.getElementById('fullscreen-element');
