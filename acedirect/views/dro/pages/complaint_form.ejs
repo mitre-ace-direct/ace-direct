@@ -171,6 +171,10 @@
         font-size: 15px;
         background-color: lightgrey;
       }
+      .fileShareIcon {
+        margin-top:4px;
+        margin-bottom: 4px;
+      }
 
       .fontSizeButtons {
         border:1px solid grey !important;
@@ -185,6 +189,12 @@
         padding: 9px 18px;
         border-radius: 5px;
         cursor: pointer;
+      }
+
+      .chooseFileGroup input.fileInput:active {
+        outline: none;
+        box-shadow: none;
+        background-color: white;
       }
 
       .collapseTab:hover {
@@ -352,7 +362,7 @@
   <body>
     <div class="container" id="pageContainer">
       <div class="row">
-        <div id="callVideoColumn" class="col-md-8 text-center" style="border : 5px solid black">
+        <div id="callVideoColumn" class="col-md-8 text-center">
           <!--Only appear outside of a call-->
           <div id="noCallPoster">
             <img  id="DVC" src="dro/images/DVC2.png" alt="DVC">
@@ -397,7 +407,7 @@
           <!--END Appear inside of a call-->
         </div>
         <div id="callFeaturesColumn" class="col-md-4" style="border-left:1px solid #ddd; height:100%">
-          <div class="col-xs-9">
+          <div id="tab-pane" class="col-xs-9">
             <!-- Tab panes -->
             <div class="tab-content">
               <!--Chat pane-->
@@ -425,7 +435,7 @@
                     <input type="hidden" class="agentChatName">
                     <form name="chatsend" id="chatsend">
                       <div class="input-group">
-                        <span class="input-group-btn" style="vertical-align: bottom;">
+                        <span class="input-group-btn" style="vertical-align: top;">
                           <span class="dropup pull-left">
                           <button id="chat-emoji" class="btn btn-flat buttonFontSize" type="button" data-toggle="dropdown"
                             animation="true" style="border:2px solid lightgrey; margin-right: 10px">&#128512;</button>
@@ -470,7 +480,7 @@
                         <textarea id="newchatmessage" placeholder="Type a message" class="form-control col-xs-1 buttonFontSize" maxlength="500"
                           autocomplete="off" required></textarea>
         
-                        <span class="input-group-btn" style="vertical-align: bottom;">
+                        <span class="input-group-btn" style="vertical-align: top;">
                           <button id="chat-send" class="btn btn-primary btn-flat buttonFontSize"
                             style="background-color: #073863 !important; margin-left: 10px; border-radius: 6px;">Send</button>
                         </span>
@@ -509,8 +519,10 @@
                         style="background-color:transparent; border: transparent; padding-left: 0px; width: 80%; padding-right: 0px;">
                         <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;" tabindex="0">x</span>
                     </div>
-                    <button class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer" onclick="shareFileConsumer()"
-                      style="background-color:#073863 !important" disabled>Send</button>
+                    <a class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer" onclick="shareFileConsumer()"
+                      style="background-color:#073863 !important; margin-top: 5px; margin-bottom: 5px;"
+                      data-toggle="tooltip" title="You must choose a file" disabled>Send</a>
+
                   </div>
                     <div class="row" style="max-width: 100%; display: contents;">
                       <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
@@ -527,7 +539,7 @@
                     <br>
                     <!--send files section-->
                     <h3>Sent</h3>
-                    <hr style="border:1px solid grey"/>
+                    <hr style="border:1px solid grey; background-color: grey;"/>
                     
                     <div id="sentFilesList">
                       <span id="noSentFiles" class="noFiles">None</span>
@@ -537,7 +549,7 @@
                     <br>
                     <!--received files section-->
                     <h3>Received</h3>
-                    <hr style="border:1px solid grey"/>
+                    <hr style="border:1px solid grey; background-color: grey;"/>
                     <div id="receivedFilesList">
                       <span id="noReceivedFiles" class="noFiles">None</span>
                     </div>
@@ -548,19 +560,19 @@
               <!--end file share pane-->
             </div>
           </div>
-          <div class="col-xs-3">
+          <div id="tab-options" class="col-xs-3">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs tabs-right" style="height: 90vh;">
               <li id="collapseTab" class="collapseTab">
-                <a class="collapseTab" style="padding-bottom: 20px; padding-top:20px; width:8vw; border:solid 1px transparent; text-align: center;">
-                  <button id="collapseButton" data-toggle="tooltip" title="Collapse">
-                    <i class="fa fa-angle-double-right fa-lg" style="vertical-align: -10% !important;">
+                <a class="collapseTab sidebarTab" style="padding-bottom: 20px; padding-top:20px; width:8vw; border:solid 1px transparent; text-align: center;">
+                  <button id="collapseButton" data-toggle="tooltip" title="Collapse" onclick="collapseSidebar()">
+                    <i id="collapseButtonIcon" class="fa fa-angle-double-right fa-lg" style="vertical-align: -10% !important;">
                     </i>
                   </button>
                 </a>
               </li>
-              <li class="active">
-                <a href="#chatBody" data-toggle="tab"  style="width:8vw; text-align: center;">
+              <li id="chatTab" class="active">
+                <a href="#chatBody" data-toggle="tab" class="sidebarTab" style="width:8vw; text-align: center;" onclick="toggleTab('chat')">
                   <i class="fa fa-comments fa-2x"
                     style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
@@ -569,7 +581,7 @@
                 </a>
               </li>
               <li>
-                <a href="#fileBody" data-toggle="tab" style="width:8vw; text-align: center;">
+                <a href="#fileBody" data-toggle="tab" class="sidebarTab" style="width:8vw; text-align: center;" onclick="toggleTab('fileShare')">
                   <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
                   <br>
