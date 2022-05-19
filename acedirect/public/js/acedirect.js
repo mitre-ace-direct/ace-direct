@@ -2470,7 +2470,7 @@ function change_play_button() {
   document.getElementById('play-video-icon').classList.add('fa-play');
   document.getElementById('play-video-icon').classList.remove('fa-pause');
 }
-
+/*
 // Seekbar functionality
 var seekBar = document.getElementById('seek-bar');
 
@@ -2506,7 +2506,7 @@ seekBar.addEventListener('mouseup', function() {
   // remoteView.play();
   play_video();
 });
-
+*/
 // Event listener for the full-screen button
 function enterFullscreen() {
   var webcam_container = document.getElementById('fullscreen-element');
