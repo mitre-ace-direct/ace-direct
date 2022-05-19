@@ -36,12 +36,6 @@ $(document).ready(() => {
     trigger: 'hover'
   });
 
-  //Detect if screensharing is enabled for this browser.
-  /*if (navigator.mediaDevices && "getDisplayMedia" in navigator.mediaDevices) {
-    console.log("Detecting screenshare disabled");
-    document.getElementById("startScreenshare").disabled = true;
-  }*/
-
 });
 
 function connect_socket() {
