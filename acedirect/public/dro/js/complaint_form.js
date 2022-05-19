@@ -13,6 +13,7 @@ const ua = null;
 const videomailflag = false;
 let hasMessages = false;
 let isAgentTyping = false;
+let sharingScreen = false;
 
 $(document).ready(() => {
   $('#optionsModal').modal('show');
@@ -20,6 +21,13 @@ $(document).ready(() => {
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
   });
+
+  //Detect if screensharing is enabled for this browser.
+  /*if (navigator.mediaDevices && "getDisplayMedia" in navigator.mediaDevices) {
+    console.log("Detecting screenshare disabled");
+    document.getElementById("startScreenshare").disabled = true;
+  }*/
+
 });
 
 function connect_socket() {
@@ -584,8 +592,10 @@ function registerJssip(myExtension, myPassword) {
       if (selfStream && selfStream.srcObject) {
         selfStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended self');
-          $('#startScreenshare').hide();
-
+          //$('#startScreenshare').hide();
+          acekurento.screenshare(false);
+          sharingScreen = false;
+          document.getElementById("startScreenshare").innerText = "Start Screenshare"
           if (monitorExt) {
             // force monitor to leave the session first
             socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -602,7 +612,7 @@ function registerJssip(myExtension, myPassword) {
       if (remoteStream && remoteStream.srcObject) {
         remoteStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended remote');
-          $('#startScreenshare').hide();
+          acekurento.screenshare(false);
         };
       }
 
@@ -823,6 +833,18 @@ function logout() {
   }
   // display the login screen to the user.
   window.location.href = './logout';
+}
+
+function toggleScreenShare() {
+  if (sharingScreen) {
+    acekurento.screenshare(false);
+    sharingScreen = false;
+    document.getElementById("startScreenshare").innerText = "Start Screenshare"
+  } else {
+    acekurento.screenshare(true)
+    sharingScreen = true;
+    document.getElementById("startScreenshare").innerText = "Stop Screenshare";
+  }
 }
 
 function showFileShareConfirmation() {

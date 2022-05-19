@@ -371,9 +371,11 @@
               <button type="button" class="btn btn-gray circleButton" onclick="enterFullscreen()">
                 <i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
               </button>
-              <button type="button" class="btn btn-gray" id="startScreenshare">
-                <i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare
-              </button>
+              <span class="d-inline-block" data-toggle="popover" data-content="Screenshare is disabled for your browser.">
+                <button type="button" class="btn btn-gray" id="startScreenshare" onclick="toggleScreenShare()">
+                  <i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare
+                </button>
+              </span>
               <button id="end-call" type="button" class="btn btn-danger" onclick="terminateCall()">
                 <i id="end-call-icon" class="call-btn-icon fa fa-phone fa-rotate-135"></i> End Call
               </button>
