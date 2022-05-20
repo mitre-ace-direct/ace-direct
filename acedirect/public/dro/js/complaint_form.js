@@ -883,7 +883,7 @@ $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
 
   this.style.height = `${this.scrollHeight}px`;
   if ($('#newchatmessage').val() == '') {
-    this.style.height = '34px';
+    this.style.height = $('#chat-send').css('height');
   }
 });
 
@@ -920,6 +920,20 @@ $('#removeFileBtn').on('keyup', (evt) => {
   evt.preventDefault();
   if (evt.keyCode === 13) {
     $('#removeFileBtn').click();
+  }
+});
+
+$('#shareFileConsumer').on('keyup', (evt) => {
+  evt.preventDefault();
+  if (evt.keyCode === 13) {
+    $('#shareFileConsumer').click();
+  }
+});
+
+$('.closeFileResponse').on('keyup', (evt) => {
+  evt.preventDefault();
+  if (evt.keyCode === 13) {
+    $('.closeFileResponse').click();
   }
 });
 
@@ -1053,7 +1067,7 @@ function addFileToDownloadList(data) {
   $('#noReceivedFiles').attr('hidden', true);
   let fileType = data.original_filename.split('.')[1];
   if (fileType) {
-    if (viewableFileTypes.includes(fileType)) {
+    if (viewableFileTypes.includes(fileType.toLowerCase())) {
       // we can open this file in a new tab without downloading it
       $('#receivedFilesList').append(
         (`<span>${data.original_filename}</span>
@@ -1097,7 +1111,7 @@ function addFileToSentList(data) {
   let fileType = data.original_filename.split('.')[1];
 
   if (fileType) {
-    if (viewableFileTypes.includes(fileType)) {
+    if (viewableFileTypes.includes(fileType.toLowerCase())) {
       // we can open this file in a tab without downloading it
       // add to sent files list
       $('#sentFilesList').append(
@@ -1150,24 +1164,55 @@ function setOtherFontSize(size) {
   const originalFont = Number($('.currentFontSize').text().split('%')[0]);
   const temp = (originalFont + size) / 100;
 
-  console.log(`setting new button font-size to: ${(14 * temp).toString()}px`);
-  console.log(`setting new header font-size to: ${(30 * temp).toString()}px`);
   $('.buttonFontSize').css('font-size', `${(Number(14) * temp).toString()}px`);
 
-  $('#newchatmessage').css('height', $('#chat-send').css('height'));
+  if ($('#fileBody').hasClass('active')) {
+    // need to do some weird stuff to update the textarea height when the chat tab isn't active
+    $('#chatBody').addClass('active')
+
+    if ($('#newchatmessage').val() == '') {
+      $('#newchatmessage').css('height', $('#chat-send').css('height'));
+    } else {
+      // changing the font size while the textarea has a content
+      $('#newchatmessage').css('height','0px');
+      $('#newchatmessage').css('height', `${$('#newchatmessage')[0].scrollHeight}px`);
+    }
+    $('#chatBody').removeClass('active')
+  } else {
+    // the chat tab is open
+    if ($('#newchatmessage').val() == '') {
+      $('#newchatmessage').css('height', $('#chat-send').css('height'));
+    } else {
+      // changing the font size while the textarea has a content
+      $('#newchatmessage').css('height','0px');
+      $('#newchatmessage').css('height', `${$('#newchatmessage')[0].scrollHeight}px`);
+    }
+  }
 }
 
-function collapseSidebar() {
-  console.log('collapseSidebar!')
-  console.log(isSidebarCollapsed)
+function collapseSidebar(tab) {
   if (isSidebarCollapsed) {
     // open the sidebar
     isSidebarCollapsed = false;
     $('.tab-content').attr('hidden', false);
     $('#tab-pane').attr('hidden', false)
     $('#tab-options').css('padding-left', '');
-    $('#chatTab').addClass('active');
-    $('sidebarTab').css('width', '8vw');
+
+    if (tab !== '') {
+      // open the selected tab
+      $('#'+tab).addClass('active');
+      if (tab === 'fileShareTab') {
+        $('#fileBody').addClass('active');
+      } else if (tab === 'chatTab') {
+        $('#chatBody').addClass('active');
+      }
+    } else {
+      // default to chat tab
+      $('#chatTab').addClass('active');
+      $('#chatBody').addClass('active');
+    }
+
+    $('.sidebarTab').css('width', '8vw');
 
     $('#callFeaturesColumn').removeClass('col-md-1');
     $('#callFeaturesColumn').addClass('col-md-4');
@@ -1177,9 +1222,14 @@ function collapseSidebar() {
     $('#callFeaturesColumn').css('border-left', '1px solid #ddd');
     $('#callFeaturesColumn').css('padding-left', '')
 
-    $('#collapseButton').attr('data-original-title', "Collapse").parent().find('.tooltip-inner').html('Collapse');
     $('#collapseButtonIcon').removeClass('fa fa-angle-double-left');
     $('#collapseButtonIcon').addClass('fa fa-angle-double-right');
+
+    // update the collapse button tooltip
+    $('#collapseButton').attr('data-original-title', "Collapse").parent().find('.tooltip-inner').html('Collapse');
+    if (tab == '') {
+      $('#collapseButton').tooltip('show')
+    }
 
     $('#remoteViewCol').css('height', '');
     $('#remoteView').css('height','');
@@ -1191,6 +1241,7 @@ function collapseSidebar() {
     $('#tab-pane').attr('hidden', true);
     $('#tab-options').css('padding-left', '0px');
     $('li').removeClass('active');
+    $('.tab-pane').removeClass('active')
     $('.sidebarTab').css('width', '8.8vw')
 
     $('#callFeaturesColumn').removeClass('col-md-4');
@@ -1201,7 +1252,11 @@ function collapseSidebar() {
     $('#callFeaturesColumn').css('border-left', '');
     $('#callFeaturesColumn').css('padding-left', '0px');
 
+    //update the collapse button tooltip
     $('#collapseButton').attr('data-original-title', "Expand").parent().find('.tooltip-inner').html('Expand');
+    if (tab == '') {
+      $('#collapseButton').tooltip('show')
+    }
     $('#collapseButtonIcon').removeClass('fa fa-angle-double-right');
     $('#collapseButtonIcon').addClass('fa fa-angle-double-left');
 
@@ -1215,6 +1270,6 @@ function collapseSidebar() {
 function toggleTab(tab) {
   if (isSidebarCollapsed) {
     // open sidebar
-    collapseSidebar();
+    collapseSidebar(tab);
   }
 }
