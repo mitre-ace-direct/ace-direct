@@ -29,7 +29,7 @@
   height: 100%;
   overflow-y: hidden;
   overflow-x: auto;
-  min-width: 992px;
+  /* min-width: 992px; */
 }
 
 #logoContainer {
