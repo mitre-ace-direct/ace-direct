@@ -46,6 +46,7 @@ const JS = [
   'lodash/lodash.min.js',
   'datatables.net/js/jquery.dataTables.min.js',
   'datatables.net-bs/js/dataTables.bootstrap.min.js',
+  'recordrtc/RecordRTC.min.js',
   'getstats/getStats.js'
   /*
     'admin-lte/plugins/bootstrap-slider/bootstrap-slider.js',

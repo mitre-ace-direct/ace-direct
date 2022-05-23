@@ -577,6 +577,17 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   $  pm2 restart all  # restart all application servers
   ```
 
+* If `acedirect-kurento` takes too long to build, try:
+
+  ```bash
+  $  cd ~/ace-direct/acedirect-kurento/vendor/reconnect-ws
+  $
+  $  rm package-lock.json
+  $  npm run clean
+  $  npm run build
+  $
+  ```
+
 * The Node builds on `acenode` are taking too long - see instructions above for creating the `~/.gitconfig` file.
 * A node server is failing to build or start - the `package-lock.json` file may be outdated. Delete the file and rebuild. For example, for `videomail-service`:
 
@@ -601,6 +612,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   ```
 
 * All services appear to be working, but calls are not queuing - The signaling server (`acedirect-kurento`) may have trouble connecting to Asterisk. There will be reconnect messages in the signaling server. Asterisk may have a successful status, but it is responsive. Try restarting the Asterisk service: `sudo service asterisk restart`.
+* On an incoming consumer portal call, the agent portal sees the consumer extension instead of the VRS number as the caller ID number. Also, the agent has no incoming video after answering the call. Try restarting REDIS: `sudo service redis restart` .
 
 ---
 

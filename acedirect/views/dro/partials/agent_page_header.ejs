@@ -3,6 +3,7 @@
     display: flex;
     align-items: center;
     width: 100%;
+    min-width: 992px;
     margin-left: 0px;
   }
 
@@ -18,10 +19,10 @@
   }
 </style>
 
-<head>
+
   <div class="Navbar row display-flex-center">
     <div class="appTitle col-xs-8 col-md-6">FCC ASL Consumer Support</div>
-    <div class="col-xs-4 col-md-6 text-right" onclick="logout()"><span class="fa fa-sign-out" aria-hidden="true"></span> Exit</div>
+    <div class="col-xs-4 col-md-6 text-right" onclick="logout()" style="cursor: pointer;"><span class="fa fa-sign-out" aria-hidden="true"></span> Exit</div>
   </div>
 
   <script>
@@ -37,4 +38,4 @@
     window.location.href = './logout';
 }
   </script>
-</head>
+

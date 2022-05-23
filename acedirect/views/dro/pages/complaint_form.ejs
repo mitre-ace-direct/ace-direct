@@ -19,6 +19,16 @@
         width: -webkit-fill-available;
       }
 
+      #noCallPoster {
+        height : 100%;
+      }
+
+      #DVC {
+        top : 40%;
+        position: relative;
+        width: 400px;
+      }
+
       #pageContainer {
         padding-left: 0px !important;
         padding-right: 15px !important;
@@ -74,6 +84,7 @@
         background-color: #073863 !important;
         color: white;
         margin-left: 2%;
+        vertical-align: unset;
       }
 
       .big-icon {
@@ -163,6 +174,11 @@
         border-radius: 50%;
         color: black;
         font-size: 15px;
+        background-color: lightgrey;
+      }
+      .fileShareIcon {
+        margin-top:4px;
+        margin-bottom: 4px;
       }
 
       .fontSizeButtons {
@@ -178,6 +194,12 @@
         padding: 9px 18px;
         border-radius: 5px;
         cursor: pointer;
+      }
+
+      .chooseFileGroup input.fileInput:active {
+        outline: none;
+        box-shadow: none;
+        background-color: white;
       }
 
       .collapseTab:hover {
@@ -279,7 +301,7 @@
         margin-left: 2%;
       }
 
-      #communicationText {
+      #CommunicationText {
         vertical-align: sub;
       }
 
@@ -309,6 +331,13 @@
         background-color: lightgray !important;
         overflow-wrap: break-word;
       }
+      .rttChatBubble {
+        border-radius: 25px !important;
+        color: #737373 !important;
+        background-color: #f9f9f9 !important;
+        overflow-wrap: break-word;
+      }
+
       .direct-chat-name {
         font-weight: bold;
         margin-right: 1rem;
@@ -335,18 +364,23 @@
         min-width: 600px;
         position:absolute;
       }
+      
+      .sidebarTab {
+        width: 8vw;
+        text-align: center;
+      }
 
     </style>
   </head>
   <%- include("../partials/agent_page_header") %>
 
-  <body>
+  <body style="overflow-x: hidden">
     <div class="container" id="pageContainer">
       <div class="row">
         <div id="callVideoColumn" class="col-xs-6 col-lg-8 text-center" style="border : 5px solid black">
           <!--Only appear outside of a call-->
           <div id="noCallPoster">
-            <img  id="heroLogo" src="dro/images/acedirect-logo.png" alt="heroLogo">
+            <img  id="DVC" src="dro/images/DVC2.png" alt="DVC">
           </div>
           <!--END Only appear outside of a call-->
           <!--Appear inside of a call-->
@@ -362,7 +396,7 @@
               <button type="button" class="btn btn-gray circleButton" onclick="enterFullscreen()">
                 <i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
               </button>
-              <button type="button" class="btn btn-gray" id="startScreenshare">
+              <button type="button" class="btn btn-gray" id="startScreenshare" onclick="toggleScreenShare()">
                 <i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare
               </button>
               <button id="end-call" type="button" class="btn btn-danger" onclick="terminateCall()">
@@ -404,12 +438,14 @@
                   <!-- Conversations are loaded here -->
                   <div id="chat-body" style="height:75vh; flex-direction: column; display: flex;">
                     <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
-                    <span id="emptyChat">This is the start of your chat<span id="agentChatName"></span>. No messages yet to display</span>
+                    <div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble" id="rtt-typing" style="min-height: 20px; display: none;"></div>
+                    <span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No messages yet to display</span>
                     </div>
                   </div>
         
                   <div id="chat-footer" class="box-footer" style="padding-top:10px; bottom:0; position:absolute;">
                     <input type="hidden" id="displayname">
+                    <input type="hidden" class="agentChatName">
                     <form name="chatsend" id="chatsend">
                       <div class="input-group">
                         <span class="input-group-btn" style="vertical-align: bottom;">
@@ -459,7 +495,7 @@
         
                         <span class="input-group-btn" style="vertical-align: bottom;">
                           <button id="chat-send" class="btn btn-primary btn-flat buttonFontSize"
-                            style="background-color: #073863 !important; margin-left: 10px; border-radius: 6px;">Send</button>
+                            style="background-color: #073863 !important; margin-left: 10px; border-radius: 6px; border: 2px solid #073863">Send</button>
                         </span>
                       </div>
                     </form>
@@ -496,16 +532,18 @@
                         style="background-color:transparent; border: transparent; padding-left: 0px; width: 80%; padding-right: 0px;">
                         <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;" tabindex="0">x</span>
                     </div>
-                    <button class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer" onclick="shareFileConsumer()"
-                      style="background-color:#073863 !important" disabled>Send</button>
+                    <a class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer" onclick="shareFileConsumer()"
+                      style="background-color:#073863 !important; margin-top: 5px; margin-bottom: 5px;"
+                      data-toggle="tooltip" title="You must choose a file" tabindex="0" disabled>Send</a>
+
                   </div>
                     <div class="row" style="max-width: 100%; display: contents;">
                       <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
-                          <span class="close" onclick="$('#fileSent').hide();" style="text-decoration:none">×</span>
+                          <span  class="close closeFileResponse" onclick="$('#fileSent').hide();" style="text-decoration:none" tabindex="0">×</span>
                           <strong>Success!</strong>  File Sent
                       </div>
                       <div class="alert alert-danger"  alert-dismissable id="fileSentError" style="margin-top: 10px;" hidden>
-                        <span class="close" onclick="$('#fileSentError').hide();" style="text-decoration:none">×</span>
+                        <span class="close  closeFileResponse" onclick="$('#fileSentError').hide();" style="text-decoration:none" tabindex="0">×</span>
                         <strong>Error!</strong>  Error sending file.
                     </div>
                   </div>
@@ -514,7 +552,7 @@
                     <br>
                     <!--send files section-->
                     <h3>Sent</h3>
-                    <hr style="border:1px solid grey"/>
+                    <hr style="border:1px solid grey; background-color: grey;"/>
                     
                     <div id="sentFilesList">
                       <span id="noSentFiles" class="noFiles">None</span>
@@ -524,7 +562,7 @@
                     <br>
                     <!--received files section-->
                     <h3>Received</h3>
-                    <hr style="border:1px solid grey"/>
+                    <hr style="border:1px solid grey; background-color: grey;"/>
                     <div id="receivedFilesList">
                       <span id="noReceivedFiles" class="noFiles">None</span>
                     </div>
@@ -535,19 +573,19 @@
               <!--end file share pane-->
             </div>
           </div>
-          <div class="col-xs-3">
+          <div id="tab-options" class="col-xs-3">
             <!-- Nav tabs -->
             <ul class="nav nav-tabs tabs-right" style="height: 90vh;">
               <li id="collapseTab" class="collapseTab">
-                <a class="collapseTab" style="padding-bottom: 20px; padding-top:20px; width:8vw; border:solid 1px transparent; text-align: center;">
-                  <button id="collapseButton" data-toggle="tooltip" title="Collapse">
-                    <i class="fa fa-angle-double-right fa-lg" style="vertical-align: -10% !important;">
+                <a class="collapseTab sidebarTab" style="padding-bottom: 20px; padding-top:20px; border:solid 1px transparent;">
+                  <button id="collapseButton" data-toggle="tooltip" title="Collapse" onclick="collapseSidebar('')">
+                    <i id="collapseButtonIcon" class="fa fa-angle-double-right fa-lg" style="vertical-align: -10% !important;">
                     </i>
                   </button>
                 </a>
               </li>
-              <li class="active">
-                <a href="#chatBody" data-toggle="tab"  style="width:8vw; text-align: center;">
+              <li id="chatTab" class="active">
+                <a href="#chatBody" data-toggle="tab" class="sidebarTab" onclick="toggleTab('chatTab')">
                   <i class="fa fa-comments fa-2x"
                     style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
@@ -555,8 +593,8 @@
                   <p style="color: #073863;">Chat</p>
                 </a>
               </li>
-              <li>
-                <a href="#fileBody" data-toggle="tab" style="width:8vw; text-align: center;">
+              <li id="fileShareTab">
+                <a href="#fileBody" data-toggle="tab" class="sidebarTab" onclick="toggleTab('fileShareTab')">
                   <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
                   <br>
@@ -573,7 +611,7 @@
     
   </body>
   <%- include("../partials/acedirect_footer") %>
-  <div id="optionsModal" class="modal fade">
+  <div id="optionsModal" class="modal fade"  data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -605,7 +643,9 @@
 
                   <i class="fa fa-envelope big-icon"></i>
                   <div class="button-area text-center">
-                    <button type="button" class="btn btn-primary btn-style" data-dismiss="modal">Leave Videomail</button>
+                    <a href="./videomail">
+                      <button type="button" class="btn btn-primary btn-style">Leave Videomail</button>
+                    </a>
                   </div>
                 </div>
                 
@@ -620,7 +660,7 @@
 			</div>
 		</div>
 	</div>
-  <div id="waitingModal" class="modal fade">
+  <div id="waitingModal" class="modal fade"  data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-dialog">
 			<div class="modal-content">
 				<div class="modal-header text-center">
@@ -638,13 +678,15 @@
           <br />
           <div class="row button-row">
             <div class="col-xs-5">
+              <a href="./videomail">
               <button type="button" class="btn btn-secondary modal-outline-btn"><i class="fa fa-envelope"></i><span class="separator"></span>Leave Videomail</button>
+            </a>
             </div>
             <div class="col-xs-2 second-or">
               - OR -
             </div>
             <div class="col-xs-5">
-              <button type="button" class="btn btn-secondary modal-outline-btn"><i class="fa fa-phone rotate-phone"></i><span class="separator"></span>Hang Up</button>
+              <button type="button" class="btn btn-secondary modal-outline-btn" onclick="exitQueue()"><i class="fa fa-phone rotate-phone"></i><span class="separator"></span>Hang Up</button>
             </div>
           </div>
 
@@ -655,25 +697,28 @@
 			</div>
 		</div>
 	</div>
+
+  <script>
+  let nginxPath = '<%= nginxPath %>';
+  let consumerPath = '<%= consumerPath %>';
+  let stunFQDN = '<%= stunFQDN %>';
+  let stunPort = '<%= stunPort %>';
+  let turnFQDN = '<%= turnFQDN %>';
+  let turnPort = '<%= turnPort %>';
+  let turnUser = '<%= turnUser %>';
+  let turnCred = '<%= turnCred %>';
+
+  //not instrumenting complaint web page right now
+  let logWebRTCStats = false;
+  let logWebRTCStatsFreq = 60000;
+  let logWebRTCMongo = '';
+  </script>
+
   <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
-	<script type="text/javascript" src="/assets/js/bootstrap.js"></script>
+  <script type="text/javascript" src="/assets/js/bootstrap.js"></script>
   <script type="text/javascript" src="/dro/js/complaint_form.js"></script>
   <script type="text/javascript" src="/assets/js/jwt-decode.js"></script>
   <script type="text/javascript" src='/assets/js/moment.js'></script>
   <script type="text/javascript" src="./socket.io/socket.io.js"></script>
   <script src="/js/ACEKurento-1.0.0.js"></script>
-  <script>
-		var nginxPath = '<%= nginxPath %>';
-		var stunFQDN = '<%= stunFQDN %>';
-		var stunPort = '<%= stunPort %>';
-		var turnFQDN = '<%= turnFQDN %>';
-		var turnPort = '<%= turnPort %>';
-		var turnUser = '<%= turnUser %>';
-		var turnCred = '<%= turnCred %>';
-
-		//not instrumenting complaint web page right now
-		var logWebRTCStats = false;
-		var logWebRTCStatsFreq = 60000;
-		var logWebRTCMongo = '';
-	</script>
 </html>

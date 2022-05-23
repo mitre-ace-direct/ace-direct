@@ -503,9 +503,9 @@ function connect_socket() {
                 monitorCall: monitorAvailability(data.agents[i].status, data.agents[i].name, data.agents[i].extension),
                 transferCall: transferAvailability(data.agents[i].status, data.agents[i].name, data.agents[i].extension),
                 multipartyInvite : (data.agents[i].status == 'READY' && $('#user-status').text() == 'In Call' && $('#agentname-sidebar').text() != data.agents[i].name)
-                ? '<Button class=\"demo-btn\" onClick=multipartyinvite(' + data.agents[i].extension + ')><i class=\"fa fa-users\"></i></Button>'
-                : '<Button class=\"secondary\" disabled><i class=\"fa fa-users\"></i></Button>',
-                chat: '<Button class=\"demo-btn\" onClick="showChatMessage(\'' + data.agents[i].extension + '\',\'' + data.agents[i].name + '\')"><i class=\"fa fa-comments\"></i></Button>'
+                ? '<Button class=\"demo-btn\" style=\"width: 100%;height: 5rem;\" onClick=multipartyinvite(' + data.agents[i].extension + ')><i class=\"fa fa-users\"></i></Button>'
+                : '<Button class=\"secondary\" style=\"width: 100%;height: 5rem;\" disabled><i class=\"fa fa-users\"></i></Button>',
+                chat: '<Button class=\"demo-btn\" style=\"width: 100%;height: 5rem;\" onClick="showChatMessage(\'' + data.agents[i].extension + '\',\'' + data.agents[i].name + '\')"><i class=\"fa fa-comments\"></i></Button>'
               });
               $('#availableAgents').append(
                 '<tr><td>' + data.agents[i].name + '</td>' +
@@ -1142,14 +1142,14 @@ function alignDataTableHeaders() {
 
 function monitorAvailability(status, name, ext) {
   return (($('#user-status').text() == 'Ready' || $('#user-status').text() == 'Away') && status == 'INCALL' && $('#agentname-sidebar').text() != name) 
-  ? '<Button class=\"demo-btn\" onClick=startMonitoringCall(' + ext + ')><i class=\"fa fa-eye\"></i></Button>'
-  : '<Button class=\"secondary\" disabled><i class=\"fa fa-eye\"></i></Button>'
+  ? '<Button class=\"demo-btn\" style=\"width: 100%;height: 5rem;\" onClick=startMonitoringCall(' + ext + ')><i class=\"fa fa-eye\"></i></Button>'
+  : '<Button class=\"secondary\" style=\"width: 100%;height: 5rem;\" disabled><i class=\"fa fa-eye\"></i></Button>'
 }
 
 function transferAvailability(status, name, ext) {
   return (status == 'READY' && $('#user-status').text() == 'In Call' && $('#agentname-sidebar').text() != name) 
-    ? '<Button class=\"demo-btn\" onClick="getTransferType(' + ext + ')"><i class=\"fa fa-share-square\"></i></Button>' 
-  : '<Button class=\"secondary\" disabled><i class=\"fa fa-share-square\"></i></Button>'
+    ? '<Button class=\"demo-btn\" style=\"width: 100%;height: 5rem;\" onClick="getTransferType(' + ext + ')"><i class=\"fa fa-share-square\"></i></Button>' 
+  : '<Button class=\"secondary\" style=\"width: 100%;height: 5rem;\" disabled><i class=\"fa fa-share-square\"></i></Button>'
 }
 
 $('#ivrsnum').keyup(function (event) {
@@ -2470,43 +2470,6 @@ function change_play_button() {
   document.getElementById('play-video-icon').classList.add('fa-play');
   document.getElementById('play-video-icon').classList.remove('fa-pause');
 }
-
-// Seekbar functionality
-var seekBar = document.getElementById('seek-bar');
-
-// Event listener for the seek bar
-seekBar.addEventListener('change', function() {
-  // Calculate the new time
-  var time = remoteView.duration * (seekBar.value / 100);
-
-  // Update the video time
-  remoteView.currentTime = time;
-});
-
-// Update the seek bar as the video plays
-remoteView.addEventListener('timeupdate', function () {
-  // Calculate the slider value
-  var value = (100 / remoteView.duration) * remoteView.currentTime;
-
-  // Update the slider value
-  seekBar.value = value;
-
-  //update the current time info
-  updateVideoTime(remoteView.currentTime, 'vmail-current-time');
-});
-
-// Pause the video when the seek handle is being dragged
-seekBar.addEventListener('mousedown', function() {
-  // remoteView.pause();
-  play_video()
-});
-
-// Play the video when the seek handle is dropped
-seekBar.addEventListener('mouseup', function() {
-  // remoteView.play();
-  play_video();
-});
-
 // Event listener for the full-screen button
 function enterFullscreen() {
   var webcam_container = document.getElementById('fullscreen-element');
