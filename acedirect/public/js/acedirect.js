@@ -3179,6 +3179,27 @@ function ShareFile() {
   }
 }
 
+// Event emitting for handling profile pic setting.
+/** TODO:
+ * Change value of sidebar and navbar pictures.
+ * Set up S3 bucket configuration.
+ * Save uploaded image to S3 bucket.
+ */
+function setProfilePic() {
+  if(document.getElementById('profile-pic-file-upload').files && document.getElementById('profile-pic-file-upload').files[0]) {
+    var fileReader = new FileReader();
+
+    fileReader.onload = (e) => {
+      $('#sidebar-profile-pic').attr('src', e.target.result)
+      $('#agent-pic-header').attr('src', e.target.result)
+      $('#agent-pic-dropdown').attr('src', e.target.result)
+    }
+
+    fileReader.readAsDataURL(document.getElementById('profile-pic-file-upload').files[0])
+    // socket.emit('profile-pic-set')
+  }
+}
+
 $('#fullscreen-element').dblclick(function() {
   enterFullscreen();
 })
