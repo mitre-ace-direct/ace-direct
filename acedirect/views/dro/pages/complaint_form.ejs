@@ -370,6 +370,12 @@
         text-align: center;
       }
 
+      #exitFullscreen {
+        margin: 0 auto;
+        background-color: #073863 !important;
+        color: white;
+      }
+
     </style>
   </head>
   <%- include("../partials/agent_page_header") %>
@@ -408,12 +414,15 @@
               <span id="CommunicationText"></span>
             </div>
 
-            <div id="callVideosRow" class="row">
-              <div class="col-md-3" id="selfViewCol">
-                <video id="selfView" autoplay muted="true" class="mirror-mode"></video>
-              </div>
-              <div class="col-md-9" id="remoteViewCol">
-                <video id="remoteView" autoplay></video>
+            <div class="box-body" id="fullscreen-element">
+              <div id="callVideosRow" class="row">
+                <div class="col-md-3" id="selfViewCol">
+                  <video id="selfView" autoplay muted="true" class="mirror-mode"></video>
+                  <button id="exitFullscreen" onclick="exitFullscreen()">Exit Fullscreen</button>
+                </div>
+                <div class="col-md-9" id="remoteViewCol">
+                  <video id="remoteView" autoplay></video>
+                </div>
               </div>
             </div>
           </div>

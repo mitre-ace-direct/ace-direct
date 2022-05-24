@@ -31,11 +31,26 @@ const viewableFileTypes = [
 
 $(document).ready(() => {
   $('#optionsModal').modal('show');
+  document.getElementById("exitFullscreen").style.display = 'none';
   connect_socket();
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
   });
 
+});
+
+$(window).bind("fullscreenchange", function (e) {
+    // check to see if your browser has exited fullscreen
+    console.log("CURRENTLY CHECKING " + !document.fullscreenElement && !document.mozFullScreenElement
+    && !document.webkitFullscreenElement && !document.msFullscreenElement)
+    if (!document.fullscreenElement && !document.mozFullScreenElement
+      && !document.webkitFullscreenElement && !document.msFullscreenElement) { // video fullscreen mode has changed
+       if (document.fullscreenElement) {
+            // you have just ENTERED full screen video
+       } else {
+        document.getElementById("exitFullscreen").style.display = 'none';
+       }
+    }
 });
 
 function connect_socket() {
@@ -759,7 +774,7 @@ function terminateCall() {
   //  removeVideo();
   // disableChatButtons();
   //  enableInitialButtons();
-  //  exitFullscreen();
+  exitFullscreen();
   // $('#transcriptoverlay').html('');
   // hideCaptions();
 
@@ -855,6 +870,55 @@ function toggleScreenShare() {
     acekurento.screenshare(true)
     sharingScreen = true;
     document.getElementById("startScreenshare").innerText = "Stop Screenshare";
+  }
+}
+
+function enterFullscreen() {
+  const webcamContainer = document.getElementById('fullscreen-element');
+
+  if (!document.fullscreenElement && !document.mozFullScreenElement
+    && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+    document.getElementById("exitFullscreen").style.display = 'block';
+    if (webcamContainer.requestFullscreen) {
+      webcamContainer.requestFullscreen();
+    } else if (webcamContainer.msRequestFullscreen) {
+      webcamContainer.msRequestFullscreen();
+    } else if (webcamContainer.mozRequestFullScreen) {
+      webcamContainer.mozRequestFullScreen();
+    } else if (webcamContainer.webkitRequestFullscreen) {
+      webcamContainer.webkitRequestFullscreen();
+    }
+
+    // $('#remoteView').css('object-fit', 'cover');
+  } else {
+
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+    document.getElementById("exitFullscreen").style.display = 'none';
+    $('#remoteView').css('object-fit', 'contain');
+  }
+}
+
+// Used to exit fullscreen if active when call is teminated
+function exitFullscreen() {
+  if (document.getElementById('fullscreen-element').fullscreenElement) {
+    document.getElementById("exitFullscreen").style.display = 'none';
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
   }
 }
 
