@@ -604,7 +604,7 @@ router.post('/videomailupload', consumerRestrict,  (req, res) => { //add restric
   
     form.parse(req, (err, fields, files) => {
       if (err) {
-        error.error('oh no an error', err);
+        console.error(err);
         res.writeHead(200, {
           'content-type': 'text/plain',
         });
