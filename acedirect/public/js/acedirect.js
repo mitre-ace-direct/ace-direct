@@ -3196,9 +3196,13 @@ function setProfilePic() {
       $('#agent-pic-header').attr('src', e.target.result)
       $('#agent-pic-dropdown').attr('src', e.target.result)
 
+      console.log('Emitting profile-pic-set event now...')
+
       socket.emit('profile-pic-set', {
         picture : e.target.result,
         pictureAsString : e.target.result.toString
+      }, (res) => {
+        console.log(res)
       })
     }
   }

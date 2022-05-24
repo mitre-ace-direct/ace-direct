@@ -23,7 +23,8 @@ const c = require('./app/constants.js')
 const utils = require('./app/utils.js')
 const config = require('./configuration.js');
 const AWS = require('aws-sdk');
-const uploadAPI = config.uploadServer + 'updateProfile'
+const uploadAPI = config.uploadServer + '/updateProfile'
+const proxy = require('proxy-agent')
 
 AWS.config.update({
   region: config.awsRegion,
@@ -32,7 +33,7 @@ AWS.config.update({
   }
 })
 
-const s3 = AWS.S3();
+const s3 = new AWS.S3();
 
 let dbConnection = null;
 let dbconn = null;
@@ -835,8 +836,9 @@ io.sockets.on('connection', (socket) => {
    * Implement event listener
    */
 
-  socket.on('profile-pic-set', (data) => {
+  socket.on('profile-pic-set', (data, callback) => {
     console.log('Profile Picture Set!')
+    callback("Emitter signal received!")
 
     var profilePic = data.picture
     var uploadParams = { Bucket : config.awsS3, Key : data.pictureAsString, Body : '' }
@@ -3731,10 +3733,6 @@ app.use((req, res, next) => {
   };
   next();
 });
-
-const adRoutes = require('./app/routes');
-const { proxy } = require('./configuration.js');
-app.use('/', adRoutes);
 
 // Download depends on globals; define this route here
 app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
