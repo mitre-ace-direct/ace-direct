@@ -1283,9 +1283,9 @@ function collapseSidebar(tab) {
     $('.sidebarTab').css('width', '8vw');
 
     $('#callFeaturesColumn').removeClass('col-md-1');
-    $('#callFeaturesColumn').addClass('col-md-4');
+    $('#callFeaturesColumn').addClass('col-xs-6 col-lg-4');
     $('#callVideoColumn').removeClass('col-md-11');
-    $('#callVideoColumn').addClass('col-md-8');
+    $('#callVideoColumn').addClass('col-xs-6 col-lg-8');
 
     $('#callFeaturesColumn').css('border-left', '1px solid #ddd');
     $('#callFeaturesColumn').css('padding-left', '')
@@ -1312,9 +1312,9 @@ function collapseSidebar(tab) {
     $('.tab-pane').removeClass('active')
     $('.sidebarTab').css('width', '8.8vw')
 
-    $('#callFeaturesColumn').removeClass('col-md-4');
+    $('#callFeaturesColumn').removeClass('col-xs-6 col-lg-4');
     $('#callFeaturesColumn').addClass('col-md-1');
-    $('#callVideoColumn').removeClass('col-md-8');
+    $('#callVideoColumn').removeClass('col-xs-6 col-lg-8');
     $('#callVideoColumn').addClass('col-md-11');
 
     $('#callFeaturesColumn').css('border-left', '');
