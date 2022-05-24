@@ -1,4 +1,4 @@
-const dC = require('./../../dat/config.json');
+const dC = require('./../dat/config.json');
 
 var config = {
 	debug: 0, //0: no debug, 1: yes debug 
