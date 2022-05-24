@@ -1,19 +1,29 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html lang="en-us" class="full-height">
 
 <head>
-  <title>FCC ASL Consumer Support Videomail</title>
+  <title>ACE Direct - Videomail</title>
 
-  <meta name="description" content="FCC ASL Consumer Support Videomail">
-  <!-- <meta name="viewport" content="width=device-width"> -->
+  <meta name="description" content="ACE Direct - Videomail">
+  <meta name="viewport" content="width=device-width">
 
   <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
   <link rel="stylesheet" href="/css/ca-portal.css">
   <style>
+    .full-height {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .fill-height {
+      flex-grow: 1;
+      width: 100%;
+    }
+
     .ad-container {
       width: 100% !important;
-      position: absolute;
     }
 
     .greeting-controls {
@@ -24,9 +34,6 @@
     }
 
     .video-element {
-      height: 100%;
-      width: 100%;
-      object-fit: fill;
       cursor: pointer;
     }
 
@@ -38,7 +45,6 @@
       cursor: pointer;
       background-color: #839CB1;
       height: 5px;
-      margin-bottom: 10px;
       overflow: hidden;
       position: relative;
       width: 75%;
@@ -69,14 +75,10 @@
     #recordingTimer {
       background-color: #fdeeec;
       height: 25px;
-      margin-bottom: 0px;
       overflow: hidden;
       position: relative;
       width: 100%;
-      display: inline-block;
-      padding-left: 1em;
       border: #000000;
-      border-width: 1em;
     }
 
     #recordingTimer span {
@@ -96,39 +98,67 @@
       -ms-transform: translate(-50%, -50%);
       transform: translate(-50%, -50%);
     }
+
     .greeting-button {
-        width: 100%;
-        background-color: #073863 !important;
-        padding-top: 8px !important;
-        padding-bottom: 8px !important;
-        font-weight: bold !important;
-      }
+      width: 100%;
+      background-color: #073863 !important;
+      padding-top: 8px !important;
+      padding-bottom: 8px !important;
+      font-weight: bold !important;
+    }
+
+    .video-container {
+      position: relative;
+    }
+
+    .video-container video {
+      position: relative;
+      z-index: 0;
+    }
+
+    .recordingInfoBanner {
+      position: absolute;
+      bottom: 0;
+      height: 100px;
+      width: 100%;
+      text-align: center;
+      background-color: rgba(0, 0, 0, 0.3);
+      color: white;
+      font-weight: bold;
+      z-index: 1;
+      padding-top: 40px;
+    }
   </style>
 </head>
 
-<body>
+<body class="full-height">
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
     <div class="container ad-container">
+
+
+
       <div class="row" id="greetingDiv">
-        <div class="row  greeting-controls">
-          <div class="col-12 text-center align-self-center">
-            <i class="fa fa-play fa-2x" aria-hidden="true" id="greetingPlayPauseBtn"></i>
-            <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span>
-            <div id="custom-seekbar"><span></span></div>
-            <button class="btn .greeting-button" onclick="skipGreeting();">Skip Greeting&nbsp;<i
-                class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
-          </div>
+        <div class="row  text-center greeting-controls" id="greeting-controls">
+          <i class="fa fa-play fa-2x" aria-hidden="true" id="greetingPlayPauseBtn"></i>
+          <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span>
+          <div id="custom-seekbar"><span></span></div>
+          <button class="btn btn-light" onclick="skipGreeting();">Skip Greeting&nbsp;<i class="fa fa-angle-double-right"
+              aria-hidden="true"></i> </button>
         </div>
-        <div class="row">
-          <div class="col-12">
-            <video class="video-element" id="greetingVideo" title="Play Video">
-              <source src="/media/videomailGreeting.mp4" type="video/mp4">
-            </video>
-          </div>
-        </div>
+        <video class="fill-height video-element" id="greetingVideo" title="Play Video">
+          <source src="/media/videomailGreeting.mp4" type="video/mp4">
+        </video>
       </div>
+
+
+
+
+
+
+
+
       <div class="row text-center" style="display:none" id="countDownDiv">
 
         <div class="col-12 text-center align-self-center">
@@ -152,14 +182,21 @@
                   aria-hidden="true"></i> Send Videomail</button>
             </div>
           </div>
-          <div class="row  recording-timer-bar">
+          <div class="row  recording-timer-bar" id="recording-timer-bar">
             <div class="col-12">
               <div id="recordingTimer"><span></span></div>
             </div>
           </div>
-          <video autoplay="true" id="selfVideo">
 
-          </video>
+          <div class="video-container">
+            <video autoplay="true" class="video-element" id="selfVideo">
+
+            </video>
+            <div class="recordingInfoBanner">
+              <span>To send your Videomail before the 90 second time limit elapses, click the 'Send Videomail'
+                button.</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -168,7 +205,7 @@
     <%- include("../partials/acedirect_footer") %>
 
       <!-- MODALS -->
-      <div id="goodbyeModal" class="modal fade">
+      <div id="goodbyeModal" class="modal fade" data-backdrop="static">
         <div class="modal-dialog modal-dialog-csentered" role="document">
           <div class="modal-content">
             <div class="modal-body" style="position: relative;min-height:300px;">
@@ -285,9 +322,11 @@
 
   function startVideomail() {
     startWebcam();
+    setVideoSize()
   }
 
   var selfVideo = document.querySelector("#selfVideo");
+  selfVideo.recTime = 0;
   function startWebcam() {
 
     if (navigator.mediaDevices.getUserMedia) {
@@ -308,7 +347,7 @@
   });
 
   function startVideomailTimer() {
-    let rTime = 0;
+    var rTime = 0;
     let maxTime = <%= maxRecordSeconds %>;
     let d = new Date(0);
     d.setSeconds(maxTime); // specify value for SECONDS here
@@ -319,6 +358,7 @@
       let percentage = (rTime / maxTime) * 100;
       $("#recordingTimer span").css("width", percentage + "%");
       if (rTime % 1 != 0) {
+        selfVideo.recTime = rTime;
         let date = new Date(0);
         date.setSeconds(rTime); // specify value for SECONDS here
         let timeString = date.toISOString().substr(15, 4);
@@ -333,15 +373,17 @@
   }
   var recorder = null;
   function startRecording() {
-    recorder = new RecordRTCPromisesHandler(selfVideo.srcObject, {
-      type: 'video'
-    });
-    recorder.startRecording();
+    if (recorder == null) {
+      recorder = new RecordRTCPromisesHandler(selfVideo.srcObject, {
+        type: 'video'
+      });
+      recorder.startRecording();
+    }
   }
 
   async function sendVideomail() {
     console.log("sendVideomail")
-    console.log("selfVideo.currentTime" + selfVideo.currentTime)
+    console.log("selfVideo.currentTime" + selfVideo.recTime)
     if (recorder != null) {
       await recorder.stopRecording();
       let blob = await recorder.getBlob()
@@ -351,7 +393,7 @@
         type: 'video/webm'
       });
       formData.append('file', file)
-      formData.append('duration', selfVideo.currentTime)
+      formData.append('duration', selfVideo.recTime)
       var request = new XMLHttpRequest();
       request.onreadystatechange = function () {
         if (request.readyState == 4 && request.status == 200) {
@@ -395,6 +437,19 @@
     window.location.href = './logout';
   }
 
+
+
+  const setVideoSize = function () {
+    let a1 = document.getElementById("greeting-controls")
+    let a2 = document.getElementById("recording-timer-bar")
+    let b = document.getElementById("footer-container-consumer");
+    let top = a1.getBoundingClientRect().bottom || a2.getBoundingClientRect().bottom;
+    let videoHeight = b.getBoundingClientRect().top - top;
+    console.log(videoHeight)
+    $('.video-element').height(videoHeight)
+  }
+  setVideoSize()
+  window.addEventListener('resize', setVideoSize);
 </script>
 
 </html>
