@@ -3197,7 +3197,8 @@ function setProfilePic() {
       $('#agent-pic-dropdown').attr('src', e.target.result)
 
       socket.emit('profile-pic-set', {
-        picture : e.target.result
+        picture : e.target.result,
+        pictureAsString : e.target.result.toString
       })
     }
   }

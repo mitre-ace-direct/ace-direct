@@ -832,11 +832,23 @@ io.sockets.on('connection', (socket) => {
    * Upload Handler and event listener for setting profile pic.
    * TODO:
    * Implement upload handling function
-   * Implement even listener
+   * Implement event listener
    */
 
   socket.on('profile-pic-set', (data) => {
+    console.log('Profile Picture Set!')
 
+    var profilePic = data.picture
+    var uploadParams = { Bucket : config.awsS3, Key : data.pictureAsString, Body : '' }
+
+    console.log("Upload parameters: " + JSON.stringify(uploadParams))
+
+    uploadParams.Body = profilePic;
+    s3.upload(uploadParams, (err) => {
+      if(err) {
+        console.log("Error! Could not upload to S3 bucket: " + err)
+      }
+    })
   });
 
   socket.on('transferCallInvite', (data) => {
