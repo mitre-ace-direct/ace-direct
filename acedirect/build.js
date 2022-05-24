@@ -38,6 +38,8 @@ const JS = [
   'jwt-decode/build/jwt-decode.js',
   'jwt-decode/build/jwt-decode.js.map',
   'moment/moment.js',
+  'moment/min/moment.min.js',
+  'moment/min/moment.min.js.map',
   'admin-lte/dist/js/adminlte.min.js',
   'admin-lte/plugins/jQueryUI/jquery-ui.min.js',
   'gridstack/dist/gridstack.min.js',

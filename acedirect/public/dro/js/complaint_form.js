@@ -18,24 +18,38 @@ let isSidebarCollapsed = false;
 
 // this list may be incomplete
 const viewableFileTypes = [
-  "png",
-  "jpg",
-  "jpeg",
-  "gif",
-  "pdf",
-  "md",
-  "txt",
-  "json",
-  "html"
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'pdf',
+  'md',
+  'txt',
+  'json',
+  'html'
 ];
 
 $(document).ready(() => {
   $('#optionsModal').modal('show');
+  document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
   });
+});
 
+$(window).bind('fullscreenchange', function (_e) {
+  // check to see if your browser has exited fullscreen
+  console.log('CURRENTLY CHECKING ' + !document.fullscreenElement && !document.mozFullScreenElement
+    && !document.webkitFullscreenElement && !document.msFullscreenElement);
+  if (!document.fullscreenElement && !document.mozFullScreenElement
+    && !document.webkitFullscreenElement && !document.msFullscreenElement) { // video fullscreen mode has changed
+    if (document.fullscreenElement) {
+      // you have just ENTERED full screen video
+    } else {
+      document.getElementById('exitFullscreen').style.display = 'none';
+    }
+  }
 });
 
 function connect_socket() {
@@ -161,7 +175,7 @@ function connect_socket() {
                 acekurento.selfStream = document.getElementById('selfView');
 
                 const eventHandlers = {
-                  connected: (e) => {
+                  connected: (_e) => {
                     console.log('--- WV: Connected ---\n');
                     registerJssip(data.extension, data.password); // register with the given extension
                     startCall(asteriskSipUri); // calling asterisk to get into the queue
@@ -172,22 +186,22 @@ function connect_socket() {
                       // empty
                     }
                   },
-                  accepted: (e) => {
+                  accepted: (_e) => {
                     $('#remoteView').removeClass('mirror-mode');
                   },
-                  pausedQueue: (e) => {
+                  pausedQueue: (_e) => {
                     console.log('--- WV: Paused Agent Member in Queue ---\n');
                   },
-                  unpausedQueue: (e) => {
+                  unpausedQueue: (_e) => {
                     console.log('--- WV: Unpaused Agent Member in Queue ---\n');
                   },
                   callResponse: (e) => {
                     console.log('--- WV: Call response ---\n', e);
                   },
-                  incomingCall: (call) => {
+                  incomingCall: (_call) => {
                     console.log('--- WV: Incoming call ---\n');
                   },
-                  progress: (e) => {
+                  progress: (_e) => {
                     console.log('--- WV: Calling... ---\n');
                   },
                   startedRecording: (e) => {
@@ -205,7 +219,7 @@ function connect_socket() {
                   failed: (e) => {
                     console.log(`--- WV: Failed ---\n${e}`);
                   },
-                  ended: (e) => {
+                  ended: (_e) => {
                     console.log('--- WV: Call ended ---\n');
                     // terminateCall();
                   }
@@ -354,7 +368,8 @@ function connect_socket() {
           .on('queue-caller-leave', (data) => {
             const currentPosition = $('#pos-in-queue').text();
             if (data.queue === 'ComplaintsQueue') {
-              /* if (!abandonedCaller) { // abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
+              /* if (!abandonedCaller) {
+                // abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
                     setQueueText(currentPosition -= 1);
                 } */
               console.log('queue caller leave');
@@ -390,7 +405,7 @@ function connect_socket() {
               $('#agents-avail').text('No representatives are available to take your call at this time.');
             }
           })
-          .on('chat-leave', (error) => {
+          .on('chat-leave', (_error) => {
             // clear chat
             $('#chatcounter').text('500');
             $('#chat-messages').html('<div id="rtt-typing" ></div>');
@@ -404,9 +419,10 @@ function connect_socket() {
             $('#subject').val('');
 
             if (complaintRedirectActive) {
+              $('#redirectURL').text(complaintRedirectUrl);
               $('#callEndedModal').modal('show');
               setTimeout(() => {
-                window.location = complaintRedirectUrl;
+                location = complaintRedirectUrl;
               }, 5000);
             }
           })
@@ -600,10 +616,10 @@ function registerJssip(myExtension, myPassword) {
       if (selfStream && selfStream.srcObject) {
         selfStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended self');
-          //$('#startScreenshare').hide();
+          // $('#startScreenshare').hide();
           acekurento.screenshare(false);
           sharingScreen = false;
-          document.getElementById("startScreenshare").innerText = "Start Screenshare"
+          document.getElementById('startScreenshare').innerText = 'Start Screenshare';
           if (monitorExt) {
             // force monitor to leave the session first
             socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -634,7 +650,8 @@ function registerJssip(myExtension, myPassword) {
 
       $('#startScreenshare').hide();
 
-      terminateCall();
+      endCall();
+      // terminateCall();
       // clearScreen();
       // disableChatButtons();
       // enableInitialButtons();
@@ -697,12 +714,14 @@ function enterQueue() {
 function endCall() {
   terminateCall();
 
-  // TODO: this redirects, but we need the new redirect modal here
   if (complaintRedirectActive) {
-    $('#callEndedModal').modal('show'); // TODO - does not exist at the moment
+    $('#redirectURL').text(complaintRedirectUrl);
+    $('#callEndedModal').modal('show');
     setTimeout(() => {
-      window.location = complaintRedirectUrl;
+      location = complaintRedirectUrl;
     }, 5000);
+  } else {
+    // TODO what should we do if the redirect flag is false?
   }
 }
 
@@ -722,7 +741,7 @@ function startCall(otherSipUri) {
   callTimer = setInterval(() => {
     callTimer += 1;
     minutes = Math.floor((callTimer / 60)) > 0 ? Math.floor(callTimer / 60) : 0;
-    seconds = (callTimer - minutes * 60);
+    let seconds = (callTimer - minutes * 60);
     if (seconds < 10) {
       seconds = `0${seconds}`;
     }
@@ -755,7 +774,7 @@ function terminateCall() {
   //  removeVideo();
   // disableChatButtons();
   //  enableInitialButtons();
-  //  exitFullscreen();
+  exitFullscreen();
   // $('#transcriptoverlay').html('');
   // hideCaptions();
 
@@ -846,11 +865,60 @@ function toggleScreenShare() {
   if (sharingScreen) {
     acekurento.screenshare(false);
     sharingScreen = false;
-    document.getElementById("startScreenshare").innerText = "Start Screenshare"
+    document.getElementById('startScreenshare').innerText = 'Start Screenshare';
   } else {
-    acekurento.screenshare(true)
+    acekurento.screenshare(true);
     sharingScreen = true;
-    document.getElementById("startScreenshare").innerText = "Stop Screenshare";
+    document.getElementById('startScreenshare').innerText = 'Stop Screenshare';
+  }
+}
+
+function enterFullscreen() {
+  const webcamContainer = document.getElementById('fullscreen-element');
+
+  if (!document.fullscreenElement && !document.mozFullScreenElement
+    && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+    document.getElementById('exitFullscreen').style.display = 'block';
+    if (webcamContainer.requestFullscreen) {
+      webcamContainer.requestFullscreen();
+    } else if (webcamContainer.msRequestFullscreen) {
+      webcamContainer.msRequestFullscreen();
+    } else if (webcamContainer.mozRequestFullScreen) {
+      webcamContainer.mozRequestFullScreen();
+    } else if (webcamContainer.webkitRequestFullscreen) {
+      webcamContainer.webkitRequestFullscreen();
+    }
+
+    // $('#remoteView').css('object-fit', 'cover');
+  } else {
+
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+    document.getElementById('exitFullscreen').style.display = 'none';
+    $('#remoteView').css('object-fit', 'contain');
+  }
+}
+
+// Used to exit fullscreen if active when call is teminated
+function exitFullscreen() {
+  if (document.getElementById('fullscreen-element').fullscreenElement) {
+    document.getElementById('exitFullscreen').style.display = 'none';
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
   }
 }
 
@@ -882,24 +950,24 @@ $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
   }
 
   this.style.height = `${this.scrollHeight}px`;
-  if ($('#newchatmessage').val() == '') {
+  if ($('#newchatmessage').val() === '') {
     this.style.height = $('#chat-send').css('height');
   }
 });
 
 $('#fileInput').on('change', () => {
-  if ($('#fileInput')[0].value == '') {
+  if ($('#fileInput')[0].value === '') {
     console.log('no file chosen');
     $('#shareFileConsumer').attr('disabled', true);
     $('#removeFileBtn').css('display', 'none');
     // add tooltip to send button
-    $('#shareFileConsumer').attr('data-original-title', "You must choose a file").parent().find('.tooltip-inner').html('You must choose a file');
+    $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
   } else {
     console.log('file chosen!');
     $('#shareFileConsumer').attr('disabled', false);
     $('#removeFileBtn').css('display', 'block');
     // remove tooltip on send button
-    $('#shareFileConsumer').attr('data-original-title', "").parent().find('.tooltip-inner').html('');
+    $('#shareFileConsumer').attr('data-original-title', '').parent().find('.tooltip-inner').html('');
   }
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
@@ -910,7 +978,7 @@ function removeFile() {
   $('#fileInput')[0].value = '';
   $('#shareFileConsumer').attr('disabled', true);
   $('#removeFileBtn').css('display', 'none');
-  $('#shareFileConsumer').attr('data-original-title', "You must choose a file").parent().find('.tooltip-inner').html('You must choose a file');
+  $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
   });
@@ -1052,7 +1120,7 @@ function shareFileConsumer() {
         console.log('file successfully sent');
         $('#fileSent').show();
         $('#removeFileBtn').hide();
-        $('#shareFileConsumer').attr('data-original-title', "You must choose a file").parent().find('.tooltip-inner').html('You must choose a file');
+        $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
       },
       error: (jXHR, textStatus, errorThrown) => {
         console.log(`ERROR: ${jXHR} ${textStatus} ${errorThrown}`);
@@ -1061,7 +1129,6 @@ function shareFileConsumer() {
     });
   }
 }
-
 
 function addFileToDownloadList(data) {
   $('#noReceivedFiles').attr('hidden', true);
@@ -1168,19 +1235,19 @@ function setOtherFontSize(size) {
 
   if ($('#fileBody').hasClass('active')) {
     // need to do some weird stuff to update the textarea height when the chat tab isn't active
-    $('#chatBody').addClass('active')
+    $('#chatBody').addClass('active');
 
-    if ($('#newchatmessage').val() == '') {
+    if ($('#newchatmessage').val() === '') {
       $('#newchatmessage').css('height', $('#chat-send').css('height'));
     } else {
       // changing the font size while the textarea has a content
-      $('#newchatmessage').css('height','0px');
+      $('#newchatmessage').css('height', '0px');
       $('#newchatmessage').css('height', `${$('#newchatmessage')[0].scrollHeight}px`);
     }
-    $('#chatBody').removeClass('active')
+    $('#chatBody').removeClass('active');
   } else {
     // the chat tab is open
-    if ($('#newchatmessage').val() == '') {
+    if ($('#newchatmessage').val() === '') {
       $('#newchatmessage').css('height', $('#chat-send').css('height'));
     } else {
       // changing the font size while the textarea has a content
@@ -1195,12 +1262,12 @@ function collapseSidebar(tab) {
     // open the sidebar
     isSidebarCollapsed = false;
     $('.tab-content').attr('hidden', false);
-    $('#tab-pane').attr('hidden', false)
+    $('#tab-pane').attr('hidden', false);
     $('#tab-options').css('padding-left', '');
 
     if (tab !== '') {
       // open the selected tab
-      $('#'+tab).addClass('active');
+      $('#' + tab).addClass('active');
       if (tab === 'fileShareTab') {
         $('#fileBody').addClass('active');
       } else if (tab === 'chatTab') {
@@ -1215,20 +1282,20 @@ function collapseSidebar(tab) {
     $('.sidebarTab').css('width', '8vw');
 
     $('#callFeaturesColumn').removeClass('col-md-1');
-    $('#callFeaturesColumn').addClass('col-md-4');
+    $('#callFeaturesColumn').addClass('col-xs-6 col-lg-4');
     $('#callVideoColumn').removeClass('col-md-11');
-    $('#callVideoColumn').addClass('col-md-8');
+    $('#callVideoColumn').addClass('col-xs-6 col-lg-8');
 
     $('#callFeaturesColumn').css('border-left', '1px solid #ddd');
-    $('#callFeaturesColumn').css('padding-left', '')
+    $('#callFeaturesColumn').css('padding-left', '');
 
     $('#collapseButtonIcon').removeClass('fa fa-angle-double-left');
     $('#collapseButtonIcon').addClass('fa fa-angle-double-right');
 
     // update the collapse button tooltip
-    $('#collapseButton').attr('data-original-title', "Collapse").parent().find('.tooltip-inner').html('Collapse');
-    if (tab == '') {
-      $('#collapseButton').tooltip('show')
+    $('#collapseButton').attr('data-original-title', 'Collapse').parent().find('.tooltip-inner').html('Collapse');
+    if (tab === '') {
+      $('#collapseButton').tooltip('show');
     }
 
     $('#remoteViewCol').css('height', '');
@@ -1241,28 +1308,28 @@ function collapseSidebar(tab) {
     $('#tab-pane').attr('hidden', true);
     $('#tab-options').css('padding-left', '0px');
     $('li').removeClass('active');
-    $('.tab-pane').removeClass('active')
-    $('.sidebarTab').css('width', '8.8vw')
+    $('.tab-pane').removeClass('active');
+    $('.sidebarTab').css('width', '8.8vw');
 
-    $('#callFeaturesColumn').removeClass('col-md-4');
+    $('#callFeaturesColumn').removeClass('col-xs-6 col-lg-4');
     $('#callFeaturesColumn').addClass('col-md-1');
-    $('#callVideoColumn').removeClass('col-md-8');
+    $('#callVideoColumn').removeClass('col-xs-6 col-lg-8');
     $('#callVideoColumn').addClass('col-md-11');
 
     $('#callFeaturesColumn').css('border-left', '');
     $('#callFeaturesColumn').css('padding-left', '0px');
 
-    //update the collapse button tooltip
-    $('#collapseButton').attr('data-original-title', "Expand").parent().find('.tooltip-inner').html('Expand');
-    if (tab == '') {
-      $('#collapseButton').tooltip('show')
+    // update the collapse button tooltip
+    $('#collapseButton').attr('data-original-title', 'Expand').parent().find('.tooltip-inner').html('Expand');
+    if (tab === '') {
+      $('#collapseButton').tooltip('show');
     }
     $('#collapseButtonIcon').removeClass('fa fa-angle-double-right');
     $('#collapseButtonIcon').addClass('fa fa-angle-double-left');
 
-    // make sure remote video doesn't expand past footer 
+    // make sure remote video doesn't expand past footer
     $('#remoteViewCol').css('height', '75vh');
-    $('#remoteView').css('height','100%');
+    $('#remoteView').css('height', '100%');
     $('#remoteView').css('width', '100% !important');
   }
 }
