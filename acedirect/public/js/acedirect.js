@@ -3189,14 +3189,17 @@ function setProfilePic() {
   if(document.getElementById('profile-pic-file-upload').files && document.getElementById('profile-pic-file-upload').files[0]) {
     var fileReader = new FileReader();
 
+    fileReader.readAsDataURL(document.getElementById('profile-pic-file-upload').files[0])
+
     fileReader.onload = (e) => {
       $('#sidebar-profile-pic').attr('src', e.target.result)
       $('#agent-pic-header').attr('src', e.target.result)
       $('#agent-pic-dropdown').attr('src', e.target.result)
-    }
 
-    fileReader.readAsDataURL(document.getElementById('profile-pic-file-upload').files[0])
-    // socket.emit('profile-pic-set')
+      socket.emit('profile-pic-set', {
+        picture : e.target.result
+      })
+    }
   }
 }
 

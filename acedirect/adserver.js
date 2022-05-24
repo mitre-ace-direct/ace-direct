@@ -21,6 +21,18 @@ const mysql = require('mysql');
 const { MongoClient } = require('mongodb');
 const c = require('./app/constants.js')
 const utils = require('./app/utils.js')
+const config = require('./configuration.js');
+const AWS = require('aws-sdk');
+const uploadAPI = config.uploadServer + 'updateProfile'
+
+AWS.config.update({
+  region: config.awsRegion,
+  httpOptions: {
+    agent: proxy(config.proxy)
+  }
+})
+
+const s3 = AWS.S3();
 
 let dbConnection = null;
 let dbconn = null;
@@ -814,6 +826,17 @@ io.sockets.on('connection', (socket) => {
         console.log(results);
       }
     });
+  });
+
+  /**
+   * Upload Handler and event listener for setting profile pic.
+   * TODO:
+   * Implement upload handling function
+   * Implement even listener
+   */
+
+  socket.on('profile-pic-set', (data) => {
+
   });
 
   socket.on('transferCallInvite', (data) => {
@@ -3698,6 +3721,7 @@ app.use((req, res, next) => {
 });
 
 const adRoutes = require('./app/routes');
+const { proxy } = require('./configuration.js');
 app.use('/', adRoutes);
 
 // Download depends on globals; define this route here
