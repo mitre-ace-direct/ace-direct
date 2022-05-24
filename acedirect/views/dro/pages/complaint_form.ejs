@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="/css/ca-portal.css">
     <style>
 
+      body {
+        min-width: 992px;
+        overflow-x: auto !important;
+      }
       #selfView {
         width : 200px;
         padding-top: 10px;
@@ -27,8 +31,9 @@
 
       #pageContainer {
         padding-left: 0px !important;
-        padding-right: 0px !important;
-        width: 98vw !important;
+        padding-right: 15px !important;
+        width: 96vw !important;
+        min-width: 992px !important;
       }
 
       #callVideoColumn {
@@ -355,6 +360,11 @@
         font-size: 14px;
       }
 
+      #optionsModal {
+        min-width: 600px;
+        position:absolute;
+      }
+      
       .sidebarTab {
         width: 8vw;
         text-align: center;
@@ -367,7 +377,7 @@
   <body style="overflow-x: hidden">
     <div class="container" id="pageContainer">
       <div class="row">
-        <div id="callVideoColumn" class="col-md-8 text-center">
+        <div id="callVideoColumn" class="col-xs-6 col-lg-8 text-center" style="border : 5px solid black">
           <!--Only appear outside of a call-->
           <div id="noCallPoster">
             <img  id="DVC" src="dro/images/DVC2.png" alt="DVC">
@@ -409,8 +419,8 @@
           </div>
           <!--END Appear inside of a call-->
         </div>
-        <div id="callFeaturesColumn" class="col-md-4" style="border-left:1px solid #ddd; height:100%">
-          <div id="tab-pane" class="col-xs-9">
+        <div id="callFeaturesColumn" class="col-xs-6 col-lg-4" style="border-left:1px solid #ddd; height:100%">
+          <div class="col-xs-9">
             <!-- Tab panes -->
             <div class="tab-content">
               <!--Chat pane-->
