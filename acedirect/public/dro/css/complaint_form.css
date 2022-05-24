@@ -1,0 +1,373 @@
+body {
+  min-width: 992px;
+  overflow-x: auto !important;
+}
+
+#selfView {
+  width: 200px;
+  padding-top: 10px;
+}
+
+#remoteView {
+  width: -webkit-fill-available;
+}
+
+#noCallPoster {
+  height: 100%;
+}
+
+#DVC {
+  top: 40%;
+  position: relative;
+  width: 400px;
+}
+
+#pageContainer {
+  padding-left: 0px !important;
+  padding-right: 15px !important;
+  width: 96vw !important;
+  min-width: 992px !important;
+}
+
+#callVideoColumn {
+  height: 86vh;
+}
+
+#callFeaturesColumn {
+  height: 86vh;
+}
+
+#callButtonsRow {
+  background-color: #dddddd;
+}
+
+#speakingToRow {
+  background-color: #c8c8c8;
+  height: 28px;
+}
+
+#end-call {
+  float: right;
+  margin-top: 1%;
+  margin-right: 1%;
+}
+
+#end-call-icon {
+  margin-right: 5px;
+  padding-bottom: 2px;
+}
+
+#screenshare-icon {
+  margin-right: 5px;
+}
+
+.circleButton {
+  border-radius: 50% !important;
+  border: none;
+  height: 45px;
+  width: 45px !important;
+  margin: 5px;
+  margin-left: 15px;
+  background-color: #073863 !important;
+  color: white;
+  vertical-align: initial !important;
+}
+
+#startScreenshare {
+  background-color: #073863 !important;
+  color: white;
+  margin-left: 2%;
+  vertical-align: unset;
+}
+
+.big-icon {
+  font-size: 60px !important;
+  color: #8f8f8f;
+  margin-top: 20px;
+}
+
+.panel-header {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.button-area {
+  margin-top: 20px;
+}
+
+.button-area button {
+  width: 100%;
+  background-color: #073863 !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  font-weight: bold !important;
+}
+
+.or-column {
+  font-weight: bold;
+  font-size: 15px;
+  margin-top: 90px;
+  width: 9.666667% !important;
+}
+
+.modal-footer {
+  text-align: center !important;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+}
+
+.button-panel {
+  background-color: #f9f9f9 !important;
+  padding: 10px;
+  margin-bottom: 0px !important;
+}
+
+.panel-header {
+  color: black !important;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.panel-col {
+  width: 45% !important;
+}
+
+.tabs-right {
+  border-bottom: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+  padding-top: 2px;
+}
+
+.tabs-right>li {
+  float: none;
+  margin-bottom: 2px;
+  margin-left: -1px;
+}
+
+.tabs-right>li.active>a,
+.tabs-right>li.active>a:hover,
+.tabs-right>li.active>a:focus {
+  border-bottom: 1px solid #ddd !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
+
+.tabs-right>li>a {
+  border-radius: 0 4px 4px 0;
+  margin-right: 0;
+}
+
+#collapseButton {
+  border-radius: 50%;
+  color: #073863;
+  border: 2px solid lightgrey
+}
+
+.fileshareButton {
+  border-radius: 50%;
+  color: black;
+  font-size: 15px;
+  background-color: lightgrey;
+}
+
+.fileShareIcon {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.fontSizeButtons {
+  border: 1px solid grey !important;
+  height: 100%;
+}
+
+.chooseFileGroup input.fileInput::-webkit-file-upload-button {
+  border: none;
+  color: black;
+  font-weight: 500;
+  background: lightgrey;
+  padding: 9px 18px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.chooseFileGroup input.fileInput:active {
+  outline: none;
+  box-shadow: none;
+  background-color: white;
+}
+
+.collapseTab:hover {
+  background-color: transparent !important;
+}
+
+/* Center modals vertically */
+.modal-dialog {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+  min-height: calc(100vh - 60px);
+
+  @media (max-width: 767px) {
+    min-height: calc(100vh - 20px);
+  }
+}
+
+.modal-outline-btn {
+  color: #073863 !important;
+  border-color: #073863 !important;
+  border-width: 2px !important;
+  font-weight: bold !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  width: 190px !important;
+}
+
+.rotate-phone {
+  -webkit-transform: rotate(137deg);
+  -ms-transform: rotate(137deg);
+  transform: rotate(137deg);
+  font-size: 18px !important;
+  top: 2px !important;
+  position: relative;
+}
+
+.separator {
+  content: '';
+  display: inline-block;
+  background: #073863;
+  margin: 1px 12px;
+  height: 18px;
+  width: 1px;
+  vertical-align: top;
+}
+
+.second-or {
+  margin-top: 9px;
+}
+
+.my-body {
+  padding-bottom: 20px !important;
+}
+
+.button-row {
+  width: 90%;
+  margin-left: 5% !important;
+}
+
+.waiting-header {
+  margin-bottom: 30px;
+}
+
+#placeholderImage {
+  margin-bottom: 8px;
+}
+
+
+#emptyChat {
+  color: #767676;
+  display: inline-block;
+  margin-top: 75%
+}
+
+#newchatmessage {
+  height: 34px;
+  resize: none;
+  /* position: absolute;*/
+  bottom: 0;
+  min-height: 34px !important
+}
+
+.emojiButtons {
+  background-color: transparent;
+  border: none;
+  font-size: large;
+}
+
+#hangupButton {
+  background-color: #c70000;
+}
+
+#callTime {
+  margin-top: 1.5%;
+  margin-left: 2%;
+}
+
+#CommunicationText {
+  vertical-align: sub;
+}
+
+.emptyMessages {
+  text-align: center;
+}
+
+.populatedMessages {
+  overflow-y: auto;
+  position: relative;
+  height: fit-content;
+  max-height: 70vh;
+  margin-top: auto;
+  margin-bottom: 5vh;
+  padding-right: 2rem;
+}
+
+.sentChat {
+  border-radius: 25px !important;
+  color: black !important;
+  overflow-wrap: break-word;
+}
+
+.receivedChat {
+  border-radius: 25px !important;
+  color: black !important;
+  background-color: lightgray !important;
+  overflow-wrap: break-word;
+}
+
+.rttChatBubble {
+  border-radius: 25px !important;
+  color: #737373 !important;
+  background-color: #f9f9f9 !important;
+  overflow-wrap: break-word;
+}
+
+.direct-chat-name {
+  font-weight: bold;
+  margin-right: 1rem;
+}
+
+.noFiles {
+  font-style: italic;
+  color: grey;
+}
+
+.filesList {
+  max-height: 20%;
+  overflow: scroll;
+}
+
+.tabFontSize {
+  font-size: 100%;
+}
+
+.buttonFontSize {
+  font-size: 14px;
+}
+
+#optionsModal {
+  min-width: 600px;
+  position: absolute;
+}
+
+.sidebarTab {
+  width: 8vw;
+  text-align: center;
+}
+
+#exitFullscreen {
+  margin: 0 auto;
+  background-color: #073863 !important;
+  color: white;
+}
