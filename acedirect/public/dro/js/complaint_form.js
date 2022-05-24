@@ -404,9 +404,10 @@ function connect_socket() {
             $('#subject').val('');
 
             if (complaintRedirectActive) {
+              $('#redirectURL').text(complaintRedirectUrl);
               $('#callEndedModal').modal('show');
               setTimeout(() => {
-                window.location = complaintRedirectUrl;
+                location = complaintRedirectUrl;
               }, 5000);
             }
           })
@@ -634,7 +635,8 @@ function registerJssip(myExtension, myPassword) {
 
       $('#startScreenshare').hide();
 
-      terminateCall();
+      endCall();
+      //terminateCall();
       // clearScreen();
       // disableChatButtons();
       // enableInitialButtons();
@@ -697,12 +699,14 @@ function enterQueue() {
 function endCall() {
   terminateCall();
 
-  // TODO: this redirects, but we need the new redirect modal here
   if (complaintRedirectActive) {
-    $('#callEndedModal').modal('show'); // TODO - does not exist at the moment
+    $('#redirectURL').text(complaintRedirectUrl);
+    $('#callEndedModal').modal('show');
     setTimeout(() => {
-      window.location = complaintRedirectUrl;
+      location = complaintRedirectUrl;
     }, 5000);
+  } else {
+    // TODO what should we do if the redirect flag is false?
   }
 }
 

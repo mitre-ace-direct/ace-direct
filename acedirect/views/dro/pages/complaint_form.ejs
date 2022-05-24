@@ -687,6 +687,33 @@
 			</div>
 		</div>
 	</div>
+  <div id="callEndedModal" class="modal fade"  data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header text-center" style="border-bottom: 0px">
+          <div>
+            <i class="fa-2x fa fa-check-circle" style="color: green;"></i></div>
+          <h3 class="waiting-header">Your call with an FCC ASL Consumer Portal Support agent has ended.</h3>
+          <br />
+          <hr style="margin:auto; width:20%; background-color: black; border: 1px solid black;"/>
+          <br />
+					
+				</div>
+				<div class="modal-body text-center my-body">
+					
+          <div class="row">
+            <div class="col-xs-12 text-center">
+                You will be redirected to <span id="redirectURL"></span> in 5 seconds.
+            </div>
+          </div>
+          <br />
+				</div>
+				<div class="modal-footer">
+          <a href="#" onclick="logout()"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
+				</div>
+			</div>
+		</div>
+	</div>
 
   <script>
   let nginxPath = '<%= nginxPath %>';
