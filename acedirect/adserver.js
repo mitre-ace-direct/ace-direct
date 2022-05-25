@@ -841,14 +841,34 @@ io.sockets.on('connection', (socket) => {
     callback("Emitter signal received!")
 
     var profilePic = data.picture
-    var uploadParams = { Bucket : config.awsS3, Key : data.pictureAsString, Body : '' }
+    var agent = data.agent
+
+    console.log("Bucket: " + config.awsS3Bucket)
+    console.log("Key Type: " + typeof agent)
+    var getParams = { Bucket : config.awsS3Bucket, Key : agent }
+    var uploadParams = { ...getParams, Body : profilePic }
 
     console.log("Upload parameters: " + JSON.stringify(uploadParams))
 
-    uploadParams.Body = profilePic;
-    s3.upload(uploadParams, (err) => {
+    s3.getObject(getParams, (err, data) => {
       if(err) {
-        console.log("Error! Could not upload to S3 bucket: " + err)
+        s3.upload(uploadParams, (err) => {
+          if(err) {
+            console.log("Error! Could not upload to S3 bucket: " + err)
+          }
+        })
+      } else {
+        s3.deleteObject(getParams, (err, data) => {
+          if(err) console.log(err)
+          else {
+            console.log(data)
+            s3.upload(uploadParams, (err) => {
+              if(err) {
+                console.log("Error! Could not upload to S3 bucket: " + err)
+              }
+            })
+          }
+        })
       }
     })
   });
@@ -3733,6 +3753,9 @@ app.use((req, res, next) => {
   };
   next();
 });
+
+const adRoutes = require('./app/routes');
+app.use('/', adRoutes);
 
 // Download depends on globals; define this route here
 app.get('/downloadFile', /* agent.shield(cookieShield) , */(req, res) => {
