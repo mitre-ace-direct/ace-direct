@@ -717,10 +717,13 @@ function enterQueue() {
 
 function endCall() {
   terminateCall();
+  clearInterval(callTimer);
 
   if (complaintRedirectActive) {
     $('#redirectURL').text(complaintRedirectUrl);
     $('#callEndedModal').modal('show');
+    document.getElementById('noCallPoster').style.display = 'block';
+    document.getElementById('inCallSection').style.display = 'none';
     setTimeout(() => {
       location = complaintRedirectUrl;
     }, 5000);
