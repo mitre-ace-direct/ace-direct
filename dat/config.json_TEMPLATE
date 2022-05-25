@@ -127,6 +127,9 @@
       }
     ]
   },
+  "web_videomail": {
+    "introVideo": ""
+  },
   "s3": {
     "region": "aws-region",
     "bucketname": "bucketname"
