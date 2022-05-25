@@ -360,6 +360,7 @@ const appRouter = (connection, asterisk) => {
      * @apiParam {String} orgainization ORganization for the CSR Agent user
      * @apiParam {Boolean} is_approved A boolean value.
      * @apiParam {Boolean} is_active A boolean value.
+     * @apiParam {String} profile_picture Link to Profile Picture stored in AWS.
      *
      * @apiSuccessExample Success-Response
      *     HTTP/1.1 200 OK
@@ -392,6 +393,7 @@ const appRouter = (connection, asterisk) => {
     const { extension } = req.body;
     const queueId = req.body.queue_id;
     const queue2Id = req.body.queue2_id;
+    const profile_picture = req.body.profile_picture;
 
     if (!agentId || !firstName || !lastName || !role || !phone || !email || !organization
         || Number.isNaN(isApproved) || Number.isNaN(isActive) || Number.isNaN(extension)) {
@@ -432,11 +434,12 @@ const appRouter = (connection, asterisk) => {
       + ', extension_id = ?'
       + ', queue_id = ?'
       + ', queue2_id = ?'
+      + ', profile_picture = ?'
       + ' WHERE agent_id = ?';
 
       // Query for all records sorted by the id
       connection.query(query, [firstName, lastName, role, phone, email, organization,
-        isApproved, isActive, extensionIdParam, queueId, queue2Id, agentId], (err, results) => {
+        isApproved, isActive, extensionIdParam, queueId, queue2Id, profile_picture, agentId], (err, results) => {
         if (err) {
           console.log(err);
           return res.status(500).send({
