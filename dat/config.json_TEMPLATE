@@ -128,7 +128,7 @@
     ]
   },
   "web_videomail": {
-    "introVideo": ""
+    "introVideo": "videomailGreeting.mp4"
   },
   "s3": {
     "region": "aws-region",

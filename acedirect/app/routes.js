@@ -590,7 +590,6 @@ router.get('/logout', (req, res) => {
 
 
 router.get('/videomail', consumerRestrict, (req, res) => {  
-
     let introVideo = 'videomailGreeting.mp4';
     if (config.web_videomail && config.web_videomail.introVideo) {
       introVideo = utils.getConfigVal(config.web_videomail.introVideo);
@@ -598,8 +597,6 @@ router.get('/videomail', consumerRestrict, (req, res) => {
         introVideo = 'videomailGreeting.mp4';
       }
     }
-
-    introVideo = `/media/${introVideo}`;
     res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs), introVideo });
 });
 
