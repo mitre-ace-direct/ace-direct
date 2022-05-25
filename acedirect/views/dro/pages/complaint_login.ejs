@@ -19,38 +19,44 @@
     <%- include("../partials/agent_page_header") %>
   </header>
 
-  <div id="logoContainer">
-    <img src="dro/images/DVC2.png" style="margin-right: 3%;" width="20%" alt="Direct Video Calling Logo">
-    <img src="dro/images/fcc-logo.jpg" width="7%" alt="FCC Logo">
-  </div>
-  <img id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100vw" alt="">
+  <section aria-label="logos">
+    <div id="logoContainer">
+      <img src="dro/images/DVC2.png" style="margin-right: 3%;" width="20%" alt="Direct Video Calling Logo">
+      <img src="dro/images/fcc-logo.jpg" width="7%" alt="FCC Logo">
+    </div>
+    <img id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100vw" aria-hidden="true" alt="">
+  </section>
 
-  <div class="row">
-    <div id="VRSlogincontainer"  class="col-lg-4 col-md-6 col-xs-8">
-      <div id="VRScontent">
-        <label id="headerBox" for="vrs_number"><b>Videophone Number</b></label>
-        <p font-size="14px">Please enter your videophone number below to proceed to the FCC consumer support portal.</p>
-        <br />
-        <div id="input-group" class="input-group">
-          <input type="text" class="form-control input-lg" id="vrs_number" data-inputmask="'mask': '(999) 999-9999'"
-            data-mask required aria-required="true" tabindex="0">
-          <span class="input-group-btn">
-            <button id="continueButton" class="btn input-lg" style="background-color: #073863; color: white !important;" tabindex="0">
-              <b>Continue <span class="fa fa-angle-double-right" aria-hidden="true" /></b>
-            </button>
-          </span>
+  <main>
+    <div class="row">
+      <div id="VRSlogincontainer" class="col-lg-4 col-md-6 col-xs-8">
+        <div id="VRScontent">
+          <label id="headerBox" for="vrs_number"><b>Videophone Number</b></label>
+          <p font-size="14px">Please enter your videophone number below to proceed to the FCC consumer support portal.
+          </p>
+          <br />
+          <div id="input-group" class="input-group">
+            <input type="text" class="form-control input-lg" id="vrs_number" data-inputmask="'mask': '(999) 999-9999'"
+              data-mask required tabindex="0">
+            <span class="input-group-btn">
+              <button id="continueButton" class="btn input-lg"
+                style="background-color: #073863; color: white !important;" tabindex="0">
+                <b>Continue <span class="fa fa-angle-double-right" aria-hidden="true" /></b>
+              </button>
+            </span>
+          </div>
+          <div id="message" hidden></div>
         </div>
-        <div id="message" hidden></div>
-      </div>
 
-      <div id="infoBox">
-        <p font-size="14px">You are entering an Official United States Government System, which may be used only for
-          authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby
-          notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized attempts to
-          upload or change information on this web site is prohibited.</p>
+        <div id="infoBox">
+          <p font-size="14px">You are entering an Official United States Government System, which may be used only for
+            authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby
+            notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized attempts
+            to upload or change information on this web site is prohibited.</p>
+        </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <!--Incorrect Browser Modal-->
   <div class="modal fade" id="notChromeModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
@@ -81,7 +87,8 @@
         <div class="modal-footer" style="background-color: #F9F9F9; border-radius: 6px;">
           <div class="row">
             <div class="col-xs-12 text-center">
-              <a href="https://www.fcc.gov/accessibility"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
+              <a href="https://www.fcc.gov/accessibility" style="color:#073863"><i class="fa fa-sign-out"></i> Exit
+                Support Portal</a>
             </div>
           </div>
         </div>

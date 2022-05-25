@@ -22,7 +22,10 @@
 
   <div class="Navbar row display-flex-center">
     <div class="appTitle col-xs-8 col-md-6">FCC ASL Consumer Support</div>
-    <div class="col-xs-4 col-md-6 text-right" onclick="logout()" style="cursor: pointer;"><span class="fa fa-sign-out" aria-hidden="true"></span> Exit</div>
+    <div class="col-xs-4 col-md-6 text-right" style="cursor: pointer;" onclick="logout()" onkeypress="logout()"
+      role="button" aria-label="Exit" tabindex="0">
+      <span class="fa fa-sign-out" aria-hidden="true" alt=""></span> Exit
+    </div>
   </div>
 
   <script>
@@ -38,4 +41,3 @@
     window.location.href = './logout';
 }
   </script>
-
