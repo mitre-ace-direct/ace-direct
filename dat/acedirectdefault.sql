@@ -69,6 +69,7 @@ CREATE TABLE `agent_data` (
   `extension_id` int(10) DEFAULT NULL,
   `queue_id` int(10) DEFAULT NULL,
   `queue2_id` int(10) DEFAULT NULL,
+  `profile_picture` varchar(255) DEFAULT NULL
   `layout` text,
   PRIMARY KEY (`agent_id`),
   UNIQUE KEY `username` (`username`),
