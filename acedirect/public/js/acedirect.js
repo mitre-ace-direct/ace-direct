@@ -3200,7 +3200,7 @@ function setProfilePic() {
 
       socket.emit('profile-pic-set', {
         picture : e.target.result,
-        pictureAsString : e.target.result.toString
+        agent : extensionMe.toString()
       }, (res) => {
         console.log(res)
       })
