@@ -408,9 +408,12 @@ function connect_socket() {
           .on('chat-leave', (_error) => {
             // clear chat
             $('#chatcounter').text('500');
-            $('#chat-messages').html('<div id="rtt-typing" ></div>');
             $('#caption-messages').html('');
             $('#newchatmessage').val('');
+            $('#chat-messages').removeClass('populatedMessages');
+            $('#chat-messages').addClass('emptyMessages');
+            $('#chat-messages').html('<div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble" id="rtt-typing" style="min-height: 20px; display: none;"></div>\
+            <span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No messages yet to display</span>');
 
             // reset buttons and ticket form
             $('#ticketNumber').text('');
@@ -680,6 +683,7 @@ function registerJssip(myExtension, myPassword) {
         $('#waitingModal').modal('hide');
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
+        startCallTimer();
       }
     }
   };
@@ -721,14 +725,14 @@ function endCall() {
       location = complaintRedirectUrl;
     }, 5000);
   } else {
-    // TODO what should we do if the redirect flag is false?
+    // reset the page
+    window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
   }
 }
 
 function exitQueue() {
   endCall();
   $('#waitingModal').modal('hide');
-  window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
 }
 
 // makes a call
@@ -736,28 +740,30 @@ function exitQueue() {
 * Use acekurento object to make the call. Not sure about the extension
 */
 function startCall(otherSipUri) {
-  let minutes;
-  // Set the timer
-  callTimer = setInterval(() => {
-    callTimer += 1;
-    minutes = Math.floor((callTimer / 60)) > 0 ? Math.floor(callTimer / 60) : 0;
-    let seconds = (callTimer - minutes * 60);
-    if (seconds < 10) {
-      seconds = `0${seconds}`;
-    }
-    $('#callTime').text(`${minutes}:${seconds} min`);
-  }, 1000);
-
   console.log(`startCall: ${otherSipUri}`);
   selfStream.removeAttribute('hidden');
-  // if (!captionsMuted()) {
-  //  showCaptions();
-  // }
 
   $('#screenshareButton').removeAttr('disabled');
   $('#fileInput').removeAttr('disabled');
   // acekurento.call(globalData.queues_complaint_number, false);
   acekurento.call(otherSipUri, false);
+}
+
+function startCallTimer() {
+  let minutes = 0;
+  let seconds = 0;
+  let start = new Date;
+
+  callTimer = setInterval(function() {
+    let temp = Math.round(new Date - start) / 1000;
+    minutes = Math.floor(temp / 60) > 0 ? Math.floor(temp / 60) : 0;
+    seconds = Math.floor((temp -(minutes * 60)));
+
+    if (seconds < 10) {
+      seconds = `0${seconds}`;
+    }
+    $('#callTime').text(`${minutes}:${seconds} min`);
+  }, 1000);
 }
 
 function terminateCall() {
