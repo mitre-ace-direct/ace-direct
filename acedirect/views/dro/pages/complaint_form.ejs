@@ -1,28 +1,30 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
-    <title>FCC ASL Consumer Support Call</title>
 
-    <meta name="description" content="FCC ASL Consumer Support Call">
-    <meta name="viewport" content="width=device-width">
+<head>
+  <title>FCC ASL Consumer Support Call</title>
 
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/dro/css/complaint_form.css">
-    <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/css/ca-portal.css">
-  </head>
+  <meta name="description" content="FCC ASL Consumer Support Call">
+  <meta name="viewport" content="width=device-width">
 
-  <body style="overflow-x: hidden">
-    <header>
-      <%- include("../partials/agent_page_header") %>
-    </header>
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/dro/css/complaint_form.css">
+  <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/css/ca-portal.css">
+</head>
 
-    <div class="container" id="pageContainer">
-      <div class="row">
+<body style="overflow-x: hidden">
+  <header>
+    <%- include("../partials/agent_page_header") %>
+  </header>
+
+  <div class="container" id="pageContainer">
+    <div class="row">
+      <main>
         <div id="callVideoColumn" class="col-xs-6 col-lg-8 text-center">
           <!--Only appear outside of a call-->
           <div id="noCallPoster">
-            <img  id="DVC" src="dro/images/DVC2.png" alt="DVC">
+            <img id="DVC" src="dro/images/DVC2.png" alt="DVC">
           </div>
           <!--END Only appear outside of a call-->
           <!--Appear inside of a call-->
@@ -64,6 +66,7 @@
           </div>
           <!--END Appear inside of a call-->
         </div>
+
         <div id="callFeaturesColumn" class="col-xs-6 col-lg-4" style="border-left:1px solid #ddd; height:100%">
           <div id="tab-pane" class="col-xs-9">
             <!-- Tab panes -->
@@ -74,8 +77,10 @@
                   <h2 style="float:left">Chat</h2>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                     <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)">A</button>
-                    <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize" style="background-color: white; pointer-events: none;">100%</button>
-                    <button type="button" class="btn fontSizeButtons" style="font-size:large;" onclick="setFontSize(10)">A</button>
+                    <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize"
+                      style="background-color: white; pointer-events: none;">100%</button>
+                    <button type="button" class="btn fontSizeButtons" style="font-size:large;"
+                      onclick="setFontSize(10)">A</button>
                   </div>
                 </div>
                 <hr />
@@ -83,8 +88,10 @@
                   <!-- Conversations are loaded here -->
                   <div id="chat-body" style="height:75vh; flex-direction: column; display: flex;">
                     <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
-                    <div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble" id="rtt-typing" style="min-height: 20px; display: none;"></div>
-                    <span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No messages yet to display</span>
+                      <div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble" id="rtt-typing"
+                        style="min-height: 20px; display: none;"></div>
+                      <span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No
+                        messages yet to display</span>
                     </div>
                   </div>
 
@@ -95,48 +102,51 @@
                       <div class="input-group">
                         <span class="input-group-btn" style="vertical-align: bottom;">
                           <span class="dropup pull-left">
-                          <button id="chat-emoji" class="btn btn-flat buttonFontSize" type="button" data-toggle="dropdown"
-                            animation="true" style="border:2px solid lightgrey; margin-right: 10px">&#128512;</button>
-                          <div class="dropdown-menu dropdown-multicol" id="emoji-selector" aria-labelledby="dropdownMenuButton"
-                            style="height:fit-content; overflow-y: auto; text-align: center;">
-                            <div class="dropdown-row">
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128512;">&#128512;</button>
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128513;">&#128513;</button>
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128516;">&#128516;</button>
-                            </div>
-                            <div class="dropdown-row">
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128547;">&#128547;</button>
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128577;">&#128577;</button>
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#129320;">&#129320;</button>
-                            </div>
-                            <div class="dropdown-row">
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128077;">&#128077;</button>
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128078;">&#128078;</button>
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128075;">&#128075;</button>
-                            </div>
-                            <div class="dropdown-row">
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128263;">&#128263;</button>
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128264;">&#128264;</button>
-                              <button class="dropdown-item emojiButtons" type="button"
-                                onclick="addEmoji(this.value)" value="&#128266;">&#128266;</button>
-                            </div>
+                            <button id="chat-emoji" class="btn btn-flat buttonFontSize" type="button"
+                              data-toggle="dropdown" animation="true"
+                              style="border:2px solid lightgrey; margin-right: 10px">&#128512;</button>
+                            <div class="dropdown-menu dropdown-multicol" id="emoji-selector"
+                              aria-labelledby="dropdownMenuButton"
+                              style="height:fit-content; overflow-y: auto; text-align: center;">
+                              <div class="dropdown-row">
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128512;">&#128512;</button>
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128513;">&#128513;</button>
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128516;">&#128516;</button>
+                              </div>
+                              <div class="dropdown-row">
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128547;">&#128547;</button>
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128577;">&#128577;</button>
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#129320;">&#129320;</button>
+                              </div>
+                              <div class="dropdown-row">
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128077;">&#128077;</button>
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128078;">&#128078;</button>
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128075;">&#128075;</button>
+                              </div>
+                              <div class="dropdown-row">
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128263;">&#128263;</button>
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128264;">&#128264;</button>
+                                <button class="dropdown-item emojiButtons" type="button" onclick="addEmoji(this.value)"
+                                  value="&#128266;">&#128266;</button>
+                              </div>
 
-                          </div>
+                            </div>
+                          </span>
                         </span>
-                        </span>
-                        <textarea id="newchatmessage" placeholder="Type a message" class="form-control col-xs-1 buttonFontSize" maxlength="500"
-                          autocomplete="off" required></textarea>
+                        <textarea id="newchatmessage" placeholder="Type a message"
+                          class="form-control col-xs-1 buttonFontSize" maxlength="500" autocomplete="off"
+                          required></textarea>
 
                         <span class="input-group-btn" style="vertical-align: bottom;">
                           <button id="chat-send" class="btn btn-primary btn-flat buttonFontSize"
@@ -156,8 +166,10 @@
                   <h2 style="float:left">File Sharing</h2>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                     <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)">A</button>
-                    <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize" style="background-color: white; pointer-events: none;">100%</button>
-                    <button type="button" class="btn fontSizeButtons" style="font-size:large;" onclick="setFontSize(10)">A</button>
+                    <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize"
+                      style="background-color: white; pointer-events: none;">100%</button>
+                    <button type="button" class="btn fontSizeButtons" style="font-size:large;"
+                      onclick="setFontSize(10)">A</button>
                   </div>
                 </div>
                 <hr />
@@ -165,39 +177,47 @@
                   <!-- Conversations are loaded here -->
                   <!--Hard coding messages for now-->
                   <div id="file-share-body" style="height:75vh; overflow-y: auto; padding-right: 2rem;">
-                    <p style="line-height: inherit;">Select a file to send by clicking 'Choose File'; send the file by clicking 'Send'.</p>
-                    <p style="line-height: inherit;">View sent files in the 'Sent' section, and view or download received files in the 'Received' section.</p>
+                    <p style="line-height: inherit;">Select a file to send by clicking 'Choose File'; send the file by
+                      clicking 'Send'.</p>
+                    <p style="line-height: inherit;">View sent files in the 'Sent' section, and view or download
+                      received files in the 'Received' section.</p>
                     <br>
                     <br>
                     <!--file selection section-->
                     <div style="overflow:hidden">
-                    <div class="btn-group chooseFileGroup" style="width: 70%;">
-                      <input type="file" id="fileInput" name="fileInput"
-                        class="form-control-file btn btn-default fileInput buttonFontSize"
-                        style="background-color:transparent; border: transparent; padding-left: 0px; width: 80%; padding-right: 0px;">
-                        <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;" tabindex="0">x</span>
-                    </div>
-                    <a class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer" onclick="shareFileConsumer()"
-                      style="background-color:#073863 !important; margin-top: 5px; margin-bottom: 5px;"
-                      data-toggle="tooltip" title="You must choose a file" tabindex="0" disabled>Send</a>
-
-                  </div>
-                    <div class="row" style="max-width: 100%; display: contents;">
-                      <div class="alert alert-success"  alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
-                          <span  class="close closeFileResponse" onclick="$('#fileSent').hide();" style="text-decoration:none" tabindex="0">×</span>
-                          <strong>Success!</strong>  File Sent
+                      <div class="btn-group chooseFileGroup" style="width: 70%;">
+                        <input type="file" id="fileInput" name="fileInput"
+                          class="form-control-file btn btn-default fileInput buttonFontSize"
+                          style="background-color:transparent; border: transparent; padding-left: 0px; width: 80%; padding-right: 0px;">
+                        <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;"
+                          tabindex="0">x</span>
                       </div>
-                      <div class="alert alert-danger"  alert-dismissable id="fileSentError" style="margin-top: 10px;" hidden>
-                        <span class="close  closeFileResponse" onclick="$('#fileSentError').hide();" style="text-decoration:none" tabindex="0">×</span>
-                        <strong>Error!</strong>  Error sending file.
+                      <a class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer"
+                        onclick="shareFileConsumer()"
+                        style="background-color:#073863 !important; margin-top: 5px; margin-bottom: 5px;"
+                        data-toggle="tooltip" title="You must choose a file" role="button" tabindex="0"
+                        disabled>Send</a>
+
                     </div>
-                  </div>
+                    <div class="row" style="max-width: 100%; display: contents;">
+                      <div class="alert alert-success" alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
+                        <span class="close closeFileResponse" onclick="$('#fileSent').hide();"
+                          style="text-decoration:none" tabindex="0">×</span>
+                        <strong>Success!</strong> File Sent
+                      </div>
+                      <div class="alert alert-danger" alert-dismissable id="fileSentError" style="margin-top: 10px;"
+                        hidden>
+                        <span class="close  closeFileResponse" onclick="$('#fileSentError').hide();"
+                          style="text-decoration:none" tabindex="0">×</span>
+                        <strong>Error!</strong> Error sending file.
+                      </div>
+                    </div>
                     <!--end file selection section-->
                     <br>
                     <br>
                     <!--send files section-->
                     <h3>Sent</h3>
-                    <hr style="border:1px solid grey; background-color: grey;"/>
+                    <hr style="border:1px solid grey; background-color: grey;" />
 
                     <div id="sentFilesList">
                       <span id="noSentFiles" class="noFiles">None</span>
@@ -207,7 +227,7 @@
                     <br>
                     <!--received files section-->
                     <h3>Received</h3>
-                    <hr style="border:1px solid grey; background-color: grey;"/>
+                    <hr style="border:1px solid grey; background-color: grey;" />
                     <div id="receivedFilesList">
                       <span id="noReceivedFiles" class="noFiles">None</span>
                     </div>
@@ -222,155 +242,162 @@
             <!-- Nav tabs -->
             <ul class="nav nav-tabs tabs-right" style="height: 90vh;">
               <li id="collapseTab" class="collapseTab">
-                <a class="collapseTab sidebarTab" style="padding-bottom: 20px; padding-top:20px; border:solid 1px transparent;">
-                  <button id="collapseButton" data-toggle="tooltip" title="Collapse" onclick="collapseSidebar('')">
-                    <i id="collapseButtonIcon" class="fa fa-angle-double-right fa-lg" style="vertical-align: -10% !important;">
+                <a class="collapseTab sidebarTab"
+                  style="padding-bottom: 20px; padding-top:20px; border:solid 1px transparent;" role="button"
+                  tabindex="0">
+                  <button id="collapseButton" data-toggle="tooltip" title="Collapse" aria-label="Collapse"
+                    onclick="collapseSidebar('')">
+                    <i id="collapseButtonIcon" class="fa fa-angle-double-right fa-lg"
+                      style="vertical-align: -10% !important;">
                     </i>
                   </button>
                 </a>
               </li>
               <li id="chatTab" class="active">
-                <a href="#chatBody" data-toggle="tab" class="sidebarTab" onclick="toggleTab('chatTab')">
-                  <i class="fa fa-comments fa-2x"
-                    style="color: #073863; padding-top:10px; padding-bottom: 10px;">
+                <a href="#chatBody" data-toggle="tab" class="sidebarTab" onclick="toggleTab('chatTab')" tabindex="0">
+                  <i class="fa fa-comments fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
                   <br>
                   <p style="color: #073863;">Chat</p>
                 </a>
               </li>
               <li id="fileShareTab">
-                <a href="#fileBody" data-toggle="tab" class="sidebarTab" onclick="toggleTab('fileShareTab')">
+                <a href="#fileBody" data-toggle="tab" class="sidebarTab" onclick="toggleTab('fileShareTab')"
+                  role="button" aria-roledescription="file share button" tabindex="0">
                   <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
                   <br>
-                    <p style="color: #073863;">File Share</p>
+                  <p style="color: #073863;">File Share</p>
                 </a>
               </li>
             </ul>
           </div>
         </div>
-        </div>
-      </div>
+      </main>
     </div>
+  </div>
+  <%- include("../partials/acedirect_footer") %>
+</body>
 
-    <%- include("../partials/acedirect_footer") %>
-  </body>
+<div id="optionsModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog">
+  <div class="modal-dialog modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <img id="placeholderImage" src="/dro/images/placeholder.png" width="100%" alt="Video placeholder">
+      </div>
+      <div class="modal-body text-center">
 
-  <div id="optionsModal" class="modal fade"  data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <img  id="placeholderImage" src="/dro/images/placeholder.png" width="100%" alt="Video placeholder">
-        </div>
-        <div class="modal-body text-center">
+        <div class="row">
+          <div class="col-xs-5 panel-col">
+            <div class="panel panel-default button-panel">
+              <div class="panel-body">
+                <span class="panel-header">Videocall with an agent</span>
 
-          <div class="row">
-            <div class="col-xs-5 panel-col">
-                <div class="panel panel-default button-panel">
-                    <div class="panel-body">
-                      <span class="panel-header">Videocall with an agent</span>
-
-                      <i class="fa fa-user big-icon"></i>
-                      <div class="button-area text-center">
-                        <button type="button" class="btn btn-primary btn-style" data-dismiss="modal" onclick="enterQueue()">Call</button>
-                      </div>
-                    </div>
-
+                <i class="fa fa-user big-icon"></i>
+                <div class="button-area text-center">
+                  <button type="button" class="btn btn-primary btn-style" data-dismiss="modal"
+                    onclick="enterQueue()">Call</button>
                 </div>
-            </div>
-            <div class="col-xs-2 or-column">
-              OR
-            </div>
-            <div class="col-xs-5 panel-col">
-              <div class="panel panel-default button-panel">
-                <div class="panel-body">
-                  <span class="panel-header">Leave a message</span>
+              </div>
 
-                  <i class="fa fa-envelope big-icon"></i>
-                  <div class="button-area text-center">
-                    <a href="./videomail">
-                      <button type="button" class="btn btn-primary btn-style">Leave Videomail</button>
-                    </a>
-                  </div>
-                </div>
-
-            </div>
             </div>
           </div>
+          <div class="col-xs-2 or-column">
+            OR
+          </div>
+          <div class="col-xs-5 panel-col">
+            <div class="panel panel-default button-panel">
+              <div class="panel-body">
+                <span class="panel-header">Leave a message</span>
 
+                <i class="fa fa-envelope big-icon"></i>
+                <div class="button-area text-center">
+                  <a href="./videomail">
+                    <button type="button" class="btn btn-primary btn-style">Leave Videomail</button>
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
-        <div class="modal-footer">
-          <a href="#" onclick="logout()"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
-        </div>
+
+      </div>
+      <div class="modal-footer">
+        <a href="#" onclick="logout()" style="color:#073863"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
       </div>
     </div>
   </div>
-  <div id="waitingModal" class="modal fade"  data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header text-center">
-          <h3 class="waiting-header">Waiting for the next available agent...</h3>
-          <hr />
-          <img  id="placeholderImage" src="/dro/images/placeholder.png" width="100%" alt="Video placeholder">
-        </div>
-        <div class="modal-body text-center my-body">
+</div>
+<div id="waitingModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog">
+  <div class="modal-dialog modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h3 class="waiting-header">Waiting for the next available agent...</h3>
+        <hr />
+        <img id="placeholderImage" src="/dro/images/placeholder.png" width="100%" alt="Video placeholder">
+      </div>
+      <div class="modal-body text-center my-body">
 
-          <div class="row">
-            <div class="col-xs-12 text-center">
-                If you do not wish to wait for an agent, you may:
-            </div>
+        <div class="row">
+          <div class="col-xs-12 text-center">
+            If you do not wish to wait for an agent, you may:
           </div>
-          <br />
-          <div class="row button-row">
-            <div class="col-xs-5">
-              <a href="./videomail">
-              <button type="button" class="btn btn-secondary modal-outline-btn"><i class="fa fa-envelope"></i><span class="separator"></span>Leave Videomail</button>
+        </div>
+        <br />
+        <div class="row button-row">
+          <div class="col-xs-5">
+            <a href="./videomail">
+              <button type="button" class="btn btn-secondary modal-outline-btn"><i class="fa fa-envelope"></i><span
+                  class="separator"></span>Leave Videomail</button>
             </a>
-            </div>
-            <div class="col-xs-2 second-or">
-              - OR -
-            </div>
-            <div class="col-xs-5">
-              <button type="button" class="btn btn-secondary modal-outline-btn" onclick="exitQueue()"><i class="fa fa-phone rotate-phone"></i><span class="separator"></span>Hang Up</button>
-            </div>
           </div>
+          <div class="col-xs-2 second-or">
+            - OR -
+          </div>
+          <div class="col-xs-5">
+            <button type="button" class="btn btn-secondary modal-outline-btn" onclick="exitQueue()"><i
+                class="fa fa-phone rotate-phone"></i><span class="separator"></span>Hang Up</button>
+          </div>
+        </div>
 
-        </div>
-        <div class="modal-footer">
-          <a href="#" onclick="logout()"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" onclick="logout()"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
       </div>
     </div>
   </div>
-  <div id="callEndedModal" class="modal fade"  data-keyboard="false" data-backdrop="static">
-    <div class="modal-dialog modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header text-center" style="border-bottom: 0px">
-          <div>
-            <i class="fa-2x fa fa-check-circle" style="color: green;"></i></div>
-          <h3 class="waiting-header">Your call with an FCC ASL Consumer Portal Support agent has ended.</h3>
-          <br />
-          <hr style="margin:auto; width:20%; background-color: black; border: 1px solid black;"/>
-          <br />
-
+</div>
+<div id="callEndedModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog">
+  <div class="modal-dialog modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header text-center" style="border-bottom: 0px">
+        <div>
+          <i class="fa-2x fa fa-check-circle" style="color: green;"></i>
         </div>
-        <div class="modal-body text-center my-body">
+        <h3 class="waiting-header">Your call with an FCC ASL Consumer Portal Support agent has ended.</h3>
+        <br />
+        <hr style="margin:auto; width:20%; background-color: black; border: 1px solid black;" />
+        <br />
 
-          <div class="row">
-            <div class="col-xs-12 text-center">
-                You will be redirected to <span id="redirectURL"></span> in 5 seconds.
-            </div>
+      </div>
+      <div class="modal-body text-center my-body">
+
+        <div class="row">
+          <div class="col-xs-12 text-center">
+            You will be redirected to <span id="redirectURL"></span> in 5 seconds.
           </div>
-          <br />
         </div>
-        <div class="modal-footer">
-          <a href="#" onclick="logout()"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
-        </div>
+        <br />
+      </div>
+      <div class="modal-footer">
+        <a href="#" onclick="logout()"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
       </div>
     </div>
   </div>
+</div>
 
-  <script>
+<script>
   let nginxPath = '<%= nginxPath %>';
   let consumerPath = '<%= consumerPath %>';
   let stunFQDN = '<%= stunFQDN %>';
@@ -384,13 +411,14 @@
   let logWebRTCStats = false;
   let logWebRTCStatsFreq = 60000;
   let logWebRTCMongo = '';
-  </script>
+</script>
 
-  <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="/dro/js/complaint_form.js"></script>
-  <script type="text/javascript" src="/assets/js/jwt-decode.js"></script>
-  <script type="text/javascript" src="/assets/js/moment.min.js" async></script>
-  <script type="text/javascript" src="./socket.io/socket.io.js"></script>
-  <script src="/js/ACEKurento-1.0.0.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/dro/js/complaint_form.js"></script>
+<script type="text/javascript" src="/assets/js/jwt-decode.js"></script>
+<script type="text/javascript" src="/assets/js/moment.min.js" async></script>
+<script type="text/javascript" src="./socket.io/socket.io.js"></script>
+<script src="/js/ACEKurento-1.0.0.js"></script>
+
 </html>
