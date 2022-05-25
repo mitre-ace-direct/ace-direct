@@ -588,6 +588,35 @@ router.get('/logout', (req, res) => {
     });
 });
 
+router.post('/updateAgent', (req, res) => {
+    request({
+        method: 'POST',
+        url: `https://${config.main_private_ip}:${config.app_ports.mserver}/updateProfile`,
+        form : {
+            agent_id : asdf,
+            first_name : asdf,
+            last_name : asdf,
+            role : asdf,
+            phone : asdf,
+            email : adsf,
+            organization : asdf,
+            isApproved : asdf,
+            isActive : asdf,
+            extension : asdf,
+            queueId : asdf,
+            queue2Id : adsf,
+            profile_picture : asdf
+        }
+      }, function (error, response, data) {
+        if (error) {
+          console.log("Error", error);
+          console.log("Could not upload:", new Date());
+        } else {
+          console.log("Successful video upload:", new Date());
+        }
+      });
+})
+
 
 router.get('/videomail', consumerRestrict, (req, res) => {  
     res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs)});
