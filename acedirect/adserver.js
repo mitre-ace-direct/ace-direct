@@ -22,6 +22,7 @@ const { MongoClient } = require('mongodb');
 const c = require('./app/constants.js')
 const utils = require('./app/utils.js')
 const config = require('./configuration.js');
+const datConfig = require('./../dat/config.json')
 const AWS = require('aws-sdk');
 const uploadAPI = config.uploadServer + '/updateProfile'
 const proxy = require('proxy-agent')
@@ -841,12 +842,68 @@ io.sockets.on('connection', (socket) => {
     callback("Emitter signal received!")
 
     var profilePic = data.picture
-    var agent = data.agent
+    var agentExt = data.agentExtension
+    var agentUsnm = data.agentUsername
+    var fileExt = data.fileExt
+
+    /** 
+     * Implementing callbacks for getting an agent using mserver getagentrec/:username
+     * endpoint and mserver updateProfile endpoint. This is so the request code is contained
+     * and isn't repeated multiple times in each S3 upload below. Also 
+     * */ 
+    const getAgent = (usnm) => {
+      return new Promise((resolve, reject) => {
+        request({
+          method: 'GET',
+          url: `https://${datConfig.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`,
+        }, function (error, response, data) {
+          if (error) {
+            console.log("Error! Could not get agent:", error);
+            reject(error)
+          } else {
+            console.log("Success! Agent found!");
+            if(data.data.length > 0) resolve(data.data)
+            else reject("Agent cannot be found!")
+          }
+        });
+      });
+    }
+    const updateAgent = (aId, first, last, role, phone, email, org, isApp, isAct, ext, q1, q2, profPic) => {
+      return new Promise((resolve, reject) => {
+        request({
+          method: 'POST',
+          url: `https://${datConfig.main_private_ip}:${datConfig.app_ports.mserver}/updateProfile`,
+          form : {
+              agent_id : aId,
+              first_name : first,
+              last_name : last,
+              role,
+              phone,
+              email,
+              organization : org,
+              isApproved : isApp,
+              isActive : isAct,
+              extension : ext,
+              queueId : q1,
+              queue2Id : q2,
+              profile_picture : profPic
+          }
+        }, function (error, response, data) {
+          if (error) {
+            console.log("Error", error);
+            reject(error)
+          } else {
+            console.log("**Updating the agent was a success!**");
+          }
+        });
+      });
+    }
 
     console.log("Bucket: " + config.awsS3Bucket)
-    console.log("Key Type: " + typeof agent)
-    var getParams = { Bucket : config.awsS3Bucket, Key : agent }
-    var uploadParams = { ...getParams, Body : profilePic }
+
+    var getParams = { Bucket : config.awsS3Bucket, Key : agentExt+'.'+fileExt }
+    var uploadParams = { ...getParams, Body : profilePic, ContentType : 'image/*' }
+    var linkToProfPic = `${config.awsS3Bucket}.s3.${config.awsRegion}.amazonaws.com/${getParams.Key}`
 
     console.log("Upload parameters: " + JSON.stringify(uploadParams))
 
@@ -855,6 +912,13 @@ io.sockets.on('connection', (socket) => {
         s3.upload(uploadParams, (err) => {
           if(err) {
             console.log("Error! Could not upload to S3 bucket: " + err)
+          } else {
+            getAgent(agentUsnm).then(agentInfoArray => {
+              let agentInfo = agentInfoArray[0];
+              updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
+                agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
+                linkToProfPic);
+            })
           }
         })
       } else {
@@ -871,6 +935,7 @@ io.sockets.on('connection', (socket) => {
         })
       }
     })
+
   });
 
   socket.on('transferCallInvite', (data) => {

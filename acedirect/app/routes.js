@@ -588,33 +588,54 @@ router.get('/logout', (req, res) => {
     });
 });
 
-router.post('/updateAgent', (req, res) => {
-    request({
-        method: 'POST',
-        url: `https://${config.main_private_ip}:${config.app_ports.mserver}/updateProfile`,
-        form : {
-            agent_id : asdf,
-            first_name : asdf,
-            last_name : asdf,
-            role : asdf,
-            phone : asdf,
-            email : adsf,
-            organization : asdf,
-            isApproved : asdf,
-            isActive : asdf,
-            extension : asdf,
-            queueId : asdf,
-            queue2Id : adsf,
-            profile_picture : asdf
+router.get('/profilePic', (req, res) => {
+    let key = req.session.user.extension + '.';
+    let options = {
+        Bucket : config.s3.bucketname,
+        Key : key
+    };
+    const fileExts = ['jpg','jpeg','png']
+
+    const pollingResult = new Promise((resolve, reject) => {
+        let tempKey
+        let tempOptions = options
+        for(ext in fileExts) {
+            tempKey = key + ext
+            tempOptions.Key = tempKey
+
+            s3.headObject(tempOptions, (err, data) => {
+                if(err) {
+                    console.log('no file matches: ', tempKey)
+                } else {
+                    resolve(tempKey)
+                }
+            })
         }
-      }, function (error, response, data) {
-        if (error) {
-          console.log("Error", error);
-          console.log("Could not upload:", new Date());
-        } else {
-          console.log("Successful video upload:", new Date());
+        reject('')
+    })
+
+    pollingResult.then((key) => {
+        let image;
+
+        if(key==='') {
+            try {
+                image = fs.readFileSync('./public/images/anon.png')
+            } catch(err) {
+                console.log("Could not read image!", err)
+            }
         }
-      });
+        else {
+            options.Key = key
+            
+            s3.getObject(options, (err, data) => {
+                image = data
+            }).on('httpHeaders', (statusCode, headers) => {
+                res.set('Content-Type', headers['content-type']);
+                this.response.httpResponse.createUnbufferedStream().pipe(res)
+            })
+        }
+        res.send(image)
+    })
 })
 
 

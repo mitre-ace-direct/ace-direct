@@ -178,7 +178,7 @@ const appRouter = (connection, asterisk) => {
      *             extension: 1234,
      *             extension_secret: "ABC123",
      *             queue_name: "Queue1234",
-     *             queue_name: null
+     *             queue2_name: null
      *            }]
      *    }
      *
