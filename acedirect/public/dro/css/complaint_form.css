@@ -340,7 +340,7 @@ body {
 
 .noFiles {
   font-style: italic;
-  color: grey;
+  color: #767676 !important;
 }
 
 .filesList {
