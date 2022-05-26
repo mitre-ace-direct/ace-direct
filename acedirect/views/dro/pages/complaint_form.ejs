@@ -31,19 +31,19 @@
           <div id="inCallSection" hidden>
             <div id="callButtonsRow" class="row">
               <span id="callTime" class="pull-left"></span>
-              <button id="mute-audio" type="button" class="btn btn-gray circleButton" onclick="muteAudio()">
+              <button id="mute-audio" type="button" class="btn btn-gray circleButton" onclick="muteAudio()" aria-label="Mute Audio">
                 <i id="mute-audio-icon" class="call-btn-icon fa fa-microphone"></i>
               </button>
-              <button id="hide-video" type="button" class="btn btn-gray circleButton" onclick="enableVideoPrivacy()">
+              <button id="hide-video" type="button" class="btn btn-gray circleButton" onclick="enableVideoPrivacy()" aria-label="Enable Video Privacy">
                 <i id="mute-camera-off-icon" class="call-btn-icon fa fa-video-camera"></i>
               </button>
-              <button type="button" class="btn btn-gray circleButton" onclick="enterFullscreen()">
+              <button type="button" class="btn btn-gray circleButton" onclick="enterFullscreen()" aria-label="Enter Fullscreen">
                 <i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
               </button>
-              <button type="button" class="btn btn-gray" id="startScreenshare" onclick="toggleScreenShare()">
+              <button type="button" class="btn btn-gray" id="startScreenshare" onclick="toggleScreenShare()" aria-label="Toggle Screenshare">
                 <i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare
               </button>
-              <button id="end-call" type="button" class="btn btn-danger" onclick="terminateCall()">
+              <button id="end-call" type="button" class="btn btn-danger" onclick="terminateCall()" aria-label="End Call">
                 <i id="end-call-icon" class="call-btn-icon fa fa-phone fa-rotate-135"></i> End Call
               </button>
             </div>
@@ -55,11 +55,11 @@
             <div class="box-body" id="fullscreen-element">
               <div id="callVideosRow" class="row">
                 <div class="col-md-3" id="selfViewCol">
-                  <video id="selfView" autoplay muted="true" class="mirror-mode"></video>
-                  <button id="exitFullscreen" onclick="exitFullscreen()">Exit Fullscreen</button>
+                  <video id="selfView" autoplay muted="true" class="mirror-mode" aria-label="Self Video"></video>
+                  <button id="exitFullscreen" onclick="exitFullscreen()" aria-label="Exit Fullscreen">Exit Fullscreen</button>
                 </div>
                 <div class="col-md-9" id="remoteViewCol">
-                  <video id="remoteView" autoplay></video>
+                  <video id="remoteView" autoplay aria-label="Remote Video"></video>
                 </div>
               </div>
             </div>
@@ -74,7 +74,7 @@
               <!--Chat pane-->
               <div class="tab-pane active tabFontSize" id="chatBody">
                 <div class="box-header" style="overflow: hidden;">
-                  <h2 style="float:left">Chat</h2>
+                  <h1 style="float:left">Chat</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                     <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)">A</button>
                     <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize"
@@ -144,7 +144,7 @@
                             </div>
                           </span>
                         </span>
-                        <textarea id="newchatmessage" placeholder="Type a message"
+                        <textarea id="newchatmessage" placeholder="Type a message" aria-label="Type a message"
                           class="form-control col-xs-1 buttonFontSize" maxlength="500" autocomplete="off"
                           required></textarea>
 
@@ -163,7 +163,7 @@
               <!--File Share Pane-->
               <div class="tab-pane tabFontSize" id="fileBody">
                 <div class="box-header" style="overflow: hidden;">
-                  <h2 style="float:left">File Sharing</h2>
+                  <h1 style="float:left">File Sharing</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                     <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)">A</button>
                     <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize"
@@ -186,15 +186,15 @@
                     <!--file selection section-->
                     <div style="overflow:hidden">
                       <div class="btn-group chooseFileGroup" style="width: 70%;">
-                        <input type="file" id="fileInput" name="fileInput"
+                        <input type="file" id="fileInput" name="fileInput" aria-label="Choose a File"
                           class="form-control-file btn btn-default fileInput buttonFontSize"
                           style="background-color:transparent; border: transparent; padding-left: 0px; width: 80%; padding-right: 0px;">
                         <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;"
                           tabindex="0">x</span>
                       </div>
-                      <a class="btn btn-primary pull-right buttonFontSize" id="shareFileConsumer"
+                      <a class="btn pull-right buttonFontSize" id="shareFileConsumer"
                         onclick="shareFileConsumer()"
-                        style="background-color:#073863 !important; margin-top: 5px; margin-bottom: 5px;"
+                        style="background-color:rgb(15, 42, 66) !important; color: white !important; margin-top: 5px; margin-bottom: 5px;"
                         data-toggle="tooltip" title="You must choose a file" role="button" tabindex="0"
                         disabled>Send</a>
 
@@ -216,7 +216,7 @@
                     <br>
                     <br>
                     <!--send files section-->
-                    <h3>Sent</h3>
+                    <h2>Sent</h2>
                     <hr style="border:1px solid grey; background-color: grey;" />
 
                     <div id="sentFilesList">
@@ -226,7 +226,7 @@
                     <br>
                     <br>
                     <!--received files section-->
-                    <h3>Received</h3>
+                    <h2>Received</h2>
                     <hr style="border:1px solid grey; background-color: grey;" />
                     <div id="receivedFilesList">
                       <span id="noReceivedFiles" class="noFiles">None</span>
@@ -242,7 +242,7 @@
             <!-- Nav tabs -->
             <ul class="nav nav-tabs tabs-right" style="height: 90vh;">
               <li id="collapseTab" class="collapseTab">
-                <a class="collapseTab sidebarTab"
+                <a class="collapseTab sidebarTab" title="Collapse Sidebar"
                   style="padding-bottom: 20px; padding-top:20px; border:solid 1px transparent;" role="button"
                   tabindex="0">
                   <button id="collapseButton" data-toggle="tooltip" title="Collapse" aria-label="Collapse"
