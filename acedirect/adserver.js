@@ -853,16 +853,24 @@ io.sockets.on('connection', (socket) => {
      * */ 
     const getAgent = (usnm) => {
       return new Promise((resolve, reject) => {
+        console.log('Getting agent! Username: ', usnm)
+        console.log('get agent link', `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`)
         request({
           method: 'GET',
-          url: `https://${datConfig.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`,
+          headers : {'Accept': 'application/json'},
+          url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`,
         }, function (error, response, data) {
           if (error) {
             console.log("Error! Could not get agent:", error);
             reject(error)
           } else {
             console.log("Success! Agent found!");
-            if(data.data.length > 0) resolve(data.data)
+            console.log('Data: ', typeof data)
+            console.log("TEXT " + JSON.parse(data));
+            if(data.length > 0) {
+              var jsonData = JSON.parse(data)
+              resolve(jsonData)
+            }
             else reject("Agent cannot be found!")
           }
         });
@@ -872,7 +880,7 @@ io.sockets.on('connection', (socket) => {
       return new Promise((resolve, reject) => {
         request({
           method: 'POST',
-          url: `https://${datConfig.main_private_ip}:${datConfig.app_ports.mserver}/updateProfile`,
+          url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/updateProfile`,
           form : {
               agent_id : aId,
               first_name : first,
@@ -894,6 +902,8 @@ io.sockets.on('connection', (socket) => {
             reject(error)
           } else {
             console.log("**Updating the agent was a success!**");
+            console.log('response:', response)
+            console.log('data:', JSON.parse(data))
           }
         });
       });
@@ -915,6 +925,9 @@ io.sockets.on('connection', (socket) => {
           } else {
             getAgent(agentUsnm).then(agentInfoArray => {
               let agentInfo = agentInfoArray[0];
+              
+              console.log('agentInfo', agentInfoArray[0])
+
               updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
                 agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
                 linkToProfPic);
@@ -929,6 +942,16 @@ io.sockets.on('connection', (socket) => {
             s3.upload(uploadParams, (err) => {
               if(err) {
                 console.log("Error! Could not upload to S3 bucket: " + err)
+              } else {
+                getAgent(agentUsnm).then(agentInfoArray => {
+                  let agentInfo = agentInfoArray.data[0];
+
+                  console.log('agentInfo', agentInfoArray.data[0])
+
+                  updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
+                    agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
+                    linkToProfPic);
+                })
               }
             })
           }

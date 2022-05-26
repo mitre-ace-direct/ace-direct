@@ -599,8 +599,8 @@ router.get('/profilePic', (req, res) => {
     const pollingResult = new Promise((resolve, reject) => {
         let tempKey
         let tempOptions = options
-        for(ext in fileExts) {
-            tempKey = key + ext
+        for(let extension in fileExts) {
+            tempKey = key + extension
             tempOptions.Key = tempKey
 
             s3.headObject(tempOptions, (err, data) => {
