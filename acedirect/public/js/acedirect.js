@@ -1,4 +1,5 @@
 var socket;
+var username;
 var extensionMe;
 var extensionMePassword;
 var queueNameMe;
@@ -225,6 +226,7 @@ function connect_socket() {
             hello: 'hello'
           });
 
+          username = payload.username
           extensionMe = payload.extension; //e.g. 6001
           extensionMePassword = payload.extensionPassword;
           queueNameMe = payload.queue_name; //e.g. InboundQueue
@@ -3188,8 +3190,12 @@ function ShareFile() {
 function setProfilePic() {
   if(document.getElementById('profile-pic-file-upload').files && document.getElementById('profile-pic-file-upload').files[0]) {
     var fileReader = new FileReader();
+    var file = document.getElementById('profile-pic-file-upload').files[0]
 
-    fileReader.readAsDataURL(document.getElementById('profile-pic-file-upload').files[0])
+    var fileExt = file.name.split('.')[1].toLowerCase()
+    console.log('You have uploaded a picture! File name:', file.name.split('.')[1])
+
+    fileReader.readAsDataURL(file)
 
     fileReader.onload = (e) => {
       $('#sidebar-profile-pic').attr('src', e.target.result)
@@ -3199,8 +3205,10 @@ function setProfilePic() {
       console.log('Emitting profile-pic-set event now...')
 
       socket.emit('profile-pic-set', {
-        picture : e.target.result,
-        agent : extensionMe.toString()
+        picture : file,
+        agentExtension : extensionMe.toString(),
+        agentUsername : username,
+        fileExt
       }, (res) => {
         console.log(res)
       })
