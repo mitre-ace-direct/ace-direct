@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Except these files...
+!.gitignore
+!calibrate.webm
+!videoPrivacy.webm
+!videomailGreeting.mp4
