@@ -21,7 +21,6 @@ const mysql = require('mysql');
 const { MongoClient } = require('mongodb');
 const c = require('./app/constants.js')
 const utils = require('./app/utils.js')
-const config = require('./configuration.js');
 const datConfig = require('./../dat/config.json')
 const AWS = require('aws-sdk');
 const proxy = require('proxy-agent')
