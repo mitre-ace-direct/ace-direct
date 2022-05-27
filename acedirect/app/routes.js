@@ -44,6 +44,33 @@ function restrict(req, res, next) {
     }
 };
 
+
+const getAgent = (usnm) => {
+    return new Promise((resolve, reject) => {
+      console.log('Getting agent! Username: ', usnm)
+      console.log('get agent link', `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`)
+      request({
+        method: 'GET',
+        headers : {'Accept': 'application/json'},
+        url: `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`,
+      }, function (error, response, data) {
+        if (error) {
+          console.log("Error! Could not get agent:", error);
+          reject(error)
+        } else {
+          console.log("Success! Agent found!");
+          console.log('Data: ', typeof data)
+          console.log("TEXT " + JSON.parse(data));
+          if(data.length > 0) {
+            var jsonData = JSON.parse(data)
+            resolve(jsonData)
+          }
+          else reject("Agent cannot be found!")
+        }
+      });
+    });
+  }
+
 router.get('/',  (req, res, next) => {
     res.redirect("."+utils.getConfigVal(config.nginx.consumer_route))
 });
@@ -593,32 +620,6 @@ router.get('/profilePic', (req, res) => {
 
     let image;
 
-    const getAgent = (usnm) => {
-        return new Promise((resolve, reject) => {
-          console.log('Getting agent! Username: ', usnm)
-          console.log('get agent link', `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`)
-          request({
-            method: 'GET',
-            headers : {'Accept': 'application/json'},
-            url: `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`,
-          }, function (error, response, data) {
-            if (error) {
-              console.log("Error! Could not get agent:", error);
-              reject(error)
-            } else {
-              console.log("Success! Agent found!");
-              console.log('Data: ', typeof data)
-              console.log("TEXT " + JSON.parse(data));
-              if(data.length > 0) {
-                var jsonData = JSON.parse(data)
-                resolve(jsonData)
-              }
-              else reject("Agent cannot be found!")
-            }
-          });
-        });
-      }
-
       getAgent(req.session.user.username).then((data) => {
         if(data.data[0].profile_picture) {
             key = data.data[0].profile_picture
@@ -659,6 +660,17 @@ router.get('/profilePic', (req, res) => {
       })
 })
 
+router.get('/profilePicPoll', (req, res) => {
+    var profilePicFlag = { profilePicExists : false};
+    
+    getAgent(req.session.user.username).then((data) => {
+        if(data.data[0].profile_picture && data.data[0].profile_picture.length > 1) {
+            console.log('User has a profile pic saved!')
+            profilePicFlag.profilePicExists = true
+        }
+        res.send(profilePicFlag)
+    });
+})
 
 router.get('/videomail', consumerRestrict, (req, res) => {  
     let introVideo = 'videomailGreeting.mp4';

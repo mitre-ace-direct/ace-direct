@@ -196,6 +196,11 @@ function connect_socket() {
           $('#loginModal').modal('hide');
           $('#statusmsg').text(''); // clear status text
 
+          // // Conditionally show remove image text
+          // if() {
+
+          // }
+
           // populate call agent information
           $('#displayname').val('CSR ' + payload.first_name);
           $('#agentname-sidebar').html(payload.first_name + ' ' + payload.last_name);

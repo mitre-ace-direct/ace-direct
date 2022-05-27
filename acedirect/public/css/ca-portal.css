@@ -667,22 +667,46 @@ p#agentInfo
 a#profilePic
 {
   padding-top: 0px;
+  color: rgba(255,255,255,0.8);
+  font-size: smaller;
 }
 
 a#profilePic:hover
 {
   background-color: transparent;
+  text-decoration: none;
+  color: rgba(255,255,255,0.8);
 }
 
-label#profilePicUpload
+label#changeProfilePic
+{
+  border: none;
+  outline: none;
+  background: none;
+  padding-right: 5px;
+}
+
+label.profilePicUpload
 {
   color: rgba(255,255,255,0.8);
-  font-size: smaller;
 }
 
-label#profilePicUpload:hover
+label.profilePicUpload:hover
 {
   color: #999;
+  cursor: pointer;
+}
+
+button#deleteProfilePic
+{
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+  border-left: rgba(255,255,255,0.8);
+  border-left-style: solid;
+  padding-left: 7px;
+  outline: none;
+  background: none;
 }
 
 input#profile-pic-file-upload {
