@@ -635,6 +635,12 @@ router.get('/profilePic', (req, res) => {
         s3.getObject(options, (err, data) => {
             if(err) { 
                 console.log("Error retrieving file from bucket!",err)
+                try {
+                    image = fs.readFileSync('./public/images/anon.png')
+                    res.send(image)
+                } catch(err) {
+                    console.log("Could not read image!", err)
+                }
             }
             else {
                 console.log("success! Data retrieveed:", data.Body)
