@@ -24,13 +24,12 @@ const utils = require('./app/utils.js')
 const config = require('./configuration.js');
 const datConfig = require('./../dat/config.json')
 const AWS = require('aws-sdk');
-const uploadAPI = config.uploadServer + '/updateProfile'
 const proxy = require('proxy-agent')
 
-AWS.config.update({
-  region: config.awsRegion,
+AWS.datConfig.update({
+  region: datConfig.s3.region,
   httpOptions: {
-    agent: proxy(config.proxy)
+    agent: proxy(datConfig.common.proxy)
   }
 })
 
@@ -910,9 +909,9 @@ io.sockets.on('connection', (socket) => {
       });
     }
 
-    console.log("Bucket: " + config.awsS3Bucket)
+    console.log("Bucket: " + datConfig.s3.bucketname)
 
-    var getParams = { Bucket : config.awsS3Bucket, Key : agentExt+'.'+fileExt }
+    var getParams = { Bucket : datConfig.s3.bucketname, Key : agentExt+'.'+fileExt }
     var uploadParams = { ...getParams, Body : profilePic, ContentType : 'image/*' }
 
     console.log("Upload parameters: " + JSON.stringify(uploadParams))
