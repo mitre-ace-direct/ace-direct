@@ -677,6 +677,7 @@ a#profilePic:hover
 label#profilePicUpload
 {
   color: rgba(255,255,255,0.8);
+  font-size: smaller;
 }
 
 label#profilePicUpload:hover
