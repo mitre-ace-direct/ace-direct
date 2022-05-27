@@ -178,7 +178,7 @@ const appRouter = (connection, asterisk) => {
      *             extension: 1234,
      *             extension_secret: "ABC123",
      *             queue_name: "Queue1234",
-     *             queue_name: null
+     *             queue2_name: null
      *            }]
      *    }
      *
@@ -196,7 +196,7 @@ const appRouter = (connection, asterisk) => {
      */
   app.get('/getagentrec/:username', (req, res) => {
     // Query DB for an agent record
-    connection.query('SELECT ad.agent_id, ad.username, ad.first_name, ad.last_name, ad.role, ad.phone, ad.email, ad.organization, ad.is_approved, ad.is_active, ae.extension, ae.extension_secret, aq.queue_name,  ad.layout, aq2.queue_name AS queue2_name, oc.channel FROM agent_data AS ad LEFT JOIN asterisk_extensions AS ae ON ad.extension_id = ae.id LEFT JOIN asterisk_queues AS aq ON aq.id = ad.queue_id LEFT JOIN asterisk_queues AS aq2 ON aq2.id = ad.queue2_id LEFT JOIN outgoing_channels AS oc ON oc.id = ae.id WHERE ad.username =  ?', [req.params.username], (err, rows, _fields) => {
+    connection.query('SELECT ad.agent_id, ad.username, ad.first_name, ad.last_name, ad.role, ad.phone, ad.email, ad.organization, ad.is_approved, ad.is_active, ae.extension, ae.extension_secret, aq.queue_name,  ad.layout, aq2.queue_name AS queue2_name, ad.profile_picture, oc.channel FROM agent_data AS ad LEFT JOIN asterisk_extensions AS ae ON ad.extension_id = ae.id LEFT JOIN asterisk_queues AS aq ON aq.id = ad.queue_id LEFT JOIN asterisk_queues AS aq2 ON aq2.id = ad.queue2_id LEFT JOIN outgoing_channels AS oc ON oc.id = ae.id WHERE ad.username =  ?', [req.params.username], (err, rows, _fields) => {
       if (err) {
         console.log(err);
         return res.status(500).send({
@@ -360,6 +360,7 @@ const appRouter = (connection, asterisk) => {
      * @apiParam {String} orgainization ORganization for the CSR Agent user
      * @apiParam {Boolean} is_approved A boolean value.
      * @apiParam {Boolean} is_active A boolean value.
+     * @apiParam {String} profile_picture Link to Profile Picture stored in AWS.
      *
      * @apiSuccessExample Success-Response
      *     HTTP/1.1 200 OK
@@ -392,6 +393,7 @@ const appRouter = (connection, asterisk) => {
     const { extension } = req.body;
     const queueId = req.body.queue_id;
     const queue2Id = req.body.queue2_id;
+    const profile_picture = req.body.profile_picture;
 
     if (!agentId || !firstName || !lastName || !role || !phone || !email || !organization
         || Number.isNaN(isApproved) || Number.isNaN(isActive) || Number.isNaN(extension)) {
@@ -432,13 +434,16 @@ const appRouter = (connection, asterisk) => {
       + ', extension_id = ?'
       + ', queue_id = ?'
       + ', queue2_id = ?'
+      + ', profile_picture = ?'
       + ' WHERE agent_id = ?';
 
       // Query for all records sorted by the id
       connection.query(query, [firstName, lastName, role, phone, email, organization,
-        isApproved, isActive, extensionIdParam, queueId, queue2Id, agentId], (err, results) => {
+        isApproved, isActive, extensionIdParam, queueId, queue2Id, profile_picture, agentId], (err, results) => {
         if (err) {
           console.log(err);
+          console.log("QUERY DATA:", firstName, lastName, role, phone, email, organization,
+          isApproved, isActive, extensionIdParam, queueId, queue2Id, profile_picture, agentId)
           return res.status(500).send({
             message: 'MySQL error'
           });

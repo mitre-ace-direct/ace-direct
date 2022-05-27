@@ -21,6 +21,18 @@ const mysql = require('mysql');
 const { MongoClient } = require('mongodb');
 const c = require('./app/constants.js')
 const utils = require('./app/utils.js')
+const datConfig = require('./../dat/config.json')
+const AWS = require('aws-sdk');
+const proxy = require('proxy-agent')
+
+AWS.config.update({
+  region: datConfig.s3.region,
+  httpOptions: {
+    agent: proxy(datConfig.common.proxy)
+  }
+})
+
+const s3 = new AWS.S3();
 
 let dbConnection = null;
 let dbconn = null;
@@ -814,6 +826,139 @@ io.sockets.on('connection', (socket) => {
         console.log(results);
       }
     });
+  });
+
+  /**
+   * Upload Handler and event listener for setting profile pic.
+   * TODO:
+   * Implement upload handling function
+   * Implement event listener
+   */
+
+  socket.on('profile-pic-set', (data, callback) => {
+    console.log('Profile Picture Set!')
+    callback("Emitter signal received!")
+
+    var profilePic = data.picture
+    var agentExt = data.agentExtension
+    var agentUsnm = data.agentUsername
+    var fileExt = data.fileExt
+
+    /** 
+     * Implementing callbacks for getting an agent using mserver getagentrec/:username
+     * endpoint and mserver updateProfile endpoint. This is so the request code is contained
+     * and isn't repeated multiple times in each S3 upload below. Also 
+     * */ 
+    const getAgent = (usnm) => {
+      return new Promise((resolve, reject) => {
+        console.log('Getting agent! Username: ', usnm)
+        console.log('get agent link', `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`)
+        request({
+          method: 'GET',
+          headers : {'Accept': 'application/json'},
+          url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`,
+        }, function (error, response, data) {
+          if (error) {
+            console.log("Error! Could not get agent:", error);
+            reject(error)
+          } else {
+            console.log("Success! Agent found!");
+            console.log('Data: ', typeof data)
+            console.log("TEXT " + JSON.parse(data));
+            if(data.length > 0) {
+              var jsonData = JSON.parse(data)
+              resolve(jsonData)
+            }
+            else reject("Agent cannot be found!")
+          }
+        });
+      });
+    }
+    const updateAgent = (aId, first, last, role, phone, email, org, isApp, isAct, ext, q1, q2, profPic) => {
+      return new Promise((resolve, reject) => {
+        console.log("update agent data: ", aId, first, last, role, phone, email, org, isApp, isAct, ext, q1, q2, profPic)
+        request({
+          method: 'POST',
+          url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/updateProfile`,
+          form : {
+              agent_id : aId,
+              first_name : first,
+              last_name : last,
+              role,
+              phone,
+              email,
+              organization : org,
+              isApproved : isApp,
+              isActive : isAct,
+              extension : ext,
+              queueId : q1,
+              queue2Id : q2,
+              profile_picture : profPic
+          }
+        }, function (error, response, data) {
+          if (error) {
+            console.log("Error", error);
+            reject(error)
+          } else {
+            console.log("**Updating the agent was a success!**");
+            console.log('response:', response)
+            console.log('data:', data)
+          }
+        });
+      });
+    }
+
+    console.log("Bucket: " + datConfig.s3.bucketname)
+
+    var getParams = { Bucket : datConfig.s3.bucketname, Key : agentExt+'.'+fileExt }
+    var uploadParams = { ...getParams, Body : profilePic, ContentType : 'image/*' }
+
+    console.log("Upload parameters: " + JSON.stringify(uploadParams))
+
+    s3.getObject(getParams, (err, data) => {
+      if(err) {
+        s3.upload(uploadParams, (err) => {
+          if(err) {
+            console.log("Error! Could not upload to S3 bucket: " + err)
+          } else {
+            getAgent(agentUsnm).then(agentInfoArray => {
+              let agentInfo = agentInfoArray[0];
+              
+              console.log('agentInfo', agentInfoArray[0])
+
+              updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
+                agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
+                getParams.Key);
+            }).catch(err => {
+              console.log("Error getting agent!", err)
+            })
+          }
+        })
+      } else {
+        s3.deleteObject(getParams, (err, data) => {
+          if(err) console.log(err)
+          else {
+            console.log(data)
+            s3.upload(uploadParams, (err) => {
+              if(err) {
+                console.log("Error! Could not upload to S3 bucket: " + err)
+              } else {
+                getAgent(agentUsnm).then(agentInfoArray => {
+                  let agentInfo = agentInfoArray.data[0];
+
+                  console.log('agentInfo', agentInfoArray.data[0])
+
+                  updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
+                    agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
+                    getParams.Key);
+                })
+              }
+            })
+          }
+        })
+      }
+    })
+
   });
 
   socket.on('transferCallInvite', (data) => {

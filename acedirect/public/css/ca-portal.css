@@ -657,6 +657,40 @@ However, delay the fade out process for 2.5 seconds */
   padding: 3px;
 }
 
+/* Profile Pic Styles START */
+
+p#agentInfo 
+{
+  padding-bottom: 0px;
+}
+
+a#profilePic
+{
+  padding-top: 0px;
+}
+
+a#profilePic:hover
+{
+  background-color: transparent;
+}
+
+label#profilePicUpload
+{
+  color: rgba(255,255,255,0.8);
+  font-size: smaller;
+}
+
+label#profilePicUpload:hover
+{
+  color: #999;
+}
+
+input#profile-pic-file-upload {
+  position: absolute;
+  left: -9999rem;
+}
+/* Profile Pic Styles END */
+
 input[type=range]::-moz-range-track {
   width: 100%;
   height: 10px;
