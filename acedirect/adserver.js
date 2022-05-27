@@ -878,6 +878,7 @@ io.sockets.on('connection', (socket) => {
     }
     const updateAgent = (aId, first, last, role, phone, email, org, isApp, isAct, ext, q1, q2, profPic) => {
       return new Promise((resolve, reject) => {
+        console.log("update agent data: ", aId, first, last, role, phone, email, org, isApp, isAct, ext, q1, q2, profPic)
         request({
           method: 'POST',
           url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/updateProfile`,
@@ -903,7 +904,7 @@ io.sockets.on('connection', (socket) => {
           } else {
             console.log("**Updating the agent was a success!**");
             console.log('response:', response)
-            console.log('data:', JSON.parse(data))
+            console.log('data:', data)
           }
         });
       });
@@ -913,7 +914,6 @@ io.sockets.on('connection', (socket) => {
 
     var getParams = { Bucket : config.awsS3Bucket, Key : agentExt+'.'+fileExt }
     var uploadParams = { ...getParams, Body : profilePic, ContentType : 'image/*' }
-    var linkToProfPic = `${config.awsS3Bucket}.s3.${config.awsRegion}.amazonaws.com/${getParams.Key}`
 
     console.log("Upload parameters: " + JSON.stringify(uploadParams))
 
@@ -930,7 +930,9 @@ io.sockets.on('connection', (socket) => {
 
               updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
                 agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
-                linkToProfPic);
+                getParams.Key);
+            }).catch(err => {
+              console.log("Error getting agent!", err)
             })
           }
         })
@@ -950,7 +952,7 @@ io.sockets.on('connection', (socket) => {
 
                   updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
                     agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
-                    linkToProfPic);
+                    getParams.Key);
                 })
               }
             })
