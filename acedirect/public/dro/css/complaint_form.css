@@ -102,6 +102,13 @@ body {
   padding-bottom: 8px !important;
   font-weight: bold !important;
 }
+.button-area a {
+  width: 100%;
+  background-color: #073863 !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  font-weight: bold !important;
+}
 
 .or-column {
   font-weight: bold;

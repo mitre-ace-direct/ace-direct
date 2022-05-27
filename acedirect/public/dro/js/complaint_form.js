@@ -31,6 +31,7 @@ const viewableFileTypes = [
 
 $(document).ready(() => {
   $('#optionsModal').modal('show');
+  openDialog('optionsModal', window);
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
   $('[data-toggle="tooltip"]').tooltip({
@@ -424,6 +425,7 @@ function connect_socket() {
             if (complaintRedirectActive) {
               $('#redirectURL').text(complaintRedirectUrl);
               $('#callEndedModal').modal('show');
+              openDialog('callEndedModal', window);
               setTimeout(() => {
                 location = complaintRedirectUrl;
               }, 5000);
@@ -713,6 +715,7 @@ function enterQueue() {
     vrs
   });
   $('#waitingModal').modal('show');
+  openDialog('waitingModal', window);
 }
 
 function endCall() {
@@ -722,6 +725,7 @@ function endCall() {
   if (complaintRedirectActive) {
     $('#redirectURL').text(complaintRedirectUrl);
     $('#callEndedModal').modal('show');
+    openDialog('callEndedModal', window);
     document.getElementById('noCallPoster').style.display = 'block';
     document.getElementById('inCallSection').style.display = 'none';
     setTimeout(() => {
