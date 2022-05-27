@@ -620,7 +620,11 @@ router.get('/profilePic', (req, res) => {
       }
 
       getAgent(req.session.user.username).then((data) => {
-        key = data.data[0].profile_picture
+        if(data.data[0].profile_picture) {
+            key = data.data[0].profile_picture
+        } else {
+            throw new Error("No profile Pic!")
+        }
         console.log("TYPEOF DATA:", typeof data)
         console.log("data.data[0].profile_picture:", data.data[0].profile_picture)
         console.log("typeof data.data[0].profile_picture", typeof data.data[0].profile_picture)
