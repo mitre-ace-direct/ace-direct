@@ -588,6 +588,77 @@ router.get('/logout', (req, res) => {
     });
 });
 
+router.get('/profilePic', (req, res) => {
+    let key = '';
+
+    let image;
+
+    const getAgent = (usnm) => {
+        return new Promise((resolve, reject) => {
+          console.log('Getting agent! Username: ', usnm)
+          console.log('get agent link', `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`)
+          request({
+            method: 'GET',
+            headers : {'Accept': 'application/json'},
+            url: `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`,
+          }, function (error, response, data) {
+            if (error) {
+              console.log("Error! Could not get agent:", error);
+              reject(error)
+            } else {
+              console.log("Success! Agent found!");
+              console.log('Data: ', typeof data)
+              console.log("TEXT " + JSON.parse(data));
+              if(data.length > 0) {
+                var jsonData = JSON.parse(data)
+                resolve(jsonData)
+              }
+              else reject("Agent cannot be found!")
+            }
+          });
+        });
+      }
+
+      getAgent(req.session.user.username).then((data) => {
+        if(data.data[0].profile_picture) {
+            key = data.data[0].profile_picture
+        } else {
+            throw new Error("No profile Pic!")
+        }
+        console.log("TYPEOF DATA:", typeof data)
+        console.log("data.data[0].profile_picture:", data.data[0].profile_picture)
+        console.log("typeof data.data[0].profile_picture", typeof data.data[0].profile_picture)
+        let options = {
+            Bucket : config.s3.bucketname,
+            Key : key
+        };            
+        s3.getObject(options, (err, data) => {
+            if(err) { 
+                console.log("Error retrieving file from bucket!",err)
+                try {
+                    image = fs.readFileSync('./public/images/anon.png')
+                    res.send(image)
+                } catch(err) {
+                    console.log("Could not read image!", err)
+                }
+            }
+            else {
+                console.log("success! Data retrieveed:", data.Body)
+                image = data.Body
+                res.send(image)
+            }
+        })
+      }).catch(err => {
+          console.log("Error finding agent!", err)
+        try {
+            image = fs.readFileSync('./public/images/anon.png')
+            res.send(image)
+        } catch(err) {
+            console.log("Could not read image!", err)
+        }
+      })
+})
+
 
 router.get('/videomail', consumerRestrict, (req, res) => {  
     let introVideo = 'videomailGreeting.mp4';

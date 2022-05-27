@@ -1,4 +1,5 @@
 var socket;
+var username;
 var extensionMe;
 var extensionMePassword;
 var queueNameMe;
@@ -225,6 +226,7 @@ function connect_socket() {
             hello: 'hello'
           });
 
+          username = payload.username
           extensionMe = payload.extension; //e.g. 6001
           extensionMePassword = payload.extensionPassword;
           queueNameMe = payload.queue_name; //e.g. InboundQueue
@@ -3176,6 +3178,41 @@ function ShareFile() {
         $('#fileSentError').show();
       }
     });
+  }
+}
+
+// Event emitting for handling profile pic setting.
+/** TODO:
+ * Change value of sidebar and navbar pictures.
+ * Set up S3 bucket configuration.
+ * Save uploaded image to S3 bucket.
+ */
+function setProfilePic() {
+  if(document.getElementById('profile-pic-file-upload').files && document.getElementById('profile-pic-file-upload').files[0]) {
+    var fileReader = new FileReader();
+    var file = document.getElementById('profile-pic-file-upload').files[0]
+
+    var fileExt = file.name.split('.')[1].toLowerCase()
+    console.log('You have uploaded a picture! File name:', file.name.split('.')[1])
+
+    fileReader.readAsDataURL(file)
+
+    fileReader.onload = (e) => {
+      $('#sidebar-profile-pic').attr('src', e.target.result)
+      $('#agent-pic-header').attr('src', e.target.result)
+      $('#agent-pic-dropdown').attr('src', e.target.result)
+
+      console.log('Emitting profile-pic-set event now...')
+
+      socket.emit('profile-pic-set', {
+        picture : file,
+        agentExtension : extensionMe.toString(),
+        agentUsername : username,
+        fileExt
+      }, (res) => {
+        console.log(res)
+      })
+    }
   }
 }
 
