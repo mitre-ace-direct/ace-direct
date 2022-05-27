@@ -25,7 +25,7 @@ const datConfig = require('./../dat/config.json')
 const AWS = require('aws-sdk');
 const proxy = require('proxy-agent')
 
-AWS.datConfig.update({
+AWS.config.update({
   region: datConfig.s3.region,
   httpOptions: {
     agent: proxy(datConfig.common.proxy)
