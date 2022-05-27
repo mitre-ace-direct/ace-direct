@@ -31,6 +31,7 @@ const viewableFileTypes = [
 
 $(document).ready(() => {
   $('#optionsModal').modal('show');
+  openDialog('optionsModal', window);
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
   $('[data-toggle="tooltip"]').tooltip({
@@ -424,6 +425,7 @@ function connect_socket() {
             if (complaintRedirectActive) {
               $('#redirectURL').text(complaintRedirectUrl);
               $('#callEndedModal').modal('show');
+              openDialog('callEndedModal', window);
               setTimeout(() => {
                 location = complaintRedirectUrl;
               }, 5000);
@@ -445,7 +447,7 @@ function connect_socket() {
             // file sent confirmation
             addFileToSentList(data);
             $('#fileInput').val('');
-            $('#shareFileConsumer').attr('disabled', true);
+            $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');
           })
           .on('screenshareResponse', (data) => {
             console.log(`screen request received ${data.permission}`);
@@ -713,6 +715,7 @@ function enterQueue() {
     vrs
   });
   $('#waitingModal').modal('show');
+  openDialog('waitingModal', window);
 }
 
 function endCall() {
@@ -722,6 +725,7 @@ function endCall() {
   if (complaintRedirectActive) {
     $('#redirectURL').text(complaintRedirectUrl);
     $('#callEndedModal').modal('show');
+    openDialog('callEndedModal', window);
     document.getElementById('noCallPoster').style.display = 'block';
     document.getElementById('inCallSection').style.display = 'none';
     setTimeout(() => {
@@ -967,13 +971,13 @@ $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
 $('#fileInput').on('change', () => {
   if ($('#fileInput')[0].value === '') {
     console.log('no file chosen');
-    $('#shareFileConsumer').attr('disabled', true);
+    $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');
     $('#removeFileBtn').css('display', 'none');
     // add tooltip to send button
     $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
   } else {
     console.log('file chosen!');
-    $('#shareFileConsumer').attr('disabled', false);
+    $('#shareFileConsumer').attr('disabled', false).css('background-color','#073863');;
     $('#removeFileBtn').css('display', 'block');
     // remove tooltip on send button
     $('#shareFileConsumer').attr('data-original-title', '').parent().find('.tooltip-inner').html('');
@@ -985,7 +989,7 @@ $('#fileInput').on('change', () => {
 
 function removeFile() {
   $('#fileInput')[0].value = '';
-  $('#shareFileConsumer').attr('disabled', true);
+  $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');;
   $('#removeFileBtn').css('display', 'none');
   $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
   $('[data-toggle="tooltip"]').tooltip({
