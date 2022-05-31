@@ -48,10 +48,16 @@
                             <span id="agentrole-headerdropdown"></span>
                         </p>
                         <a id="profilePic">
-                            <label id="profilePicUpload">
-                                <input type="file" id="profile-pic-file-upload" name="fileInput" class="form-control-file" accept="image/*" onchange="setProfilePic()"/>
-                                Change Profile Picture
+                            <label class="profilePicUpload" id="changeProfilePic">
+                                <input type="file" id="profile-pic-file-upload" name="fileInput" class="form-control-file" accept="image/*" onchange="setProfilePic()">
+                                Change
                             </label>
+                            <label class="profilePicUpload">
+                                <button id="deleteProfilePic" onclick="deleteProfilePic()">
+                                Delete
+                                </button>
+                            </label>
+                            <span> Profile Picure </span>
                         </a>
                     </li>
                     <!-- Menu Footer-->
