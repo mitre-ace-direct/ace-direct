@@ -58,50 +58,50 @@
     </div>
   </main>
 
-  <!--Incorrect Browser Modal-->
-  <div class="modal fade" id="notChromeModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
-    aria-labelledby="recommendedBrowserTitle">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div id="recommendedBrowserTitle" class="modal-header text-center">
-          <div class="browsercheckheader">Recommended Browser</div>
-        </div>
-        <div class="modal-body">
-          <div class="row justify-content-md-center">
-            <div class="col-8 text-center align-self-center" id="browsercheckdescription">
-              <div class="browsercheckdescription">For the best experience, visit this site using Google Chrome.</div>
-              <div class="browsercheckdescription" style="padding-top: 15px">You are using <span
-                  id="browserType"></span>.</div>
-              <div class="btn-group-lg" role="group">
-                <button id="continue-btn" type="button" class="btn btn-light btn-lg"
-                  style="background-color: #073863; color: white;  margin-right: 15px;" data-dismiss="modal">Continue to
-                  Support Portal</button>
-                <button id="copy-btn" type="button" class="btn btn-light btn-lg"
-                  style="color:#073863; background-color: white; border:2px solid #073863;">Copy
-                  Support Portal Link</button>
-              </div>
-              <div id="clipboardStatus" hidden></div>
+  <%- include("../partials/acedirect_footer") %>
+</body>
+
+<!--Incorrect Browser Modal-->
+<div id="notChromeModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="recommendedBrowserTitle">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <div id="recommendedBrowserTitle" class="browsercheckheader">Recommended Browser</div>
+      </div>
+      <div class="modal-body">
+        <div class="row justify-content-md-center">
+          <div class="col-8 text-center align-self-center" id="browsercheckdescription">
+            <div class="browsercheckdescription">For the best experience, visit this site using Google Chrome.</div>
+            <div class="browsercheckdescription" style="padding-top: 15px">You are using <span id="browserType"></span>.
             </div>
+            <div class="btn-group-lg" role="group">
+              <button id="continue-btn" type="button" class="btn btn-light btn-lg"
+                style="background-color: #073863; color: white;  margin-right: 15px;" data-dismiss="modal">Continue to
+                Support Portal</button>
+              <button id="copy-btn" type="button" class="btn btn-light btn-lg"
+                style="color:#073863; background-color: white; border:2px solid #073863;">Copy
+                Support Portal Link</button>
+            </div>
+            <div id="clipboardStatus" hidden></div>
           </div>
         </div>
-        <div class="modal-footer" style="background-color: #F9F9F9; border-radius: 6px;">
-          <div class="row">
-            <div class="col-xs-12 text-center">
-              <a href="https://www.fcc.gov/accessibility" style="color:#073863"><i class="fa fa-sign-out"></i> Exit
-                Support Portal</a>
-            </div>
+      </div>
+      <div class="modal-footer" style="background-color: #F9F9F9; border-radius: 6px;">
+        <div class="row">
+          <div class="col-xs-12 text-center">
+            <a href="https://www.fcc.gov/accessibility" style="color:#073863"><i class="fa fa-sign-out"></i> Exit
+              Support Portal</a>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <%- include("../partials/acedirect_footer") %>
-</body>
+</div>
 
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="dro/js/complaint_login.js" async></script>
+<script type="text/javascript" src="/dro/js/dialog.js"></script>
+<script type="text/javascript" src="/dro/js/complaint_login.js" async></script>
 <script type="text/javascript" src="/assets/js/inputmask.min.js"></script>
 <script type="text/javascript" src="/assets/js/jquery.inputmask.min.js" async></script>
 
