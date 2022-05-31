@@ -962,14 +962,16 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('delete-profile-pic', (data, callback) => {
-    try {
-      let image = fs.readFileSync('./public/images/anon.png').toString();
-      console.log("fs.readFileSync image:", image)
-      callback(image);
-    } catch(err) {
-      console.log("Could not read image!", err);
-      callback('', err);
-    }
+    fs.readFile('./public/images/anon.png', (err, data) => {
+      if(err) {
+        console.log("Could not read image!", err);
+        callback('', err);
+      } else {
+        let image = data
+        console.log("fs.readFileSync image:", image)
+        callback(image);
+      }
+    })
 
     let username = data.username;
     let key = ''
