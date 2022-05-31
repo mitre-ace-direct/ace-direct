@@ -155,6 +155,27 @@ $(document).ready(function () {
   });
 });
 
+function checkProfilePic() {
+  $.ajax({
+    url: './profilePicPoll',
+    type: 'GET',
+    dataType: 'json',
+    success: (data) => {
+      console.log("Profile Picture Poll:", JSON.stringify(data))
+      var response = data.profilePicExists // Parsing the value of response for checking Profile Pic
+
+      if(response) {
+        $('#deleteProfilePic').show()
+      } else {
+        $('#deleteProfilePic').hide()
+      }
+    },
+    error: (error) => {
+      console.log("Error checking profile pic!", error);
+    }
+  })
+}
+
 function connect_socket() {
   console.log('connect_socket to ');
   console.log(window.location.host);
@@ -196,10 +217,7 @@ function connect_socket() {
           $('#loginModal').modal('hide');
           $('#statusmsg').text(''); // clear status text
 
-          // // Conditionally show remove image text
-          // if() {
-
-          // }
+          checkProfilePic();
 
           // populate call agent information
           $('#displayname').val('CSR ' + payload.first_name);
@@ -3187,11 +3205,6 @@ function ShareFile() {
 }
 
 // Event emitting for handling profile pic setting.
-/** TODO:
- * Change value of sidebar and navbar pictures.
- * Set up S3 bucket configuration.
- * Save uploaded image to S3 bucket.
- */
 function setProfilePic() {
   if(document.getElementById('profile-pic-file-upload').files && document.getElementById('profile-pic-file-upload').files[0]) {
     var fileReader = new FileReader();
@@ -3207,6 +3220,8 @@ function setProfilePic() {
       $('#agent-pic-header').attr('src', e.target.result)
       $('#agent-pic-dropdown').attr('src', e.target.result)
 
+      $('#deleteProfilePic').show();
+
       console.log('Emitting profile-pic-set event now...')
 
       socket.emit('profile-pic-set', {
@@ -3219,6 +3234,40 @@ function setProfilePic() {
       })
     }
   }
+}
+
+// Event emitting for deleting a profile pic.
+function deleteProfilePic() {
+  console.log("Deleting profile pic!");
+
+  $('#deleteProfilePic').hide();
+
+  socket.emit('delete-profile-pic', {
+    username
+  }, (res, error) => {
+    if(error) {
+      console.log("Could not read file!")
+    } else {
+      var fileReader = new FileReader();
+
+      console.log("Delete image response:", res)
+
+      var fileBlob = new Blob([res], { type: 'image/*' })
+
+      console.log("Response Blob:", fileBlob)
+
+      console.log('Profile Picture is being deleted!')
+
+      fileReader.readAsDataURL(fileBlob)
+
+      fileReader.onload = (e) => {
+        console.log("File reader onload event:", e)
+        $('#sidebar-profile-pic').attr('src', e.target.result)
+        $('#agent-pic-header').attr('src', e.target.result)
+        $('#agent-pic-dropdown').attr('src', e.target.result)
+      }
+    }
+  })
 }
 
 $('#fullscreen-element').dblclick(function() {

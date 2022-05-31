@@ -621,7 +621,7 @@ router.get('/profilePic', (req, res) => {
     let image;
 
       getAgent(req.session.user.username).then((data) => {
-        if(data.data[0].profile_picture) {
+        if(data.data[0].profile_picture && data.data[0].profile_picture !== '') {
             key = data.data[0].profile_picture
         } else {
             throw new Error("No profile Pic!")
@@ -661,7 +661,7 @@ router.get('/profilePic', (req, res) => {
 })
 
 router.get('/profilePicPoll', (req, res) => {
-    var profilePicFlag = { profilePicExists : false};
+    var profilePicFlag = { profilePicExists : false };
     
     getAgent(req.session.user.username).then((data) => {
         if(data.data[0].profile_picture && data.data[0].profile_picture.length > 1) {
