@@ -64,20 +64,26 @@ $(document).ready(() => {
   $('#usertable tbody').on('click', 'td', function ClickOnRow() {
     const data = table.row($(this).parents('tr')).data();
     const col = table.cell(this).index().column;
-    // console.log("cell clicked with col: " + col + " data: " + JSON.stringify(data));
+    console.log("cell clicked with col: " + col + " data: " + JSON.stringify(data));
 
     if (col !== 6) { // do not load agent info if the clicked cell is the checkbox
-      const url = `./GetAgent/${data.username}`;
+      const url = `./GetAgent/${data["4"]}`;
       console.log(`GetAgent url: ${url}`);
       selectedUser = data.userId;
       $.get('./GetAgent', {
-        username: data.username
+        username: data["4"]
       },
       (result, _status) => {
         console.log(`GetAgent returned: ${JSON.stringify(result)}`);
 
         $.get(`./ProfilePic/${result.username}`, (res, _status) => {
-          $('#inputProfilePic').attr('src', res)
+          var urlCreator = window.URL || window.webkitURL; // Front end JS way to produce URLs for images.
+          let blobImage = new Blob([res], { type: 'image/*' }); // Converting data to Blob format
+          let image = urlCreator.createObjectURL(blobImage); // Continuation of URL creation process.
+
+          console.log("URL Produced:", image)
+
+          $('#inputProfilePic').attr('src', image);
 
           $('#inputUsername').val(result.username);
           $('#inputFirstname').val(result.first_name);
