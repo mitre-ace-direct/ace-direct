@@ -33,6 +33,7 @@
                         <thead>
                           <tr>
                             <th class="text">ID</th>
+                            <th class="text">Profile Picture</th>
                             <th class="text">First Name</th>
                             <th class="text">Last Name</th>
                             <th class="text">Username</th>
@@ -43,11 +44,11 @@
                         <tbody>
                           <% users.forEach(function(user) { %>
                             <tr style="cursor:pointer" value="<%= user.agent_id %>">
-                              <td align="center">
-                                <img src="/ProfilePic/<%= user.username %>" style="height: 50px; width: 50px;">
-                              </td>
                               <td>
                                 <%= user.agent_id %>
+                              </td>
+                              <td align="center">
+                                <img src="/ProfilePic/<%= user.username %>" style="height: 50px; width: 50px;">
                               </td>
                               <td>
                                 <%= user.first_name %>
