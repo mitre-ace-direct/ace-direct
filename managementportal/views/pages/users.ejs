@@ -43,6 +43,9 @@
                         <tbody>
                           <% users.forEach(function(user) { %>
                             <tr style="cursor:pointer" value="<%= user.agent_id %>">
+                              <td align="center">
+                                <img src="/ProfilePic/<%= user.username %>" style="height: 50px; width: 50px;">
+                              </td>
                               <td>
                                 <%= user.agent_id %>
                               </td>
