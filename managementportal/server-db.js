@@ -1578,6 +1578,7 @@ function HandleManagerEvent(evt) {
       if (!a) {
         if (AgentMap.has(agentInt)) {
           const evtNewAgent = evt;
+          console.log("EVT New Agent:", evtNewAgent)
           logger.debug('Agents: New Agent');
           evtNewAgent.name = AgentMap.get(agentInt).name;
           evtNewAgent.talktime = 0;
