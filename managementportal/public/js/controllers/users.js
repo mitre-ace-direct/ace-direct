@@ -66,7 +66,7 @@ $(document).ready(() => {
     const col = table.cell(this).index().column;
     // console.log("cell clicked with col: " + col + " data: " + JSON.stringify(data));
 
-    if (col !== 5) { // do not load agent info if the clicked cell is the checkbox
+    if (col !== 6) { // do not load agent info if the clicked cell is the checkbox
       const url = `./GetAgent/${data.username}`;
       console.log(`GetAgent url: ${url}`);
       selectedUser = data.userId;
@@ -75,21 +75,26 @@ $(document).ready(() => {
       },
       (result, _status) => {
         console.log(`GetAgent returned: ${JSON.stringify(result)}`);
-        $('#inputUsername').val(result.username);
-        $('#inputFirstname').val(result.first_name);
-        $('#inputLastname').val(result.last_name);
-        $('#inputEmail').val(result.email);
-        $('#inputPhone').val(result.phone);
-        $('#inputOrganization').val(result.organization);
-        $('#inputExtension').val(result.extension);
-        if (result.queue_name != null) {
-          $('#inputComplaintsQueue').prop('checked', true);
-        }
-        if (result.queue2_name != null) {
-          $('#inputGeneralQueue').prop('checked', true);
-        }
-        console.log(`complaintsQueue value is: ${$('#inputComplaintsQueue').val()}`);
-        console.log(`generalQueue value is: ${$('#inputGeneralQueue').val()}`);
+
+        $.get(`./ProfilePic/${result.username}`, (res, _status) => {
+          $('#inputProfilePic').attr('src', res)
+
+          $('#inputUsername').val(result.username);
+          $('#inputFirstname').val(result.first_name);
+          $('#inputLastname').val(result.last_name);
+          $('#inputEmail').val(result.email);
+          $('#inputPhone').val(result.phone);
+          $('#inputOrganization').val(result.organization);
+          $('#inputExtension').val(result.extension);
+          if (result.queue_name != null) {
+            $('#inputComplaintsQueue').prop('checked', true);
+          }
+          if (result.queue2_name != null) {
+            $('#inputGeneralQueue').prop('checked', true);
+          }
+          console.log(`complaintsQueue value is: ${$('#inputComplaintsQueue').val()}`);
+          console.log(`generalQueue value is: ${$('#inputGeneralQueue').val()}`);
+        })
       });
 
       $('#inputUsername').prop('disabled', true);
