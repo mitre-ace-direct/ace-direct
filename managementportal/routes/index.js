@@ -670,12 +670,13 @@ router.get('/ProfilePic/:username', (req, res) => {
     })
   }).catch(err => {
     console.log("Error finding agent!", err)
-    try {
-      image = fs.readFileSync('./public/images/anon.png')
-      res.send(image)
-    } catch(err) {
+    fs.readFile('./public/images/anon.png', (err, data) => {
+      if(err) {
         console.log("Could not read image!", err)
-    }
+      } else {
+        res.send(data)
+      }
+    })
   })
 })
 

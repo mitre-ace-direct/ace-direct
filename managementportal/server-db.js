@@ -1587,7 +1587,7 @@ function HandleManagerEvent(evt) {
           evtNewAgent.avgtalktime = 0;
           evtNewAgent.queue = '--';
           evtNewAgent.status = 'Logged Out';
-
+          evtNewAgent.username = AgentMap.get(agentInt).username;
           evtNewAgent.callMap = new Map();
           for (let i = 0; i < AsteriskQueuenames.length; i += 1) {
             evtNewAgent.callMap.set(AsteriskQueuenames[i], 0); // set the total call to 0
@@ -1903,8 +1903,10 @@ function mapAgents() {
             queues += `, ${data.data[i].queue2_name}`;
           }
         }
+        
         const usr = {
           name: `${data.data[i].first_name} ${data.data[i].last_name}`,
+          username: data.data[i].username,
           queues
         };
         AgentMap.set(ext, usr);
