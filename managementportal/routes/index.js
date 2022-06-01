@@ -639,6 +639,10 @@ router.get('/ProfilePic/:username', (req, res) => {
 
   let image;
 
+  res.set({
+    'Content-Type': 'image/*'
+  })
+
   getAgent(req.params.username).then((data) => {
     if(data.data[0].profile_picture && data.data[0].profile_picture !== '') {
        key = data.data[0].profile_picture
@@ -663,7 +667,7 @@ router.get('/ProfilePic/:username', (req, res) => {
             }
         }
         else {
-          console.log("success! Data retrieveed:", data.Body)
+          console.log("success! Data retrieved:", data.Body)
           image = data.Body
           res.send(image)
         }
@@ -674,6 +678,7 @@ router.get('/ProfilePic/:username', (req, res) => {
       if(err) {
         console.log("Could not read image!", err)
       } else {
+        console.log(data)
         res.send(data)
       }
     })

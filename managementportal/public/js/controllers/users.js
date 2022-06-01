@@ -76,27 +76,34 @@ $(document).ready(() => {
       (result, _status) => {
         console.log(`GetAgent returned: ${JSON.stringify(result)}`);
 
-        let url = `/ProfilePic/${result.username}`
+        $.get(`./ProfilePic/${result.username}`, (res, _status) => {
+          var fileReader = new FileReader() // Front end JS way to produce URLs for images.
+          let blobImage = new Blob([res], { type: 'image/*' }); // Converting data to Blob format
+          let url = URL.createObjectURL(blobImage);
 
-        console.log("URL:", url)
+          console.log("TYPE OF RES:", typeof res);
+          console.log("RES:", res);
+          console.log("BLOB:", blobImage)
+          console.log("BLOB URL:", url)
 
-        $('#inputProfilePic').attr('src', url);
+          $('#inputProfilePic').attr('src', url);
 
-        $('#inputUsername').val(result.username);
-        $('#inputFirstname').val(result.first_name);
-        $('#inputLastname').val(result.last_name);
-        $('#inputEmail').val(result.email);
-        $('#inputPhone').val(result.phone);
-        $('#inputOrganization').val(result.organization);
-        $('#inputExtension').val(result.extension);
-        if (result.queue_name != null) {
-          $('#inputComplaintsQueue').prop('checked', true);
-        }
-        if (result.queue2_name != null) {
-          $('#inputGeneralQueue').prop('checked', true);
-        }
-        console.log(`complaintsQueue value is: ${$('#inputComplaintsQueue').val()}`);
-        console.log(`generalQueue value is: ${$('#inputGeneralQueue').val()}`);
+          $('#inputUsername').val(result.username);
+          $('#inputFirstname').val(result.first_name);
+          $('#inputLastname').val(result.last_name);
+          $('#inputEmail').val(result.email);
+          $('#inputPhone').val(result.phone);
+          $('#inputOrganization').val(result.organization);
+          $('#inputExtension').val(result.extension);
+          if (result.queue_name != null) {
+            $('#inputComplaintsQueue').prop('checked', true);
+          }
+          if (result.queue2_name != null) {
+            $('#inputGeneralQueue').prop('checked', true);
+          }
+          console.log(`complaintsQueue value is: ${$('#inputComplaintsQueue').val()}`);
+          console.log(`generalQueue value is: ${$('#inputGeneralQueue').val()}`);
+        })
       });
 
       $('#inputUsername').prop('disabled', true);
