@@ -436,7 +436,6 @@ const appRouter = (connection, asterisk) => {
       + ', queue2_id = ?'
       + ', profile_picture = ?'
       + ' WHERE agent_id = ?';
-
       // Query for all records sorted by the id
       connection.query(query, [firstName, lastName, role, phone, email, organization,
         isApproved, isActive, extensionIdParam, queueId, queue2Id, profile_picture, agentId], (err, results) => {
