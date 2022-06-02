@@ -128,9 +128,11 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginxParams
   });
 
   app.get('/logout', (req, res) => {
-    // req.logout();
-    req.session.destroy(() => {
-      res.redirect('./login');
+    req.session.user = null;
+    req.session.save(function (err1) {
+      req.session.regenerate(function (err2) {
+        res.redirect('./login');
+      });
     });
   });
 
