@@ -196,7 +196,7 @@ const appRouter = (connection, asterisk) => {
      */
   app.get('/getagentrec/:username', (req, res) => {
     // Query DB for an agent record
-    connection.query('SELECT ad.agent_id, ad.username, ad.first_name, ad.last_name, ad.role, ad.phone, ad.email, ad.organization, ad.is_approved, ad.is_active, ae.extension, ae.extension_secret, aq.queue_name,  ad.layout, aq2.queue_name AS queue2_name, ad.profile_picture, oc.channel FROM agent_data AS ad LEFT JOIN asterisk_extensions AS ae ON ad.extension_id = ae.id LEFT JOIN asterisk_queues AS aq ON aq.id = ad.queue_id LEFT JOIN asterisk_queues AS aq2 ON aq2.id = ad.queue2_id LEFT JOIN outgoing_channels AS oc ON oc.id = ae.id WHERE ad.username =  ?', [req.params.username], (err, rows, _fields) => {
+    connection.query('SELECT ad.agent_id, ad.username, ad.first_name, ad.last_name, ad.role, ad.phone, ad.email, ad.organization, ad.is_approved, ad.is_active, ae.extension, ae.extension_secret, ad.queue_id, aq.queue_name,  ad.layout, ad.queue2_id, aq2.queue_name AS queue2_name, ad.profile_picture, oc.channel FROM agent_data AS ad LEFT JOIN asterisk_extensions AS ae ON ad.extension_id = ae.id LEFT JOIN asterisk_queues AS aq ON aq.id = ad.queue_id LEFT JOIN asterisk_queues AS aq2 ON aq2.id = ad.queue2_id LEFT JOIN outgoing_channels AS oc ON oc.id = ae.id WHERE ad.username =  ?', [req.params.username], (err, rows, _fields) => {
       if (err) {
         console.log(err);
         return res.status(500).send({
