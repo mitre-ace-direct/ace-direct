@@ -985,8 +985,6 @@ io.sockets.on('connection', (socket) => {
 
       let agentInfo = data.data[0];
 
-      console.log('agentInfo', agentInfo)
-
       updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
         agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
         '');
