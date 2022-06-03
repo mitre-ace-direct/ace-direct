@@ -13,10 +13,10 @@ $(document).ready(() => {
       visible: false,
       searchable: false
     }, {
-      targets: [3],
+      targets: [4],
       data: 'username'
     }, {
-      targets: [4],
+      targets: [5],
       render(data, _type, _row) {
         if (data.length === 0) {
           return 'Never';
@@ -24,7 +24,7 @@ $(document).ready(() => {
         return data;
       }
     }, {
-      targets: [5],
+      targets: [6],
       data: 'selected',
       orderable: false,
       render(data, type, _row) {
@@ -64,17 +64,20 @@ $(document).ready(() => {
   $('#usertable tbody').on('click', 'td', function ClickOnRow() {
     const data = table.row($(this).parents('tr')).data();
     const col = table.cell(this).index().column;
-    // console.log("cell clicked with col: " + col + " data: " + JSON.stringify(data));
+    console.log("cell clicked with col: " + col + " data: " + JSON.stringify(data));
 
-    if (col !== 5) { // do not load agent info if the clicked cell is the checkbox
-      const url = `./GetAgent/${data.username}`;
+    if (col !== 6) { // do not load agent info if the clicked cell is the checkbox
+      const url = `./GetAgent/${data["4"]}`;
       console.log(`GetAgent url: ${url}`);
       selectedUser = data.userId;
       $.get('./GetAgent', {
-        username: data.username
+        username: data["4"]
       },
       (result, _status) => {
         console.log(`GetAgent returned: ${JSON.stringify(result)}`);
+
+        $('#inputProfilePic').attr('src', `./ProfilePic/${result.username}`);
+
         $('#inputUsername').val(result.username);
         $('#inputFirstname').val(result.first_name);
         $('#inputLastname').val(result.last_name);

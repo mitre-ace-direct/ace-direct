@@ -181,6 +181,8 @@
                         <thead>
                           <tr>
                             <th class="text-center" data-toggle="tooltip" data-container="body"
+                              title="Profile Picture for the Agent">Profile Picture</th>
+                            <th class="text-center" data-toggle="tooltip" data-container="body"
                               title="Name of the agent">Call Agent</th>
                             <th class="text-center" data-toggle="tooltip" data-container="body"
                               title="Extension assigned to the agent">Registered Ext.</th>
@@ -202,6 +204,7 @@
                           </tr>
                         </thead>
                         <tr ng-repeat="a in Agents" highlight-on-change="{{a.help}}" ng-click="a.help = 'no'">
+                          <td align="center"><img ng-src="/ProfilePic/{{a.username}}" style="width: 50px; height: 50px;"></td>
                           <td><span class="queue-info" ng-bind="a.name"></span></td>
 
                           <td class="text-center"><span class="queue-info" ng-bind="a.agent"></span></td>
