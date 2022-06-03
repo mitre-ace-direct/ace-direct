@@ -18,3 +18,65 @@ margin: 0px 3px 0px 20px;
   position:absolute;
   top:12px
 } */
+
+/* Profile Pic Styles START */
+
+p#agentInfo 
+{
+  padding-bottom: 0px;
+}
+
+a#profilePic
+{
+  padding-top: 0px;
+  color: black;
+  font-size: smaller;
+  display: block;
+  align-content: center;
+}
+
+a#profilePic:hover
+{
+  background-color: transparent;
+  text-decoration: none;
+  color: black;
+}
+
+label#changeProfilePic
+{
+  border: none;
+  outline: none;
+  background: none;
+  padding-right: 5px;
+}
+
+label.profilePicUpload
+{
+  color:black;
+}
+
+label.profilePicUpload:hover
+{
+  color: #999;
+  cursor: pointer;
+}
+
+button#deleteProfilePic
+{
+  border: none;
+  outline: none;
+  background: none;
+  color: black;
+  font-weight: bold;
+}
+
+button#deleteProfilePic:hover
+{
+  color:#999;
+}
+
+input#profile-pic-file-upload {
+  position: absolute;
+  left: -9999rem;
+}
+/* Profile Pic Styles END */
