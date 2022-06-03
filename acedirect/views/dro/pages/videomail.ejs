@@ -26,6 +26,12 @@
       width: 100% !important;
     }
 
+    .modal-footer {
+      text-align: center !important;
+      background-color: #f9f9f9;
+      border-radius: 6px;
+    }
+
     .greeting-controls {
       background-color: lightgray;
       height: 100%;
@@ -195,7 +201,7 @@
 
 
 
-    <div class="row text-center" style="display:none" id="countDownDiv">
+    <div class="row text-center" style="display:none; vertical-align: -webkit-baseline-middle;" id="countDownDiv">
 
       <div class="col-12 text-center align-self-center">
         <br /><br /><br /><br /><br />
@@ -252,7 +258,7 @@
               <br /><br />
               <p style="font-size: 1.5em;">Thank you for leaving videomail. An agent will review your videomail
                 message.</p>
-              <hr class="text-black" style="width:50%;height:2px;background-color:black;border:none;">
+              <hr class="text-black" style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
               <p>You are being redirected in <b>5</b> seconds to <b id='redirectSiteURL'>
                   <%= redirectURL%>
                 </b></p>
@@ -261,7 +267,8 @@
           </div>
           <div class="modal-footer">
             <div class="text-center">
-              <a href="#" onclick="logout()"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
+              <a href="#" onclick="logout()" style="color:#073863;"><i class="fa fa-sign-out"></i> Exit Support
+                Portal</a>
             </div>
 
           </div>
