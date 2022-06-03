@@ -61,6 +61,81 @@ $(document).ready(() => {
     // console.log("checkbox data: " + data.selected);
   });
 
+  /**
+   * Event handlers for changing and deleting an agent's profile picture below.
+   * This is because the jquery that brings up the users information is right below.
+   * $(#usertable tbody)
+   */
+
+  // Event emitting for handling profile pic setting.
+  function setProfilePic() {
+    if(document.getElementById('profile-pic-file-upload').files && document.getElementById('profile-pic-file-upload').files[0]) {
+      var fileReader = new FileReader();
+      var file = document.getElementById('profile-pic-file-upload').files[0]
+
+      var fileExt = file.name.split('.')[1].toLowerCase()
+      console.log('You have uploaded a picture! File name:', file.name.split('.')[1])
+
+      fileReader.readAsDataURL(file)
+
+      fileReader.onload = (e) => {
+        $('#inputProfilePic').attr('src', e.target.result)
+
+        $('#deleteProfilePic').show();
+
+        console.log('Emitting profile-pic-set event now...')
+
+        // TODO: Not using sockets, so implement the logic below differently: 
+
+        // socket.emit('profile-pic-set', {
+        //   picture : file,
+        //   agentExtension : extensionMe.toString(),
+        //   agentUsername : username,
+        //   fileExt
+        // }, (res) => {
+        //   console.log(res)
+        // })
+      }
+    }
+  }
+
+  // Event emitting for deleting a profile pic.
+  function deleteProfilePic() {
+    console.log("Deleting profile pic!");
+
+    $('#deleteProfilePic').hide();
+
+
+    // TODO: Not using sockets, so implement the below logic differently:
+
+    // socket.emit('delete-profile-pic', {
+    //   username
+    // }, (res, error) => {
+    //   if(error) {
+    //     console.log("Could not read file!")
+    //   } else {
+    //     var fileReader = new FileReader();
+
+    //     console.log("Delete image response:", res)
+
+    //     var fileBlob = new Blob([res], { type: 'image/*' })
+
+    //     console.log("Response Blob:", fileBlob)
+
+    //     console.log('Profile Picture is being deleted!')
+
+    //     fileReader.readAsDataURL(fileBlob)
+
+    //     fileReader.onload = (e) => {
+    //       console.log("File reader onload event:", e)
+    //       $('#sidebar-profile-pic').attr('src', e.target.result)
+    //       $('#agent-pic-header').attr('src', e.target.result)
+    //       $('#agent-pic-dropdown').attr('src', e.target.result)
+    //     }
+    //   }
+    // })
+  }
+
   $('#usertable tbody').on('click', 'td', function ClickOnRow() {
     const data = table.row($(this).parents('tr')).data();
     const col = table.cell(this).index().column;
