@@ -650,7 +650,14 @@ router.get('/ProfilePic/:username', (req, res) => {
     if(data.data[0].profile_picture && data.data[0].profile_picture !== '') {
        key = data.data[0].profile_picture
     } else {
-        throw new Error("No profile Pic!")
+      fs.readFile('./public/images/anon.png', (err, data) => {
+        if(err) {
+          console.log("Could not read image!", err)
+        } else {
+          console.log(data)
+          res.send(data)
+        }
+      })
     }
     console.log("TYPEOF DATA:", typeof data)
     console.log("data.data[0].profile_picture:", data.data[0].profile_picture)
@@ -661,13 +668,7 @@ router.get('/ProfilePic/:username', (req, res) => {
     };            
     s3.getObject(options, (err, data) => {
         if(err) { 
-          console.log("Error retrieving file from bucket!",err)
-            try {
-              image = fs.readFileSync('./public/images/anon.png')
-              res.send(image)
-            } catch(err) {
-                console.log("Could not read image!", err)
-            }
+          throw new Error(err)
         }
         else {
           console.log("success! Data retrieved:", data.Body)
@@ -676,7 +677,7 @@ router.get('/ProfilePic/:username', (req, res) => {
         }
     })
   }).catch(err => {
-    console.log("Error finding agent!", err)
+    console.log("Error finding agent!", err);
     fs.readFile('./public/images/anon.png', (err, data) => {
       if(err) {
         console.log("Could not read image!", err)
