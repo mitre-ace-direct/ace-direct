@@ -26,15 +26,27 @@
       width: 100% !important;
     }
 
+    .modal-footer {
+      text-align: center !important;
+      background-color: #f9f9f9;
+      border-radius: 6px;
+    }
+
     .greeting-controls {
       background-color: lightgray;
       height: 100%;
       color: #000000;
       padding: 0.6em 2.6em 0.6em 2.6em;
+      display: flex;
+      column-gap: 30px;
+      justify-content: space-between;
+      align-items: center;
+      justify-content: center;
     }
 
     .video-element {
       cursor: pointer;
+      background-color: #333333;
     }
 
     #greetingPlayPauseBtn {
@@ -61,8 +73,20 @@
       width: 0px;
     }
 
+    .modal-outline-btn {
+      color: #073863 !important;
+      border-color: #073863 !important;
+      border-width: 2px !important;
+      font-weight: bold !important;
+      padding-top: 10px !important;
+      padding-bottom: 10px !important;
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+      width: 190px !important;
+    }
+
     #recordingCountdown {
-      font-size: xxx-large;
+      font-size: 5em;
     }
 
     .recording-controls {
@@ -70,6 +94,11 @@
       height: 100%;
       color: #000000;
       padding: 0.6em 2.6em 0.6em 2.6em;
+      display: flex;
+      column-gap: 30px;
+      justify-content: space-between;
+      align-items: center;
+      justify-content: center;
     }
 
     #recordingTimer {
@@ -88,6 +117,17 @@
       left: 0;
       height: 25px;
       width: 0px;
+    }
+
+    .btn-custom {
+      color: #fff;
+      background-color: #073863;
+      border-color: #073863;
+    }
+
+    .btn-custom:hover {
+      background-color: #073863;
+      color: white;
     }
 
     .center {
@@ -109,6 +149,7 @@
 
     .video-container {
       position: relative;
+      background-color: #333333;
     }
 
     .video-container video {
@@ -135,23 +176,23 @@
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
-    <div class="container ad-container">
+  <div class="container ad-container">
 
 
 
-      <div class="row" id="greetingDiv">
-        <div class="row  text-center greeting-controls" id="greeting-controls">
-          <i class="fa fa-play fa-2x" aria-hidden="true" id="greetingPlayPauseBtn"></i>
-          <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span>
-          <div id="custom-seekbar"><span></span></div>
-          <button class="btn btn-light" onclick="skipGreeting();">Skip Greeting&nbsp;<i class="fa fa-angle-double-right"
-              aria-hidden="true"></i> </button>
-        </div>
-        <video class="fill-height video-element" id="greetingVideo" title="Play Video">
-          <source src='/media/<%= introVideo %>' type="video/mp4">
-          <source src='/media/<%= introVideo %>' type="video/webm">
-        </video>
+    <div class="row" id="greetingDiv">
+      <div class="row  text-center greeting-controls" id="greeting-controls">
+        <i class="fa fa-play fa-2x" aria-hidden="true" id="greetingPlayPauseBtn"></i>
+        <div> <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
+        <div id="custom-seekbar"><span></span></div>
+        <button class="btn btn-secondary modal-outline-btn" onclick="skipGreeting();">Skip Greeting&nbsp;<i
+            class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
       </div>
+      <video class="fill-height video-element" id="greetingVideo" title="Play Video">
+        <source src='/media/<%= introVideo %>' type="video/mp4">
+        <source src='/media/<%= introVideo %>' type="video/webm">
+      </video>
+    </div>
 
 
 
@@ -160,78 +201,81 @@
 
 
 
-      <div class="row text-center" style="display:none" id="countDownDiv">
+    <div class="row text-center" style="display:none; vertical-align: -webkit-baseline-middle;" id="countDownDiv">
 
-        <div class="col-12 text-center align-self-center">
-          <br /><br /><br /><br /><br />
-          Recording will start in:<br /><span id="recordingCountdown">3</span>
-        </div>
+      <div class="col-12 text-center align-self-center">
+        <br /><br /><br /><br /><br />
+        <p class="lead"><strong>Recording will start in:</strong></p>
+        <span id="recordingCountdown">5</span>
       </div>
+    </div>
 
-      <div class="row" style="display:none" id="recordingDiv">
-        <div class="col-12 text-center">
-          <div class="row  recording-controls">
-            <div class="col-md-3">
-              <span class="text-danger" id="recordingTime"></span>
-            </div>
-            <div class="col-md-6 text-center">
-              <span><i class="fa fa-microphone-slash" aria-hidden="true"></i>&nbsp;Microphone is muted | <i
-                  class="fa fa-video-camera" aria-hidden="true"></i>&nbsp;Video is ON</span>
-            </div>
-            <div class="col-md-3">
-              <button class="btn btn-primary pull-right" onclick="sendVideomail();"><i class="fa fa-paper-plane"
-                  aria-hidden="true"></i> Send Videomail</button>
-            </div>
+    <div class="row" style="display:none" id="recordingDiv">
+      <div class="col-12 text-center">
+        <div class="row  recording-controls">
+          <div class="col-md-3">
+            <span class="text-danger" id="recordingTime"></span>
           </div>
-          <div class="row  recording-timer-bar" id="recording-timer-bar">
-            <div class="col-12">
-              <div id="recordingTimer"><span></span></div>
-            </div>
+          <div class="col-md-6 text-center">
+            <span><i class="fa fa-microphone-slash" aria-hidden="true"></i>&nbsp;Microphone is muted
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa fa-video-camera"
+                aria-hidden="true"></i>&nbsp;Video is ON</span>
           </div>
+          <div class="col-md-3">
+            <button class="btn btn-custom pull-right" onclick="sendVideomail();"><i class="fa fa-paper-plane"
+                aria-hidden="true"></i> Send Videomail</button>
+          </div>
+        </div>
+        <div class="row  recording-timer-bar" id="recording-timer-bar">
+          <div class="col-12">
+            <div id="recordingTimer"><span></span></div>
+          </div>
+        </div>
 
-          <div class="video-container">
-            <video autoplay="true" class="video-element" id="selfVideo">
+        <div class="video-container">
+          <video autoplay="true" class="video-element" id="selfVideo">
 
-            </video>
-            <div class="recordingInfoBanner">
-              <span>To send your Videomail before the 90 second time limit elapses, click the 'Send Videomail'
-                button.</span>
-            </div>
+          </video>
+          <div class="recordingInfoBanner">
+            <span>To send your Videomail before the 90 second time limit elapses, click the 'Send Videomail'
+              button.</span>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
 
-    <%- include("../partials/acedirect_footer") %>
+  <%- include("../partials/acedirect_footer") %>
 
-      <!-- MODALS -->
-      <div id="goodbyeModal" class="modal fade" data-backdrop="static">
-        <div class="modal-dialog modal-dialog-csentered" role="document">
-          <div class="modal-content">
-            <div class="modal-body" style="position: relative;min-height:300px;">
-              <div class="center text-center" style="width: 75%;">
-                <i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>
-                <br /><br />
-                <p style="font-size: 1.5em;">Thank you for leaving videomail. An agent will review your videomail
-                  message.</p>
-                <hr class="text-black" style="width:50%;height:2px;background-color:black;border:none;">
-                <p>You are being redirected in <b>5</b> seconds to <b id='redirectSiteURL'>
-                    <%= redirectURL%>
-                  </b></p>
-
-              </div>
-            </div>
-            <div class="modal-footer">
-              <div class="text-center">
-                <a href="#" onclick="logout()"><i class="fa fa-sign-out"></i> Exit Support Portal</a>
-              </div>
+    <!-- MODALS -->
+    <div id="goodbyeModal" class="modal fade" data-backdrop="static">
+      <div class="modal-dialog modal-dialog-csentered" role="document">
+        <div class="modal-content">
+          <div class="modal-body" style="position: relative;min-height:300px;">
+            <div class="center text-center" style="width: 75%;">
+              <i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>
+              <br /><br />
+              <p style="font-size: 1.5em;">Thank you for leaving videomail. An agent will review your videomail
+                message.</p>
+              <hr class="text-black" style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
+              <p>You are being redirected in <b>5</b> seconds to <b id='redirectSiteURL'>
+                  <%= redirectURL%>
+                </b></p>
 
             </div>
           </div>
-        </div>
+          <div class="modal-footer">
+            <div class="text-center">
+              <a href="#" onclick="logout()" style="color:#073863;"><i class="fa fa-sign-out"></i> Exit Support
+                Portal</a>
+            </div>
 
+          </div>
+        </div>
       </div>
+
+    </div>
 
 
 </body>
@@ -363,7 +407,7 @@
         let date = new Date(0);
         date.setSeconds(rTime); // specify value for SECONDS here
         let timeString = date.toISOString().substr(15, 4);
-        $('#recordingTime').html("<i class='fa fa-circle' aria-hidden='true'></i> Recording | " + timeString + " / " + mTimeFormatted);
+        $('#recordingTime').html("<i class='fa fa-circle' aria-hidden='true'></i> Recording &nbsp;&nbsp;|&nbsp;&nbsp; " + timeString + " / " + mTimeFormatted);
         if (rTime > maxTime) {
           clearInterval(recTimerInterval)
           sendVideomail();
