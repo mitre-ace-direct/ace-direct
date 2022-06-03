@@ -78,8 +78,8 @@
       "passwd": "password"
     },
     "extensions": {
-      "start_number": "90001",
-      "end_number": "90005",
+      "start_number": "99001",
+      "end_number": "99005",
       "secret": "password"
     },
     "queues": {
