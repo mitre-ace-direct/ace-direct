@@ -23,7 +23,7 @@ const c = require('./app/constants.js')
 const utils = require('./app/utils.js')
 const datConfig = require('./../dat/config.json')
 const AWS = require('aws-sdk');
-const proxy = require('proxy-agent')
+const proxy = require('proxy-agent');
 
 AWS.config.update({
   region: datConfig.s3.region,
