@@ -648,7 +648,25 @@ router.get('/ProfilePic/:username', (req, res) => {
 
   getAgent(req.params.username).then((data) => {
     if(data.data[0].profile_picture && data.data[0].profile_picture !== '') {
-       key = data.data[0].profile_picture
+      key = data.data[0].profile_picture;
+
+      console.log("TYPEOF DATA:", typeof data)
+      console.log("data.data[0].profile_picture:", data.data[0].profile_picture)
+      console.log("typeof data.data[0].profile_picture", typeof data.data[0].profile_picture)
+      let options = {
+          Bucket : config.s3.bucketname,
+          Key : key
+      };            
+      s3.getObject(options, (err, data) => {
+          if(err) { 
+            throw new Error(err)
+          }
+          else {
+            console.log("success! Data retrieved:", data.Body)
+            image = data.Body
+            res.send(image)
+          }
+      });
     } else {
       fs.readFile('./public/images/anon.png', (err, data) => {
         if(err) {
@@ -659,23 +677,6 @@ router.get('/ProfilePic/:username', (req, res) => {
         }
       })
     }
-    console.log("TYPEOF DATA:", typeof data)
-    console.log("data.data[0].profile_picture:", data.data[0].profile_picture)
-    console.log("typeof data.data[0].profile_picture", typeof data.data[0].profile_picture)
-    let options = {
-        Bucket : config.s3.bucketname,
-        Key : key
-    };            
-    s3.getObject(options, (err, data) => {
-        if(err) { 
-          throw new Error(err)
-        }
-        else {
-          console.log("success! Data retrieved:", data.Body)
-          image = data.Body
-          res.send(image)
-        }
-    })
   }).catch(err => {
     console.log("Error finding agent!", err);
     fs.readFile('./public/images/anon.png', (err, data) => {
@@ -687,6 +688,18 @@ router.get('/ProfilePic/:username', (req, res) => {
       }
     })
   })
+})
+
+router.get('/profilePicPoll/:username', (req, res) => {
+  var profilePicFlag = { profilePicExists : false };
+  
+  getAgent(req.params.username).then((data) => {
+      if(data.data[0].profile_picture && data.data[0].profile_picture.length > 1) {
+          console.log('User has a profile pic saved!')
+          profilePicFlag.profilePicExists = true
+      }
+      res.send(profilePicFlag)
+  });
 })
 
 module.exports = router;

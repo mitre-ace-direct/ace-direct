@@ -22,6 +22,18 @@ const mysql = require('mysql');
 const Json2csvParser = require('json2csv').Parser;
 const redis = require('redis');
 const socketIO = require('socket.io');
+const proxy = require('proxy-agent');
+const AWS = require('aws-sdk')
+const datConfig = require('./../dat/config.json');
+
+AWS.config.update({
+  region: datConfig.s3.region,
+  httpOptions: {
+    agent: proxy(datConfig.common.proxy)
+  }
+})
+
+const s3 = new AWS.S3();
 
 // additional helpers/utility functions
 const { getConfigVal } = require('./helpers/utility');
@@ -31,6 +43,65 @@ const report = require('./controllers/report');
 const webrtcstats = require('./controllers/webrtcstats');
 const { setRgbValues } = require('./helpers/utility');
 const validator = require('./utils/validator');
+
+const getAgent = (usnm) => {
+  return new Promise((resolve, reject) => {
+    console.log('Getting agent! Username: ', usnm)
+    console.log('get agent link', `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`)
+    request({
+      method: 'GET',
+      headers : {'Accept': 'application/json'},
+      url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`,
+    }, function (error, response, data) {
+      if (error) {
+        console.log("Error! Could not get agent:", error);
+        reject(error)
+      } else {
+        console.log("Success! Agent found!");
+        console.log('Data: ', typeof data)
+        console.log("TEXT " + JSON.parse(data));
+        if(data.length > 0) {
+          var jsonData = JSON.parse(data)
+          resolve(jsonData)
+        }
+        else reject("Agent cannot be found!")
+      }
+    });
+  });
+}
+const updateAgent = (aId, first, last, role, phone, email, org, isApp, isAct, ext, q1_id, q2_id, profPic) => {
+  return new Promise((resolve, reject) => {
+    console.log("update agent data: ", aId, first, last, role, phone, email, org, isApp, isAct, ext, q1_id, q2_id, profPic)
+    request({
+      method: 'POST',
+      url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/updateProfile`,
+      form : {
+          agent_id : aId,
+          first_name : first,
+          last_name : last,
+          role,
+          phone,
+          email,
+          organization : org,
+          isApproved : isApp,
+          isActive : isAct,
+          extension : ext,
+          queue_id : q1_id,
+          queue2_id : q2_id,
+          profile_picture : profPic
+      }
+    }, function (error, response, data) {
+      if (error) {
+        console.log("Error", error);
+        reject(error)
+      } else {
+        console.log("**Updating the agent was a success!**");
+        console.log('response:', response)
+        console.log('data:', data)
+      }
+    });
+  });
+}
 
 let port = null; // set the port
 let ami = null; // Asterisk AMI
@@ -1434,6 +1505,110 @@ io.sockets.on('connection', (socket) => {
           }
         });
       }
+    });
+  });
+
+  socket.on('profile-pic-set', (data, callback) => {
+    console.log('Profile Picture Set!')
+    callback("Emitter signal received!")
+
+    var profilePic = data.picture
+    var agentExt = data.agentExtension
+    var agentUsnm = data.agentUsername
+    var fileExt = data.fileExt
+
+    console.log("Bucket: " + datConfig.s3.bucketname)
+
+    var getParams = { Bucket : datConfig.s3.bucketname, Key : agentExt+'.'+fileExt }
+    var uploadParams = { ...getParams, Body : profilePic, ContentType : 'image/*' }
+
+    //console.log("Upload parameters: " + JSON.stringify(uploadParams))
+
+    s3.getObject(getParams, (err, data) => {
+      if(err) {
+        s3.upload(uploadParams, (err) => {
+          if(err) {
+            console.log("Error! Could not upload to S3 bucket: " + err)
+          } else {
+            getAgent(agentUsnm).then(agentInfoArray => {
+              let agentInfo = agentInfoArray.data[0];
+              
+              console.log('agentInfo1', agentInfoArray.data[0])
+
+              updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
+                agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
+                getParams.Key);
+            }).catch(err => {
+              console.log("Error getting agent!", err)
+            })
+          }
+        })
+      } else {
+        s3.deleteObject(getParams, (err, data) => {
+          if(err) console.log(err)
+          else {
+            console.log(data)
+            s3.upload(uploadParams, (err) => {
+              if(err) {
+                console.log("Error! Could not upload to S3 bucket: " + err)
+              } else {
+                getAgent(agentUsnm).then(agentInfoArray => {
+                  let agentInfo = agentInfoArray.data[0];
+
+                  console.log('agentInfo2', agentInfoArray.data[0])
+
+                  updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
+                    agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
+                    getParams.Key);
+                })
+              }
+            })
+          }
+        })
+      }
+    })
+
+  });
+
+  socket.on('delete-profile-pic', (data, callback) => {
+    fs.readFile('./public/images/anon.png', (err, data) => {
+      if(err) {
+        console.log("Could not read image!", err);
+        callback('', err);
+      } else {
+        let image = data
+        console.log("fs.readFileSync image:", image)
+        callback(image);
+      }
+    })
+
+    let username = data.agentUsername;
+    let key = ''
+
+    getAgent(username).then((data) => {
+      if(data.data[0].profile_picture) {
+        key = data.data[0].profile_picture
+      } else {
+        throw new Error("No profile Pic!")
+      }
+
+      let agentInfo = data.data[0];
+
+      updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
+        agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
+        '');
+
+      let deleteParams = { Bucket : datConfig.s3.bucketname, Key : key }
+
+      s3.deleteObject(deleteParams, (err, data) => {
+        if(err) {
+          console.log("There was an error deleting the user profile picture in S3 bucket!", err);
+        } else {
+          console.log("Deleting image successful!", data)
+        }
+      })
+    }).catch(e => {
+      console.log("Error deleting profile pic!", e)
     });
   });
 });
