@@ -182,10 +182,10 @@
 
     <div class="row" id="greetingDiv">
       <div class="row  text-center greeting-controls" id="greeting-controls">
-        <i class="fa fa-play fa-2x" aria-hidden="true" id="greetingPlayPauseBtn"></i>
+        <i class="fa fa-play fa-2x" id="greetingPlayPauseBtn" tabindex="0" aria-label="Play Greeting" role="button"></i>
         <div> <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
         <div id="custom-seekbar"><span></span></div>
-        <button class="btn btn-secondary modal-outline-btn" onclick="skipGreeting();">Skip Greeting&nbsp;<i
+        <button class="btn btn-secondary modal-outline-btn" onclick="skipGreeting();" tabindex="0">Skip Greeting&nbsp;<i
             class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
       </div>
       <video class="fill-height video-element" id="greetingVideo" title="Play Video">
@@ -205,8 +205,8 @@
 
       <div class="col-12 text-center align-self-center">
         <br /><br /><br /><br /><br />
-        <p class="lead"><strong>Recording will start in:</strong></p>
-        <span id="recordingCountdown">5</span>
+        <p class="lead"><strong aria-live="assertive">Recording will start in:</strong></p>
+        <span id="recordingCountdown" aria-live="assertive">5</span>
       </div>
     </div>
 
@@ -237,7 +237,7 @@
 
           </video>
           <div class="recordingInfoBanner">
-            <span>To send your Videomail before the 90 second time limit elapses, click the 'Send Videomail'
+            <span role="alert">To send your Videomail before the 90 second time limit elapses, click the 'Send Videomail'
               button.</span>
           </div>
         </div>
@@ -249,25 +249,24 @@
   <%- include("../partials/acedirect_footer") %>
 
     <!-- MODALS -->
-    <div id="goodbyeModal" class="modal fade" data-backdrop="static">
-      <div class="modal-dialog modal-dialog-csentered" role="document">
+    <div id="goodbyeModal" class="modal fade" data-backdrop="static" role="dialog" aria-labelledby="goodbyeDescription">
+      <div class="modal-dialog modal-dialog-csentered">
         <div class="modal-content">
           <div class="modal-body" style="position: relative;min-height:300px;">
             <div class="center text-center" style="width: 75%;">
               <i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>
               <br /><br />
-              <p style="font-size: 1.5em;">Thank you for leaving videomail. An agent will review your videomail
+              <p id="goodbyeDescription" style="font-size: 1.5em;">Thank you for leaving videomail. An agent will review your videomail
                 message.</p>
-              <hr class="text-black" style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
-              <p>You are being redirected in <b>5</b> seconds to <b id='redirectSiteURL'>
+              <!-- <hr class="text-black" style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;"> -->
+              <!-- <p>You are being redirected in <b>5</b> seconds to <b id='redirectSiteURL'>
                   <%= redirectURL%>
-                </b></p>
-
+                </b></p> -->
             </div>
           </div>
           <div class="modal-footer">
             <div class="text-center">
-              <a href="#" onclick="logout()" style="color:#073863;"><i class="fa fa-sign-out"></i> Exit Support
+              <a id="goodbyeExit" href="#" onclick="logout()" style="color:#073863;" role="button" tabindex="0"><i class="fa fa-sign-out"></i> Exit Support
                 Portal</a>
             </div>
 
@@ -335,11 +334,11 @@
   $('#greetingVideo').on('play', (evt) => {
     console.log("playing")
     $('#greetingVideo').attr("title", "Pause Video");
-    $("#greetingPlayPauseBtn").removeClass('fa-play').addClass('fa-pause');
+    $("#greetingPlayPauseBtn").removeClass('fa-play').addClass('fa-pause').attr('aria-label','Pause Greeting');
   }).on('pause', (evt) => {
     console.log("pause")
     $('#greetingVideo').attr("title", "Play Video");
-    $("#greetingPlayPauseBtn").removeClass('fa-pause').addClass('fa-play');
+    $("#greetingPlayPauseBtn").removeClass('fa-pause').addClass('fa-play').attr('aria-label','Play Greeting');
   }).on('ended', (evt) => {
     console.log("ended")
     gotoCountDown()
@@ -464,9 +463,9 @@
 
     $('#recordingDiv').hide();
     $('#goodbyeModal').modal()
-    setTimeout(() => {
-      redirect();
-    }, 5000)
+    // setTimeout(() => {
+    //   redirect();
+    // }, 5000)
   }
 
   function redirect() {
@@ -495,6 +494,11 @@
   }
   setVideoSize()
   window.addEventListener('resize', setVideoSize);
+
+  $('#goodbyeModal').on('shown.bs.modal', () => {
+    $('#goodbyeExit').focus();
+  });
+
 </script>
 
 </html>
