@@ -1077,7 +1077,9 @@ function newChatMessage(data) {
     $('#rtt-typing').css('display', 'none');
     $('#chat-messages').remove($('#rtt-typing'));
     $('#rtt-typing').html('').removeClass('direct-chat-text');
-    $(msgblock).addClass('alert alert-secondary receivedChat').appendTo($('#chat-messages'));
+    $(msgblock).addClass('alert alert-secondary receivedChat')
+      .attr('aria-live', 'assertive')
+      .appendTo($('#chat-messages'));
   }
   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 }
