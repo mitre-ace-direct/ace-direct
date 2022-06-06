@@ -84,7 +84,7 @@
                   </div>
                 </div>
                 <hr />
-                <div class="box-body" style="height:75vh; display:flex; flex-direction: column; overflow: hidden;">
+                <div class="box-body" style="height:75vh; display:flex; flex-direction: column; overflow: hidden;" role="region" aria-label="chat window">
                   <!-- Conversations are loaded here -->
                   <div id="chat-body" style="height:75vh; flex-direction: column; display: flex;">
                     <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
@@ -165,11 +165,11 @@
                 <div class="box-header" style="overflow: hidden;">
                   <h1 style="float:left">File Sharing</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
-                    <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)">A</button>
+                    <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)" aria-label="Decrease font size by 10%">A</button>
                     <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize"
-                      style="background-color: white; pointer-events: none;">100%</button>
+                      style="background-color: white; pointer-events: none;" aria-live="assertive">100%</button>
                     <button type="button" class="btn fontSizeButtons" style="font-size:large;"
-                      onclick="setFontSize(10)">A</button>
+                      onclick="setFontSize(10)" aria-label="Increase font size by 10%">A</button>
                   </div>
                 </div>
                 <hr />
