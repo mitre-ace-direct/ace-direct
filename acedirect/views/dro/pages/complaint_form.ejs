@@ -76,11 +76,11 @@
                 <div class="box-header" style="overflow: hidden;">
                   <h1 style="float:left">Chat</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
-                    <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)">A</button>
+                    <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)" aria-label="Decrease font size by 10%">A</button>
                     <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize"
-                      style="background-color: white; pointer-events: none;">100%</button>
+                      style="background-color: white; pointer-events: none;" aria-live="assertive">100%</button>
                     <button type="button" class="btn fontSizeButtons" style="font-size:large;"
-                      onclick="setFontSize(10)">A</button>
+                      onclick="setFontSize(10)" aria-label="Increase font size by 10%">A</button>
                   </div>
                 </div>
                 <hr />
@@ -104,7 +104,7 @@
                           <span class="dropup pull-left">
                             <button id="chat-emoji" class="btn btn-flat buttonFontSize" type="button"
                               data-toggle="dropdown" animation="true"
-                              style="border:2px solid lightgrey; margin-right: 10px">&#128512;</button>
+                              style="border:2px solid lightgrey; margin-right: 10px" aria-label="Select emoji">&#128512;</button>
                             <div class="dropdown-menu dropdown-multicol" id="emoji-selector"
                               aria-labelledby="dropdownMenuButton"
                               style="height:fit-content; overflow-y: auto; text-align: center;">
