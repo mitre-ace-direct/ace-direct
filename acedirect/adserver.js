@@ -1765,25 +1765,21 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('broadcast-agent-chat', (data) => {
     const broadcastExtensions = [];
+    io.to('my room').emit('broadcast', data);
+    const clients = io.sockets.adapter.rooms.get('my room');
 
-    const clientsInTheRoom = io.sockets.adapter.rooms['my room'];
-    const clients = (clientsInTheRoom.sockets);
-    const roomKeys = Object.keys(clients);
-
-    // if the socketID matches, add to convo
-    for (let i = 0; i < roomKeys.length; i += 1) {
-      const currentRooms = (io.sockets.sockets[roomKeys[i]].rooms);
-      broadcastExtensions.push((Object.keys(currentRooms)));
+    for (const clientId of clients ) {
+      const clientSocket = io.sockets.sockets.get(clientId);
+      broadcastExtensions.push(clientSocket.decoded_token.extension);
     }
 
-    io.emit('broadcast', data);
     if (saveChatHistory === 'true') {
       // insert the broadcast into each conversation's db
       for (let i = 0; i < broadcastExtensions.length; i += 1) {
         data.destname = '';
-        const currentExt = broadcastExtensions[i][0];
+        const currentExt = broadcastExtensions[i];
 
-        data.destext = broadcastExtensions[i][0];
+        data.destext = broadcastExtensions[i];
 
         let chatMembers = [currentExt, data.senderext];
         chatMembers = chatMembers.sort();
