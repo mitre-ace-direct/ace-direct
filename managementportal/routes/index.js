@@ -5,6 +5,17 @@ const fs = require('fs');
 const logger = require('../helpers/logger');
 const { getConfigVal } = require('../helpers/utility');
 const validator = require('../utils/validator');
+const config = require('./../../dat/config.json');
+const AWS = require('aws-sdk');
+const proxy = require('proxy-agent');
+
+AWS.config.update({
+  region: config.s3.region,
+  httpOptions: {
+    agent: proxy(config.common.proxy)
+  }
+});
+const s3 = new AWS.S3();
 
 const router = express.Router();
 
@@ -272,8 +283,11 @@ router.get('/token', restrict, (req, res) => {
  * @param {function} function(req, res)
  */
 router.get('/logout', (req, res) => {
-  req.session.destroy(()=>{
-     res.redirect(req.get('referer'));
+  req.session.user = null;
+  req.session.save(function (err1) {
+    req.session.regenerate(function (err2) {
+      res.redirect(req.get('referer'));
+    });
   });
 });
 
@@ -583,5 +597,109 @@ router.get('/GetAgent', restrict, (req, res) => {
     }
   });
 });
+
+/**
+ * Handler function for getting an agent from the database.
+ */
+
+ const getAgent = (usnm) => {
+  return new Promise((resolve, reject) => {
+    console.log('Getting agent! Username: ', usnm)
+    console.log('get agent link', `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`)
+    request({
+      method: 'GET',
+      headers : {'Accept': 'application/json'},
+      url: `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`,
+    }, function (error, response, data) {
+      if (error) {
+        console.log("Error! Could not get agent:", error);
+        reject(error)
+      } else {
+        console.log("Success! Agent found!");
+        console.log('Data: ', typeof data)
+        console.log("TEXT " + JSON.parse(data));
+        if(data.length > 0) {
+          var jsonData = JSON.parse(data)
+          resolve(jsonData)
+        }
+        else reject("Agent cannot be found!")
+      }
+    });
+  });
+}
+
+
+/**
+ * Handles populating all profile picture image tags seen throughout the management portal.
+ * 
+ * @param {string} '/profilePic/:username
+ * 
+ */
+
+router.get('/ProfilePic/:username', (req, res) => {
+  console.log(`/ProfilePic/${req.params.username} endpoint called!`)
+  let key = '';
+
+  let image;
+
+  res.set({
+    'Content-Type': 'image/*'
+  })
+
+  getAgent(req.params.username).then((data) => {
+    if(data.data[0].profile_picture && data.data[0].profile_picture !== '') {
+      key = data.data[0].profile_picture;
+
+      console.log("TYPEOF DATA:", typeof data)
+      console.log("data.data[0].profile_picture:", data.data[0].profile_picture)
+      console.log("typeof data.data[0].profile_picture", typeof data.data[0].profile_picture)
+      let options = {
+          Bucket : config.s3.bucketname,
+          Key : key
+      };            
+      s3.getObject(options, (err, data) => {
+          if(err) { 
+            throw new Error(err)
+          }
+          else {
+            console.log("success! Data retrieved:", data.Body)
+            image = data.Body
+            res.send(image)
+          }
+      });
+    } else {
+      fs.readFile('./public/images/anon.png', (err, data) => {
+        if(err) {
+          console.log("Could not read image!", err)
+        } else {
+          console.log(data)
+          res.send(data)
+        }
+      })
+    }
+  }).catch(err => {
+    console.log("Error finding agent!", err);
+    fs.readFile('./public/images/anon.png', (err, data) => {
+      if(err) {
+        console.log("Could not read image!", err)
+      } else {
+        console.log(data)
+        res.send(data)
+      }
+    })
+  })
+})
+
+router.get('/profilePicPoll/:username', (req, res) => {
+  var profilePicFlag = { profilePicExists : false };
+  
+  getAgent(req.params.username).then((data) => {
+      if(data.data[0].profile_picture && data.data[0].profile_picture.length > 1) {
+          console.log('User has a profile pic saved!')
+          profilePicFlag.profilePicExists = true
+      }
+      res.send(profilePicFlag)
+  });
+})
 
 module.exports = router;

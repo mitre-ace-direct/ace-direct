@@ -126,13 +126,14 @@ const dbController = angular.module('dashboardModule', ['csrService', 'angularDu
         for (let i = 0; i < data.agents.length; i += 1) {
           const a = findAgent($scope.Agents, data.agents[i]);
           if (a) {
-            Object.keys(data.agents[i]).forEach((prop) => { a[prop] = data.agents[i][prop]; });
+            Object.keys(data.agents[i]).forEach((prop) => { a[prop] = data.agents[i][prop]; console.log("Agent data:", data.agents[i][prop]); });
 
             // for (const prop in data.agents[i]) {
             //   a[prop] = data.agents[i][prop];
             // }
           } else {
             $scope.Agents.push(data.agents[i]);
+            console.log("Agent data:", data.agents[i])
           }
         }
 

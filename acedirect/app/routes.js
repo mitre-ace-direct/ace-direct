@@ -625,8 +625,11 @@ router.get('/getagentstatus/:token', (req, res) => {
  */
 
 router.get('/logout', (req, res) => {
-    req.session.destroy(()=>{
-       res.redirect(req.get('referer'));
+    req.session.user = null;
+    req.session.save(function (err1) {
+      req.session.regenerate(function (err2) {
+        res.redirect(req.get('referer'));
+      });
     });
 });
 
