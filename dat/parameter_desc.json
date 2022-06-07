@@ -265,5 +265,9 @@
   },
   "filesharing": {
     "virus_scan_enabled": "Virus scan will be enabled if set to 'true' but clamdscan must be set up on the machine for it to work. The default is false"
+  },
+  "complaint_videos": {
+    "instructions_video": "video filename for instructions to the complaint user; MP4/webm format; defaults to sample.mp4; customize with your own instructions file in /acedirect/public/media/",
+    "please_wait_video": "video filename for letting the complaint user know to wait; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/"
   }
 }
