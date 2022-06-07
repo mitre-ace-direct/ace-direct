@@ -378,3 +378,7 @@ body {
   background-color: #073863 !important;
   color: white;
 }
+
+.video-element {
+  width: 100%;
+}
