@@ -178,14 +178,12 @@
   </header>
   <div class="container ad-container">
 
-
-
     <div class="row" id="greetingDiv">
       <div class="row  text-center greeting-controls" id="greeting-controls">
         <i class="fa fa-play fa-2x" id="greetingPlayPauseBtn" tabindex="0" aria-label="Play Greeting" role="button"></i>
         <div> <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
         <div id="custom-seekbar"><span></span></div>
-        <button class="btn btn-secondary modal-outline-btn" onclick="skipGreeting();" tabindex="0">Skip Greeting&nbsp;<i
+        <button class="btn btn-secondary modal-outline-btn" onclick="skipGreeting();" tabindex="0" aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
             class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
       </div>
       <video class="fill-height video-element" id="greetingVideo" title="Play Video">
@@ -194,19 +192,12 @@
       </video>
     </div>
 
-
-
-
-
-
-
-
     <div class="row text-center" style="display:none; vertical-align: -webkit-baseline-middle;" id="countDownDiv">
 
       <div class="col-12 text-center align-self-center">
         <br /><br /><br /><br /><br />
-        <p class="lead"><strong aria-live="assertive">Recording will start in:</strong></p>
-        <span id="recordingCountdown" aria-live="assertive">5</span>
+        <p class="lead"><strong>Recording will start in:</strong></p>
+        <span id="recordingCountdown">5</span>
       </div>
     </div>
 
@@ -237,14 +228,13 @@
 
           </video>
           <div class="recordingInfoBanner">
-            <span role="alert">To send your Videomail before the 90 second time limit elapses, click the 'Send Videomail'
+            <span role="alert" aria-live="assertive">To send your Videomail before the 90 second time limit elapses, click the 'Send Videomail'
               button.</span>
           </div>
         </div>
       </div>
     </div>
   </div>
-
 
   <%- include("../partials/acedirect_footer") %>
 
@@ -258,10 +248,10 @@
               <br /><br />
               <p id="goodbyeDescription" style="font-size: 1.5em;">Thank you for leaving videomail. An agent will review your videomail
                 message.</p>
-              <!-- <hr class="text-black" style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;"> -->
-              <!-- <p>You are being redirected in <b>5</b> seconds to <b id='redirectSiteURL'>
+              <hr class="text-black" style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
+              <p>You are being redirected in <b>5</b> seconds to <b id='redirectSiteURL'>
                   <%= redirectURL%>
-                </b></p> -->
+                </b></p>
             </div>
           </div>
           <div class="modal-footer">
@@ -275,7 +265,6 @@
       </div>
 
     </div>
-
 
 </body>
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
@@ -463,9 +452,9 @@
 
     $('#recordingDiv').hide();
     $('#goodbyeModal').modal()
-    // setTimeout(() => {
-    //   redirect();
-    // }, 5000)
+    setTimeout(() => {
+      redirect();
+    }, 5000)
   }
 
   function redirect() {
