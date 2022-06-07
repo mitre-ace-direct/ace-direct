@@ -23,7 +23,7 @@ const c = require('./app/constants.js')
 const utils = require('./app/utils.js')
 const datConfig = require('./../dat/config.json')
 const AWS = require('aws-sdk');
-const proxy = require('proxy-agent')
+const proxy = require('proxy-agent');
 
 AWS.config.update({
   region: datConfig.s3.region,
@@ -628,9 +628,9 @@ io.sockets.on('connection', (socket) => {
       });
     });
   }
-  const updateAgent = (aId, first, last, role, phone, email, org, isApp, isAct, ext, q1, q2, profPic) => {
+  const updateAgent = (aId, first, last, role, phone, email, org, isApp, isAct, ext, q1_id, q2_id, profPic) => {
     return new Promise((resolve, reject) => {
-      console.log("update agent data: ", aId, first, last, role, phone, email, org, isApp, isAct, ext, q1, q2, profPic)
+      console.log("update agent data: ", aId, first, last, role, phone, email, org, isApp, isAct, ext, q1_id, q2_id, profPic)
       request({
         method: 'POST',
         url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/updateProfile`,
@@ -645,8 +645,8 @@ io.sockets.on('connection', (socket) => {
             isApproved : isApp,
             isActive : isAct,
             extension : ext,
-            queueId : q1,
-            queue2Id : q2,
+            queue_id : q1_id,
+            queue2_id : q2_id,
             profile_picture : profPic
         }
       }, function (error, response, data) {
@@ -924,10 +924,10 @@ io.sockets.on('connection', (socket) => {
             getAgent(agentUsnm).then(agentInfoArray => {
               let agentInfo = agentInfoArray.data[0];
               
-              console.log('agentInfo', agentInfoArray.data[0])
+              console.log('agentInfo1', agentInfoArray.data[0])
 
               updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
-                agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
+                agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
                 getParams.Key);
             }).catch(err => {
               console.log("Error getting agent!", err)
@@ -946,10 +946,10 @@ io.sockets.on('connection', (socket) => {
                 getAgent(agentUsnm).then(agentInfoArray => {
                   let agentInfo = agentInfoArray.data[0];
 
-                  console.log('agentInfo', agentInfoArray.data[0])
+                  console.log('agentInfo2', agentInfoArray.data[0])
 
                   updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
-                    agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
+                    agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
                     getParams.Key);
                 })
               }
@@ -985,10 +985,8 @@ io.sockets.on('connection', (socket) => {
 
       let agentInfo = data.data[0];
 
-      console.log('agentInfo', agentInfo)
-
       updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
-        agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_name, agentInfo.queue2_name,
+        agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
         '');
 
       let deleteParams = { Bucket : datConfig.s3.bucketname, Key : key }

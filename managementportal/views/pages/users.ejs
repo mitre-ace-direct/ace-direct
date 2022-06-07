@@ -33,6 +33,7 @@
                         <thead>
                           <tr>
                             <th class="text">ID</th>
+                            <th class="text">Profile Picture</th>
                             <th class="text">First Name</th>
                             <th class="text">Last Name</th>
                             <th class="text">Username</th>
@@ -45,6 +46,9 @@
                             <tr style="cursor:pointer" value="<%= user.agent_id %>">
                               <td>
                                 <%= user.agent_id %>
+                              </td>
+                              <td align="center">
+                                <img src="/ProfilePic/<%= user.username %>" style="height: 50px; width: 50px;">
                               </td>
                               <td>
                                 <%= user.first_name %>
@@ -96,6 +100,21 @@
         <div class="modal-body">
           <div class="container-fluid">
             <form class="toggle-disabled" id="addUserForm">
+              <div class="form-group-row" align="center">
+                <img id="inputProfilePic" src="images/anon.png" style="height: 216px; width: 216px; margin-bottom: 1rem;" decoding="async">
+                <a id="profilePic">
+                  <label class="profilePicUpload" id="changeProfilePic">
+                      <input type="file" id="profile-pic-file-upload" name="fileInput" class="form-control-file" accept="image/*" onchange="setProfilePic()">
+                      Change
+                  </label>
+                  <label class="profilePicUpload">
+                      <button id="deleteProfilePic" onclick="deleteProfilePicture()">
+                      Delete
+                      </button>
+                  </label>
+                  <span> Profile Picure </span>
+              </a>
+              </div>
               <div class="form-group row">
                 <label for="inputUsername" class="col-sm-3 col-form-label">Username</label>
                 <div class="col-sm-9">

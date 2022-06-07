@@ -22,6 +22,7 @@ function fnBrowserDetect() {
     // show modal
     $('#browserType').text(browserName);
     $('#notChromeModal').modal('show');
+    openDialog('notChromeModal', window);
   }
 }
 
@@ -134,35 +135,3 @@ $('#notChromeModal').on('shown.bs.modal', () => {
   $('#continue-btn').focus();
   console.log('shown.bs.modal');
 });
-
-// Add all the elements inside modal which you want to make focusable
-const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-const modal = document.querySelector('#notChromeModal'); // select the modal by it's id
-
-// get first element to be focused inside modal
-const firstFocusableElement = modal.querySelectorAll(focusableElements)[0];
-const focusableContent = modal.querySelectorAll(focusableElements);
-// Get last element to be focused inside modal
-const lastFocusableElement = focusableContent[focusableContent.length - 1];
-
-document.addEventListener('keydown', (e) => {
-  const isTabPressed = e.key === 'Tab' || e.keyCode === 9;
-
-  if (!isTabPressed) {
-    return;
-  }
-
-  if (e.shiftKey) { // if shift key pressed for shift + tab combination
-    if (document.activeElement === firstFocusableElement) {
-      lastFocusableElement.focus(); // add focus for the last focusable element
-      e.preventDefault();
-    }
-  } else if (document.activeElement === lastFocusableElement) {
-    // if focused has reached to last focusable element then focus first focusable
-    // element after pressing tab
-    firstFocusableElement.focus(); // add focus for the first focusable element
-    e.preventDefault();
-  }
-});
-
-firstFocusableElement.focus();

@@ -332,34 +332,6 @@ function connect_socket() {
               $('#consumer-divider').hide();
             }
           })
-        // TODO Rename skinny mode references to base configuration
-          .on('skinny-config', (data) => {
-            if (data === 'true') {
-              $('#ticket-section').attr('hidden', true);
-              $('#vrs-info-box').attr('hidden', true);
-              $('#video-section').removeClass((index, className) => (className.match(/\bcol-\S+/g) || []).join(' '));
-              $('#video-section').addClass('col-lg-6');
-              $('#chat-section').removeClass((index, className) => (className.match(/\bcol-\S+/g) || []).join(' '));
-              $('#chat-section').addClass('col-lg-5');
-              $('#caption-settings').attr('hidden', true);
-              $('#trans-tab').attr('hidden', true);
-              skinny = true;
-            } else {
-              $('#ticket-section').removeAttr('hidden');
-              $('#vrs-info-box').removeAttr('hidden');
-              $('#video-section').removeClass((index, className) => (className.match(/\bcol-\S+/g) || []).join(' '));
-              $('#video-section').addClass('col-lg-5');
-              $('#chat-section').removeClass((index, className) => (className.match(/\bcol-\S+/g) || []).join(' '));
-              $('#chat-section').addClass('col-lg-3');
-              $('#callbutton').attr('disabled', 'disabled');
-              $('#newchatmessage').attr('disabled', 'disabled');
-              $('#chat-send').attr('disabled', 'disabled');
-              $('#chat-emoji').attr('disabled', 'disabled');
-              $('#caption-settings').removeAttr('hidden');
-              $('#trans-tab').removeAttr('hidden');
-              skinny = false;
-            }
-          })
           .on('queue-caller-join', (data) => {
             if (data.extension === exten && data.queue === 'ComplaintsQueue') {
               // setQueueText(data.position -= 1); // subtract because asterisk wording is off by one
@@ -1105,7 +1077,9 @@ function newChatMessage(data) {
     $('#rtt-typing').css('display', 'none');
     $('#chat-messages').remove($('#rtt-typing'));
     $('#rtt-typing').html('').removeClass('direct-chat-text');
-    $(msgblock).addClass('alert alert-secondary receivedChat').appendTo($('#chat-messages'));
+    $(msgblock).addClass('alert alert-secondary receivedChat')
+      .attr('aria-live', 'assertive')
+      .appendTo($('#chat-messages'));
   }
   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 }

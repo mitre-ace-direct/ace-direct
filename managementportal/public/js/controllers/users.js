@@ -1,9 +1,59 @@
 // 'use strict';
 let selectedUser = 0;
+let socket;
+let agentExt;
+let agentUsername;
+
+function checkProfilePic(username) {
+  $.ajax({
+    url: `./profilePicPoll/${username}`,
+    type: 'GET',
+    dataType: 'json',
+    success: (data) => {
+      console.log("Profile Picture Poll:", JSON.stringify(data))
+      var response = data.profilePicExists // Parsing the value of response for checking Profile Pic
+
+      if(response) {
+        $('#deleteProfilePic').show()
+      } else {
+        $('#deleteProfilePic').hide()
+      }
+    },
+    error: (error) => {
+      console.log("Error checking profile pic!", error);
+    }
+  })
+}
+
 $(document).ready(() => {
   $('#sidebaragentmanagement').addClass('active');
   $('#admin_treeview').addClass('active');
   $('#admin_users_treeview').addClass('active');
+
+  $.ajax({
+    url: './token',
+    type: 'GET',
+    dataType: 'json',
+    success(successData) {
+      if (successData.message === 'success') {
+        socket = io.connect(`https://${window.location.host}`, {
+          path: `${nginxPath}/socket.io`,
+          query: `token=${successData.token}`,
+          forceNew: true
+        });
+
+        // update version in footer
+        socket.on('adversion', (data) => {
+          $('#ad-version').text(data.version);
+          $('#ad-year').text(data.year);
+        });
+      }
+    },
+    error(_xhr, _status, _error) {
+      console.log('Error');
+      $('#message').text('An Error Occured.');
+    }
+  });
 
   const table = $('#usertable').DataTable({
     order: [],
@@ -13,10 +63,10 @@ $(document).ready(() => {
       visible: false,
       searchable: false
     }, {
-      targets: [3],
+      targets: [4],
       data: 'username'
     }, {
-      targets: [4],
+      targets: [5],
       render(data, _type, _row) {
         if (data.length === 0) {
           return 'Never';
@@ -24,7 +74,7 @@ $(document).ready(() => {
         return data;
       }
     }, {
-      targets: [5],
+      targets: [6],
       data: 'selected',
       orderable: false,
       render(data, type, _row) {
@@ -61,20 +111,36 @@ $(document).ready(() => {
     // console.log("checkbox data: " + data.selected);
   });
 
+  /**
+   * Event handlers for changing and deleting an agent's profile picture below.
+   * This is because the jquery that brings up the users information is right below.
+   * $(#usertable tbody)
+   */
+
+  // Event emitting for handling profile pic setting.
+
   $('#usertable tbody').on('click', 'td', function ClickOnRow() {
     const data = table.row($(this).parents('tr')).data();
     const col = table.cell(this).index().column;
-    // console.log("cell clicked with col: " + col + " data: " + JSON.stringify(data));
+    console.log("cell clicked with col: " + col + " data: " + JSON.stringify(data));
 
-    if (col !== 5) { // do not load agent info if the clicked cell is the checkbox
-      const url = `./GetAgent/${data.username}`;
+    if (col !== 6) { // do not load agent info if the clicked cell is the checkbox
+      const url = `./GetAgent/${data["username"]}`;
       console.log(`GetAgent url: ${url}`);
       selectedUser = data.userId;
       $.get('./GetAgent', {
-        username: data.username
+        username: data["username"]
       },
       (result, _status) => {
         console.log(`GetAgent returned: ${JSON.stringify(result)}`);
+
+        checkProfilePic(result.username);
+
+        agentExt = result.extension;
+        agentUsername = result.username;
+
+        $('#inputProfilePic').attr('src', `./ProfilePic/${result.username}`);
+
         $('#inputUsername').val(result.username);
         $('#inputFirstname').val(result.first_name);
         $('#inputLastname').val(result.last_name);
@@ -308,28 +374,63 @@ $('.glyphicon-eye-open').on('mouseover mouseout', function MouseOnEyeOpen(_e) {
   }
 });
 
-let socket;
-$.ajax({
-  url: './token',
-  type: 'GET',
-  dataType: 'json',
-  success(successData) {
-    if (successData.message === 'success') {
-      socket = io.connect(`https://${window.location.host}`, {
-        path: `${nginxPath}/socket.io`,
-        query: `token=${successData.token}`,
-        forceNew: true
-      });
+function setProfilePic() {
+  if(document.getElementById('profile-pic-file-upload').files && document.getElementById('profile-pic-file-upload').files[0]) {
+    var fileReader = new FileReader();
+    var file = document.getElementById('profile-pic-file-upload').files[0]
 
-      // update version in footer
-      socket.on('adversion', (data) => {
-        $('#ad-version').text(data.version);
-        $('#ad-year').text(data.year);
-      });
+    var fileExt = file.name.split('.')[1].toLowerCase()
+    console.log('You have uploaded a picture! File name:', file.name.split('.')[1])
+
+    fileReader.readAsDataURL(file)
+
+    fileReader.onload = (e) => {
+      $('#inputProfilePic').attr('src', e.target.result)
+
+      $('#deleteProfilePic').show();
+
+      console.log('Emitting profile-pic-set event now...')
+
+      socket.emit('profile-pic-set', {
+        picture : file,
+        agentExtension : agentExt,
+        agentUsername,
+        fileExt
+      }, (res) => {
+        console.log(res)
+      })
     }
-  },
-  error(_xhr, _status, _error) {
-    console.log('Error');
-    $('#message').text('An Error Occured.');
   }
-});
+}
+
+// Event emitting for deleting a profile pic.
+function deleteProfilePicture() {
+  console.log("Deleting profile pic!");
+
+  $('#deleteProfilePic').hide();
+
+  socket.emit('delete-profile-pic', {
+    agentUsername
+  }, (res, error) => {
+    if(error) {
+      console.log("Could not read file!")
+    } else {
+      var fileReader = new FileReader();
+
+      console.log("Delete image response:", res)
+
+      var fileBlob = new Blob([res], { type: 'image/*' })
+
+      console.log("Response Blob:", fileBlob)
+
+      console.log('Profile Picture is being deleted!')
+
+      fileReader.readAsDataURL(fileBlob)
+
+      fileReader.onload = (e) => {
+        console.log("File reader onload event:", e)
+        $('#inputProfilePic').attr('src', e.target.result)
+      }
+    }
+  })
+}
