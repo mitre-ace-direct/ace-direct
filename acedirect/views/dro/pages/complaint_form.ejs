@@ -283,7 +283,10 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <img id="placeholderImage" src="/dro/images/placeholder.png" width="100%" alt="Video placeholder">
+        <video controls class="video-element" id="instructionsVideo" title="Play Video">
+          <source src="/media/<%= instructions_video %>" type="video/mp4">
+          <source src='/media/<%= instructions_video %>' type="video/webm">
+        </video>
       </div>
       <div class="modal-body text-center">
 
@@ -335,10 +338,12 @@
       <div class="modal-header text-center">
         <h3 class="waiting-header">Waiting for the next available agent...</h3>
         <hr />
-        <img id="placeholderImage" src="/dro/images/placeholder.png" width="100%" alt="Video placeholder">
+        <video controls class="video-element" id="pleaseWaitVideo" title="Play Video">
+          <source src="/media/<%= please_wait_video %>" type="video/mp4">
+          <source src='/media/<%= please_wait_video %>' type="video/webm">
+        </video>
       </div>
       <div class="modal-body text-center my-body">
-
         <div class="row">
           <div class="col-xs-12 text-center">
             If you do not wish to wait for an agent, you may:
