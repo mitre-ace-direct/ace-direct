@@ -22,9 +22,14 @@ function RedisManager() {
 
 function init() {
     // Create a connection to Redis
-    redisClient = redis.createClient(config.redisPort, config.redisHost);
-    hGetAsync = promisify(redisClient.hget).bind(redisClient);
-    redisClient.auth(config.redisAuth);
+    redisClient = redis.createClient({
+        host: config.redisHost,
+        port: config.redisPort,
+        password: config.redisAuth
+    });
+    redisClient.connect();
+    hGetAsync = promisify(redisClient.hGet).bind(redisClient);
+    
     redisClient.on("error", function (err) {
         console.error("");
         console.error("**********************************************************");
@@ -41,7 +46,7 @@ function init() {
     });
 
     redisClient.on('connect', function () {
-        console.info("Connected to Redis");
+        console.log("Connected to Redis");
     });
 
 
