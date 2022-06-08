@@ -1112,6 +1112,7 @@ function shareFileConsumer() {
   if ($('#fileInput')[0].files[0]) {
     const formData = new FormData();
     console.log('uploading:');
+    setFeedbackText('Sending file...');
     console.log($('#fileInput')[0].files[0]);
     formData.append('uploadfile', $('#fileInput')[0].files[0]);
     $.ajax({
@@ -1139,6 +1140,7 @@ function shareFileConsumer() {
 
 function addFileToDownloadList(data) {
   $('#noReceivedFiles').attr('hidden', true);
+  setFeedbackText('File received from agent!');
   let fileType = data.original_filename.split('.')[1];
   if (fileType) {
     if (viewableFileTypes.includes(fileType.toLowerCase())) {
