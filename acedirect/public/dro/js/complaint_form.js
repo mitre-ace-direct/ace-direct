@@ -82,6 +82,9 @@ function connect_socket() {
           console.log('got connect');
           console.log('authenticated');
 
+          $('#button-feedback').hide();
+          $('#button-feedback').attr('aria-hidden', 'true');
+
           $('#firstName').val(payload.first_name);
           $('#lastName').val(payload.last_name);
           $('#callerPhone').val(payload.vrs);
@@ -771,10 +774,20 @@ function terminateCall() {
 
 // IN CALL FEATURES
 
+// Function to change the text of the feedback for the buttons.
+function setButtonFeedbackText(text) {
+  if ($('#button-feedback').is(':hidden')) {
+    $('#button-feedback').show();
+    $('#button-feedback').attr('aria-hidden', 'false');
+  }
+  $('#button-feedback').text(text);
+}
+
 // mutes self audio so remote cannot hear you
 function muteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone').addClass('call-btn-icon fa fa-microphone-slash');
   $('#mute-audio').attr('onclick', 'unmuteAudio()');
+  setButtonFeedbackText('Audio Muted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, true); // mute audio
   }
@@ -784,6 +797,7 @@ function muteAudio() {
 function unmuteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone-slash').addClass('call-btn-icon fa fa-microphone');
   $('#mute-audio').attr('onclick', 'muteAudio()');
+  setButtonFeedbackText('Audio Unmuted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, true); // unmute audio
   }
@@ -792,6 +806,7 @@ function unmuteAudio() {
 function enableVideoPrivacy() {
   $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa fa-video-camera-slash');
   $('#hide-video').attr('onclick', 'disableVideoPrivacy()');
+  setButtonFeedbackText('Video is off!');
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
       socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -814,6 +829,7 @@ function enableVideoPrivacy() {
 function disableVideoPrivacy() {
   $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera-slash').addClass('call-btn-icon fa fa-video-camera');
   $('#hide-video').attr('onclick', 'enableVideoPrivacy()');
+  setButtonFeedbackText('Video is on!');
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
       socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -855,6 +871,7 @@ function toggleScreenShare() {
     acekurento.screenshare(true);
     sharingScreen = true;
     document.getElementById('startScreenshare').innerText = 'Stop Screenshare';
+    setButtonFeedbackText('Screenshare started!');
   }
 }
 
