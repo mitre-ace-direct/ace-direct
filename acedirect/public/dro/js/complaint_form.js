@@ -790,7 +790,10 @@ function unmuteAudio() {
 }
 
 function enableVideoPrivacy() {
-  $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa fa-video-camera-slash');
+  $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa-stack');
+  $('#mute-camera-off-icon').append(
+    '<i class="fa fa-video-camera fa-stack-1x"></i><i class="fa fa-ban fa-stack-2x text-danger"></i>'
+  );
   $('#hide-video').attr('onclick', 'disableVideoPrivacy()');
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
