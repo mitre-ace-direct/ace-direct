@@ -1129,6 +1129,7 @@ function shareFileConsumer() {
         $('#fileSent').show();
         $('#removeFileBtn').hide();
         $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
+        $('#button-feedback').hide();
       },
       error: (jXHR, textStatus, errorThrown) => {
         console.log(`ERROR: ${jXHR} ${textStatus} ${errorThrown}`);
