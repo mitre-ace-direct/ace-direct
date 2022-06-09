@@ -397,26 +397,6 @@ body {
   color: white;
 }
 
-#remoteViewCol {
-  padding-right: 0px !important;
-  padding-left: 0px !important;
-  background-color: #333333;
-  height : 100%;
-}
-
-#selfViewCol {
-  height : 100%;
-}
-
-#fullscreen-element {
-  height : 100%;
-}
-
-#callVideosRow {
-  height : 100%;
-}
-
-#mute-camera-off-icon {
-  right : 9px;
-  bottom : 4px;
+.video-element {
+  width: 100%;
 }
