@@ -93,7 +93,7 @@
       background-color: lightgray;
       height: 100%;
       color: #000000;
-      padding: 0.6em 2.6em 0.6em 2.6em;
+      padding: 0.9em 2.6em 0.9em 2.6em;
       display: flex;
       column-gap: 30px;
       justify-content: space-between;
@@ -123,6 +123,11 @@
       color: #fff;
       background-color: #073863;
       border-color: #073863;
+      padding-left: 16px;
+      padding-right: 16px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      font-weight: bold;
     }
 
     .btn-custom:hover {
@@ -157,6 +162,14 @@
       z-index: 0;
     }
 
+    .self-view {
+      transform: rotateY(180deg);
+      -webkit-transform: rotateY(180deg);
+      /* Safari and Chrome */
+      -moz-transform: rotateY(180deg);
+      /* Firefox */
+    }
+
     .recordingInfoBanner {
       position: absolute;
       bottom: 0;
@@ -183,7 +196,8 @@
         <i class="fa fa-play fa-2x" id="greetingPlayPauseBtn" tabindex="0" aria-label="Play Greeting" role="button"></i>
         <div> <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
         <div id="custom-seekbar"><span></span></div>
-        <button class="btn btn-secondary modal-outline-btn" onclick="skipGreeting();" tabindex="0" aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
+        <button class="btn btn-secondary modal-outline-btn" onclick="skipGreeting();" tabindex="0"
+          aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
             class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
       </div>
       <video class="fill-height video-element" id="greetingVideo" title="Play Video">
@@ -204,17 +218,16 @@
     <div class="row" style="display:none" id="recordingDiv">
       <div class="col-12 text-center">
         <div class="row  recording-controls">
-          <div class="col-md-3">
-            <span class="text-danger" id="recordingTime"></span>
-          </div>
-          <div class="col-md-6 text-center">
-            <span><i class="fa fa-microphone-slash" aria-hidden="true"></i>&nbsp;Microphone is muted
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <i class="fa fa-video-camera"
-                aria-hidden="true"></i>&nbsp;Video is ON</span>
-          </div>
-          <div class="col-md-3">
-            <button class="btn btn-custom pull-right" onclick="sendVideomail();"><i class="fa fa-paper-plane"
-                aria-hidden="true"></i> Send Videomail</button>
+          <div class="col-md-12">
+            <span class="text-danger" id="recordingTime"><i class='fa fa-circle' aria-hidden='true'></i> Recording
+              &nbsp;&nbsp; 0:00 / 0:00</span>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i
+                class="fa fa-microphone-slash" aria-hidden="true"></i>&nbsp;Microphone is muted
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-video-camera"
+                aria-hidden="true"></i>&nbsp;Video is
+              ON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <button class="btn btn-custom" onclick="sendVideomail();"><i class="fa fa-paper-plane" aria-hidden="true"
+                style="padding-right:8px;"></i> Send Videomail</button>
           </div>
         </div>
         <div class="row  recording-timer-bar" id="recording-timer-bar">
@@ -224,11 +237,12 @@
         </div>
 
         <div class="video-container">
-          <video autoplay="true" class="video-element" id="selfVideo">
+          <video autoplay="true" class="video-element self-view" id="selfVideo">
 
           </video>
           <div class="recordingInfoBanner">
-            <span role="alert" aria-live="assertive">To send your Videomail before the 90 second time limit elapses, click the 'Send Videomail'
+            <span role="alert" aria-live="assertive">To send your Videomail before the 90 second time limit elapses,
+              click the 'Send Videomail'
               button.</span>
           </div>
         </div>
@@ -246,9 +260,11 @@
             <div class="center text-center" style="width: 75%;">
               <i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>
               <br /><br />
-              <p id="goodbyeDescription" style="font-size: 1.5em;">Thank you for leaving videomail. An agent will review your videomail
+              <p id="goodbyeDescription" style="font-size: 1.5em;">Thank you for leaving videomail. An agent will review
+                your videomail
                 message.</p>
-              <hr class="text-black" style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
+              <hr class="text-black"
+                style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
               <p>You are being redirected in <b>5</b> seconds to <b id='redirectSiteURL'>
                   <%= redirectURL%>
                 </b></p>
@@ -256,7 +272,8 @@
           </div>
           <div class="modal-footer">
             <div class="text-center">
-              <a id="goodbyeExit" href="#" onclick="logout()" style="color:#073863;" role="button" tabindex="0"><i class="fa fa-sign-out"></i> Exit Support
+              <a id="goodbyeExit" href="#" onclick="logout()" style="color:#073863;" role="button" tabindex="0"><i
+                  class="fa fa-sign-out"></i> Exit Support
                 Portal</a>
             </div>
 
@@ -283,6 +300,7 @@
   }
 
   function gotoRecording() {
+    $('#greetingDiv').hide();
     $('#countDownDiv').hide();
     $('#recordingDiv').show();
     startVideomail();
@@ -323,11 +341,11 @@
   $('#greetingVideo').on('play', (evt) => {
     console.log("playing")
     $('#greetingVideo').attr("title", "Pause Video");
-    $("#greetingPlayPauseBtn").removeClass('fa-play').addClass('fa-pause').attr('aria-label','Pause Greeting');
+    $("#greetingPlayPauseBtn").removeClass('fa-play').addClass('fa-pause').attr('aria-label', 'Pause Greeting');
   }).on('pause', (evt) => {
     console.log("pause")
     $('#greetingVideo').attr("title", "Play Video");
-    $("#greetingPlayPauseBtn").removeClass('fa-pause').addClass('fa-play').attr('aria-label','Play Greeting');
+    $("#greetingPlayPauseBtn").removeClass('fa-pause').addClass('fa-play').attr('aria-label', 'Play Greeting');
   }).on('ended', (evt) => {
     console.log("ended")
     gotoCountDown()
@@ -385,7 +403,7 @@
     let d = new Date(0);
     d.setSeconds(maxTime); // specify value for SECONDS here
     let mTimeFormatted = d.toISOString().substr(15, 4);
-    $('#recordingTime').html("<i class='fa fa-circle' aria-hidden='true'></i> Recording | 0:00 / " + mTimeFormatted)
+    $('#recordingTime').html("<i class='fa fa-circle' aria-hidden='true'></i> Recording  0:00 / " + mTimeFormatted)
     var recTimerInterval = setInterval(function () {
       rTime = rTime + 0.1;
       let percentage = (rTime / maxTime) * 100;
@@ -395,7 +413,7 @@
         let date = new Date(0);
         date.setSeconds(rTime); // specify value for SECONDS here
         let timeString = date.toISOString().substr(15, 4);
-        $('#recordingTime').html("<i class='fa fa-circle' aria-hidden='true'></i> Recording &nbsp;&nbsp;|&nbsp;&nbsp; " + timeString + " / " + mTimeFormatted);
+        $('#recordingTime').html("<i class='fa fa-circle' aria-hidden='true'></i> Recording &nbsp;&nbsp; " + timeString + " / " + mTimeFormatted);
         if (rTime > maxTime) {
           clearInterval(recTimerInterval)
           sendVideomail();
