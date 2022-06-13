@@ -491,6 +491,7 @@ function connect_socket() {
           })
           .on('call-center-closed', (data) => {
             if (data && data.closed) {
+              console.log('call center closed');
               // closed
               $('#closed-message').css('display', 'inline');
               $('#callbutton').prop('disabled', true);
