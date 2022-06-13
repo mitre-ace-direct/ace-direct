@@ -792,7 +792,7 @@ function terminateCall() {
 function muteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone').addClass('call-btn-icon fa fa-microphone-slash');
   $('#mute-audio').attr('onclick', 'unmuteAudio()');
-  $('#mute-audio').attr('arial-label', 'Unmute Audio');
+  $('#mute-audio').attr('aria-label', 'Unmute Audio');
   setFeedbackText('Audio Muted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, true); // mute audio
@@ -803,7 +803,7 @@ function muteAudio() {
 function unmuteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone-slash').addClass('call-btn-icon fa fa-microphone');
   $('#mute-audio').attr('onclick', 'muteAudio()');
-  $('#mute-audio').attr('arial-label', 'Mute Audio');
+  $('#mute-audio').attr('aria-label', 'Mute Audio');
   setFeedbackText('Audio Unmuted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, true); // unmute audio
