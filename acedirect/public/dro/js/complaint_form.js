@@ -792,6 +792,7 @@ function terminateCall() {
 function muteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone').addClass('call-btn-icon fa fa-microphone-slash');
   $('#mute-audio').attr('onclick', 'unmuteAudio()');
+  $('#mute-audio').attr('arial-label', 'Unmute Audio');
   setFeedbackText('Audio Muted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, true); // mute audio
@@ -802,6 +803,7 @@ function muteAudio() {
 function unmuteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone-slash').addClass('call-btn-icon fa fa-microphone');
   $('#mute-audio').attr('onclick', 'muteAudio()');
+  $('#mute-audio').attr('arial-label', 'Mute Audio');
   setFeedbackText('Audio Unmuted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, true); // unmute audio
@@ -811,6 +813,7 @@ function unmuteAudio() {
 function enableVideoPrivacy() {
   $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa fa-video-camera-slash');
   $('#hide-video').attr('onclick', 'disableVideoPrivacy()');
+  $('#hide-video').attr('aria-label', 'Disable Video Privacy');
   setFeedbackText('Video is off!');
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
@@ -834,6 +837,7 @@ function enableVideoPrivacy() {
 function disableVideoPrivacy() {
   $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera-slash').addClass('call-btn-icon fa fa-video-camera');
   $('#hide-video').attr('onclick', 'enableVideoPrivacy()');
+  $('#hide-video').attr('aria-label', 'Enable Video Privacy');
   setFeedbackText('Video is on!');
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
@@ -872,11 +876,13 @@ function toggleScreenShare() {
     acekurento.screenshare(false);
     sharingScreen = false;
     document.getElementById('startScreenshare').innerText = 'Start Screenshare';
-    setFeedbackText('Screenshare ended!')
+    $('#startScreenshare').attr('aria-label', 'Share screen');
+    setFeedbackText('Screenshare ended!');
   } else {
     acekurento.screenshare(true);
     sharingScreen = true;
     document.getElementById('startScreenshare').innerText = 'Stop Screenshare';
+    $('#startScreenshare').attr('aria-label', 'Stop screen share');
     setFeedbackText('Screenshare started!');
   }
 }
