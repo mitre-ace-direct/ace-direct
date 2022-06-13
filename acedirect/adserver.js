@@ -3264,7 +3264,7 @@ setInterval(() => {
       startTimeUTC = data.start; // hh:mm in UTC
       endTimeUTC = data.end; // hh:mm in UTC
     }
-    sendEmit('call-center-closed', { closed: !isOpen, redirectLink: `${datConfig.servers.nginx_fqdn}/${datConfig.nginx.ad_path}/videomail` });
+    sendEmit('call-center-closed', { closed: !isOpen });
   });
 }, 5000);
 
