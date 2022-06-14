@@ -16,6 +16,10 @@ body {
   height: 100%;
 }
 
+#inCallSection {
+  height : 100%;
+}
+
 #DVC {
   top: 40%;
   position: relative;
@@ -24,9 +28,14 @@ body {
 
 #pageContainer {
   padding-left: 0px !important;
-  padding-right: 15px !important;
-  width: 96vw !important;
+  /*padding-right: 15px !important;*/
+  width: 100% !important;
   min-width: 992px !important;
+}
+
+.container {
+  margin-left: 0px;
+  margin-right: 0px;
 }
 
 #callVideoColumn {
@@ -71,6 +80,16 @@ body {
   background-color: #073863 !important;
   color: white;
   vertical-align: initial !important;
+}
+
+.circleButton:hover {
+  color : white;
+  background-color: #396082 !important;
+}
+
+.circleButton:focus {
+  color : white;
+  background-color: #396082 !important;
 }
 
 #startScreenshare {
@@ -299,7 +318,7 @@ body {
 
 #callTime {
   margin-top: 1.5%;
-  margin-left: 2%;
+  margin-left: 5%;
 }
 
 #CommunicationText {
@@ -379,6 +398,29 @@ body {
   color: white;
 }
 
+#remoteViewCol {
+  padding-right: 0px !important;
+  padding-left: 0px !important;
+  background-color: #333333;
+  height : 95%;
+}
+
+#selfViewCol {
+  height : 100%;
+}
+
+#fullscreen-element {
+  height : 95%;
+}
+
+#callVideosRow {
+  height : 100%;
+}
+
+#mute-camera-off-icon {
+  right : 9px;
+  bottom : 4px;
+}
 .video-element {
   width: 100%;
 }
