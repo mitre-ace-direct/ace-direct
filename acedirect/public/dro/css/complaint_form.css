@@ -382,3 +382,7 @@ body {
 .video-element {
   width: 100%;
 }
+
+[tabindex="-1"]:focus {
+  outline: none;
+}
