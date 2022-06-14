@@ -1836,9 +1836,27 @@ io.sockets.on('connection', (socket) => {
 
   // Handler catches a Socket.IO event (call-initiated)
   // to register the consumer with a JsSIP extension
-  socket.on('call-initiated', (data) => {
+  socket.on('call-initiated', (data, callback) => {
     logger.info(`Received a JsSIP consumer extension creation request: ${JSON.stringify(data)}`);
-    processExtension(data);
+    request({
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/operatinghours`
+    }, (error, res, responseData) => {
+      if (error) {
+        console.log('Error polling operating hours:', error);
+        processExtension(data);
+      }
+      console.log(JSON.stringify(responseData));
+      callback(responseData.isOpen);
+
+      if (responseData.isOpen) {
+        console.log('Call Center is open!');
+        processExtension(data);
+      } else {
+        console.log('Call Center is closed!');
+      }
+    });
   });
 
   // Handler catches a Socket.IO event (chat-message)

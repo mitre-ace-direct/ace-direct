@@ -299,12 +299,8 @@
                 <i class="fa fa-user big-icon" alt="" aria-hidden="true"></i>
                 <div class="button-area text-center">
                   <button type="button" class="btn btn-primary btn-style" data-dismiss="modal"
-                    onclick="enterQueue()" id="callbutton" tabindex="0">Call</button>
+                    onclick="enterQueue()" tabindex="0">Call</button>
                 </div>
-                <div class="col-xs-12 text-center" id="closed-message"
-                    style="margin-bottom: 2px; margin-top: 2px; color:red; display:none">
-								  <p>The call center is currently closed..</p>
-								</div>
               </div>
 
             </div>
@@ -367,6 +363,37 @@
           </div>
           <div class="col-xs-5">
             <button type="button" class="btn btn-secondary modal-outline-btn" onclick="exitQueue()" tabindex="0" aria-label="Hang Up"><i
+                class="fa fa-phone rotate-phone" alt="" aria-hidden="true"></i><span class="separator"></span>Hang Up</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <a href="#" onclick="logout()" style="color:#073863" role="button" tabindex="0"><i class="fa fa-sign-out" alt="" aria-hidden="true"></i> Exit Support Portal</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="noAgentsModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="no-agents-header">
+  <div class="modal-dialog modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h3 class="no-agents-header">No agents are available to take your call at this time.</h3>
+      </div>
+      <div class="modal-body text-center my-body">
+        <div class="row button-row">
+          <div class="col-xs-5">
+            <a href="./videomail" type="button" role="button" class="btn btn-secondary modal-outline-btn" tabindex="0" aria-label="Leave Videomail">
+              <i class="fa fa-envelope"  alt="" aria-hidden="true"></i>
+              <span class="separator"></span>
+              Leave Videomail
+            </a>
+          </div>
+          <div class="col-xs-2 second-or">
+            - OR -
+          </div>
+          <div class="col-xs-5">
+            <button type="button" class="btn btn-secondary modal-outline-btn" onclick="logout()" tabindex="0" aria-label="Hang Up"><i
                 class="fa fa-phone rotate-phone" alt="" aria-hidden="true"></i><span class="separator"></span>Hang Up</button>
           </div>
         </div>
