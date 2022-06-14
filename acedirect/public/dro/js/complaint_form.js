@@ -520,7 +520,7 @@ function setFeedbackText(text) {
     $('#button-feedback').show();
     $('#button-feedback').attr('aria-hidden', 'false');
   }
-  $('#button-feedback').fadeTo(2000, 50).slideUp(500, () => {
+  $('#button-feedback').fadeTo(6000, 50).slideUp(500, () => {
     $('#button-feedback').slideUp(500);
   });
   $('#button-feedback').text(text);
