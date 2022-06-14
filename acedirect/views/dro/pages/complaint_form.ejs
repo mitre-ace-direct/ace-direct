@@ -76,7 +76,7 @@
             <!-- Tab panes -->
             <div class="tab-content">
               <!--Chat pane-->
-              <div class="tab-pane active tabFontSize" id="chatBody">
+              <div class="tab-pane active tabFontSize" id="chatBody" tabindex="0" aria-label="Chat tab content">
                 <div class="box-header" style="overflow: hidden;">
                   <h1 style="float:left">Chat</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
@@ -165,7 +165,7 @@
               </div>
               <!-- end chat pane-->
               <!--File Share Pane-->
-              <div class="tab-pane tabFontSize" id="fileBody">
+              <div class="tab-pane tabFontSize" id="fileBody" tabindex="0" aria-label="File share tab content">
                 <div class="box-header" style="overflow: hidden;">
                   <h1 style="float:left">File Sharing</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
@@ -244,12 +244,12 @@
           </div>
           <div id="tab-options" class="col-xs-3">
             <!-- Nav tabs -->
-            <ul class="nav nav-tabs tabs-right" style="height: 90vh;">
+            <ul class="nav nav-tabs tabs-right" style="height: 90vh;" role="tablist">
               <li id="collapseTab" class="collapseTab">
                 <a class="collapseTab sidebarTab" title="Collapse Sidebar"
                   style="padding-bottom: 20px; padding-top:20px; border:solid 1px transparent;" role="button"
-                  tabindex="-1">
-                  <button id="collapseButton" data-toggle="tooltip" title="Collapse" aria-label="Collapse"
+                  tabindex="-1" aria-hidden="true">
+                  <button id="collapseButton" data-toggle="tooltip" title="Collapse" aria-label="Collapse Sidebar"
                     onclick="collapseSidebar('')" tabindex="0">
                     <i id="collapseButtonIcon" class="fa fa-angle-double-right fa-lg"
                       style="vertical-align: -10% !important;">
@@ -257,17 +257,18 @@
                   </button>
                 </a>
               </li>
-              <li id="chatTab" class="active">
-                <a href="#chatBody" data-toggle="tab" class="sidebarTab" onclick="toggleTab('chatTab')">
+              <li class="active" id="tab1">
+                <a id="chatTab" href="#chatBody" data-toggle="tab" class="sidebarTab tab selected" onclick="toggleTab('chatTab')"
+                  aria-controls="chatBody" role="tab" aria-selected="true">
                   <i class="fa fa-comments fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
                   <br>
                   <p style="color: #073863;">Chat</p>
                 </a>
               </li>
-              <li id="fileShareTab">
-                <a href="#fileBody" data-toggle="tab" class="sidebarTab" onclick="toggleTab('fileShareTab')"
-                  role="button" aria-roledescription="file share button">
+              <li id="tab2">
+                <a id="fileShareTab" href="#fileBody" data-toggle="tab" class="sidebarTab tab" onclick="toggleTab('fileShareTab')"
+                  aria-controls="fileShareBody" role="tab" aria-selected="false" tabindex="-1">
                   <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;">
                   </i>
                   <br>
