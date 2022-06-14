@@ -45,6 +45,16 @@
   cursor: pointer;
 }
 
+#continueButton:hover {
+  color : white;
+  background-color: #396082 !important;
+}
+
+#continueButton:focus {
+  color : white;
+  background-color: #396082 !important;
+}
+
 #headerBox {
   font-size: 20px;
 }
