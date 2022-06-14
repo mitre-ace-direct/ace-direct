@@ -421,3 +421,6 @@ body {
   right : 9px;
   bottom : 4px;
 }
+.video-element {
+  width: 100%;
+}

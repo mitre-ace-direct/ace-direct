@@ -759,7 +759,7 @@ function connect_socket() {
                 tempSavedMessages[0].push(data);
               } else {
                 for (var i = 0; i < tempSavedMessages.length; i++) {
-                  if (tempSavedMessages[i][0].senderext == data.senderext) {
+                  if (tempSavedMessages[i][0].senderext.toString() == data.senderext.toString()) {
                     tempSavedMessages[i].push(data);
                     isNewChat = false;
                   }
@@ -783,7 +783,7 @@ function connect_socket() {
             }
 
           } else {
-            if (!agentChatOpen || $('#agent-ext').html() != data.senderext){
+            if (!agentChatOpen || $('#agent-ext').html() != data.senderext.toString()){
               showAlert('info', 'New message from ' + data.displayname);
               getMyChats();
             } else {
@@ -792,7 +792,7 @@ function connect_socket() {
             }
           }
           // check if the chat window is the same window
-          if ($('#agent-ext').html() === data.senderext) {
+          if ($('#agent-ext').html() === data.senderext.toString()) {
             debugtxt('new-agent-chat', data);
             var msg = data.message;
             var displayname = data.displayname;
@@ -807,7 +807,7 @@ function connect_socket() {
             var msgtime = document.createElement('span');
             var msgtext = document.createElement('div');
 
-            if ((data.senderext) === data.destext) {
+            if ((data.senderext.toString()) === data.destext.toString()) {
               // sending message to themselves
               socket.emit('chat-read', { ext: data.senderext, destext:extensionMe });
 
@@ -840,7 +840,7 @@ function connect_socket() {
         }).on('broadcast', function(data) {
           if (!isAgentChatSaved && $('#chatHeader').html() !== data.displayname) {
             // recieved broadcast. not saving to db
-            if (data.senderext === extensionMe) {
+            if (data.senderext.toString() === extensionMe.toString()) {
               // recieving own broadcast
               showAlert('info', 'Successfully sent broadcast');
             } else {
@@ -855,7 +855,7 @@ function connect_socket() {
                   tempSavedMessages[0].push(data);
                 } else {
                   for (var i = 0; i < tempSavedMessages.length; i++) {
-                    if (tempSavedMessages[i][0].senderext == data.senderext) {
+                    if (tempSavedMessages[i][0].senderext.toString() == data.senderext.toString()) {
                       tempSavedMessages[i].push(data);
                       isNewChat = false;
                     }
@@ -882,6 +882,7 @@ function connect_socket() {
 
           } else {
             // update the db with the recipient's name
+            showAlert('info', 'New broadcast from ' + data.displayname);
             socket.emit('update-broadcast-name', { destext: extensionMe, senderext: data.senderext, name: $('#agentname-sidebar').text(), sendername: data.displayname, time: data.timeSent});
 
             data.destext = extensionMe;
@@ -904,7 +905,7 @@ function connect_socket() {
               var msgtext = document.createElement('div');
               socket.emit('chat-read', { ext: data.senderext, destext: extensionMe });
 
-              if ((data.senderext) == extensionMe) {
+              if ((data.senderext.toString()) == extensionMe.toString()) {
                 // receiving own broadcast
                 showAlert('info', 'Successfully sent broadcast');
                 socket.emit('chat-read', {'ext': data.senderext, 'destext': extensionMe});
@@ -2652,7 +2653,7 @@ function showChatMessage(ext, destname) {
       // console.log('No messages to load');
     } else {
       for (var i = 0; i < tempSavedMessages.length; i++) {
-        if (tempSavedMessages[i][0].senderext === ext) {
+        if (tempSavedMessages[i][0].senderext.toString() === ext.toString()) {
           removeChatList(tempSavedMessages[i][0].displayname);
           var numOfMessages = tempSavedMessages[i].length;
 
@@ -2683,7 +2684,7 @@ function showChatMessage(ext, destname) {
               tempSavedMessages.splice(i, 1);
               $('#unread-chat-count').html(tempSavedMessages.length);
 
-              if (tempSavedMessages === undefined || tempSavedMessages === '') {
+              if (tempSavedMessages === undefined || tempSavedMessages.length === 0) {
                 tempSavedMessages = [[]];
                 $('#unread-chat-count').html('');
                 $('#agent-chat-list').append(
@@ -2712,7 +2713,7 @@ function showChatMessage(ext, destname) {
   socket.on('continue-agent-chat', function(data) {
     if (count === 0) {
       console.log('continuing chatting with ' +destname);
-      if (data.destExt === ext) {
+      if (data.destExt.toString() === ext.toString()) {
         //good to go
         loadAgentChats(ext,extensionMe);
       }
@@ -2770,7 +2771,7 @@ function loadAgentChats(destExt, selfExt) {
           var msgtime = document.createElement('span');
           var msgtext = document.createElement('div');
 
-          if (data[i].senderext === selfExt) {
+          if (data[i].senderext.toString() === selfExt.toString()) {
             $(msgsender).addClass('direct-chat-name pull-right').html(displayname).appendTo(msginfo);
             $(msgtime).addClass('direct-chat-timestamp pull-left').html(timestamp).appendTo(msginfo);
             $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
