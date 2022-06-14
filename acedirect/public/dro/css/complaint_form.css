@@ -48,6 +48,7 @@ body {
 
 #callButtonsRow {
   background-color: #dddddd;
+  height : "70px"; 
 }
 
 #speakingToRow {
@@ -57,7 +58,7 @@ body {
 
 #end-call {
   float: right;
-  margin-top: 1%;
+  margin-top: 16px;
   margin-right: 1%;
 }
 
@@ -75,11 +76,12 @@ body {
   border: none;
   height: 45px;
   width: 45px !important;
-  margin: 5px;
   margin-left: 15px;
   background-color: #073863 !important;
   color: white;
   vertical-align: initial !important;
+  margin-right: 5px;
+  margin-top: 11px;;
 }
 
 .circleButton:hover {
@@ -97,6 +99,26 @@ body {
   color: white;
   margin-left: 2%;
   vertical-align: unset;
+}
+
+#startScreenshare:focus {
+  color : white;
+  background-color: #396082 !important;
+}
+
+#startScreenshare:hover {
+  color : white;
+  background-color: #396082 !important;
+}
+
+#chat-send:focus {
+  color : white;
+  background-color: #396082 !important;
+}
+
+#chat-send:hover {
+  color : white;
+  background-color: #396082 !important;
 }
 
 .big-icon {
@@ -317,7 +339,7 @@ body {
 }
 
 #callTime {
-  margin-top: 1.5%;
+  margin-top: "25px";
   margin-left: 5%;
 }
 
@@ -402,7 +424,7 @@ body {
   padding-right: 0px !important;
   padding-left: 0px !important;
   background-color: #333333;
-  height : 95%;
+  height : 7%;
 }
 
 #selfViewCol {
