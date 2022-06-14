@@ -688,6 +688,7 @@ function enterQueue() {
     language,
     vrs
   }, (isOpen) => {
+    console.log('isOpen:', isOpen);
     if (isOpen) {
       $('#waitingModal').modal('show');
       openDialog('waitingModal', window);

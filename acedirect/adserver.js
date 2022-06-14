@@ -1847,10 +1847,12 @@ io.sockets.on('connection', (socket) => {
         console.log('Error polling operating hours:', error);
         processExtension(data);
       }
-      console.log(JSON.stringify(responseData));
-      callback(responseData.isOpen);
+      const jsonData = JSON.parse(responseData);
+      console.log(jsonData);
+      console.log('typeof data', typeof jsonData);
+      callback(jsonData.isOpen);
 
-      if (responseData.isOpen) {
+      if (jsonData.isOpen) {
         console.log('Call Center is open!');
         processExtension(data);
       } else {
