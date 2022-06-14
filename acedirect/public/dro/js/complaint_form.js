@@ -82,6 +82,9 @@ function connect_socket() {
           console.log('got connect');
           console.log('authenticated');
 
+          $('#button-feedback').hide();
+          $('#button-feedback').attr('aria-hidden', 'true');
+
           $('#firstName').val(payload.first_name);
           $('#lastName').val(payload.last_name);
           $('#callerPhone').val(payload.vrs);
@@ -511,6 +514,18 @@ function connect_socket() {
   });
 }
 
+// Function to change the text of the feedback for the buttons.
+function setFeedbackText(text) {
+  if ($('#button-feedback').is(':hidden')) {
+    $('#button-feedback').show();
+    $('#button-feedback').attr('aria-hidden', 'false');
+  }
+  $('#button-feedback').fadeTo(2000, 50).slideUp(500, () => {
+    $('#button-feedback').slideUp(500);
+  });
+  $('#button-feedback').text(text);
+}
+
 // setup for the call. creates and starts the User Agent (UA) and registers event handlers
 // This uses the new ACE Kurento object rather than JsSIP
 function registerJssip(myExtension, myPassword) {
@@ -722,6 +737,8 @@ function startCall(otherSipUri) {
   console.log(`startCall: ${otherSipUri}`);
   selfStream.removeAttribute('hidden');
 
+  setFeedbackText('Agent connected!');
+
   $('#screenshareButton').removeAttr('disabled');
   $('#fileInput').removeAttr('disabled');
   // acekurento.call(globalData.queues_complaint_number, false);
@@ -775,6 +792,8 @@ function terminateCall() {
 function muteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone').addClass('call-btn-icon fa fa-microphone-slash');
   $('#mute-audio').attr('onclick', 'unmuteAudio()');
+  $('#mute-audio').attr('aria-label', 'Unmute Audio');
+  setFeedbackText('Audio Muted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, true); // mute audio
   }
@@ -784,6 +803,8 @@ function muteAudio() {
 function unmuteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone-slash').addClass('call-btn-icon fa fa-microphone');
   $('#mute-audio').attr('onclick', 'muteAudio()');
+  $('#mute-audio').attr('aria-label', 'Mute Audio');
+  setFeedbackText('Audio Unmuted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, true); // unmute audio
   }
@@ -792,6 +813,8 @@ function unmuteAudio() {
 function enableVideoPrivacy() {
   $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa fa-video-camera-slash');
   $('#hide-video').attr('onclick', 'disableVideoPrivacy()');
+  $('#hide-video').attr('aria-label', 'Disable Video Privacy');
+  setFeedbackText('Video is off!');
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
       socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -814,6 +837,8 @@ function enableVideoPrivacy() {
 function disableVideoPrivacy() {
   $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera-slash').addClass('call-btn-icon fa fa-video-camera');
   $('#hide-video').attr('onclick', 'enableVideoPrivacy()');
+  $('#hide-video').attr('aria-label', 'Enable Video Privacy');
+  setFeedbackText('Video is on!');
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
       socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -851,10 +876,14 @@ function toggleScreenShare() {
     acekurento.screenshare(false);
     sharingScreen = false;
     document.getElementById('startScreenshare').innerText = 'Start Screenshare';
+    $('#startScreenshare').attr('aria-label', 'Share screen');
+    setFeedbackText('Screenshare ended!');
   } else {
     acekurento.screenshare(true);
     sharingScreen = true;
     document.getElementById('startScreenshare').innerText = 'Stop Screenshare';
+    $('#startScreenshare').attr('aria-label', 'Stop screen share');
+    setFeedbackText('Screenshare started!');
   }
 }
 
@@ -1092,6 +1121,7 @@ function shareFileConsumer() {
   if ($('#fileInput')[0].files[0]) {
     const formData = new FormData();
     console.log('uploading:');
+    setFeedbackText('Sending file...');
     console.log($('#fileInput')[0].files[0]);
     formData.append('uploadfile', $('#fileInput')[0].files[0]);
     $.ajax({
@@ -1108,6 +1138,7 @@ function shareFileConsumer() {
         $('#fileSent').show();
         $('#removeFileBtn').hide();
         $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
+        $('#button-feedback').hide();
       },
       error: (jXHR, textStatus, errorThrown) => {
         console.log(`ERROR: ${jXHR} ${textStatus} ${errorThrown}`);
@@ -1119,6 +1150,7 @@ function shareFileConsumer() {
 
 function addFileToDownloadList(data) {
   $('#noReceivedFiles').attr('hidden', true);
+  setFeedbackText('File received from agent!');
   let fileType = data.original_filename.split('.')[1];
   if (fileType) {
     if (viewableFileTypes.includes(fileType.toLowerCase())) {
