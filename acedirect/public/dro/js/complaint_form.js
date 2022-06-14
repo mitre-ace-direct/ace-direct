@@ -494,6 +494,8 @@ function connect_socket() {
           })
           .on('call-center-closed', (data) => {
             if (data && data.closed) {
+              // console.log('call center closed');
+              // window.location.replace('videomail'); // redirect to videomail
               // closed
               $('#closed-message').css('display', 'inline');
               $('#callbutton').prop('disabled', true);
@@ -700,9 +702,16 @@ function enterQueue() {
   socket.emit('call-initiated', {
     language,
     vrs
+  }, (isOpen) => {
+    console.log('isOpen:', isOpen);
+    if (isOpen) {
+      $('#waitingModal').modal('show');
+      openDialog('waitingModal', window);
+    } else {
+      $('#noAgentsModal').modal('show');
+      openDialog('noAgentsModal', window);
+    }
   });
-  $('#waitingModal').modal('show');
-  openDialog('waitingModal', window);
 }
 
 function endCall() {
