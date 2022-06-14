@@ -192,8 +192,8 @@ Complete these prerequisite prior to installation:
       $  rm -rf .n >/dev/null 2>&1
       $  mkdir .n
       $  npm install -g n
-      $  n 12.18.2
-      $  node -v  # make sure it is version 12.18.2
+      $  n 16.15.1  # require Node.js version
+      $  node -v  # verify the version
       $
       $  npm install -g pm2  # for process management
       $
