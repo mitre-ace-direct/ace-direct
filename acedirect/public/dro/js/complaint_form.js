@@ -15,6 +15,7 @@ let hasMessages = false;
 let isAgentTyping = false;
 let sharingScreen = false;
 let isSidebarCollapsed = false;
+let index = 0;
 
 // this list may be incomplete
 const viewableFileTypes = [
@@ -37,6 +38,100 @@ $(document).ready(() => {
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
   });
+
+  /* SOURCE: http://web-accessibility.carnegiemuseums.org/code/tabs/ */
+
+  const $tabs = $('a.tab');
+
+  $tabs.bind({
+    // on keydown,
+    // determine which tab to select
+    keydown: function(ev) {
+      var LEFT_ARROW = 37;
+      var UP_ARROW = 38;
+      var RIGHT_ARROW = 39;
+      var DOWN_ARROW = 40;
+
+      var key = ev.which || ev.keyCode;
+
+      // if the key pressed was an arrow key
+      if (key >= LEFT_ARROW && key <= DOWN_ARROW){
+        // move left one tab for left and up arrows
+        if (key == LEFT_ARROW || key == UP_ARROW){
+          if (index > 0) {
+            index--;
+          }
+          // unless you are on the first tab,
+          // in which case select the last tab.
+          else {
+            index = $tabs.length - 1;
+          }
+        }
+
+        // move right one tab for right and down arrows
+        else if (key == RIGHT_ARROW || key == DOWN_ARROW){
+          if (index < ($tabs.length - 1)){
+            index++;
+          }
+          // unless you're at the last tab,
+          // in which case select the first one
+          else {
+            index = 0;
+          }
+        }
+
+        // trigger a click event on the tab to move to
+        if (!isSidebarCollapsed) {
+          $($tabs.get(index)).click();
+        } else {
+          $($tabs.get(index)).attr(
+            {
+              tabindex: '0',
+              'aria-selected': 'true'
+            }).addClass('active').focus();
+        }
+        ev.preventDefault();
+      }
+    },
+
+    // just make the clicked tab the selected one
+    click: function(ev){
+      console.log('here')
+      index = $.inArray(this, $tabs.get());
+      setFocus();
+      ev.preventDefault();
+    }
+  });
+
+  var setFocus = function() {
+    // undo tab control selected state,
+    // and make them not selectable with the tab key
+    // (all tabs)
+    $tabs.attr(
+    {
+      tabindex: '-1',
+      'aria-selected': 'false'
+    }).removeClass('active');
+
+    // hide all tab panels.
+    $('.tab-pane').removeClass('active');
+
+    // make the selected tab the selected one, shift focus to it
+    $($tabs.get(index)).attr(
+    {
+      tabindex: '0',
+      'aria-selected': 'true'
+    }).addClass('active').focus();
+
+    // handle parent <li> active class (for coloring the tabs)
+    $($tabs.get(index)).parent().siblings().removeClass('active');
+    $($tabs.get(index)).parent().addClass('active');
+
+    // add an active class also to the tab panel
+    // controlled by the clicked tab
+    
+    $($($tabs.get(index)).attr('href')).addClass('active');
+  };
 });
 
 $(window).bind('fullscreenchange', function (_e) {
@@ -1276,26 +1371,53 @@ function setOtherFontSize(size) {
   }
 }
 
+$('#collapseButton').on('keydown', (e) =>{
+  if (e.keyCode === 13) {
+    // enter key pressed
+    // do not show the collapse button tooltip on enter press
+    e.preventDefault();
+    collapseSidebar('chatTab');
+    $('#collapseButton').tooltip('hide');
+  }
+});
+
 function collapseSidebar(tab) {
+  console.log('collapseSidebar')
   if (isSidebarCollapsed) {
     // open the sidebar
     isSidebarCollapsed = false;
+    $('#collapseButton').attr('aria-label', 'Collapse Sidebar');
     $('.tab-content').attr('hidden', false);
     $('#tab-pane').attr('hidden', false);
     $('#tab-options').css('padding-left', '');
+
+    $('#fileShareTab').attr('aria-label', 'File share tab');
+    $('#chatTab').attr('aria-label', 'Chat tab');
 
     if (tab !== '') {
       // open the selected tab
       $('#' + tab).addClass('active');
       if (tab === 'fileShareTab') {
         $('#fileBody').addClass('active');
+        $('#fileShareTab').addClass('active');
+        $('#chatTab').attr('aria-selected', 'false');
+        $('#fileShareTab').attr('aria-selected', 'true');
+        $('#tab2').addClass('active');
       } else if (tab === 'chatTab') {
         $('#chatBody').addClass('active');
+        $('#chatTab').addClass('active');
+        $('#chatTab').attr('aria-selected', 'true');
+        $('#fileShareTab').attr('aria-selected', 'false');
+        $('#tab1').addClass('active');
       }
     } else {
+      console.log('here')
       // default to chat tab
       $('#chatTab').addClass('active');
       $('#chatBody').addClass('active');
+      $('#chatTab').attr('aria-selected', 'true');
+      $('#fileShareTab').attr('aria-selected', 'false');
+      $('#tab1').addClass('active');
     }
 
     $('.sidebarTab').css('width', '8vw');
@@ -1323,12 +1445,20 @@ function collapseSidebar(tab) {
   } else {
     // close the sidebar
     isSidebarCollapsed = true;
+    $('#collapseButton').attr('aria-label', 'Expand Sidebar');
     $('.tab-content').attr('hidden', true);
     $('#tab-pane').attr('hidden', true);
     $('#tab-options').css('padding-left', '0px');
     $('li').removeClass('active');
     $('.tab-pane').removeClass('active');
     $('.sidebarTab').css('width', '8.8vw');
+
+    $('#chatTab').attr('aria-selected', 'false');
+    $('#fileShareTab').attr('aria-selected', 'false');
+    $('#chatTab').attr('tabindex', '0');
+    $('#fileShareTab').attr('tabindex', '-1');
+    $('#fileShareTab').attr('aria-label', 'Collapsed file share tab');
+    $('#chatTab').attr('aria-label', 'Collapsed chat tab');
 
     $('#callFeaturesColumn').removeClass('col-xs-6 col-lg-4');
     $('#callFeaturesColumn').addClass('col-md-1');
@@ -1354,8 +1484,23 @@ function collapseSidebar(tab) {
 }
 
 function toggleTab(tab) {
+  console.log('in toggleTab')
   if (isSidebarCollapsed) {
     // open sidebar
     collapseSidebar(tab);
+  } else {
+    if (tab === 'chatTab') {
+      $('#chatTab').addClass('active');
+      $('#chatTab').attr('aria-selected', 'true');
+
+      $('#fileShareTab').removeClass('active');
+      $('#fileShareTab').attr('aria-selected', 'false');
+    } else if (tab === 'fileShareTab') {
+      $('#fileShareTab').addClass('active');
+      $('#fileShareTab').attr('aria-selected', 'true');
+
+      $('#chatTab').removeClass('active');
+      $('#chatTab').attr('aria-selected', 'false');
+    }
   }
 }
