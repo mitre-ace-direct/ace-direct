@@ -1399,6 +1399,8 @@ function collapseSidebar(tab) {
     // open the sidebar
     isSidebarCollapsed = false;
     $('#collapseButton').attr('aria-label', 'Collapse Sidebar');
+    $('#collapseTabTitle').attr('title', 'Collapse Sidebar');
+    $('#collapseButton').attr('aria-expanded', 'true');
     $('.tab-content').attr('hidden', false);
     $('#tab-pane').attr('hidden', false);
     $('#tab-options').css('padding-left', '');
@@ -1458,6 +1460,8 @@ function collapseSidebar(tab) {
     // close the sidebar
     isSidebarCollapsed = true;
     $('#collapseButton').attr('aria-label', 'Expand Sidebar');
+    $('#collapseTabTitle').attr('title', 'Expand Sidebar');
+    $('#collapseButton').attr('aria-expanded', 'false');
     $('.tab-content').attr('hidden', true);
     $('#tab-pane').attr('hidden', true);
     $('#tab-options').css('padding-left', '0px');
