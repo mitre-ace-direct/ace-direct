@@ -198,6 +198,7 @@ body {
   border-bottom: 1px solid #ddd !important;
   border-left-color: transparent !important;
   border-right-color: transparent !important;
+  outline: none !important;
 }
 
 .tabs-right>li>a {
