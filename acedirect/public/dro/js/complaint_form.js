@@ -39,7 +39,8 @@ $(document).ready(() => {
     trigger: 'hover'
   });
 
-  /* SOURCE: http://web-accessibility.carnegiemuseums.org/code/tabs/ */
+  // Use arrow keys to navigate tabs
+  // SOURCE: http://web-accessibility.carnegiemuseums.org/code/tabs/
 
   const $tabs = $('a.tab');
 
@@ -96,7 +97,6 @@ $(document).ready(() => {
 
     // just make the clicked tab the selected one
     click: function(ev){
-      console.log('here')
       index = $.inArray(this, $tabs.get());
       setFocus();
       ev.preventDefault();
@@ -1394,7 +1394,6 @@ $('#collapseButton').on('keydown', (e) =>{
 });
 
 function collapseSidebar(tab) {
-  console.log('collapseSidebar')
   if (isSidebarCollapsed) {
     // open the sidebar
     isSidebarCollapsed = false;
@@ -1425,7 +1424,6 @@ function collapseSidebar(tab) {
         $('#tab1').addClass('active');
       }
     } else {
-      console.log('here')
       // default to chat tab
       $('#chatTab').addClass('active');
       $('#chatBody').addClass('active');
@@ -1500,7 +1498,6 @@ function collapseSidebar(tab) {
 }
 
 function toggleTab(tab) {
-  console.log('in toggleTab')
   if (isSidebarCollapsed) {
     // open sidebar
     collapseSidebar(tab);
