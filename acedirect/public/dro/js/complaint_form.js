@@ -418,18 +418,6 @@ function connect_socket() {
               logout('Session has expired');
             }
           })
-          .on('caption-config', (data) => {
-            if (data === 'false') {
-              $('#caption-settings').css('display', 'none');
-              $('#transcriptoverlay').css('display', 'none');
-              $('#mute-captions').css('display', 'none');
-              $('#trans-tab').css('display', 'none');
-              $('#chat-tab').removeClass('tab active-tab');
-              $('#consumer-webcam').css('height', '100%');
-              $('#consumer-captions').hide();
-              $('#consumer-divider').hide();
-            }
-          })
           .on('queue-caller-join', (data) => {
             if (data.extension === exten && data.queue === 'ComplaintsQueue') {
               // setQueueText(data.position -= 1); // subtract because asterisk wording is off by one
@@ -479,7 +467,6 @@ function connect_socket() {
           .on('chat-leave', (_error) => {
             // clear chat
             $('#chatcounter').text('500');
-            $('#caption-messages').html('');
             $('#newchatmessage').val('');
             $('#chat-messages').removeClass('populatedMessages');
             $('#chat-messages').addClass('emptyMessages');
@@ -532,23 +519,6 @@ function connect_socket() {
               $('#requestAck').html('Permission has been denied.');
             }
           })
-          .on('multiparty-caption', (transcripts) => {
-            console.log('multiparty caption:', JSON.stringify(transcripts));
-            socket.emit('translate-caption', {
-              transcripts,
-              callerNumber: exten,
-              displayname: transcripts.displayname
-            });
-          })
-          .on('caption-translated', (transcripts) => {
-            console.log('consumer received translation', transcripts);
-            if (acekurento.isMultiparty) {
-              // TODO: clear Regular Transcripts
-              updateCaptionsMultiparty(transcripts);
-            } else {
-              updateConsumerCaptions(transcripts); // in jssip_consumer.js
-            }
-          })
           .on('enable-translation', () => {
             // Activate flag/language dropdown
             /* $('#language-select').msDropDown(
@@ -577,8 +547,7 @@ function connect_socket() {
             }, 3000);
           })
           .on('consumer-being-monitored', () => {
-            // keep self-view and don't enable multiparty
-            // captions during a monitored one-to-one call
+            // keep self-view 
             acekurento.isMonitoring = true;
             $('#end-call').attr('onclick', 'monitorHangup()');
           })
@@ -633,36 +602,6 @@ function registerJssip(myExtension, myPassword) {
     },
     accepted: (e) => {
       console.log(`--- WV: UA accepted ---\n${e}`);
-    },
-    newMessage: (e) => {
-      console.log('--- WV: New Message ---\n');
-      const { consumerLanguage } = sessionStorage;
-
-      console.log(`Consumer's selected language is ${consumerLanguage}`);
-
-      try {
-        if (e.msg === 'STARTRECORDING') {
-          startRecordProgress();
-          enableVideoPrivacy();
-          setTimeout(() => {
-            disableVideoPrivacy();
-          }, 1000);
-        } else {
-          const transcripts = JSON.parse(e.msg);
-          if (transcripts.transcript && !acekurento.isMultiparty) {
-            // Acedirect will skip translation service if languages are the same
-            console.log('sending caption:', transcripts.transcript, myExtension);
-            socket.emit('translate-caption', {
-              transcripts,
-              callerNumber: myExtension
-            });
-            // acedirect.js is listening for 'caption-translated' and will call
-            // updateConsumerCaptions directly with the translation
-          }
-        }
-      } catch (err) {
-        console.log(err);
-      }
     },
     registerResponse: (error) => {
       console.log('--- WV: Register response:', error || 'Success ---');
@@ -882,7 +821,6 @@ function terminateCall() {
   //  enableInitialButtons();
   exitFullscreen();
   // $('#transcriptoverlay').html('');
-  // hideCaptions();
 
   // remove file sharing
   socket.emit('call-ended', { agentExt: '' });
