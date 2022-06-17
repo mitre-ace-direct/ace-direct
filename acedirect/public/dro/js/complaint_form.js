@@ -16,6 +16,8 @@ let isAgentTyping = false;
 let sharingScreen = false;
 let isSidebarCollapsed = false;
 let index = 0;
+let monitorExt = '';
+let isScreenshareRestart = false;
 
 // this list may be incomplete
 const viewableFileTypes = [
@@ -568,6 +570,9 @@ function connect_socket() {
               $('#closed-message').css('display', 'none');
               $('#callbutton').prop('disabled', false);
             }
+          }).on('agentScreenshare', () => {
+            // agent is stopping/starting screenshare
+            isScreenshareRestart = true;
           });
       } else {
         // need to handle bad connections?
@@ -646,7 +651,6 @@ function registerJssip(myExtension, myPassword) {
           console.log('screensharing ended self');
           // $('#startScreenshare').hide();
           acekurento.screenshare(false);
-          sharingScreen = false;
           document.getElementById('startScreenshare').innerText = 'Start Screenshare';
           if (monitorExt) {
             // force monitor to leave the session first
@@ -702,13 +706,18 @@ function registerJssip(myExtension, myPassword) {
         }
       }
 
+      if (partCount === 2 && !isScreenshareRestart) {
+        startCallTimer();
+      } else if (isScreenshareRestart) {
+        isScreenshareRestart = false;
+      }
+
       if (partCount >= 2 || videomailflag) {
         console.log('--- WV: CONNECTED');
         $('#queueModal').modal('hide');
         $('#waitingModal').modal('hide');
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
-        startCallTimer();
       }
     }
   };
@@ -917,6 +926,7 @@ function logout() {
 }
 
 function toggleScreenShare() {
+  isScreenshareRestart = true;
   if (sharingScreen) {
     acekurento.screenshare(false);
     sharingScreen = false;
