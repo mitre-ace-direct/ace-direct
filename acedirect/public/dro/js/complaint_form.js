@@ -16,6 +16,8 @@ let isAgentTyping = false;
 let sharingScreen = false;
 let isSidebarCollapsed = false;
 let index = 0;
+let monitorExt = '';
+let isScreenshareRestart = false;
 
 // this list may be incomplete
 const viewableFileTypes = [
@@ -702,13 +704,18 @@ function registerJssip(myExtension, myPassword) {
         }
       }
 
+      if (partCount === 2 && !isScreenshareRestart) {
+        startCallTimer();
+      } else if (isScreenshareRestart) {
+        isScreenshareRestart = false;
+      }
+
       if (partCount >= 2 || videomailflag) {
         console.log('--- WV: CONNECTED');
         $('#queueModal').modal('hide');
         $('#waitingModal').modal('hide');
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
-        startCallTimer();
       }
     }
   };
@@ -917,6 +924,7 @@ function logout() {
 }
 
 function toggleScreenShare() {
+  isScreenshareRestart = true;
   if (sharingScreen) {
     acekurento.screenshare(false);
     sharingScreen = false;
