@@ -890,6 +890,7 @@ function enableVideoPrivacy() {
 
 function disableVideoPrivacy() {
   $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera-slash').addClass('call-btn-icon fa fa-video-camera');
+  $('#mute-camera-off-icon').children().remove();
   $('#hide-video').attr('onclick', 'enableVideoPrivacy()');
   $('#hide-video').attr('aria-label', 'Enable Video Privacy');
   setFeedbackText('Video is on!');
