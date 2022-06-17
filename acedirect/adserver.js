@@ -1082,6 +1082,10 @@ io.sockets.on('connection', (socket) => {
     });
   });
 
+  socket.on('agent-screensharing', (data) => {
+    io.to(Number(data.consumerExt)).emit('agentScreenshare')
+  });
+
   socket.on('askMonitor', (data) => {
     io.to(Number(data.originalExt)).emit('initiateMonitor', { monitorExt: data.monitorExt });
   });

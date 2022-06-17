@@ -570,6 +570,9 @@ function connect_socket() {
               $('#closed-message').css('display', 'none');
               $('#callbutton').prop('disabled', false);
             }
+          }).on('agentScreenshare', () => {
+            // agent is stopping/starting screenshare
+            isScreenshareRestart = true;
           });
       } else {
         // need to handle bad connections?
@@ -648,7 +651,6 @@ function registerJssip(myExtension, myPassword) {
           console.log('screensharing ended self');
           // $('#startScreenshare').hide();
           acekurento.screenshare(false);
-          sharingScreen = false;
           document.getElementById('startScreenshare').innerText = 'Start Screenshare';
           if (monitorExt) {
             // force monitor to leave the session first
