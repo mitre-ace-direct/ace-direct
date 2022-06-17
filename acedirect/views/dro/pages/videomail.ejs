@@ -192,6 +192,16 @@
       font-size: 24px;
     }
 
+    #sendVideomailButton:hover{
+      color : white;
+      background-color: #205493 !important;
+    }
+
+    #sendVideomailButton:focus{
+      color : white;
+      background-color: #396082 !important;
+    }
+
   </style>
 </head>
 
@@ -236,7 +246,7 @@
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-video-camera"
                 aria-hidden="true"></i>&nbsp;Video is
               ON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <button class="btn btn-custom" onclick="sendVideomail();"><i class="fa fa-paper-plane" aria-hidden="true"
+            <button class="btn btn-custom" id="sendVideomailButton" onclick="sendVideomail();"><i class="fa fa-paper-plane" aria-hidden="true"
                 style="padding-right:8px;"></i> Send Videomail</button>
           </div>
         </div>

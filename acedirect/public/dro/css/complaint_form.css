@@ -86,7 +86,7 @@ body {
 
 .circleButton:hover {
   color : white;
-  background-color: #396082 !important;
+  background-color: #205493 !important;
 }
 
 .circleButton:focus {
@@ -108,7 +108,7 @@ body {
 
 #startScreenshare:hover {
   color : white;
-  background-color: #396082 !important;
+  background-color: #205493 !important;
 }
 
 #chat-send:focus {
@@ -118,7 +118,27 @@ body {
 
 #chat-send:hover {
   color : white;
+  background-color: #205493 !important;
+}
+
+#callQueueButton:focus {
+  color : white;
   background-color: #396082 !important;
+}
+
+#callQueueButton:hover {
+  color : white;
+  background-color: #205493 !important;
+}
+
+#leaveVideomailButton:focus {
+  color : white;
+  background-color: #396082 !important;
+}
+
+#leaveVideomailButton:hover {
+  color : white;
+  background-color: #205493 !important;
 }
 
 .big-icon {
@@ -339,7 +359,7 @@ body {
 }
 
 #callTime {
-  margin-top: "25px";
+  margin-top: "25px" !important;
   margin-left: 5%;
 }
 
