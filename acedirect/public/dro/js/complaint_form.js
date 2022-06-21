@@ -759,10 +759,10 @@ function enterQueue() {
   });
 }
 
-function endCall() {
+function endCall(forceHangup) {
   terminateCall();
   clearInterval(callTimer);
-  if(callAnswered){
+  if(callAnswered || forceHangup){
     if (complaintRedirectActive) {
       $('#redirectURL').text(complaintRedirectUrl);
       $('#callEndedModal').modal('show');
@@ -783,7 +783,7 @@ function endCall() {
 }
 
 function exitQueue() {
-  endCall();
+  endCall(true);
   $('#waitingModal').modal('hide');
 }
 
