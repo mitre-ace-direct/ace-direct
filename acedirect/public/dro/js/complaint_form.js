@@ -18,7 +18,7 @@ let isSidebarCollapsed = false;
 let index = 0;
 let monitorExt = '';
 let isScreenshareRestart = false;
-
+let callAnswered = false;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -289,6 +289,7 @@ function connect_socket() {
                   },
                   accepted: (_e) => {
                     $('#remoteView').removeClass('mirror-mode');
+                    callAnswered = true;
                   },
                   pausedQueue: (_e) => {
                     console.log('--- WV: Paused Agent Member in Queue ---\n');
@@ -323,6 +324,7 @@ function connect_socket() {
                   ended: (_e) => {
                     console.log('--- WV: Call ended ---\n');
                     // terminateCall();
+                    
                   }
                 };
                 acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
@@ -760,19 +762,23 @@ function enterQueue() {
 function endCall() {
   terminateCall();
   clearInterval(callTimer);
-
-  if (complaintRedirectActive) {
-    $('#redirectURL').text(complaintRedirectUrl);
-    $('#callEndedModal').modal('show');
-    openDialog('callEndedModal', window);
-    document.getElementById('noCallPoster').style.display = 'block';
-    document.getElementById('inCallSection').style.display = 'none';
-    setTimeout(() => {
-      location = complaintRedirectUrl;
-    }, 5000);
+  if(callAnswered){
+    if (complaintRedirectActive) {
+      $('#redirectURL').text(complaintRedirectUrl);
+      $('#callEndedModal').modal('show');
+      openDialog('callEndedModal', window);
+      document.getElementById('noCallPoster').style.display = 'block';
+      document.getElementById('inCallSection').style.display = 'none';
+      setTimeout(() => {
+        location = complaintRedirectUrl;
+      }, 5000);
+    } else {
+      // reset the page
+      window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
+    }
   } else {
-    // reset the page
-    window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
+    $('#waitingModal').modal('hide');
+    $('#noAgentsModal').modal('show');
   }
 }
 
@@ -1464,5 +1470,18 @@ function toggleTab(tab) {
       $('#chatTab').removeClass('active');
       $('#chatTab').attr('aria-selected', 'false');
     }
+  }
+}
+
+function redirectToVideomail(){
+  if(acekurento != null){
+    acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, {ended: (e) => {
+      console.log("--Call ended by asterisk, not abandoned--");
+      window.location.href = "./videomail";
+    }
+  })
+    acekurento.callTransfer("videomail");  
+  } else {
+    window.location.href = "./videomail";
   }
 }
