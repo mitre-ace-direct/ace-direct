@@ -1155,7 +1155,10 @@ function newChatMessage(data) {
   $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
   $(msgtime).addClass('direct-chat-timestamp').html(` ${timestamp}`).appendTo(msginfo);
   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-  $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
+  $(msgtext).addClass('direct-chat-text')
+    .attr('aria-label', `${displayname} said ${msg}`)
+    .html(msg)
+    .appendTo(msgblock);
 
   if ($('#displayname').val() === displayname) {
     $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
