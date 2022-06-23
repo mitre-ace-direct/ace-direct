@@ -38,10 +38,6 @@ body {
   margin-right: 0px;
 }
 
-#callVideoColumn {
-  height: 86vh;
-}
-
 #callFeaturesColumn {
   height: 86vh;
 }
@@ -338,7 +334,6 @@ body {
 #emptyChat {
   color: #767676;
   display: inline-block;
-  margin-top: 75%
 }
 
 #newchatmessage {
@@ -370,6 +365,9 @@ body {
 
 .emptyMessages {
   text-align: center;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .populatedMessages {

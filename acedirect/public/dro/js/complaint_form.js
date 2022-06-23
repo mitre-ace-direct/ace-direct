@@ -587,14 +587,47 @@ function connect_socket() {
   });
 }
 
+const setColumnSize = function () {
+  // sidebar tabs
+  let chatSeparator = document.getElementById("chat-separator");
+  let fileShareSeparator = document.getElementById("fileshare-separator");
+  let footer = document.getElementById("footer-container-consumer");
+  let tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
+  let chatHeight = footer.getBoundingClientRect().top - tabsTop;
+  let fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
+
+  $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
+  $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
+  
+  $('#fileshare-box-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20));
+  $('#fileshare-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20));
+
+  $('.tabs-right').height((chatHeight + tabsTop) - ($('#footer-container-consumer').height() + 20));
+
+  // video section
+  $('#callVideoColumn').height(footer.getBoundingClientRect().top - 70);
+
+  let buttonFeedback = document.getElementById("button-feedback");
+  let speakingToRow = document.getElementById("speakingToRow");
+  let videoButtonsRow = document.getElementById("callButtonsRow");
+  let videoTop = buttonFeedback.getBoundingClientRect().bottom || speakingToRow.getBoundingClientRect().bottom || videoButtonsRow.getBoundingClientRect().bottom;
+  let videoHeight = footer.getBoundingClientRect().top - videoTop;
+  $('#remoteViewCol').height(videoHeight);
+  $('#remoteView').height(videoHeight);
+}
+setColumnSize();
+window.addEventListener('resize', setColumnSize);
+
 // Function to change the text of the feedback for the buttons.
 function setFeedbackText(text) {
   if ($('#button-feedback').is(':hidden')) {
     $('#button-feedback').show();
     $('#button-feedback').attr('aria-hidden', 'false');
+    setColumnSize();
   }
   $('#button-feedback').fadeTo(6000, 50).slideUp(500, () => {
     $('#button-feedback').slideUp(500);
+    setColumnSize();
   });
   $('#button-feedback').text(text);
 }
@@ -720,6 +753,7 @@ function registerJssip(myExtension, myPassword) {
         $('#waitingModal').modal('hide');
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
+        setColumnSize();
       }
     }
   };
@@ -1409,6 +1443,7 @@ function collapseSidebar(tab) {
     $('#remoteViewCol').css('height', '');
     $('#remoteView').css('height','');
     $('#remoteView').css('width', '');
+    setColumnSize();
   } else {
     // close the sidebar
     isSidebarCollapsed = true;
@@ -1446,9 +1481,7 @@ function collapseSidebar(tab) {
     $('#collapseButtonIcon').addClass('fa fa-angle-double-left');
 
     // make sure remote video doesn't expand past footer
-    $('#remoteViewCol').css('height', '75vh');
-    $('#remoteView').css('height', '100%');
-    $('#remoteView').css('width', '100% !important');
+    setColumnSize()
   }
 }
 
@@ -1471,6 +1504,7 @@ function toggleTab(tab) {
       $('#chatTab').attr('aria-selected', 'false');
     }
   }
+  setColumnSize();
 }
 
 function redirectToVideomail(){
