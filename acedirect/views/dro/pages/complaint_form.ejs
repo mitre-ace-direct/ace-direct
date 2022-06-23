@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="/css/ca-portal.css">
 </head>
 
-<body style="overflow-x: hidden">
+<body style="overflow-x: hidden !important;">
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
@@ -77,7 +77,7 @@
             <div class="tab-content">
               <!--Chat pane-->
               <div class="tab-pane active tabFontSize" id="chatBody" tabindex="0" aria-label="Chat tab content">
-                <div class="box-header" style="overflow: hidden;">
+                <div class="box-header" style="overflow: hidden;" id="chat-header">
                   <h1 style="float:left">Chat</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                     <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)" aria-label="Decrease font size by 10%">A</button>
@@ -87,10 +87,10 @@
                       onclick="setFontSize(10)" aria-label="Increase font size by 10%">A</button>
                   </div>
                 </div>
-                <hr />
-                <div class="box-body" style="height:75vh; display:flex; flex-direction: column; overflow: hidden;" role="region" aria-label="chat window">
+                <hr id="chat-separator"/>
+                <div class="box-body" id="chat-box-body" style="display:flex; flex-direction: column; overflow: hidden;" role="region" aria-label="chat window">
                   <!-- Conversations are loaded here -->
-                  <div id="chat-body" style="height:75vh; flex-direction: column; display: flex;">
+                  <div id="chat-body" style="flex-direction: column; display: flex;">
                     <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
                       <div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble" id="rtt-typing"
                         style="min-height: 20px; display: none;"></div>
@@ -166,7 +166,7 @@
               <!-- end chat pane-->
               <!--File Share Pane-->
               <div class="tab-pane tabFontSize" id="fileBody" tabindex="0" aria-label="File share tab content">
-                <div class="box-header" style="overflow: hidden;">
+                <div class="box-header" style="overflow: hidden;" id="fileshare-header">
                   <h1 style="float:left">File Sharing</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                     <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)" aria-label="Decrease font size by 10%">A</button>
@@ -176,11 +176,11 @@
                       onclick="setFontSize(10)" aria-label="Increase font size by 10%">A</button>
                   </div>
                 </div>
-                <hr />
-                <div class="box-body" style="height:70vh">
+                <hr id="fileshare-separator"/>
+                <div class="box-body" id="fileshare-box-body">
                   <!-- Conversations are loaded here -->
                   <!--Hard coding messages for now-->
-                  <div id="file-share-body" style="height:75vh; overflow-y: auto; padding-right: 2rem;">
+                  <div id="fileshare-body" style="overflow-y: auto; padding-right: 2rem;">
                     <p style="line-height: inherit;">Select a file to send by clicking 'Choose File'; send the file by
                       clicking 'Send'.</p>
                     <p style="line-height: inherit;">View sent files in the 'Sent' section, and view or download
