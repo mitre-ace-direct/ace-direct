@@ -1167,7 +1167,6 @@ function newChatMessage(data) {
   $(msgtime).addClass('direct-chat-timestamp').html(` ${timestamp}`).appendTo(msginfo);
   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
   $(msgtext).addClass('direct-chat-text')
-    .attr('aria-label', `${displayname} said ${msg}`)
     .html(msg)
     .appendTo(msgblock);
 
