@@ -19,6 +19,7 @@ let index = 0;
 let monitorExt = '';
 let isScreenshareRestart = false;
 let callAnswered = false;
+let emojiToggle = false;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -1037,11 +1038,21 @@ function showFileShareConfirmation() {
   $('#fileSent').show();
 }
 
+$('#dropup-menu').on('shown.bs.dropdown', () => {
+  emojiToggle = true;
+});
+
+// $('#dropup-menu').on('hidden.bs.dropdown', () => {
+//   emojiToggle = false;
+// });
+
 $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
   if (evt.keyCode === 13) {
     evt.preventDefault();
-    if ($('#newchatmessage').val() !== '') {
+    if ($('#newchatmessage').val() !== '' && !emojiToggle) {
       $('#chatsend').submit();
+    } else if (emojiToggle) {
+      emojiToggle = false;
     }
   }
 
@@ -1189,7 +1200,9 @@ function newChatMessage(data) {
   $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
   $(msgtime).addClass('direct-chat-timestamp').html(` ${timestamp}`).appendTo(msginfo);
   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-  $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
+  $(msgtext).addClass('direct-chat-text')
+    .html(msg)
+    .appendTo(msgblock);
 
   if ($('#displayname').val() === displayname) {
     $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
