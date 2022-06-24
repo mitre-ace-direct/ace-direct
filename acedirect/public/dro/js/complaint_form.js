@@ -755,6 +755,7 @@ function registerJssip(myExtension, myPassword) {
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
         setColumnSize();
+        callAnswered = true;
       }
     }
   };
