@@ -19,6 +19,7 @@ let index = 0;
 let monitorExt = '';
 let isScreenshareRestart = false;
 let callAnswered = false;
+let emojiToggle = false;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -1003,12 +1004,22 @@ function showFileShareConfirmation() {
   $('#fileSent').show();
 }
 
+$('#dropup-menu').on('shown.bs.dropdown', () => {
+  emojiToggle = true;
+});
+
+// $('#dropup-menu').on('hidden.bs.dropdown', () => {
+//   emojiToggle = false;
+// });
+
 $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
   if (evt.keyCode === 13) {
     evt.preventDefault();
-    // if ($('#newchatmessage').val() !== '') {
-    //   $('#chatsend').submit();
-    // }
+    if ($('#newchatmessage').val() !== '' && !emojiToggle) {
+      $('#chatsend').submit();
+    } else if (emojiToggle) {
+      emojiToggle = false;
+    }
   }
 
   // rtt
