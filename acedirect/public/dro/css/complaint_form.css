@@ -81,7 +81,8 @@ body {
   color: white;
   vertical-align: initial !important;
   margin-right: 5px;
-  margin-top: 11px;;
+  margin-top: 11px;
+  margin-bottom: 11px;
 }
 
 .circleButton:hover {
@@ -359,7 +360,7 @@ body {
 }
 
 #callTime {
-  margin-top: "25px" !important;
+  margin-top: 25px !important;
   margin-left: 5%;
 }
 
@@ -466,3 +467,9 @@ body {
 .video-element {
   width: 100%;
 }
+
+#hide-video {
+  vertical-align: bottom !important;
+}
+
+
