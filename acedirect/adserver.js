@@ -1082,6 +1082,10 @@ io.sockets.on('connection', (socket) => {
     });
   });
 
+  socket.on('agent-screensharing', (data) => {
+    io.to(Number(data.consumerExt)).emit('agentScreenshare')
+  });
+
   socket.on('askMonitor', (data) => {
     io.to(Number(data.originalExt)).emit('initiateMonitor', { monitorExt: data.monitorExt });
   });
@@ -1836,9 +1840,29 @@ io.sockets.on('connection', (socket) => {
 
   // Handler catches a Socket.IO event (call-initiated)
   // to register the consumer with a JsSIP extension
-  socket.on('call-initiated', (data) => {
+  socket.on('call-initiated', (data, callback) => {
     logger.info(`Received a JsSIP consumer extension creation request: ${JSON.stringify(data)}`);
-    processExtension(data);
+    request({
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+      url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/operatinghours`
+    }, (error, res, responseData) => {
+      if (error) {
+        console.log('Error polling operating hours:', error);
+        processExtension(data);
+      }
+      const jsonData = JSON.parse(responseData);
+      console.log(jsonData);
+      console.log('typeof data', typeof jsonData);
+      callback(jsonData.isOpen);
+
+      if (jsonData.isOpen) {
+        console.log('Call Center is open!');
+        processExtension(data);
+      } else {
+        console.log('Call Center is closed!');
+      }
+    });
   });
 
   // Handler catches a Socket.IO event (chat-message)

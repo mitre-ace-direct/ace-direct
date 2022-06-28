@@ -38,10 +38,6 @@ body {
   margin-right: 0px;
 }
 
-#callVideoColumn {
-  height: 86vh;
-}
-
 #callFeaturesColumn {
   height: 86vh;
 }
@@ -219,6 +215,7 @@ body {
   border-bottom: 1px solid #ddd !important;
   border-left-color: transparent !important;
   border-right-color: transparent !important;
+  outline: none !important;
 }
 
 .tabs-right>li>a {
@@ -338,7 +335,6 @@ body {
 #emptyChat {
   color: #767676;
   display: inline-block;
-  margin-top: 75%
 }
 
 #newchatmessage {
@@ -370,6 +366,9 @@ body {
 
 .emptyMessages {
   text-align: center;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .populatedMessages {
@@ -473,3 +472,6 @@ body {
 }
 
 
+[tabindex="-1"]:focus {
+  outline: none;
+}

@@ -301,6 +301,7 @@ function register_jssip() {
               acekurento.screenshare(false);
             }, 500);
           } else {
+            socket.emit('agent-screensharing', {consumerExt: callerNumber});
             screenShareEnabled = false;
             acekurento.screenshare(false);
           }
@@ -308,6 +309,7 @@ function register_jssip() {
       }
       if (remoteStream.srcObject) {
         remoteStream.srcObject.getVideoTracks()[0].onended = function () {
+          socket.emit('agent-screensharing', {consumerExt: callerNumber});
           screenShareEnabled = false;
         };
       }
@@ -1222,6 +1224,7 @@ function exitFullscreen() {
 
 // New 4.0 feature functions
 function shareScreen() {
+  socket.emit('agent-screensharing', {consumerExt: callerNumber});
   if (agentStatus === 'IN_CALL' && !isMonitoring) {
     if (beingMonitored) {
       // kick the monitor from the session before screensharing
