@@ -38,16 +38,13 @@ body {
   margin-right: 0px;
 }
 
-#callVideoColumn {
-  height: 86vh;
-}
-
 #callFeaturesColumn {
   height: 86vh;
 }
 
 #callButtonsRow {
   background-color: #dddddd;
+  height : "70px"; 
 }
 
 #speakingToRow {
@@ -57,7 +54,7 @@ body {
 
 #end-call {
   float: right;
-  margin-top: 1%;
+  margin-top: 16px;
   margin-right: 1%;
 }
 
@@ -75,20 +72,22 @@ body {
   border: none;
   height: 45px;
   width: 45px !important;
-  margin: 5px;
   margin-left: 15px;
   background-color: #073863 !important;
   color: white;
   vertical-align: initial !important;
+  margin-right: 5px;
+  margin-top: 11px;;
 }
 
 .circleButton:hover {
   color : white;
-  background-color: #48b6ff !important;
+  background-color: #205493 !important;
 }
 
 .circleButton:focus {
   color : white;
+  background-color: #396082 !important;
 }
 
 #startScreenshare {
@@ -96,6 +95,46 @@ body {
   color: white;
   margin-left: 2%;
   vertical-align: unset;
+}
+
+#startScreenshare:focus {
+  color : white;
+  background-color: #396082 !important;
+}
+
+#startScreenshare:hover {
+  color : white;
+  background-color: #205493 !important;
+}
+
+#chat-send:focus {
+  color : white;
+  background-color: #396082 !important;
+}
+
+#chat-send:hover {
+  color : white;
+  background-color: #205493 !important;
+}
+
+#callQueueButton:focus {
+  color : white;
+  background-color: #396082 !important;
+}
+
+#callQueueButton:hover {
+  color : white;
+  background-color: #205493 !important;
+}
+
+#leaveVideomailButton:focus {
+  color : white;
+  background-color: #396082 !important;
+}
+
+#leaveVideomailButton:hover {
+  color : white;
+  background-color: #205493 !important;
 }
 
 .big-icon {
@@ -175,6 +214,7 @@ body {
   border-bottom: 1px solid #ddd !important;
   border-left-color: transparent !important;
   border-right-color: transparent !important;
+  outline: none !important;
 }
 
 .tabs-right>li>a {
@@ -294,7 +334,6 @@ body {
 #emptyChat {
   color: #767676;
   display: inline-block;
-  margin-top: 75%
 }
 
 #newchatmessage {
@@ -316,7 +355,7 @@ body {
 }
 
 #callTime {
-  margin-top: 1.5%;
+  margin-top: "25px" !important;
   margin-left: 5%;
 }
 
@@ -326,6 +365,9 @@ body {
 
 .emptyMessages {
   text-align: center;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .populatedMessages {
@@ -397,6 +439,33 @@ body {
   color: white;
 }
 
+#remoteViewCol {
+  padding-right: 0px !important;
+  padding-left: 0px !important;
+  background-color: #333333;
+  height : 7%;
+}
+
+#selfViewCol {
+  height : 100%;
+}
+
+#fullscreen-element {
+  height : 95%;
+}
+
+#callVideosRow {
+  height : 100%;
+}
+
+#mute-camera-off-icon {
+  right : 9px;
+  bottom : 4px;
+}
 .video-element {
   width: 100%;
+}
+
+[tabindex="-1"]:focus {
+  outline: none;
 }

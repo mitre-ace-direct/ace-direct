@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="/css/ca-portal.css">
 </head>
 
-<body style="overflow-x: hidden">
+<body style="overflow-x: hidden !important;">
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
@@ -52,6 +52,10 @@
               <span id="CommunicationText"></span>
             </div>
 
+            <div style="box-sizing: border-box;" class="row">
+              <p class="alert alert-info" id="button-feedback" style="display: flex;margin-bottom: 0px;text-indent: 30px;" aria-live="assertive"></p>
+            </div>
+
             <div class="box-body" id="fullscreen-element">
               <div id="callVideosRow" class="row">
                 <div class="col-md-3" id="selfViewCol">
@@ -72,8 +76,8 @@
             <!-- Tab panes -->
             <div class="tab-content">
               <!--Chat pane-->
-              <div class="tab-pane active tabFontSize" id="chatBody">
-                <div class="box-header" style="overflow: hidden;">
+              <div class="tab-pane active tabFontSize" id="chatBody" tabindex="0" aria-label="Chat tab content">
+                <div class="box-header" style="overflow: hidden;" id="chat-header">
                   <h1 style="float:left">Chat</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                     <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)" aria-label="Decrease font size by 10%">A</button>
@@ -83,10 +87,10 @@
                       onclick="setFontSize(10)" aria-label="Increase font size by 10%">A</button>
                   </div>
                 </div>
-                <hr />
-                <div class="box-body" style="height:75vh; display:flex; flex-direction: column; overflow: hidden;" role="region" aria-label="chat window">
+                <hr id="chat-separator"/>
+                <div class="box-body" id="chat-box-body" style="display:flex; flex-direction: column; overflow: hidden;" role="region" aria-label="chat window">
                   <!-- Conversations are loaded here -->
-                  <div id="chat-body" style="height:75vh; flex-direction: column; display: flex;">
+                  <div id="chat-body" style="flex-direction: column; display: flex;">
                     <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
                       <div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble" id="rtt-typing"
                         style="min-height: 20px; display: none;"></div>
@@ -101,7 +105,7 @@
                     <form name="chatsend" id="chatsend">
                       <div class="input-group">
                         <span class="input-group-btn" style="vertical-align: bottom;">
-                          <span class="dropup pull-left">
+                          <span id="dropup-menu" class="dropup pull-left">
                             <button id="chat-emoji" class="btn btn-flat buttonFontSize" type="button"
                               data-toggle="dropdown" animation="true"
                               style="border:2px solid lightgrey; margin-right: 10px" aria-label="Select emoji">&#128512;</button>
@@ -161,8 +165,8 @@
               </div>
               <!-- end chat pane-->
               <!--File Share Pane-->
-              <div class="tab-pane tabFontSize" id="fileBody">
-                <div class="box-header" style="overflow: hidden;">
+              <div class="tab-pane tabFontSize" id="fileBody" tabindex="0" aria-label="File share tab content">
+                <div class="box-header" style="overflow: hidden;" id="fileshare-header">
                   <h1 style="float:left">File Sharing</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                     <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)" aria-label="Decrease font size by 10%">A</button>
@@ -172,11 +176,11 @@
                       onclick="setFontSize(10)" aria-label="Increase font size by 10%">A</button>
                   </div>
                 </div>
-                <hr />
-                <div class="box-body" style="height:70vh">
+                <hr id="fileshare-separator"/>
+                <div class="box-body" id="fileshare-box-body">
                   <!-- Conversations are loaded here -->
                   <!--Hard coding messages for now-->
-                  <div id="file-share-body" style="height:75vh; overflow-y: auto; padding-right: 2rem;">
+                  <div id="fileshare-body" style="overflow-y: auto; padding-right: 2rem;">
                     <p style="line-height: inherit;">Select a file to send by clicking 'Choose File'; send the file by
                       clicking 'Send'.</p>
                     <p style="line-height: inherit;">View sent files in the 'Sent' section, and view or download
@@ -203,13 +207,13 @@
                       <div class="alert alert-success" alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
                         <span class="close closeFileResponse" onclick="$('#fileSent').hide();"
                           style="text-decoration:none" tabindex="0">×</span>
-                        <strong>Success!</strong> File Sent
+                        <strong aria-live="assertive">Success!</strong> File Sent
                       </div>
                       <div class="alert alert-danger" alert-dismissable id="fileSentError" style="margin-top: 10px;"
                         hidden>
                         <span class="close  closeFileResponse" onclick="$('#fileSentError').hide();"
                           style="text-decoration:none" tabindex="0">×</span>
-                        <strong>Error!</strong> Error sending file.
+                        <strong aria-live="assertive">Error!</strong> Error sending file.
                       </div>
                     </div>
                     <!--end file selection section-->
@@ -240,31 +244,32 @@
           </div>
           <div id="tab-options" class="col-xs-3">
             <!-- Nav tabs -->
-            <ul class="nav nav-tabs tabs-right" style="height: 90vh;">
+            <ul class="nav nav-tabs tabs-right" style="height: 90vh;" role="tablist">
               <li id="collapseTab" class="collapseTab">
-                <a class="collapseTab sidebarTab" title="Collapse Sidebar"
+                <a id="collapseTabTitle" class="collapseTab sidebarTab" title="Collapse Sidebar"
                   style="padding-bottom: 20px; padding-top:20px; border:solid 1px transparent;" role="button"
-                  tabindex="-1">
-                  <button id="collapseButton" data-toggle="tooltip" title="Collapse" aria-label="Collapse"
-                    onclick="collapseSidebar('')" tabindex="0">
+                  tabindex="-1" aria-hidden="true">
+                  <button id="collapseButton" data-toggle="tooltip" title="Collapse" aria-label="Collapse Sidebar"
+                    onclick="collapseSidebar('')" tabindex="0" aria-expanded="true">
                     <i id="collapseButtonIcon" class="fa fa-angle-double-right fa-lg"
-                      style="vertical-align: -10% !important;">
+                      style="vertical-align: -10% !important;" aria-hidden="true" alt="">
                     </i>
                   </button>
                 </a>
               </li>
-              <li id="chatTab" class="active">
-                <a href="#chatBody" data-toggle="tab" class="sidebarTab" onclick="toggleTab('chatTab')">
-                  <i class="fa fa-comments fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;">
+              <li class="active" id="tab1">
+                <a id="chatTab" href="#chatBody" data-toggle="tab" class="sidebarTab tab selected" onclick="toggleTab('chatTab')"
+                  aria-controls="chatBody" role="tab" aria-selected="true">
+                  <i class="fa fa-comments fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;" aria-hidden="true" alt="">
                   </i>
                   <br>
                   <p style="color: #073863;">Chat</p>
                 </a>
               </li>
-              <li id="fileShareTab">
-                <a href="#fileBody" data-toggle="tab" class="sidebarTab" onclick="toggleTab('fileShareTab')"
-                  role="button" aria-roledescription="file share button">
-                  <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;">
+              <li id="tab2">
+                <a id="fileShareTab" href="#fileBody" data-toggle="tab" class="sidebarTab tab" onclick="toggleTab('fileShareTab')"
+                  aria-controls="fileShareBody" role="tab" aria-selected="false" tabindex="-1">
+                  <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;" aria-hidden="true" alt="">
                   </i>
                   <br>
                   <p style="color: #073863;">File Share</p>
@@ -298,7 +303,7 @@
 
                 <i class="fa fa-user big-icon" alt="" aria-hidden="true"></i>
                 <div class="button-area text-center">
-                  <button type="button" class="btn btn-primary btn-style" data-dismiss="modal"
+                  <button type="button" id="callQueueButton" class="btn btn-primary btn-style" data-dismiss="modal"
                     onclick="enterQueue()" tabindex="0">Call</button>
                 </div>
               </div>
@@ -315,7 +320,7 @@
 
                 <i class="fa fa-envelope big-icon" alt="" aria-hidden="true"></i>
                 <div class="button-area text-center">
-                  <a href="./videomail" type="button" role="button" class="btn btn-primary btn-style" tabindex="0">
+                  <a href="./videomail" id="leaveVideomailButton" type="button" role="button" class="btn btn-primary btn-style" tabindex="0">
                     Leave Videomail
                   </a>
                 </div>
@@ -336,7 +341,7 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center">
-        <h3 class="waiting-header">Waiting for the next available agent...</h3>
+        <h3 class="waiting-header" role="heading" aria-level="3">Waiting for the next available agent...</h3>
         <hr />
         <video controls class="video-element" id="pleaseWaitVideo" title="Play Video">
           <source src="/media/<%= please_wait_video %>" type="video/mp4">
@@ -352,7 +357,7 @@
         <br />
         <div class="row button-row">
           <div class="col-xs-5">
-            <a href="./videomail" type="button" role="button" class="btn btn-secondary modal-outline-btn" tabindex="0" aria-label="Leave Videomail">
+            <a href="#" onclick="redirectToVideomail();" type="button" role="button" class="btn btn-secondary modal-outline-btn" tabindex="0" aria-label="Leave Videomail">
               <i class="fa fa-envelope"  alt="" aria-hidden="true"></i>
               <span class="separator"></span>
               Leave Videomail
@@ -363,6 +368,37 @@
           </div>
           <div class="col-xs-5">
             <button type="button" class="btn btn-secondary modal-outline-btn" onclick="exitQueue()" tabindex="0" aria-label="Hang Up"><i
+                class="fa fa-phone rotate-phone" alt="" aria-hidden="true"></i><span class="separator"></span>Hang Up</button>
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <a href="#" onclick="logout()" style="color:#073863" role="button" tabindex="0"><i class="fa fa-sign-out" alt="" aria-hidden="true"></i> Exit Support Portal</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="noAgentsModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="no-agents-header">
+  <div class="modal-dialog modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h3 class="no-agents-header">No agents are available to take your call at this time.</h3>
+      </div>
+      <div class="modal-body text-center my-body">
+        <div class="row button-row">
+          <div class="col-xs-5">
+            <a href="./videomail" type="button" role="button" class="btn btn-secondary modal-outline-btn" tabindex="0" aria-label="Leave Videomail">
+              <i class="fa fa-envelope"  alt="" aria-hidden="true"></i>
+              <span class="separator"></span>
+              Leave Videomail
+            </a>
+          </div>
+          <div class="col-xs-2 second-or">
+            - OR -
+          </div>
+          <div class="col-xs-5">
+            <button type="button" class="btn btn-secondary modal-outline-btn" onclick="logout()" tabindex="0" aria-label="Hang Up"><i
                 class="fa fa-phone rotate-phone" alt="" aria-hidden="true"></i><span class="separator"></span>Hang Up</button>
           </div>
         </div>

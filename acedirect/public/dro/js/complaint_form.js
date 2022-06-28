@@ -15,7 +15,11 @@ let hasMessages = false;
 let isAgentTyping = false;
 let sharingScreen = false;
 let isSidebarCollapsed = false;
-
+let index = 0;
+let monitorExt = '';
+let isScreenshareRestart = false;
+let callAnswered = false;
+let emojiToggle = false;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -37,6 +41,100 @@ $(document).ready(() => {
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
   });
+
+  // Use arrow keys to navigate tabs
+  // SOURCE: http://web-accessibility.carnegiemuseums.org/code/tabs/
+
+  const $tabs = $('a.tab');
+
+  $tabs.bind({
+    // on keydown,
+    // determine which tab to select
+    keydown: function(ev) {
+      var LEFT_ARROW = 37;
+      var UP_ARROW = 38;
+      var RIGHT_ARROW = 39;
+      var DOWN_ARROW = 40;
+
+      var key = ev.which || ev.keyCode;
+
+      // if the key pressed was an arrow key
+      if (key >= LEFT_ARROW && key <= DOWN_ARROW){
+        // move left one tab for left and up arrows
+        if (key == LEFT_ARROW || key == UP_ARROW){
+          if (index > 0) {
+            index--;
+          }
+          // unless you are on the first tab,
+          // in which case select the last tab.
+          else {
+            index = $tabs.length - 1;
+          }
+        }
+
+        // move right one tab for right and down arrows
+        else if (key == RIGHT_ARROW || key == DOWN_ARROW){
+          if (index < ($tabs.length - 1)){
+            index++;
+          }
+          // unless you're at the last tab,
+          // in which case select the first one
+          else {
+            index = 0;
+          }
+        }
+
+        // trigger a click event on the tab to move to
+        if (!isSidebarCollapsed) {
+          $($tabs.get(index)).click();
+        } else {
+          $($tabs.get(index)).attr(
+            {
+              tabindex: '0',
+              'aria-selected': 'true'
+            }).addClass('active').focus();
+        }
+        ev.preventDefault();
+      }
+    },
+
+    // just make the clicked tab the selected one
+    click: function(ev){
+      index = $.inArray(this, $tabs.get());
+      setFocus();
+      ev.preventDefault();
+    }
+  });
+
+  var setFocus = function() {
+    // undo tab control selected state,
+    // and make them not selectable with the tab key
+    // (all tabs)
+    $tabs.attr(
+    {
+      tabindex: '-1',
+      'aria-selected': 'false'
+    }).removeClass('active');
+
+    // hide all tab panels.
+    $('.tab-pane').removeClass('active');
+
+    // make the selected tab the selected one, shift focus to it
+    $($tabs.get(index)).attr(
+    {
+      tabindex: '0',
+      'aria-selected': 'true'
+    }).addClass('active').focus();
+
+    // handle parent <li> active class (for coloring the tabs)
+    $($tabs.get(index)).parent().siblings().removeClass('active');
+    $($tabs.get(index)).parent().addClass('active');
+
+    // add an active class also to the tab panel
+    // controlled by the clicked tab
+    
+    $($($tabs.get(index)).attr('href')).addClass('active');
+  };
 });
 
 $(window).bind('fullscreenchange', function (_e) {
@@ -81,6 +179,9 @@ function connect_socket() {
           // const tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
           console.log('got connect');
           console.log('authenticated');
+
+          $('#button-feedback').hide();
+          $('#button-feedback').attr('aria-hidden', 'true');
 
           $('#firstName').val(payload.first_name);
           $('#lastName').val(payload.last_name);
@@ -189,6 +290,7 @@ function connect_socket() {
                   },
                   accepted: (_e) => {
                     $('#remoteView').removeClass('mirror-mode');
+                    callAnswered = true;
                   },
                   pausedQueue: (_e) => {
                     console.log('--- WV: Paused Agent Member in Queue ---\n');
@@ -223,6 +325,7 @@ function connect_socket() {
                   ended: (_e) => {
                     console.log('--- WV: Call ended ---\n');
                     // terminateCall();
+                    
                   }
                 };
                 acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
@@ -320,18 +423,6 @@ function connect_socket() {
               logout('Session has expired');
             }
           })
-          .on('caption-config', (data) => {
-            if (data === 'false') {
-              $('#caption-settings').css('display', 'none');
-              $('#transcriptoverlay').css('display', 'none');
-              $('#mute-captions').css('display', 'none');
-              $('#trans-tab').css('display', 'none');
-              $('#chat-tab').removeClass('tab active-tab');
-              $('#consumer-webcam').css('height', '100%');
-              $('#consumer-captions').hide();
-              $('#consumer-divider').hide();
-            }
-          })
           .on('queue-caller-join', (data) => {
             if (data.extension === exten && data.queue === 'ComplaintsQueue') {
               // setQueueText(data.position -= 1); // subtract because asterisk wording is off by one
@@ -381,7 +472,6 @@ function connect_socket() {
           .on('chat-leave', (_error) => {
             // clear chat
             $('#chatcounter').text('500');
-            $('#caption-messages').html('');
             $('#newchatmessage').val('');
             $('#chat-messages').removeClass('populatedMessages');
             $('#chat-messages').addClass('emptyMessages');
@@ -434,23 +524,6 @@ function connect_socket() {
               $('#requestAck').html('Permission has been denied.');
             }
           })
-          .on('multiparty-caption', (transcripts) => {
-            console.log('multiparty caption:', JSON.stringify(transcripts));
-            socket.emit('translate-caption', {
-              transcripts,
-              callerNumber: exten,
-              displayname: transcripts.displayname
-            });
-          })
-          .on('caption-translated', (transcripts) => {
-            console.log('consumer received translation', transcripts);
-            if (acekurento.isMultiparty) {
-              // TODO: clear Regular Transcripts
-              updateCaptionsMultiparty(transcripts);
-            } else {
-              updateConsumerCaptions(transcripts); // in jssip_consumer.js
-            }
-          })
           .on('enable-translation', () => {
             // Activate flag/language dropdown
             /* $('#language-select').msDropDown(
@@ -479,8 +552,7 @@ function connect_socket() {
             }, 3000);
           })
           .on('consumer-being-monitored', () => {
-            // keep self-view and don't enable multiparty
-            // captions during a monitored one-to-one call
+            // keep self-view 
             acekurento.isMonitoring = true;
             $('#end-call').attr('onclick', 'monitorHangup()');
           })
@@ -491,6 +563,8 @@ function connect_socket() {
           })
           .on('call-center-closed', (data) => {
             if (data && data.closed) {
+              // console.log('call center closed');
+              // window.location.replace('videomail'); // redirect to videomail
               // closed
               $('#closed-message').css('display', 'inline');
               $('#callbutton').prop('disabled', true);
@@ -499,6 +573,9 @@ function connect_socket() {
               $('#closed-message').css('display', 'none');
               $('#callbutton').prop('disabled', false);
             }
+          }).on('agentScreenshare', () => {
+            // agent is stopping/starting screenshare
+            isScreenshareRestart = true;
           });
       } else {
         // need to handle bad connections?
@@ -511,6 +588,51 @@ function connect_socket() {
   });
 }
 
+const setColumnSize = function () {
+  // sidebar tabs
+  let chatSeparator = document.getElementById("chat-separator");
+  let fileShareSeparator = document.getElementById("fileshare-separator");
+  let footer = document.getElementById("footer-container-consumer");
+  let tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
+  let chatHeight = footer.getBoundingClientRect().top - tabsTop;
+  let fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
+
+  $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
+  $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
+  
+  $('#fileshare-box-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20));
+  $('#fileshare-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20));
+
+  $('.tabs-right').height((chatHeight + tabsTop) - ($('#footer-container-consumer').height() + 20));
+
+  // video section
+  $('#callVideoColumn').height(footer.getBoundingClientRect().top - 70);
+
+  let buttonFeedback = document.getElementById("button-feedback");
+  let speakingToRow = document.getElementById("speakingToRow");
+  let videoButtonsRow = document.getElementById("callButtonsRow");
+  let videoTop = buttonFeedback.getBoundingClientRect().bottom || speakingToRow.getBoundingClientRect().bottom || videoButtonsRow.getBoundingClientRect().bottom;
+  let videoHeight = footer.getBoundingClientRect().top - videoTop;
+  $('#remoteViewCol').height(videoHeight);
+  $('#remoteView').height(videoHeight);
+}
+setColumnSize();
+window.addEventListener('resize', setColumnSize);
+
+// Function to change the text of the feedback for the buttons.
+function setFeedbackText(text) {
+  if ($('#button-feedback').is(':hidden')) {
+    $('#button-feedback').show();
+    $('#button-feedback').attr('aria-hidden', 'false');
+    setColumnSize();
+  }
+  $('#button-feedback').fadeTo(6000, 50).slideUp(500, () => {
+    $('#button-feedback').slideUp(500);
+    setColumnSize();
+  });
+  $('#button-feedback').text(text);
+}
+
 // setup for the call. creates and starts the User Agent (UA) and registers event handlers
 // This uses the new ACE Kurento object rather than JsSIP
 function registerJssip(myExtension, myPassword) {
@@ -521,36 +643,6 @@ function registerJssip(myExtension, myPassword) {
     },
     accepted: (e) => {
       console.log(`--- WV: UA accepted ---\n${e}`);
-    },
-    newMessage: (e) => {
-      console.log('--- WV: New Message ---\n');
-      const { consumerLanguage } = sessionStorage;
-
-      console.log(`Consumer's selected language is ${consumerLanguage}`);
-
-      try {
-        if (e.msg === 'STARTRECORDING') {
-          startRecordProgress();
-          enableVideoPrivacy();
-          setTimeout(() => {
-            disableVideoPrivacy();
-          }, 1000);
-        } else {
-          const transcripts = JSON.parse(e.msg);
-          if (transcripts.transcript && !acekurento.isMultiparty) {
-            // Acedirect will skip translation service if languages are the same
-            console.log('sending caption:', transcripts.transcript, myExtension);
-            socket.emit('translate-caption', {
-              transcripts,
-              callerNumber: myExtension
-            });
-            // acedirect.js is listening for 'caption-translated' and will call
-            // updateConsumerCaptions directly with the translation
-          }
-        }
-      } catch (err) {
-        console.log(err);
-      }
     },
     registerResponse: (error) => {
       console.log('--- WV: Register response:', error || 'Success ---');
@@ -595,7 +687,6 @@ function registerJssip(myExtension, myPassword) {
           console.log('screensharing ended self');
           // $('#startScreenshare').hide();
           acekurento.screenshare(false);
-          sharingScreen = false;
           document.getElementById('startScreenshare').innerText = 'Start Screenshare';
           if (monitorExt) {
             // force monitor to leave the session first
@@ -651,13 +742,20 @@ function registerJssip(myExtension, myPassword) {
         }
       }
 
+      if (partCount === 2 && !isScreenshareRestart) {
+        startCallTimer();
+      } else if (isScreenshareRestart) {
+        isScreenshareRestart = false;
+      }
+
       if (partCount >= 2 || videomailflag) {
         console.log('--- WV: CONNECTED');
         $('#queueModal').modal('hide');
         $('#waitingModal').modal('hide');
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
-        startCallTimer();
+        setColumnSize();
+        callAnswered = true;
       }
     }
   };
@@ -685,32 +783,43 @@ function enterQueue() {
   socket.emit('call-initiated', {
     language,
     vrs
+  }, (isOpen) => {
+    console.log('isOpen:', isOpen);
+    if (isOpen) {
+      $('#waitingModal').modal('show');
+      openDialog('waitingModal', window);
+    } else {
+      $('#noAgentsModal').modal('show');
+      openDialog('noAgentsModal', window);
+    }
   });
-  $('#waitingModal').modal('show');
-  openDialog('waitingModal', window);
 }
 
-function endCall() {
+function endCall(forceHangup) {
   terminateCall();
   clearInterval(callTimer);
-
-  if (complaintRedirectActive) {
-    $('#redirectURL').text(complaintRedirectUrl);
-    $('#callEndedModal').modal('show');
-    openDialog('callEndedModal', window);
-    document.getElementById('noCallPoster').style.display = 'block';
-    document.getElementById('inCallSection').style.display = 'none';
-    setTimeout(() => {
-      location = complaintRedirectUrl;
-    }, 5000);
+  if(callAnswered || forceHangup){
+    if (complaintRedirectActive) {
+      $('#redirectURL').text(complaintRedirectUrl);
+      $('#callEndedModal').modal('show');
+      openDialog('callEndedModal', window);
+      document.getElementById('noCallPoster').style.display = 'block';
+      document.getElementById('inCallSection').style.display = 'none';
+      setTimeout(() => {
+        location = complaintRedirectUrl;
+      }, 5000);
+    } else {
+      // reset the page
+      window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
+    }
   } else {
-    // reset the page
-    window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
+    $('#waitingModal').modal('hide');
+    $('#noAgentsModal').modal('show');
   }
 }
 
 function exitQueue() {
-  endCall();
+  endCall(true);
   $('#waitingModal').modal('hide');
 }
 
@@ -721,6 +830,8 @@ function exitQueue() {
 function startCall(otherSipUri) {
   console.log(`startCall: ${otherSipUri}`);
   selfStream.removeAttribute('hidden');
+
+  setFeedbackText('Agent connected!');
 
   $('#screenshareButton').removeAttr('disabled');
   $('#fileInput').removeAttr('disabled');
@@ -761,7 +872,6 @@ function terminateCall() {
   //  enableInitialButtons();
   exitFullscreen();
   // $('#transcriptoverlay').html('');
-  // hideCaptions();
 
   // remove file sharing
   socket.emit('call-ended', { agentExt: '' });
@@ -775,6 +885,8 @@ function terminateCall() {
 function muteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone').addClass('call-btn-icon fa fa-microphone-slash');
   $('#mute-audio').attr('onclick', 'unmuteAudio()');
+  $('#mute-audio').attr('aria-label', 'Unmute Audio');
+  setFeedbackText('Audio Muted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, true); // mute audio
   }
@@ -784,6 +896,8 @@ function muteAudio() {
 function unmuteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone-slash').addClass('call-btn-icon fa fa-microphone');
   $('#mute-audio').attr('onclick', 'muteAudio()');
+  $('#mute-audio').attr('aria-label', 'Mute Audio');
+  setFeedbackText('Audio Unmuted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, true); // unmute audio
   }
@@ -795,6 +909,8 @@ function enableVideoPrivacy() {
     '<i class="fa fa-video-camera fa-stack-1x"></i><i class="fa fa-ban fa-stack-2x text-danger"></i>'
   );
   $('#hide-video').attr('onclick', 'disableVideoPrivacy()');
+  $('#hide-video').attr('aria-label', 'Disable Video Privacy');
+  setFeedbackText('Video is off!');
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
       socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -816,7 +932,10 @@ function enableVideoPrivacy() {
 
 function disableVideoPrivacy() {
   $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera-slash').addClass('call-btn-icon fa fa-video-camera');
+  $('#mute-camera-off-icon').children().remove();
   $('#hide-video').attr('onclick', 'enableVideoPrivacy()');
+  $('#hide-video').attr('aria-label', 'Enable Video Privacy');
+  setFeedbackText('Video is on!');
   if (acekurento !== null) {
     if (acekurento.isMonitoring) {
       socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -850,14 +969,19 @@ function logout() {
 }
 
 function toggleScreenShare() {
+  isScreenshareRestart = true;
   if (sharingScreen) {
     acekurento.screenshare(false);
     sharingScreen = false;
     document.getElementById('startScreenshare').innerText = 'Start Screenshare';
+    $('#startScreenshare').attr('aria-label', 'Share screen');
+    setFeedbackText('Screenshare ended!');
   } else {
     acekurento.screenshare(true);
     sharingScreen = true;
     document.getElementById('startScreenshare').innerText = 'Stop Screenshare';
+    $('#startScreenshare').attr('aria-label', 'Stop screen share');
+    setFeedbackText('Screenshare started!');
   }
 }
 
@@ -915,11 +1039,21 @@ function showFileShareConfirmation() {
   $('#fileSent').show();
 }
 
+$('#dropup-menu').on('shown.bs.dropdown', () => {
+  emojiToggle = true;
+});
+
+// $('#dropup-menu').on('hidden.bs.dropdown', () => {
+//   emojiToggle = false;
+// });
+
 $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
   if (evt.keyCode === 13) {
     evt.preventDefault();
-    if ($('#newchatmessage').val() !== '') {
+    if ($('#newchatmessage').val() !== '' && !emojiToggle) {
       $('#chatsend').submit();
+    } else if (emojiToggle) {
+      emojiToggle = false;
     }
   }
 
@@ -1067,7 +1201,9 @@ function newChatMessage(data) {
   $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
   $(msgtime).addClass('direct-chat-timestamp').html(` ${timestamp}`).appendTo(msginfo);
   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-  $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
+  $(msgtext).addClass('direct-chat-text')
+    .html(msg)
+    .appendTo(msgblock);
 
   if ($('#displayname').val() === displayname) {
     $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
@@ -1095,6 +1231,7 @@ function shareFileConsumer() {
   if ($('#fileInput')[0].files[0]) {
     const formData = new FormData();
     console.log('uploading:');
+    setFeedbackText('Sending file...');
     console.log($('#fileInput')[0].files[0]);
     formData.append('uploadfile', $('#fileInput')[0].files[0]);
     $.ajax({
@@ -1111,6 +1248,7 @@ function shareFileConsumer() {
         $('#fileSent').show();
         $('#removeFileBtn').hide();
         $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
+        $('#button-feedback').hide();
       },
       error: (jXHR, textStatus, errorThrown) => {
         console.log(`ERROR: ${jXHR} ${textStatus} ${errorThrown}`);
@@ -1122,6 +1260,7 @@ function shareFileConsumer() {
 
 function addFileToDownloadList(data) {
   $('#noReceivedFiles').attr('hidden', true);
+  setFeedbackText('File received from agent!');
   let fileType = data.original_filename.split('.')[1];
   if (fileType) {
     if (viewableFileTypes.includes(fileType.toLowerCase())) {
@@ -1173,7 +1312,7 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span>${data.original_filename}</span>
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}"><i class="fa fa-eye fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View file"><i class="fa fa-eye fileShareIcon"></i></a>
         <hr/>`)
       );
     } else {
@@ -1190,7 +1329,7 @@ function addFileToSentList(data) {
     // add to sent files list
     $('#sentFilesList').append(
       (`<span>${data.original_filename}</span>
-      <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Cannot view this file type" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+      <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Cannot view this file type" disabled><i class="fa fa-eye fileShareIcon" ></i></a>
       <hr/>`)
     );
   }
@@ -1247,26 +1386,53 @@ function setOtherFontSize(size) {
   }
 }
 
+$('#collapseButton').on('keydown', (e) =>{
+  if (e.keyCode === 13) {
+    // enter key pressed
+    // do not show the collapse button tooltip on enter press
+    e.preventDefault();
+    collapseSidebar('chatTab');
+    $('#collapseButton').tooltip('hide');
+  }
+});
+
 function collapseSidebar(tab) {
   if (isSidebarCollapsed) {
     // open the sidebar
     isSidebarCollapsed = false;
+    $('#collapseButton').attr('aria-label', 'Collapse Sidebar');
+    $('#collapseTabTitle').attr('title', 'Collapse Sidebar');
+    $('#collapseButton').attr('aria-expanded', 'true');
     $('.tab-content').attr('hidden', false);
     $('#tab-pane').attr('hidden', false);
     $('#tab-options').css('padding-left', '');
+
+    $('#fileShareTab').attr('aria-label', 'File share tab');
+    $('#chatTab').attr('aria-label', 'Chat tab');
 
     if (tab !== '') {
       // open the selected tab
       $('#' + tab).addClass('active');
       if (tab === 'fileShareTab') {
         $('#fileBody').addClass('active');
+        $('#fileShareTab').addClass('active');
+        $('#chatTab').attr('aria-selected', 'false');
+        $('#fileShareTab').attr('aria-selected', 'true');
+        $('#tab2').addClass('active');
       } else if (tab === 'chatTab') {
         $('#chatBody').addClass('active');
+        $('#chatTab').addClass('active');
+        $('#chatTab').attr('aria-selected', 'true');
+        $('#fileShareTab').attr('aria-selected', 'false');
+        $('#tab1').addClass('active');
       }
     } else {
       // default to chat tab
       $('#chatTab').addClass('active');
       $('#chatBody').addClass('active');
+      $('#chatTab').attr('aria-selected', 'true');
+      $('#fileShareTab').attr('aria-selected', 'false');
+      $('#tab1').addClass('active');
     }
 
     $('.sidebarTab').css('width', '8vw');
@@ -1291,15 +1457,26 @@ function collapseSidebar(tab) {
     $('#remoteViewCol').css('height', '');
     $('#remoteView').css('height','');
     $('#remoteView').css('width', '');
+    setColumnSize();
   } else {
     // close the sidebar
     isSidebarCollapsed = true;
+    $('#collapseButton').attr('aria-label', 'Expand Sidebar');
+    $('#collapseTabTitle').attr('title', 'Expand Sidebar');
+    $('#collapseButton').attr('aria-expanded', 'false');
     $('.tab-content').attr('hidden', true);
     $('#tab-pane').attr('hidden', true);
     $('#tab-options').css('padding-left', '0px');
     $('li').removeClass('active');
     $('.tab-pane').removeClass('active');
     $('.sidebarTab').css('width', '8.8vw');
+
+    $('#chatTab').attr('aria-selected', 'false');
+    $('#fileShareTab').attr('aria-selected', 'false');
+    $('#chatTab').attr('tabindex', '0');
+    $('#fileShareTab').attr('tabindex', '-1');
+    $('#fileShareTab').attr('aria-label', 'Collapsed file share tab');
+    $('#chatTab').attr('aria-label', 'Collapsed chat tab');
 
     $('#callFeaturesColumn').removeClass('col-xs-6 col-lg-4');
     $('#callFeaturesColumn').addClass('col-md-1');
@@ -1318,9 +1495,7 @@ function collapseSidebar(tab) {
     $('#collapseButtonIcon').addClass('fa fa-angle-double-left');
 
     // make sure remote video doesn't expand past footer
-    $('#remoteViewCol').css('height', '75vh');
-    $('#remoteView').css('height', '100%');
-    $('#remoteView').css('width', '100% !important');
+    setColumnSize()
   }
 }
 
@@ -1328,5 +1503,33 @@ function toggleTab(tab) {
   if (isSidebarCollapsed) {
     // open sidebar
     collapseSidebar(tab);
+  } else {
+    if (tab === 'chatTab') {
+      $('#chatTab').addClass('active');
+      $('#chatTab').attr('aria-selected', 'true');
+
+      $('#fileShareTab').removeClass('active');
+      $('#fileShareTab').attr('aria-selected', 'false');
+    } else if (tab === 'fileShareTab') {
+      $('#fileShareTab').addClass('active');
+      $('#fileShareTab').attr('aria-selected', 'true');
+
+      $('#chatTab').removeClass('active');
+      $('#chatTab').attr('aria-selected', 'false');
+    }
+  }
+  setColumnSize();
+}
+
+function redirectToVideomail(){
+  if(acekurento != null){
+    acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, {ended: (e) => {
+      console.log("--Call ended by asterisk, not abandoned--");
+      window.location.href = "./videomail";
+    }
+  })
+    acekurento.callTransfer("videomail");  
+  } else {
+    window.location.href = "./videomail";
   }
 }
