@@ -1312,7 +1312,7 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span>${data.original_filename}</span>
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}"><i class="fa fa-eye fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View file"><i class="fa fa-eye fileShareIcon"></i></a>
         <hr/>`)
       );
     } else {
@@ -1329,7 +1329,7 @@ function addFileToSentList(data) {
     // add to sent files list
     $('#sentFilesList').append(
       (`<span>${data.original_filename}</span>
-      <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Cannot view this file type" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+      <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Cannot view this file type" disabled><i class="fa fa-eye fileShareIcon" ></i></a>
       <hr/>`)
     );
   }
