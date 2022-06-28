@@ -106,7 +106,7 @@ class WebRTCMediaSession extends Events {
       extra: null
     };
     if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0) {
-      this._virtualPeers.set(ext, p);
+      //this._virtualPeers.set(ext, p);)
       return;
     }
     this._participants.set(ext, p);
@@ -290,6 +290,8 @@ class WebRTCMediaSession extends Events {
 
   async leave(ext, virtual = false, disableFinishCall = false) {
     debug('LEAVE!!!', virtual, disableFinishCall);
+    if (virtual)
+      return;
     const peers = virtual ? this._virtualPeers : this._participants;
     debug(JSON.stringify(ext));
     // debug(peers);
@@ -425,6 +427,9 @@ class WebRTCMediaSession extends Events {
   }
 
   handleRtpAnswer(ext, answer) {
+    if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0) 
+      return;
+
     const p = this._participants.get(ext) || this._virtualPeers.get(ext);
     if (!p) {
       throw new Error(`No participant registered for ${ext}`);
