@@ -384,6 +384,11 @@
     <div class="modal-content">
       <div class="modal-header text-center">
         <h3 class="no-agents-header">No agents are available to take your call at this time.</h3>
+        <hr/>
+        <video controls class="video-element" id="pleaseWaitVideo" title="Play Video">
+          <source src="/media/<%= no_agents_video %>" type="video/mp4">
+          <source src='/media/<%= no_agents_video %>' type="video/webm">
+        </video>
       </div>
       <div class="modal-body text-center my-body">
         <div class="row button-row">
