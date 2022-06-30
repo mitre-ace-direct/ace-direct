@@ -146,7 +146,7 @@ function register_jssip() {
         }, 500);
       }
 
-      if (acekurento.activeAgentList.length === participants.length) {
+      if (acekurento.activeAgentList.length === participants.length && participants.length > 1) {
         allAgentCall = true;
         beingMonitored = false;
         // consumer left the call. end the call for remaining agents

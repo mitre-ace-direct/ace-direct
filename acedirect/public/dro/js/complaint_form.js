@@ -890,6 +890,7 @@ function muteAudio() {
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, true); // mute audio
   }
+  $("#mute-audio").blur();
 }
 
 // unmutes self audio so remote can hear you
@@ -901,10 +902,13 @@ function unmuteAudio() {
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, true); // unmute audio
   }
+  $("#mute-audio").blur();
 }
 
 function enableVideoPrivacy() {
-  $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa-stack');
+  $("#hide-video").blur();
+  //$('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa-stack');
+  $('#mute-camera-off-icon').children().remove();
   $('#mute-camera-off-icon').append(
     '<i class="fa fa-video-camera fa-stack-1x"></i><i class="fa fa-ban fa-stack-2x text-danger"></i>'
   );
@@ -931,8 +935,12 @@ function enableVideoPrivacy() {
 }
 
 function disableVideoPrivacy() {
-  $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera-slash').addClass('call-btn-icon fa fa-video-camera');
+  $("#hide-video").blur();
+  //$('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa fa-video-camera');
   $('#mute-camera-off-icon').children().remove();
+  $('#mute-camera-off-icon').append(
+    '<i class="fa fa-video-camera fa-stack-1x"></i>'
+  );
   $('#hide-video').attr('onclick', 'enableVideoPrivacy()');
   $('#hide-video').attr('aria-label', 'Enable Video Privacy');
   setFeedbackText('Video is on!');
@@ -969,6 +977,7 @@ function logout() {
 }
 
 function toggleScreenShare() {
+  $("#startScreenshare").blur();
   isScreenshareRestart = true;
   if (sharingScreen) {
     acekurento.screenshare(false);
