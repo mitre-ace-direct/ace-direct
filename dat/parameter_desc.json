@@ -268,6 +268,7 @@
   },
   "complaint_videos": {
     "instructions_video": "video filename for instructions to the complaint user; MP4/webm format; defaults to sample.mp4; customize with your own instructions file in /acedirect/public/media/",
-    "please_wait_video": "video filename for letting the complaint user know to wait; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/"
+    "please_wait_video": "video filename for letting the complaint user know to wait; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/",
+    "no_agents_video": "video filename for the modal that appears when a user tries to call while all agents are away or offline; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/"
   }
 }
