@@ -627,10 +627,7 @@ function setFeedbackText(text) {
     $('#button-feedback').attr('aria-hidden', 'false');
     setColumnSize();
 
-    console.log('fadeTo Console 1');
-
     if (feedbackTimeoutID) {
-      console.log('Timeout Handler Log', feedbackTimeoutID);
       clearTimeout(feedbackTimeoutID);
     }
 
@@ -641,12 +638,8 @@ function setFeedbackText(text) {
     }, 6000);
   } else {
     if (feedbackTimeoutID) {
-      console.log('Timeout Handler Log', feedbackTimeoutID);
       clearTimeout(feedbackTimeoutID);
     }
-
-    console.log('Timeout Handler Log', feedbackTimeoutID);
-    console.log('fadeTo Console 2');
 
     feedbackTimeoutID = setTimeout(() => {
       $('#button-feedback').slideUp(500, () => {
