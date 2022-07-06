@@ -20,6 +20,7 @@ let monitorExt = '';
 let isScreenshareRestart = false;
 let callAnswered = false;
 let emojiToggle = false;
+let feedbackTimeoutID;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -625,11 +626,28 @@ function setFeedbackText(text) {
     $('#button-feedback').show();
     $('#button-feedback').attr('aria-hidden', 'false');
     setColumnSize();
+
+    if (feedbackTimeoutID) {
+      clearTimeout(feedbackTimeoutID);
+    }
+
+    feedbackTimeoutID = setTimeout(() => {
+      $('#button-feedback').slideUp(500, () => {
+        setColumnSize();
+      });
+    }, 6000);
+  } else {
+    if (feedbackTimeoutID) {
+      clearTimeout(feedbackTimeoutID);
+    }
+
+    feedbackTimeoutID = setTimeout(() => {
+      $('#button-feedback').slideUp(500, () => {
+        setColumnSize();
+      });
+    }, 6000);
   }
-  $('#button-feedback').fadeTo(6000, 50).slideUp(500, () => {
-    $('#button-feedback').slideUp(500);
-    setColumnSize();
-  });
+
   $('#button-feedback').text(text);
 }
 
