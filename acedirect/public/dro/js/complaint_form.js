@@ -20,6 +20,7 @@ let monitorExt = '';
 let isScreenshareRestart = false;
 let callAnswered = false;
 let emojiToggle = false;
+let feedbackTimeoutID;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -625,11 +626,35 @@ function setFeedbackText(text) {
     $('#button-feedback').show();
     $('#button-feedback').attr('aria-hidden', 'false');
     setColumnSize();
+
+    console.log('fadeTo Console 1');
+
+    if (feedbackTimeoutID) {
+      console.log('Timeout Handler Log', feedbackTimeoutID);
+      clearTimeout(feedbackTimeoutID);
+    }
+
+    feedbackTimeoutID = setTimeout(() => {
+      $('#button-feedback').slideUp(500, () => {
+        setColumnSize();
+      });
+    }, 6000);
+  } else {
+    if (feedbackTimeoutID) {
+      console.log('Timeout Handler Log', feedbackTimeoutID);
+      clearTimeout(feedbackTimeoutID);
+    }
+
+    console.log('Timeout Handler Log', feedbackTimeoutID);
+    console.log('fadeTo Console 2');
+
+    feedbackTimeoutID = setTimeout(() => {
+      $('#button-feedback').slideUp(500, () => {
+        setColumnSize();
+      });
+    }, 6000);
   }
-  $('#button-feedback').fadeTo(6000, 50).slideUp(500, () => {
-    $('#button-feedback').slideUp(500);
-    setColumnSize();
-  });
+
   $('#button-feedback').text(text);
 }
 
