@@ -135,6 +135,7 @@ $(document).ready(() => {
     
     $($($tabs.get(index)).attr('href')).addClass('active');
   };
+
 });
 
 $(window).bind('fullscreenchange', function (_e) {
@@ -684,10 +685,10 @@ function registerJssip(myExtension, myPassword) {
       console.log(`--- WV: restartCallResponse ---\n${JSON.stringify(e)}`);
       if (selfStream && selfStream.srcObject) {
         selfStream.srcObject.getVideoTracks()[0].onended = () => {
-          console.log('screensharing ended self');
+          console.log('SCREENSHARE ENDED SELF');
           // $('#startScreenshare').hide();
-          acekurento.screenshare(false);
-          document.getElementById('startScreenshare').innerText = 'Start Screenshare';
+          //acekurento.screenshare(false);
+          //document.getElementById('startScreenshare').innerText = 'Start Screenshare';
           if (monitorExt) {
             // force monitor to leave the session first
             socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -976,19 +977,33 @@ function logout() {
   window.location.href = './logout';
 }
 
-function toggleScreenShare() {
+function toggleScreenShare(toggle) {
   $("#startScreenshare").blur();
   isScreenshareRestart = true;
-  if (sharingScreen) {
+  if (!toggle) {
     acekurento.screenshare(false);
-    sharingScreen = false;
-    document.getElementById('startScreenshare').innerText = 'Start Screenshare';
+    console.log("UPDATING SCREENSHARE BUTTON FALSE");
+    //sharingScreen = false;
+    $('#startScreenshare').removeAttr('onclick');
+    $('#startScreenshare').attr('onClick', 'toggleScreenShare(true);');
+    $('#startScreenshare').text("");
+    $('#startScreenshare').children().remove();
+    $('#startScreenshare').append(
+      '<i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare'
+    )
     $('#startScreenshare').attr('aria-label', 'Share screen');
     setFeedbackText('Screenshare ended!');
   } else {
     acekurento.screenshare(true);
-    sharingScreen = true;
-    document.getElementById('startScreenshare').innerText = 'Stop Screenshare';
+    console.log("UPDATING SCREENSHARE BUTTON TRUE");
+    //sharingScreen = true;
+    $('#startScreenshare').removeAttr('onclick');
+    $('#startScreenshare').attr('onClick', 'toggleScreenShare(false);');
+    $('#startScreenshare').text("");
+    $('#startScreenshare').children().remove();
+    $('#startScreenshare').append(
+      '<i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Stop Screenshare'
+    )
     $('#startScreenshare').attr('aria-label', 'Stop screen share');
     setFeedbackText('Screenshare started!');
   }
