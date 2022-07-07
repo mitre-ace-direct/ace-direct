@@ -1129,3 +1129,7 @@ div#call-controls button#button-hangup {
 #consumer-tools-container .btn {
   width: 100%;
 }
+
+.agent-grid .box {
+  margin-bottom: 0px;
+}
