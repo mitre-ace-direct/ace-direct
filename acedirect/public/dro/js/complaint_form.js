@@ -1010,7 +1010,7 @@ function toggleScreenShare(toggle) {
       '<i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare'
     )
     $('#startScreenshare').attr('aria-label', 'Share screen');
-    setFeedbackText('Screenshare ended!');
+    //setFeedbackText('Screenshare ended!');
   } else {
     acekurento.screenshare(true);
     console.log("UPDATING SCREENSHARE BUTTON TRUE");
@@ -1023,7 +1023,7 @@ function toggleScreenShare(toggle) {
       '<i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Stop Screenshare'
     )
     $('#startScreenshare').attr('aria-label', 'Stop screen share');
-    setFeedbackText('Screenshare started!');
+    //setFeedbackText('Screenshare started!');
   }
 }
 
