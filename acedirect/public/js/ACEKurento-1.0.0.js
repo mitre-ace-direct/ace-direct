@@ -478,16 +478,33 @@
                 navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (aStream) {
                   audioStream = aStream;
                   start();
-                }).catch(callback);
-              }).catch(callback);
+                }), failcase => {
+                  //console.log("FIRST MEDIA DIDNT WORK", failcase);
+                };
+              }).catch(function(err){
+                //console.log("THIS WENT WRONG " + err);
+              })
             } else if (navigator.mediaDevices.getDisplayMedia) {
               navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then(function (stream) {
                 videoStream = stream;
                 navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (aStream) {
                   audioStream = aStream;
                   start();
-                }).catch(callback);
-              }).catch(callback);
+                }), failcase => {
+                  //console.log("SECOND MEDIA DIDNT WORK", failcase);
+                };
+              }).catch(function(err){
+                //console.log("THIS WENT WRONG " + err);
+                acekurento.screenshare(false);
+                $('#startScreenshare').removeAttr('onclick');
+                $('#startScreenshare').attr('onClick', 'toggleScreenShare(true);');
+                $('#startScreenshare').text("");
+                $('#startScreenshare').children().remove();
+                $('#startScreenshare').append(
+                  '<i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare'
+                )
+                $('#startScreenshare').attr('aria-label', 'Share screen');
+              })
             } else {
               logger.warn('This browser does not support getDisplayMedia, screen share might fail');
               mediaConstraints.video = { mediaSource: 'screen' };
@@ -5259,6 +5276,7 @@ function ACEKurento(config) {
         if (error) {
           //screen sharing soft errors
           //console.log(JSON.stringify(error));
+          console.log("SCREENSHARE ERROR");
           setCallState(NO_CALL);
           return;
         }
