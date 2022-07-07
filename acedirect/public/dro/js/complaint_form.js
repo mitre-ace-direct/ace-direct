@@ -20,6 +20,9 @@ let monitorExt = '';
 let isScreenshareRestart = false;
 let callAnswered = false;
 let emojiToggle = false;
+let unreadMessages = 0;
+let unreadFiles = 0;
+let openTab = 'chat';
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -504,6 +507,11 @@ function connect_socket() {
             $('#fileSent').hide();
             $('#fileSentError').hide();
             addFileToDownloadList(data);
+
+            if (isSidebarCollapsed || openTab !== 'fileShare') {
+              unreadFiles += 1;
+              $('#unreadFilesBadge').text(unreadFiles);
+            }
           })
           .on('fileListAgent', (data) => {
             // file sent confirmation
@@ -1230,6 +1238,12 @@ function newChatMessage(data) {
       .appendTo($('#chat-messages'));
   }
   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+
+  if (isSidebarCollapsed || openTab !== 'chat') {
+    // add a badge notification
+    unreadMessages += 1;
+    $('#unreadMessagesBadge').text(unreadMessages);
+  }
 }
 
 // file share logic
@@ -1428,12 +1442,23 @@ function collapseSidebar(tab) {
         $('#chatTab').attr('aria-selected', 'false');
         $('#fileShareTab').attr('aria-selected', 'true');
         $('#tab2').addClass('active');
+
+        // reset the unread files count
+        unreadFiles = 0;
+        $('#unreadFilesBadge').text('');
+        openTab = 'fileShare';
       } else if (tab === 'chatTab') {
         $('#chatBody').addClass('active');
         $('#chatTab').addClass('active');
         $('#chatTab').attr('aria-selected', 'true');
         $('#fileShareTab').attr('aria-selected', 'false');
         $('#tab1').addClass('active');
+        
+        // reset the unread messages count
+        unreadMessages = 0;
+        $('#unreadMessagesBadge').text('');
+        openTab = 'chat';
+        $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
       }
     } else {
       // default to chat tab
@@ -1442,6 +1467,12 @@ function collapseSidebar(tab) {
       $('#chatTab').attr('aria-selected', 'true');
       $('#fileShareTab').attr('aria-selected', 'false');
       $('#tab1').addClass('active');
+
+      // reset the unread messages count
+      unreadMessages = 0;
+      $('#unreadMessagesBadge').text('');
+      openTab = 'chat';
+      $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
     }
 
     $('.sidebarTab').css('width', '8vw');
@@ -1470,6 +1501,7 @@ function collapseSidebar(tab) {
   } else {
     // close the sidebar
     isSidebarCollapsed = true;
+    openTab = '';
     $('#collapseButton').attr('aria-label', 'Expand Sidebar');
     $('#collapseTabTitle').attr('title', 'Expand Sidebar');
     $('#collapseButton').attr('aria-expanded', 'false');
@@ -1516,15 +1548,31 @@ function toggleTab(tab) {
     if (tab === 'chatTab') {
       $('#chatTab').addClass('active');
       $('#chatTab').attr('aria-selected', 'true');
+      $('#chatBody').addClass('active');
+      $('#tab1').addClass('active');
 
       $('#fileShareTab').removeClass('active');
       $('#fileShareTab').attr('aria-selected', 'false');
+
+      // reset the unread messages count
+      unreadMessages = 0;
+      $('#unreadMessagesBadge').text('');
+      openTab = 'chat'
+
+      $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
     } else if (tab === 'fileShareTab') {
       $('#fileShareTab').addClass('active');
       $('#fileShareTab').attr('aria-selected', 'true');
+      $('#fileBody').addClass('active');
+      $('#tab2').addClass('active');
 
       $('#chatTab').removeClass('active');
       $('#chatTab').attr('aria-selected', 'false');
+
+      // reset the unread messages count
+      unreadFiles = 0;
+      $('#unreadFilesBadge').text('');
+      openTab = 'fileShare'
     }
   }
   setColumnSize();
