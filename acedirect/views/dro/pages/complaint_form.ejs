@@ -46,7 +46,7 @@
               <button type="button" class="btn btn-gray" id="startScreenshare" onclick="toggleScreenShare()" aria-label="Toggle Screenshare">
                 <i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare
               </button>
-              <button id="end-call" type="button" class="btn btn-danger" onclick="terminateCall()" aria-label="End Call">
+              <button id="end-call" type="button" class="btn btn-danger" style="background-color: #C70000 !important;" onclick="terminateCall()" aria-label="End Call">
                 <i id="end-call-icon" class="call-btn-icon fa fa-phone fa-rotate-135"></i> End Call
               </button>
             </div>
@@ -264,6 +264,7 @@
                 <a id="chatTab" href="#chatBody" data-toggle="tab" class="sidebarTab tab selected" onclick="toggleTab('chatTab')"
                   aria-controls="chatBody" role="tab" aria-selected="true">
                   <i class="fa fa-comments fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;" aria-hidden="true" alt="">
+                    <span id="unreadMessagesBadge" class="badge tabNotificationBadge"></span>
                   </i>
                   <br>
                   <p style="color: #073863;">Chat</p>
@@ -273,6 +274,7 @@
                 <a id="fileShareTab" href="#fileBody" data-toggle="tab" class="sidebarTab tab" onclick="toggleTab('fileShareTab')"
                   aria-controls="fileShareBody" role="tab" aria-selected="false" tabindex="-1">
                   <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;" aria-hidden="true" alt="">
+                    <span id="unreadFilesBadge" class="badge tabNotificationBadge"></span>
                   </i>
                   <br>
                   <p style="color: #073863;">File Share</p>
