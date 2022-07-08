@@ -497,7 +497,17 @@ body {
   vertical-align: bottom !important;
 }
 
-
 [tabindex="-1"]:focus {
   outline: none;
+}
+
+.fileShareRow {
+  display: flex;
+  align-items: center;
+  min-height: 50px;
+  border-bottom: 1px solid lightgrey;
+}
+
+.fileShareCell {
+  flex:4;
 }
