@@ -1,3 +1,32 @@
+function setVideoSize() {
+  const a1 = document.getElementById('greeting-controls');
+  const a2 = document.getElementById('recording-timer-bar');
+  const b = document.getElementById('footer-container-consumer');
+  const top = a1.getBoundingClientRect().bottom || a2.getBoundingClientRect().bottom;
+  const videoHeight = b.getBoundingClientRect().top - top;
+  console.log(videoHeight);
+  $('.video-element').height(videoHeight);
+}
+
+const selfVideo = document.querySelector('#selfVideo');
+selfVideo.recTime = 0;
+function startWebcam() {
+  if (navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      .then((stream) => {
+        selfVideo.srcObject = stream;
+      })
+      .catch((_error) => {
+        console.log('Something went wrong!');
+      });
+  }
+}
+
+function startVideomail() {
+  startWebcam();
+  setVideoSize();
+}
+
 function gotoRecording() {
   $('#greetingDiv').hide();
   $('#countDownDiv').hide();
@@ -9,7 +38,7 @@ function countdown() {
   let s = $('#recordingCountdown').html();
   setTimeout(() => {
     if (s > 0) {
-      s = s - 1;
+      s -= 1;
       $('#recordingCountdown').html(s);
       countdown(s);
     } else {
@@ -32,7 +61,7 @@ $('#skipGreetingButton').on('click', () => {
   skipGreeting();
 });
 
-$('#custom-seekbar').on('click', function (e) {
+$('#custom-seekbar').on('click', function changeSeekbarTime(e) {
   const offset = $(this).offset();
   const left = (e.pageX - offset.left);
   const totalWidth = $('#custom-seekbar').width();
@@ -88,83 +117,10 @@ $('#greetingVideo')
     }
   });
 
-function setVideoSize() {
-  const a1 = document.getElementById('greeting-controls');
-  const a2 = document.getElementById('recording-timer-bar');
-  const b = document.getElementById('footer-container-consumer');
-  const top = a1.getBoundingClientRect().bottom || a2.getBoundingClientRect().bottom;
-  const videoHeight = b.getBoundingClientRect().top - top;
-  console.log(videoHeight);
-  $('.video-element').height(videoHeight);
-}
-
-const selfVideo = document.querySelector('#selfVideo');
-selfVideo.recTime = 0;
-function startWebcam() {
-  if (navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-      .then((stream) => {
-        selfVideo.srcObject = stream;
-      })
-      .catch((_error) => {
-        console.log('Something went wrong!');
-      });
-  }
-}
-
-function startVideomail() {
-  startWebcam();
-  setVideoSize();
-}
-
-$('#selfVideo').on('play', (_evt) => {
-  console.log('playing');
-  startVideomailTimer();
-  startRecording();
-});
-
-function startVideomailTimer() {
-  let rTime = 0;
-  // let maxTime = <%= maxRecordSeconds %>;
-  console.log(`maxTime ${maxTime}`);
-  const d = new Date(0);
-  d.setSeconds(maxTime); // specify value for SECONDS here
-  const mTimeFormatted = d.toISOString().substr(15, 4);
-  $('#recordingTime').html(`<i class='fa fa-circle' aria-hidden='true'></i> Recording  0:00 / ${mTimeFormatted}`);
-
-  let lastAriaPercentage = 0;
-  const recTimerInterval = setInterval(() => {
-    rTime += 0.1;
-    const percentage = (rTime / maxTime) * 100;
-    $('#recordingTimer span').css('width', `${percentage}%`);
-
-    const intPercentage = Math.trunc(percentage);
-    if ((intPercentage % 5 === 0) && (intPercentage > lastAriaPercentage)) {
-      const percentComplete = `${intPercentage}% complete `;
-      $('#recordingTimer').attr('aria-label', percentComplete);
-      $('#recordingTimer').attr('aria-valuenow', intPercentage);
-      lastAriaPercentage = intPercentage;
-
-      console.log(percentComplete);
-    }
-
-    if (rTime % 1 !== 0) {
-      selfVideo.recTime = rTime;
-      const date = new Date(0);
-      date.setSeconds(rTime); // specify value for SECONDS here
-      const timeString = date.toISOString().substr(15, 4);
-      $('#recordingTime').html("<i class='fa fa-circle' aria-hidden='true'></i> Recording &nbsp;&nbsp; " + timeString + ' / ' + mTimeFormatted);
-      if (rTime > maxTime) {
-        clearInterval(recTimerInterval);
-        sendVideomail();
-      }
-    }
-  }, 100);
-}
-
 let recorder = null;
 function startRecording() {
   if (recorder == null) {
+    // eslint-disable-next-line no-undef
     recorder = new RecordRTCPromisesHandler(selfVideo.srcObject, {
       type: 'video'
     });
@@ -210,7 +166,7 @@ async function sendVideomail() {
     formData.append('file', file);
     formData.append('duration', selfVideo.recTime);
     const request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
+    request.onreadystatechange = function readyStateChange() {
       if (request.readyState === 4 && request.status === 200) {
         console.log(window.location.href + request.responseText);
         endVideomail();
@@ -223,6 +179,52 @@ async function sendVideomail() {
     console.log('Recorder never set up');
   }
 }
+
+function startVideomailTimer() {
+  let rTime = 0;
+  const maxTime = parseInt($('#maxTime').text(), 10);
+  console.log(`maxTime ${maxTime}`);
+
+  const d = new Date(0);
+  d.setSeconds(maxTime); // specify value for SECONDS here
+  const mTimeFormatted = d.toISOString().substr(15, 4);
+  $('#recordingTime').html(`<i class='fa fa-circle' aria-hidden='true'></i> Recording  0:00 / ${mTimeFormatted}`);
+
+  let lastAriaPercentage = 0;
+  const recTimerInterval = setInterval(() => {
+    rTime += 0.1;
+    const percentage = (rTime / maxTime) * 100;
+    $('#recordingTimer span').css('width', `${percentage}%`);
+
+    const intPercentage = Math.trunc(percentage);
+    if ((intPercentage % 5 === 0) && (intPercentage > lastAriaPercentage)) {
+      const percentComplete = `${intPercentage}% complete `;
+      $('#recordingTimer').attr('aria-label', percentComplete);
+      $('#recordingTimer').attr('aria-valuenow', intPercentage);
+      lastAriaPercentage = intPercentage;
+
+      console.log(percentComplete);
+    }
+
+    if (rTime % 1 !== 0) {
+      selfVideo.recTime = rTime;
+      const date = new Date(0);
+      date.setSeconds(rTime); // specify value for SECONDS here
+      const timeString = date.toISOString().substr(15, 4);
+      $('#recordingTime').html(`<i class='fa fa-circle' aria-hidden='true'></i> Recording &nbsp;&nbsp; ${timeString} / ${mTimeFormatted}`);
+      if (rTime > maxTime) {
+        clearInterval(recTimerInterval);
+        sendVideomail();
+      }
+    }
+  }, 100);
+}
+
+$('#selfVideo').on('play', (_evt) => {
+  console.log('playing');
+  startVideomailTimer();
+  startRecording();
+});
 
 function logout() {
   console.log('logout');
