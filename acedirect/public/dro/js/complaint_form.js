@@ -1273,7 +1273,6 @@ function shareFileConsumer() {
   if ($('#fileInput')[0].files[0]) {
     const formData = new FormData();
     console.log('uploading:');
-    setFeedbackText('Sending file...');
     console.log($('#fileInput')[0].files[0]);
     formData.append('uploadfile', $('#fileInput')[0].files[0]);
     $.ajax({
@@ -1291,6 +1290,10 @@ function shareFileConsumer() {
         $('#removeFileBtn').hide();
         $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
         $('#button-feedback').hide();
+        
+        setTimeout(() => {
+          $('#fileSent').slideUp(500);
+        }, 6000)
       },
       error: (jXHR, textStatus, errorThrown) => {
         console.log(`ERROR: ${jXHR} ${textStatus} ${errorThrown}`);
@@ -1308,33 +1311,36 @@ function addFileToDownloadList(data) {
     if (viewableFileTypes.includes(fileType.toLowerCase())) {
       // we can open this file in a new tab without downloading it
       $('#receivedFilesList').append(
-        (`<span>${data.original_filename}</span>
-        <span class="btn-toolbar pull-right" role="toolbar">
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}"><i class="fa fa-eye fileShareIcon"></i></a>
+        (`<span class="fileShareRow">
+        <span class="fileShareCell">${data.original_filename}</span>
+        <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View file in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
-        <hr/>`)
+        </span>`)
       );
     } else {
       // cannot view without downloading
       $('#receivedFilesList').append(
-        (`<span>${data.original_filename}</span>
-        <span class="btn-toolbar pull-right" role="toolbar">
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}"><i class="fa fa-download fileShareIcon"></i></a>
+        (`<span class="fileShareRow">
+        <span class="fileShareCell>${data.original_filename}</span>
+        <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="You need to download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
-        <hr/>`)
+        </span>`)
       );
     }
   } else {
     // file type not in file name-- cannot view without downloading
     $('#receivedFilesList').append(
-      (`<span>${data.original_filename}</span>
-      <span class="btn-toolbar pull-right" role="toolbar">
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}"><i class="fa fa-download fileShareIcon"></i></a>
+      (`<span class="fileShareRow">
+      <span class="fileShareCell">${data.original_filename}</span>
+      <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="You need to download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
       </span>
-      <hr/>`)
+      </span>`)
     );
   }
 
@@ -1353,26 +1359,38 @@ function addFileToSentList(data) {
       // we can open this file in a tab without downloading it
       // add to sent files list
       $('#sentFilesList').append(
-        (`<span>${data.original_filename}</span>
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View file"><i class="fa fa-eye fileShareIcon"></i></a>
-        <hr/>`)
+        (`<span class="fileShareRow">
+        <span class="fileShareCell">${data.original_filename}</span>
+        <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View file in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
+        </span>
+        </span>`)
       );
     } else {
       // we cannot open this file in a tab without downloading it
       // add to sent files list
       $('#sentFilesList').append(
-        (`<span>${data.original_filename}</span>
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Cannot view this file type" disabled><i class="fa fa-eye fileShareIcon"></i></a>
-        <hr/>`)
+        (`<span class="fileShareRow">
+        <span class="fileShareCell">${data.original_filename}</span>
+        <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="You need to download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+        </span>
+        </span>`)
       );
     }
   } else {
     // file type isn't in the file name-- cannot open the file in a new tab
     // add to sent files list
     $('#sentFilesList').append(
-      (`<span>${data.original_filename}</span>
-      <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Cannot view this file type" disabled><i class="fa fa-eye fileShareIcon" ></i></a>
-      <hr/>`)
+      (`<span class="fileShareRow">
+      <span class="fileShareCell">${data.original_filename}</span>
+      <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="You need to download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+      </span>
+      </span>`)
     );
   }
 
