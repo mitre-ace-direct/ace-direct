@@ -10,80 +10,84 @@
   <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
   <link rel="stylesheet" href="/dro/css/videomail.css">
-  <link rel="stylesheet" href="/css/ca-portal.css">
+  <!-- <link rel="stylesheet" href="/css/ca-portal.css"> -->
 </head>
 
 <body class="full-height">
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
-  <div class="container ad-container">
+  <main>
+    <div class="container ad-container">
+      <div class="row" id="greetingDiv">
+        <div class="row  text-center greeting-controls" id="greeting-controls">
+          <div>
+            <button class="circleButton" id="greetingPlayPauseBtn" tabindex="0" aria-label="Play Greeting">
+              <i id="greetingPlayPauseBtnIcon" class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
 
-    <div class="row" id="greetingDiv">
-      <div class="row  text-center greeting-controls" id="greeting-controls">
-        <div>
-          <button class="circleButton" id="greetingPlayPauseBtn" tabindex="0" aria-label="Play Greeting">
-            <i id="greetingPlayPauseBtnIcon" class="fa fa-play"></i>
-          </button>
+          <div><span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
+          <div id="custom-seekbar" aria-label="seek bar"><span></span></div>
+
+          <button class="btn btn-secondary modal-outline-btn" id="skipGreetingButton" tabindex="0"
+            aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
+              class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
         </div>
-
-        <div> <span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
-        <div id="custom-seekbar"><span></span></div>
-
-        <button class="btn btn-secondary modal-outline-btn" id="skipGreetingButton" tabindex="0"
-          aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
-            class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
+        <video class="fill-height video-element" id="greetingVideo" title="Play Video" aria-label="videomail greeting video">
+          <source src="/media/<%= introVideo %>" type="video/mp4">
+          <source src="/media/<%= introVideo %>" type="video/webm">
+        </video>
       </div>
-      <video class="fill-height video-element" id="greetingVideo" title="Play Video">
-        <source src="/media/<%= introVideo %>" type="video/mp4">
-        <source src="/media/<%= introVideo %>" type="video/webm">
-      </video>
-    </div>
 
-    <div class="row text-center" style="display:none; vertical-align: -webkit-baseline-middle;" id="countDownDiv">
-      <div class="col-12 text-center align-self-center">
-        <br /><br /><br /><br /><br />
-        <p class="lead"><strong>Recording will start in:</strong></p>
-        <span id="recordingCountdown">5</span>
-      </div>
-    </div>
-
-    <div class="row" style="display:none" id="recordingDiv">
-      <div class="col-12 text-center">
-
-        <div class="row  recording-controls">
-          <div class="col-md-12">
-            <span class="text-danger" id="recordingTime"><i class="fa fa-circle" aria-hidden="true"></i> Recording
-              &nbsp;&nbsp; 0:00 / 0:00</span>
-            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i
-                class="fa fa-microphone-slash" aria-hidden="true"></i>&nbsp;Microphone is muted
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-video-camera"
-                aria-hidden="true"></i>&nbsp;Video is
-              ON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <button class="btn btn-custom" id="sendVideomailButton" onclick="sendVideomail();"><i
-                class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Send Videomail</button>
-          </div>
-        </div>
-
-        <div class="row recording-timer-bar" id="recording-timer-bar">
-          <div class="col-12">
-            <div id="recordingTimer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
-              aria-live="polite"><span></span></div>
-          </div>
-        </div>
-
-        <div class="video-container">
-          <video autoplay="true" class="video-element self-view" id="selfVideo">
-          </video>
-          <div class="recordingInfoBanner">
-            <span role="alert" aria-live="assertive">To send your Videomail before the 90 second time limit elapses,
-              click the 'Send Videomail' button.</span>
-          </div>
+      <div class="row text-center" style="display:none; vertical-align: -webkit-baseline-middle;" id="countDownDiv">
+        <div class="col-12 text-center align-self-center">
+          <br /><br /><br /><br /><br />
+          <p class="lead"><strong>Recording will start in:</strong></p>
+          <span id="recordingCountdown">5</span>
         </div>
       </div>
-    </div>
-  </div>
 
+      <div class="row" style="display:none" id="recordingDiv">
+        <div class="col-12 text-center">
+
+          <div class="row  recording-controls">
+            <div class="col-md-12">
+              <span class="text-danger" id="recordingTime"><i class="fa fa-circle" aria-hidden="true"></i> Recording
+                &nbsp;&nbsp; 0:00 / 0:00</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i
+                  class="fa fa-microphone-slash" aria-hidden="true"></i>&nbsp;Microphone is muted
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-video-camera"
+                  aria-hidden="true"></i>&nbsp;Video is
+                ON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <button class="btn btn-custom" id="sendVideomailButton" onclick="sendVideomail();"><i
+                  class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Send Videomail</button>
+            </div>
+          </div>
+
+          <div class="row recording-timer-bar" id="recording-timer-bar">
+            <div class="col-12">
+              <div id="recordingTimer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                aria-live="polite"><span></span></div>
+            </div>
+          </div>
+
+          <div class="video-container">
+            <video autoplay="true" class="video-element self-view" id="selfVideo">
+            </video>
+            <div class="recordingInfoBanner">
+              <span role="alert" aria-live="assertive">To send your Videomail before the 90 second time limit elapses,
+                click the 'Send Videomail' button.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <span id="maxTime" hidden>
+        <%= maxRecordSeconds %>
+      </span>
+    </div>
+  </main>
   <%- include("../partials/acedirect_footer") %>
 
     <!-- MODALS -->
@@ -115,13 +119,11 @@
       </div>
     </div>
 </body>
+
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
-<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/assets/js/moment.min.js"></script>
+<script type="text/javascript" src="/assets/js/bootstrap.min.js" async></script>
+<!-- <script type="text/javascript" src="/assets/js/moment.min.js" async></script> -->
 <script type="text/javascript" src="/dro/js/videomail.js" async></script>
-<script type="text/javascript" src="/assets/js/RecordRTC.min.js"></script>
-<script>
-  const maxTime = <%= maxRecordSeconds %>;
-</script>
+<script type="text/javascript" src="/assets/js/RecordRTC.min.js" async></script>
 
 </html>
