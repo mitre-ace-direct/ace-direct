@@ -497,7 +497,6 @@ body {
   vertical-align: bottom !important;
 }
 
-
 [tabindex="-1"]:focus {
   outline: none;
 }
@@ -508,4 +507,26 @@ body {
   background-color: #C70000;
   top: 10px;
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.fileShareRow {
+  display: flex;
+  align-items: center;
+  min-height: 70px;
+  border-bottom: 1px solid lightgrey;
+}
+
+.fileShareCellFilename {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  flex:4;
+}
+
+.fileShareCellBtn {
+  flex:2;
+}
+
+.populatedFilesDivider {
+  margin-bottom:0 !important;
 }
