@@ -1332,8 +1332,8 @@ function addFileToDownloadList(data) {
         (`<span class="fileShareRow">
         <span class="fileShareCellFilename">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View file in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
         </span>`)
       );
@@ -1343,8 +1343,8 @@ function addFileToDownloadList(data) {
         (`<span class="fileShareRow">
         <span class="fileShareCellFilename">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
         </span>`)
       );
@@ -1355,8 +1355,8 @@ function addFileToDownloadList(data) {
       (`<span class="fileShareRow">
       <span class="fileShareCellFilename">${data.original_filename}</span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
       </span>
       </span>`)
     );
@@ -1383,8 +1383,8 @@ function addFileToSentList(data) {
         (`<span class="fileShareRow">
         <span class="fileShareCellFilename">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View file in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
         </span>`)
       );
@@ -1395,8 +1395,8 @@ function addFileToSentList(data) {
         (`<span class="fileShareRow">
         <span class="fileShareCellFilename">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
         </span>`)
       );
@@ -1408,8 +1408,8 @@ function addFileToSentList(data) {
       (`<span class="fileShareRow">
       <span class="fileShareCellFilename">${data.original_filename}</span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
       </span>
       </span>`)
     );
