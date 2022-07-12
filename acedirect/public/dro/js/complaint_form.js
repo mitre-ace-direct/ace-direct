@@ -1114,7 +1114,7 @@ $('#fileInput').on('change', () => {
     $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');
     $('#removeFileBtn').css('display', 'none');
     // add tooltip to send button
-    $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
+    $('#shareFileConsumer').attr('data-original-title', 'Choose a file to send').parent().find('.tooltip-inner').html('Choose a file to send');
   } else {
     console.log('file chosen!');
     $('#shareFileConsumer').attr('disabled', false).css('background-color','#073863');;
@@ -1131,7 +1131,7 @@ function removeFile() {
   $('#fileInput')[0].value = '';
   $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');;
   $('#removeFileBtn').css('display', 'none');
-  $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
+  $('#shareFileConsumer').attr('data-original-title', 'Choose a file to send').parent().find('.tooltip-inner').html('Choose a file to send');
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
   });
@@ -1265,6 +1265,7 @@ function newChatMessage(data) {
 function shareFileConsumer() {
   $('#fileSent').hide();
   $('#fileSentError').hide();
+  $('#shareFileConsumer').blur();
   if ($('#fileInput')[0].files[0]) {
     const formData = new FormData();
     console.log('uploading:');
@@ -1300,6 +1301,9 @@ function shareFileConsumer() {
 
 function addFileToDownloadList(data) {
   $('#noReceivedFiles').attr('hidden', true);
+  if (!$('#receivedFilesDivider').hasClass('populatedFilesDivider')) {
+    $('#receivedFilesDivider').addClass('populatedFilesDivider');
+  }
   setFeedbackText('File received from agent!');
   let fileType = data.original_filename.split('.')[1];
   if (fileType) {
@@ -1307,8 +1311,8 @@ function addFileToDownloadList(data) {
       // we can open this file in a new tab without downloading it
       $('#receivedFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCell">${data.original_filename}</span>
-        <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+        <span class="fileShareCellFilename">${data.original_filename}</span>
+        <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View file in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
@@ -1318,10 +1322,10 @@ function addFileToDownloadList(data) {
       // cannot view without downloading
       $('#receivedFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCell>${data.original_filename}</span>
-        <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+        <span class="fileShareCellFilename">${data.original_filename}</span>
+        <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="You need to download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
         </span>`)
       );
@@ -1330,10 +1334,10 @@ function addFileToDownloadList(data) {
     // file type not in file name-- cannot view without downloading
     $('#receivedFilesList').append(
       (`<span class="fileShareRow">
-      <span class="fileShareCell">${data.original_filename}</span>
-      <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+      <span class="fileShareCellFilename">${data.original_filename}</span>
+      <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="You need to download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
       </span>
       </span>`)
     );
@@ -1347,6 +1351,9 @@ function addFileToDownloadList(data) {
 
 function addFileToSentList(data) {
   $('#noSentFiles').attr('hidden', true);
+  if (!$('#sentFilesDivider').hasClass('populatedFilesDivider')) {
+    $('#sentFilesDivider').addClass('populatedFilesDivider');
+  }
   let fileType = data.original_filename.split('.')[1];
 
   if (fileType) {
@@ -1355,8 +1362,8 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCell">${data.original_filename}</span>
-        <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+        <span class="fileShareCellFilename">${data.original_filename}</span>
+        <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View file in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
@@ -1367,10 +1374,10 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCell">${data.original_filename}</span>
-        <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+        <span class="fileShareCellFilename">${data.original_filename}</span>
+        <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="You need to download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
         </span>`)
       );
@@ -1380,10 +1387,10 @@ function addFileToSentList(data) {
     // add to sent files list
     $('#sentFilesList').append(
       (`<span class="fileShareRow">
-      <span class="fileShareCell">${data.original_filename}</span>
-      <span class="btn-toolbar pull-right fileShareCell" role="toolbar">
+      <span class="fileShareCellFilename">${data.original_filename}</span>
+      <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download file"><i class="fa fa-download fileShareIcon"></i></a>
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="You need to download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
       </span>
       </span>`)
     );
