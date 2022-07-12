@@ -512,10 +512,21 @@ body {
 .fileShareRow {
   display: flex;
   align-items: center;
-  min-height: 50px;
+  min-height: 70px;
   border-bottom: 1px solid lightgrey;
 }
 
-.fileShareCell {
+.fileShareCellFilename {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
   flex:4;
+}
+
+.fileShareCellBtn {
+  flex:2;
+}
+
+.populatedFilesDivider {
+  margin-bottom:0 !important;
 }
