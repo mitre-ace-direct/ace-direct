@@ -346,7 +346,7 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center">
-        <h3 class="waiting-header" role="heading" aria-level="3">Waiting for the next available agent...</h3>
+        <h3 class="waiting-header" role="heading" aria-level="3" aria-live="assertive">Waiting for the next available agent...</h3>
         <hr />
         <video controls class="video-element" id="pleaseWaitVideo" title="Play Video">
           <source src="/media/<%= please_wait_video %>" type="video/mp4">
@@ -388,7 +388,7 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center">
-        <h3 class="no-agents-header">No agents are available to take your call at this time.</h3>
+        <h3 class="no-agents-header" aria-live="assertive">No agents are available to take your call at this time.</h3>
         <hr/>
         <video controls class="video-element" id="pleaseWaitVideo" title="Play Video">
           <source src="/media/<%= no_agents_video %>" type="video/mp4">
