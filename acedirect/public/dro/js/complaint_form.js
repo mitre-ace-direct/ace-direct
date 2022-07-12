@@ -492,7 +492,7 @@ function connect_socket() {
               openDialog('callEndedModal', window);
               setTimeout(() => {
                 location = complaintRedirectUrl;
-              }, 5000);
+              }, 10000);
             }
           })
           .on('error', (reason) => {
@@ -826,7 +826,7 @@ function endCall(forceHangup) {
       document.getElementById('inCallSection').style.display = 'none';
       setTimeout(() => {
         location = complaintRedirectUrl;
-      }, 5000);
+      }, 10000);
     } else {
       // reset the page
       window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
