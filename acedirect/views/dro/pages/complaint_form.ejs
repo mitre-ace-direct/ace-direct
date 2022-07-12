@@ -186,8 +186,7 @@
                   <div id="fileshare-body" style="overflow-y: auto; padding-right: 2rem;">
                     <p style="line-height: inherit;">Select a file to send by clicking 'Choose File'; send the file by
                       clicking 'Send'.</p>
-                    <p style="line-height: inherit;">View sent files in the 'Sent' section, and view or download
-                      received files in the 'Received' section.</p>
+                    <p style="line-height: inherit;">View and/or download sent and received files in the 'Sent' and 'Received' sections, respectively.</p>
                     <br>
                     <br>
                     <!--file selection section-->
@@ -224,7 +223,7 @@
                     <br>
                     <!--send files section-->
                     <h2>Sent</h2>
-                    <hr style="border:1px solid grey; background-color: grey;" />
+                    <hr id="sentFilesDivider" style="border:1px solid grey; background-color: grey;" />
 
                     <div id="sentFilesList">
                       <span id="noSentFiles" class="noFiles">None</span>
@@ -234,8 +233,8 @@
                     <br>
                     <!--received files section-->
                     <h2>Received</h2>
-                    <hr style="border:1px solid grey; background-color: grey;" />
-                    <div id="receivedFilesList">
+                    <hr id="receivedFilesDivider" style="border:1px solid grey; background-color: grey;" />
+                    <div id="receivedFilesList" style="display: flex; flex-direction: column;">
                       <span id="noReceivedFiles" class="noFiles">None</span>
                     </div>
                     <!--end received files section-->
