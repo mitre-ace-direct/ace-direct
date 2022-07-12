@@ -5030,6 +5030,9 @@ function ACEKurento(config) {
           sendMessage(message);
         });
       });
+    },
+    sendTextMessage: function (params) {
+      sendMessage(params);
     }
   });
 

@@ -259,6 +259,21 @@ class ClientSession extends Events {
     }
   }
 
+  /**
+   * Regulates sending a text from Kurento server to VRS device over SIP.
+   */
+  async sendText(params) {
+    if (this._status !== CL_STATUS_BUSY) {
+      return;
+    }
+
+    try {
+      console.log('sending text');
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   handleHangup(removeFromQueue) {
     debug('[%s] Hangup/Stop request', this._id);
     if (this._session) {
