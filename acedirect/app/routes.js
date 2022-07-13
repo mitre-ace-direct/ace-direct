@@ -729,7 +729,7 @@ router.post('/videomailupload', consumerRestrict,  (req, res) => { //add restric
           var filepath = files.file.filepath;
         fs.readFile(filepath, function (err, fileData) {
             if (files.file.mimetype === 'video/webm') {
-            var uploadParams = { Bucket: '***REMOVED***-recordings', Key: files.file.newFilename+'.webm', Body: "" };
+            var uploadParams = { Bucket: utils.getConfigVal(config.s3.bucketname), Key: files.file.newFilename+'.webm', Body: "" };
             uploadParams.Body = fileData;
             s3.upload(uploadParams, function (err) {
               if (err) {
@@ -746,7 +746,7 @@ router.post('/videomailupload', consumerRestrict,  (req, res) => { //add restric
 
         request({
             method: 'POST',
-            url: 'https://***REMOVED***:9014/UploadVideomail',
+            url: 'https://'+utils.getConfigVal(config.servers.main_private_ip)+':'+utils.getConfigVal(config.app_ports.mserver)+'/UploadVideomail',
             rejectUnauthorized: false,
             form: {
               ext: '88888', //
