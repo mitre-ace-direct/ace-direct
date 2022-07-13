@@ -21,6 +21,9 @@ let isScreenshareRestart = false;
 let callAnswered = false;
 let emojiToggle = false;
 let feedbackTimeoutID;
+let unreadMessages = 0;
+let unreadFiles = 0;
+let openTab = 'chat';
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -141,8 +144,6 @@ $(document).ready(() => {
 
 $(window).bind('fullscreenchange', function (_e) {
   // check to see if your browser has exited fullscreen
-  console.log('CURRENTLY CHECKING ' + !document.fullscreenElement && !document.mozFullScreenElement
-    && !document.webkitFullscreenElement && !document.msFullscreenElement);
   if (!document.fullscreenElement && !document.mozFullScreenElement
     && !document.webkitFullscreenElement && !document.msFullscreenElement) { // video fullscreen mode has changed
     if (document.fullscreenElement) {
@@ -154,14 +155,11 @@ $(window).bind('fullscreenchange', function (_e) {
 });
 
 function connect_socket() {
-  console.log('connect_socket to ');
-  console.log(window.location.host);
   $.ajax({
     url: './token',
     type: 'GET',
     dataType: 'json',
     success: (data) => {
-      console.log(JSON.stringify(data));
       if (data.message === 'success') {
         socket = io.connect(`https://${window.location.host}`, {
           path: `${nginxPath}/socket.io`,
@@ -179,8 +177,6 @@ function connect_socket() {
           const payload = jwt_decode(data.token);
           // get the start/end time strings for the after hours dialog
           // const tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
-          console.log('got connect');
-          console.log('authenticated');
 
           $('#button-feedback').hide();
           $('#button-feedback').attr('aria-hidden', 'true');
@@ -213,7 +209,7 @@ function connect_socket() {
           });
         })
           .on('ad-ticket-created', (data) => {
-            console.log('got ad-ticket-created');
+            ;
             /* $('#userformoverlay').removeClass('overlay').hide();
                 if (data.zendesk_ticket) {
                 $('#firstName').val(data.first_name);
@@ -227,7 +223,6 @@ function connect_socket() {
                 } */
           })
           .on('extension-created', (data) => {
-            console.log('got extension-created');
             if (data.message === 'success') {
               globalData = data;
               // $('#outOfExtensionsModal').modal('hide');
@@ -243,7 +238,6 @@ function connect_socket() {
                 asteriskSipUri = data.queues_complaint_number; // TODO: what is this doing?
               }
 
-              console.log(`Asterisk sip URI = ${asteriskSipUri}`);
               // get the max videomail recording seconds
               maxRecordingSeconds = data.queues_videomail_maxrecordsecs;
 
@@ -259,7 +253,6 @@ function connect_socket() {
 
               // registerJssip(data.extension, data.password); //register with the given extension
 
-              console.log(`asteriskSipUri: ${asteriskSipUri}`);
 
               // registerJssip(data.extension, data.password); //register with the given extension
 
@@ -333,7 +326,7 @@ function connect_socket() {
                 acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
               }
             } else if (data.message === 'OutOfExtensions') {
-              console.log('out of extensions...');
+              console.log('error - out of extensions...');
               // Try again in 10 seconds.
               /* $('#outOfExtensionsModal').modal({
                     show: true,
@@ -347,11 +340,10 @@ function connect_socket() {
                     i -= 1 || (clearInterval(newExtensionRetryCounter), extensionRetry());
                 }, 1000); */
             } else {
-              console.log('Something went wrong when getting an extension');
+              console.log('error - something went wrong when getting an extension');
             }
           })
           .on('chat-message-new', (data) => {
-            console.log(data);
             newChatMessage(data);
             /*
                 // debugtxt('chat-message-new', data);
@@ -370,7 +362,7 @@ function connect_socket() {
           })
           .on('chat-message-new-translated', (data) => {
             newChatMessage(data);
-            console.log('translated', data);
+            ;
           })
           .on('translate-language-error', (error) => {
             console.error('Translation error:', error);
@@ -401,7 +393,6 @@ function connect_socket() {
             if ($('#displayname').val() !== data.displayname) {
               isAgentTyping = false;
               if (!hasMessages) {
-                console.log($('.agentChatName').text());
                 $('#chat-messages').removeClass('populatedMessages');
                 $('#chat-messages').addClass('emptyMessages');
                 $('#emptyChat').text(`This is the start of your chat${$('.agentChatName').text()}. No messages yet to display`);
@@ -409,7 +400,6 @@ function connect_socket() {
               } else {
                 $('#emptyChat').css('margin-top', '0px');
               }
-              console.log('typing clear');
               $('#rtt-typing').css('display', 'none');
               $('#chat-messages').remove($('#rtt-typing'));
               $('#rtt-typing').html('').removeClass('direct-chat-text').removeClass('direct-chat-timestamp text-bold');
@@ -417,7 +407,6 @@ function connect_socket() {
             }
           })
           .on('disconnect', () => {
-            console.log('disconnected');
             unregisterJssip();
           })
           .on('unauthorized', (error) => {
@@ -429,7 +418,6 @@ function connect_socket() {
             if (data.extension === exten && data.queue === 'ComplaintsQueue') {
               // setQueueText(data.position -= 1); // subtract because asterisk wording is off by one
             }
-            console.log('queue caller join');
           })
           .on('queue-caller-leave', (data) => {
             const currentPosition = $('#pos-in-queue').text();
@@ -438,7 +426,6 @@ function connect_socket() {
                 // abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
                     setQueueText(currentPosition -= 1);
                 } */
-              console.log('queue caller leave');
               abandonedCaller = false;
             }
           })
@@ -450,7 +437,6 @@ function connect_socket() {
                 currentPosition = $('#pos-in-queue').text();
                 // setQueueText(currentPosition -= 1);
               }
-              console.log('queue caller abandon');
               abandonedCaller = true;
             }
           })
@@ -506,6 +492,11 @@ function connect_socket() {
             $('#fileSent').hide();
             $('#fileSentError').hide();
             addFileToDownloadList(data);
+
+            if (isSidebarCollapsed || openTab !== 'fileShare') {
+              unreadFiles += 1;
+              $('#unreadFilesBadge').text(unreadFiles);
+            }
           })
           .on('fileListAgent', (data) => {
             // file sent confirmation
@@ -514,7 +505,6 @@ function connect_socket() {
             $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');
           })
           .on('screenshareResponse', (data) => {
-            console.log(`screen request received ${data.permission}`);
             if (data.permission === true) {
               $('#startScreenshare').show();
               $('#screenshareButton').prop('disabled', true);
@@ -522,7 +512,6 @@ function connect_socket() {
               $('#screenshareButtonGroup').show();
               $('#requestAck').hide();
             } else {
-              console.log('No permission');
               $('#requestAck').html('Permission has been denied.');
             }
           })
@@ -1263,6 +1252,12 @@ function newChatMessage(data) {
       .appendTo($('#chat-messages'));
   }
   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+
+  if (isSidebarCollapsed || openTab !== 'chat') {
+    // add a badge notification
+    unreadMessages += 1;
+    $('#unreadMessagesBadge').text(unreadMessages);
+  }
 }
 
 // file share logic
@@ -1461,12 +1456,23 @@ function collapseSidebar(tab) {
         $('#chatTab').attr('aria-selected', 'false');
         $('#fileShareTab').attr('aria-selected', 'true');
         $('#tab2').addClass('active');
+
+        // reset the unread files count
+        unreadFiles = 0;
+        $('#unreadFilesBadge').text('');
+        openTab = 'fileShare';
       } else if (tab === 'chatTab') {
         $('#chatBody').addClass('active');
         $('#chatTab').addClass('active');
         $('#chatTab').attr('aria-selected', 'true');
         $('#fileShareTab').attr('aria-selected', 'false');
         $('#tab1').addClass('active');
+        
+        // reset the unread messages count
+        unreadMessages = 0;
+        $('#unreadMessagesBadge').text('');
+        openTab = 'chat';
+        $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
       }
     } else {
       // default to chat tab
@@ -1475,6 +1481,12 @@ function collapseSidebar(tab) {
       $('#chatTab').attr('aria-selected', 'true');
       $('#fileShareTab').attr('aria-selected', 'false');
       $('#tab1').addClass('active');
+
+      // reset the unread messages count
+      unreadMessages = 0;
+      $('#unreadMessagesBadge').text('');
+      openTab = 'chat';
+      $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
     }
 
     $('.sidebarTab').css('width', '8vw');
@@ -1503,6 +1515,7 @@ function collapseSidebar(tab) {
   } else {
     // close the sidebar
     isSidebarCollapsed = true;
+    openTab = '';
     $('#collapseButton').attr('aria-label', 'Expand Sidebar');
     $('#collapseTabTitle').attr('title', 'Expand Sidebar');
     $('#collapseButton').attr('aria-expanded', 'false');
@@ -1549,15 +1562,31 @@ function toggleTab(tab) {
     if (tab === 'chatTab') {
       $('#chatTab').addClass('active');
       $('#chatTab').attr('aria-selected', 'true');
+      $('#chatBody').addClass('active');
+      $('#tab1').addClass('active');
 
       $('#fileShareTab').removeClass('active');
       $('#fileShareTab').attr('aria-selected', 'false');
+
+      // reset the unread messages count
+      unreadMessages = 0;
+      $('#unreadMessagesBadge').text('');
+      openTab = 'chat'
+
+      $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
     } else if (tab === 'fileShareTab') {
       $('#fileShareTab').addClass('active');
       $('#fileShareTab').attr('aria-selected', 'true');
+      $('#fileBody').addClass('active');
+      $('#tab2').addClass('active');
 
       $('#chatTab').removeClass('active');
       $('#chatTab').attr('aria-selected', 'false');
+
+      // reset the unread messages count
+      unreadFiles = 0;
+      $('#unreadFilesBadge').text('');
+      openTab = 'fileShare'
     }
   }
   setColumnSize();

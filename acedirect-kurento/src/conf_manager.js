@@ -423,12 +423,13 @@ class ConfManager extends Events {
             + '</to_encoder>'
             + '</vc_primitive>'
             + '</media_control>';
+          if(session && session._status != 8){ //Check to make sure session isn't terminated
+            session.sendInfo('application/media_control+xml', body);
 
-          session.sendInfo('application/media_control+xml', body);
-
-          const ms = param('asteriskss.sip_media_request_interval');
-          if (ms) {
-            pfuInt = setInterval(() => { session.sendInfo('application/media_control+xml', body); }, ms);
+            const ms = param('asteriskss.sip_media_request_interval');
+            if (ms) {
+              pfuInt = setInterval(() => { session.sendInfo('application/media_control+xml', body); }, ms);
+            }
           }
         }, 1000);
         // end
