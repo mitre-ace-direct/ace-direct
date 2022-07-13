@@ -102,6 +102,7 @@ class ClientSession extends Events {
           this.keyframe();
           break;
         case 'sipMessage':
+          console.log('Send message request receieved!');
           this.sendText(message.target, message.body);
           break;
         case 'accept':
@@ -265,16 +266,19 @@ class ClientSession extends Events {
   /**
    * Regulates sending a text from Kurento server to VRS device over SIP.
    */
-  async sendText(uri, msg) {
-    if (this._status !== CL_STATUS_BUSY) {
-      return;
-    }
+  sendText(uri, msg) {
+    // I want to add some sort of checking to make sure a call is active. Like below:
+
+    // if (this._status !== CL_STATUS_BUSY) {
+    //   console.log('checking status');
+    //   return;
+    // }
 
     try {
-      console.log('sending text');
       const target = uri;
       const body = msg;
 
+      console.log('sending text to', target);
       this._ua.sendMessage(target, body); // ua.sendMessage(target, body, options=null);
     } catch (err) {
       console.log(err);
