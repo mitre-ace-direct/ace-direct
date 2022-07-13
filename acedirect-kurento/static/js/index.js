@@ -131,6 +131,13 @@ window.onload = function () {
     acekurento.callTransfer(document.getElementById('peer').value, false);
   });
 
+  document.getElementById('sendText').addEventListener('click', (_evt) => {
+    const target = document.getElementById('peer').value;
+    const body = document.getElementById('text_message').value;
+
+    acekurento.sendSIPInstantMessage(target, body);
+  });
+
   // Events
   const eventHandlers = {
     connected: function (_e) {

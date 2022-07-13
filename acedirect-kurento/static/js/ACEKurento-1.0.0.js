@@ -5031,8 +5031,13 @@ function ACEKurento(config) {
         });
       });
     },
-    sendTextMessage: function (params) {
-      sendMessage(params);
+    sendSIPInstantMessage: function (target, body) {
+      const options = {
+        id: 'sipMessage',
+        target: target,
+        body: body
+      };
+      sendMessage(options);
     }
   });
 

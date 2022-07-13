@@ -101,6 +101,9 @@ class ClientSession extends Events {
         case 'keyframe':
           this.keyframe();
           break;
+        case 'sipMessage':
+          this.sendText(message.target, message.body);
+          break;
         case 'accept':
         case 'decline':
           break;
@@ -262,13 +265,17 @@ class ClientSession extends Events {
   /**
    * Regulates sending a text from Kurento server to VRS device over SIP.
    */
-  async sendText(params) {
+  async sendText(uri, msg) {
     if (this._status !== CL_STATUS_BUSY) {
       return;
     }
 
     try {
       console.log('sending text');
+      const target = uri;
+      const body = msg;
+
+      this._ua.sendMessage(target, body); // ua.sendMessage(target, body, options=null);
     } catch (err) {
       console.log(err);
     }
