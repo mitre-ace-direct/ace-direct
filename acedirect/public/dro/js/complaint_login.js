@@ -67,6 +67,7 @@ $(window).on('load', () => {
     } else {
       $('#input-group').addClass('has-error');
       $('#message').text('Invalid phone number format');
+      $('#message').css({ color: 'red' });
       $('#message').show();
     }
   });
@@ -113,6 +114,14 @@ function login() {
     $('#message').show();
   }
 }
+
+function hideMessage() {
+  $('#message').hide();
+}
+
+// Hide the message so that a new error will cause
+// the message to reappear and be read by screen reader.
+$('#vrs_number').on('keydown', hideMessage);
 
 function copyURL() {
   navigator.clipboard.writeText(window.location.href).then(() => {

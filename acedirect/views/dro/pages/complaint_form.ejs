@@ -186,8 +186,7 @@
                   <div id="fileshare-body" style="overflow-y: auto; padding-right: 2rem;">
                     <p style="line-height: inherit;">Select a file to send by clicking 'Choose File'; send the file by
                       clicking 'Send'.</p>
-                    <p style="line-height: inherit;">View sent files in the 'Sent' section, and view or download
-                      received files in the 'Received' section.</p>
+                    <p style="line-height: inherit;">View and/or download sent and received files in the 'Sent' and 'Received' sections, respectively.</p>
                     <br>
                     <br>
                     <!--file selection section-->
@@ -197,26 +196,26 @@
                           class="form-control-file btn btn-default fileInput buttonFontSize"
                           style="background-color:transparent; border: transparent; padding-left: 0px; width: 80%; padding-right: 0px;">
                         <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;"
-                          tabindex="0">x</span>
+                          tabindex="0" aria-label="Remove selected file" role="button">x</span>
                       </div>
                       <a class="btn pull-right buttonFontSize" id="shareFileConsumer"
                         onclick="shareFileConsumer()"
                         style="background-color:rgb(15, 42, 66) !important; color: white !important; margin-top: 5px; margin-bottom: 5px;"
                         data-toggle="tooltip" title="You must choose a file" role="button" tabindex="0"
-                        disabled>Send</a>
+                        disabled aria-label="Send file">Send</a>
 
                     </div>
                     <div class="row" style="max-width: 100%; display: contents;">
                       <div class="alert alert-success" alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
                         <span class="close closeFileResponse" onclick="$('#fileSent').hide();"
-                          style="text-decoration:none" tabindex="0">×</span>
-                        <strong aria-live="assertive">Success!</strong> File Sent
+                          style="text-decoration:none" tabindex="0" aria-label="Close file upload message" role="button">×</span>
+                        <strong aria-live="assertive" aria-label="Success file sent">Success!</strong> File Sent
                       </div>
                       <div class="alert alert-danger" alert-dismissable id="fileSentError" style="margin-top: 10px;"
                         hidden>
                         <span class="close  closeFileResponse" onclick="$('#fileSentError').hide();"
-                          style="text-decoration:none" tabindex="0">×</span>
-                        <strong aria-live="assertive">Error!</strong> Error sending file.
+                          style="text-decoration:none" tabindex="0" aria-label="Close file upload error message" role="button">×</span>
+                        <strong aria-live="assertive" aria-label="Error sending file">Error!</strong> Error sending file.
                       </div>
                     </div>
                     <!--end file selection section-->
@@ -224,7 +223,7 @@
                     <br>
                     <!--send files section-->
                     <h2>Sent</h2>
-                    <hr style="border:1px solid grey; background-color: grey;" />
+                    <hr id="sentFilesDivider" style="border:1px solid grey; background-color: grey;" />
 
                     <div id="sentFilesList">
                       <span id="noSentFiles" class="noFiles">None</span>
@@ -234,8 +233,8 @@
                     <br>
                     <!--received files section-->
                     <h2>Received</h2>
-                    <hr style="border:1px solid grey; background-color: grey;" />
-                    <div id="receivedFilesList">
+                    <hr id="receivedFilesDivider" style="border:1px solid grey; background-color: grey;" />
+                    <div id="receivedFilesList" style="display: flex; flex-direction: column;">
                       <span id="noReceivedFiles" class="noFiles">None</span>
                     </div>
                     <!--end received files section-->
@@ -346,7 +345,7 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center">
-        <h3 class="waiting-header" role="heading" aria-level="3">Waiting for the next available agent...</h3>
+        <h3 class="waiting-header" role="heading" aria-level="3" aria-live="assertive">Waiting for the next available agent...</h3>
         <hr />
         <video controls class="video-element" id="pleaseWaitVideo" title="Play Video">
           <source src="/media/<%= please_wait_video %>" type="video/mp4">
@@ -388,7 +387,7 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center">
-        <h3 class="no-agents-header">No agents are available to take your call at this time.</h3>
+        <h3 class="no-agents-header" aria-live="assertive">No agents are available to take your call at this time.</h3>
         <hr/>
         <video controls class="video-element" id="pleaseWaitVideo" title="Play Video">
           <source src="/media/<%= no_agents_video %>" type="video/mp4">
