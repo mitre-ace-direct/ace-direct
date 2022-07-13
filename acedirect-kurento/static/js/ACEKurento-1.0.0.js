@@ -5032,6 +5032,11 @@ function ACEKurento(config) {
       });
     },
     sendSIPInstantMessage: function (target, body) {
+      if (acekurento.callState !== IN_CALL) {
+        console.log("must be in call to send message!");
+        return;
+      }
+
       const options = {
         id: 'sipMessage',
         target: target,

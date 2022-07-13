@@ -412,6 +412,7 @@ class ConfManager extends Events {
 
       session.on('confirmed', (_evt) => {
         this._calls.set(calleeExt, call);
+        console.log('speaking to', calleeExt);
 
         setTimeout(() => {
           // force pfu at start of the call
