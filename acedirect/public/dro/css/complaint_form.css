@@ -350,7 +350,6 @@ body {
 }
 
 .waiting-header {
-  margin-bottom: 30px;
   font-size: 18px;
 }
 
@@ -538,6 +537,5 @@ body {
   padding: 20px;
   color: white;
   font-size: 24px;
-  /*width: 200px;
-  height: 150px;*/
+  margin-bottom: 20px;
 }
