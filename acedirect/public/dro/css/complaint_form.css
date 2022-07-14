@@ -351,6 +351,7 @@ body {
 
 .waiting-header {
   margin-bottom: 30px;
+  font-size: 18px;
 }
 
 #placeholderImage {
@@ -529,4 +530,14 @@ body {
 
 .populatedFilesDivider {
   margin-bottom:0 !important;
+}
+
+#callingBanner {
+  border-radius: 25px;
+  background: #00860D;
+  padding: 20px;
+  color: white;
+  font-size: 24px;
+  /*width: 200px;
+  height: 150px;*/
 }
