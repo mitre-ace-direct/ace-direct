@@ -345,7 +345,8 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center">
-        <h3 class="waiting-header" role="heading" aria-level="3" aria-live="assertive">Waiting for the next available agent...</h3>
+        <p id="callingBanner"><b>Calling...</b></p>
+        <p class="waiting-header" role="heading" aria-level="3" aria-live="assertive">Waiting for the next available agent.</p>
         <hr />
         <video controls class="video-element" id="pleaseWaitVideo" title="Play Video">
           <source src="/media/<%= please_wait_video %>" type="video/mp4">
@@ -419,16 +420,17 @@
     </div>
   </div>
 </div>
+<!--
 <div id="callEndedModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center" style="border-bottom: 0px">
         <div>
-          <i class="fa-2x fa fa-check-circle" style="color: green;" alt="" aria-hidden="true"></i>
+          
         </div>
         <h3 class="waiting-header">Your call with an FCC ASL Consumer Portal Support agent has ended.</h3>
         <br />
-        <hr style="margin:auto; width:20%; background-color: black; border: 1px solid black;" />
+        <hr style="margin:auto; width:50%; background-color: black; border: 1px solid black;" />
         <br />
 
       </div>
@@ -436,7 +438,7 @@
 
         <div class="row">
           <div class="col-xs-12 text-center">
-            You will be redirected to <span id="redirectURL" style="font-weight: bold;"></span> in 5 seconds.
+            You will be redirected to <span id="redirectURL" style="font-weight: bold;"></span> in <b>10</b> seconds.
           </div>
         </div>
         <br />
@@ -446,6 +448,33 @@
       </div>
     </div>
   </div>
+</div>
+-->
+<div id="callEndedModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog">
+  <div class="modal-dialog modal-dialog-csentered">
+    <div class="modal-content">
+
+
+      <div class="modal-body" style="position: relative;min-height:300px;">
+        <div class="center text-center"><!--style="width: 75%"-->
+          <!--<i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>-->
+          <br /><br />
+          <p id="goodbyeDescription" style="font-size: 1.5em;">Your call with an FCC ASL Consumer Support agent has ended.</p>
+          <hr class="text-black"
+            style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
+          You are being redirected in <b>10</b> seconds to <b id='redirectURL'>
+            </b>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="text-center">
+          <a href="#" onclick="logout()" style="color:#073863;" role="button" tabindex="0"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit Support Portal</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script>

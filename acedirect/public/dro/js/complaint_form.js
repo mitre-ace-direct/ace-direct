@@ -472,13 +472,13 @@ function connect_socket() {
             $('#complaint').val('');
             $('#subject').val('');
 
-            if (complaintRedirectActive) {
+            if (complaintRedirectActive && callAnswered) {
               $('#redirectURL').text(complaintRedirectUrl);
               $('#callEndedModal').modal('show');
               openDialog('callEndedModal', window);
               setTimeout(() => {
                 location = complaintRedirectUrl;
-              }, 5000);
+              }, 10000);
             }
           })
           .on('error', (reason) => {
@@ -725,7 +725,6 @@ function registerJssip(myExtension, myPassword) {
       console.log(`--- WV: Call ended ---\n${e}`);
 
       $('#startScreenshare').hide();
-
       endCall();
       // terminateCall();
       // clearScreen();
@@ -815,20 +814,24 @@ function endCall(forceHangup) {
       document.getElementById('inCallSection').style.display = 'none';
       setTimeout(() => {
         location = complaintRedirectUrl;
-      }, 5000);
+      }, 10000);
     } else {
       // reset the page
       window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
     }
   } else {
     $('#waitingModal').modal('hide');
-    $('#noAgentsModal').modal('show');
+    $('#optionsModal').modal('show');
+    //$('#noAgentsModal').modal('show');
   }
 }
 
 function exitQueue() {
-  endCall(true);
+  //endCall(true);
   $('#waitingModal').modal('hide');
+  terminateCall();
+  $('#optionsModal').modal('show');
+
 }
 
 // makes a call
