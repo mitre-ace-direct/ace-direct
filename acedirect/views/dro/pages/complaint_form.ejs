@@ -79,13 +79,12 @@
             <!-- Tab panes -->
             <div class="tab-content">
               <!--Chat pane-->
-              <div class="tab-pane active tabFontSize" id="chatBody" tabindex="0" aria-label="Chat tab content">
+              <div class="tab-pane active tabFontSize" id="chatBody" tabindex="0" aria-label="Chat tab content" aria-role="tabpanel">
                 <div class="box-header" style="overflow: hidden;" id="chat-header">
                   <h1 style="float:left">Chat</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                     <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)" aria-label="Decrease font size by 10%">A</button>
-                    <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize"
-                      style="background-color: white; pointer-events: none;" aria-live="assertive">100%</button>
+                    <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize" aria-live="assertive">100%</button>
                     <button type="button" class="btn fontSizeButtons" style="font-size:large;"
                       onclick="setFontSize(10)" aria-label="Increase font size by 10%">A</button>
                   </div>
@@ -102,7 +101,7 @@
                     </div>
                   </div>
 
-                  <div id="chat-footer" class="box-footer" style="padding-top:10px; bottom:0; position:absolute;">
+                  <div id="chat-footer" class="box-footer" style="padding-top:10px; padding-right: 15px; bottom:0; position:absolute;">
                     <input type="hidden" id="displayname">
                     <input type="hidden" class="agentChatName">
                     <form name="chatsend" id="chatsend">
@@ -168,21 +167,18 @@
               </div>
               <!-- end chat pane-->
               <!--File Share Pane-->
-              <div class="tab-pane tabFontSize" id="fileBody" tabindex="0" aria-label="File share tab content">
+              <div class="tab-pane tabFontSize" id="fileBody" tabindex="0" aria-label="File share tab content" aria-role="tabpanel">
                 <div class="box-header" style="overflow: hidden;" id="fileshare-header">
                   <h1 style="float:left">File Sharing</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                     <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)" aria-label="Decrease font size by 10%">A</button>
-                    <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize"
-                      style="background-color: white; pointer-events: none;" aria-live="assertive">100%</button>
+                    <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize" aria-live="assertive">100%</button>
                     <button type="button" class="btn fontSizeButtons" style="font-size:large;"
                       onclick="setFontSize(10)" aria-label="Increase font size by 10%">A</button>
                   </div>
                 </div>
                 <hr id="fileshare-separator"/>
                 <div class="box-body" id="fileshare-box-body">
-                  <!-- Conversations are loaded here -->
-                  <!--Hard coding messages for now-->
                   <div id="fileshare-body" style="overflow-y: auto; padding-right: 2rem;">
                     <p style="line-height: inherit;">Select a file to send by clicking 'Choose File'; send the file by
                       clicking 'Send'.</p>
