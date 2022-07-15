@@ -52,7 +52,7 @@
             </div>
 
             <div id="speakingToRow" class="row">
-              <span id="CommunicationText"></span>
+              <span id="CommunicationText" aria-live="assertive"></span>
             </div>
 
             <div style="box-sizing: border-box;" class="row">
@@ -74,12 +74,51 @@
           <!--END Appear inside of a call-->
         </div>
 
-        <div id="callFeaturesColumn" class="col-xs-6 col-lg-4" style="border-left:1px solid #ddd; height:100%">
-          <div id="tab-pane" class="col-xs-9">
-            <!-- Tab panes -->
+        <!-- Collapse/Expand, Chat, and File Share -->
+        <div id="callFeaturesColumn" class="col-xs-6 col-lg-4" style="border-left:1px solid #ddd; height:100%; display:flex;">
+          <!-- Nav tabs -->
+          <div id="tab-options" class="col-xs-3" style="order:2;">
+            <ul class="nav nav-tabs tabs-right" style="height: 90vh;" role="tablist">
+              <li id="collapseTab" class="collapseTab">
+                <a id="collapseTabTitle" class="collapseTab sidebarTab" title="Collapse Sidebar"
+                  style="padding-bottom: 20px; padding-top:20px; border:solid 1px transparent;" role="button"
+                  tabindex="-1" aria-hidden="true">
+                  <button id="collapseButton" data-toggle="tooltip" title="Collapse" aria-label="Collapse Sidebar"
+                    onclick="collapseSidebar('')" tabindex="0" aria-expanded="true">
+                    <i id="collapseButtonIcon" class="fa fa-angle-double-right fa-lg"
+                      style="vertical-align: -10% !important;" aria-hidden="true" alt="">
+                    </i>
+                  </button>
+                </a>
+              </li>
+              <li class="active" id="tab1">
+                <a id="chatTab" href="#chatBody" data-toggle="tab" class="sidebarTab tab selected" onclick="toggleTab('chatTab')"
+                  aria-controls="chatBody" role="tab" aria-selected="true">
+                  <i class="fa fa-comments fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;" aria-hidden="true" alt="">
+                    <span id="unreadMessagesBadge" class="badge tabNotificationBadge"></span>
+                  </i>
+                  <br>
+                  <p style="color: #073863;">Chat</p>
+                </a>
+              </li>
+              <li id="tab2">
+                <a id="fileShareTab" href="#fileBody" data-toggle="tab" class="sidebarTab tab" onclick="toggleTab('fileShareTab')"
+                  aria-controls="fileShareBody" role="tab" aria-selected="false" tabindex="-1">
+                  <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;" aria-hidden="true" alt="">
+                    <span id="unreadFilesBadge" class="badge tabNotificationBadge"></span>
+                  </i>
+                  <br>
+                  <p style="color: #073863;">File Share</p>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Tab panes -->
+          <div id="tab-pane" class="col-xs-9" style="order:1;">
             <div class="tab-content">
               <!--Chat pane-->
-              <div class="tab-pane active tabFontSize" id="chatBody" tabindex="0" aria-label="Chat tab content">
+              <div class="tab-pane active tabFontSize" id="chatBody" tabindex="0" aria-label="Chat tab content" aria-role="tabpanel" >
                 <div class="box-header" style="overflow: hidden;" id="chat-header">
                   <h1 style="float:left">Chat</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
@@ -102,7 +141,7 @@
                     </div>
                   </div>
 
-                  <div id="chat-footer" class="box-footer" style="padding-top:10px; bottom:0; position:absolute;">
+                  <div id="chat-footer" class="box-footer" style="padding-top:10px; padding-bottom:30px; bottom:0; position:absolute;">
                     <input type="hidden" id="displayname">
                     <input type="hidden" class="agentChatName">
                     <form name="chatsend" id="chatsend">
@@ -156,7 +195,7 @@
                           required></textarea>
 
                         <span class="input-group-btn" style="vertical-align: bottom;">
-                          <button id="chat-send" class="btn btn-primary btn-flat buttonFontSize"
+                          <button id="chat-send" class="btn btn-primary btn-flat buttonFontSize" aria-label="Send message"
                             style="background-color: #073863 !important; margin-left: 10px; border-radius: 6px; border: 2px solid #073863">Send</button>
                         </span>
                       </div>
@@ -168,7 +207,7 @@
               </div>
               <!-- end chat pane-->
               <!--File Share Pane-->
-              <div class="tab-pane tabFontSize" id="fileBody" tabindex="0" aria-label="File share tab content">
+              <div class="tab-pane tabFontSize" id="fileBody" tabindex="0" aria-label="File share tab content"  aria-role="tabpanel" >
                 <div class="box-header" style="overflow: hidden;" id="fileshare-header">
                   <h1 style="float:left">File Sharing</h1>
                   <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
@@ -244,43 +283,6 @@
               <!--end file share pane-->
             </div>
           </div>
-          <div id="tab-options" class="col-xs-3">
-            <!-- Nav tabs -->
-            <ul class="nav nav-tabs tabs-right" style="height: 90vh;" role="tablist">
-              <li id="collapseTab" class="collapseTab">
-                <a id="collapseTabTitle" class="collapseTab sidebarTab" title="Collapse Sidebar"
-                  style="padding-bottom: 20px; padding-top:20px; border:solid 1px transparent;" role="button"
-                  tabindex="-1" aria-hidden="true">
-                  <button id="collapseButton" data-toggle="tooltip" title="Collapse" aria-label="Collapse Sidebar"
-                    onclick="collapseSidebar('')" tabindex="0" aria-expanded="true">
-                    <i id="collapseButtonIcon" class="fa fa-angle-double-right fa-lg"
-                      style="vertical-align: -10% !important;" aria-hidden="true" alt="">
-                    </i>
-                  </button>
-                </a>
-              </li>
-              <li class="active" id="tab1">
-                <a id="chatTab" href="#chatBody" data-toggle="tab" class="sidebarTab tab selected" onclick="toggleTab('chatTab')"
-                  aria-controls="chatBody" role="tab" aria-selected="true">
-                  <i class="fa fa-comments fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;" aria-hidden="true" alt="">
-                    <span id="unreadMessagesBadge" class="badge tabNotificationBadge"></span>
-                  </i>
-                  <br>
-                  <p style="color: #073863;">Chat</p>
-                </a>
-              </li>
-              <li id="tab2">
-                <a id="fileShareTab" href="#fileBody" data-toggle="tab" class="sidebarTab tab" onclick="toggleTab('fileShareTab')"
-                  aria-controls="fileShareBody" role="tab" aria-selected="false" tabindex="-1">
-                  <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;" aria-hidden="true" alt="">
-                    <span id="unreadFilesBadge" class="badge tabNotificationBadge"></span>
-                  </i>
-                  <br>
-                  <p style="color: #073863;">File Share</p>
-                </a>
-              </li>
-            </ul>
-          </div>
         </div>
       </main>
     </div>
@@ -288,6 +290,7 @@
   <!--<%- include("../partials/acedirect_footer") %>-->
 </body>
 <%- include("../partials/acedirect_footer") %>
+
 <div id="optionsModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
@@ -426,7 +429,7 @@
     <div class="modal-content">
       <div class="modal-header text-center" style="border-bottom: 0px">
         <div>
-          
+
         </div>
         <h3 class="waiting-header">Your call with an FCC ASL Consumer Portal Support agent has ended.</h3>
         <br />
