@@ -223,6 +223,10 @@ body {
   margin-right: 0;
 }
 
+.tab:first-child {
+  border-right: transparent !important;
+}
+
 #collapseButton {
   border-radius: 50%;
   color: #073863;
@@ -529,6 +533,13 @@ body {
 
 .populatedFilesDivider {
   margin-bottom:0 !important;
+}
+
+.currentFontSize {
+  width: 64px;
+  min-width: 64px;
+  background-color: white;
+  pointer-events: none;
 }
 
 #callingBanner {
