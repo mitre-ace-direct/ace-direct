@@ -149,7 +149,7 @@ function endVideomail() {
   $('#goodbyeModal').modal();
   setTimeout(() => {
     redirect();
-  }, 5000);
+  }, 10000);
 }
 
 async function sendVideomail() {
