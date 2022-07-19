@@ -464,6 +464,16 @@ body {
   text-align: center;
 }
 
+#fileShareTab:focus-visible {
+  outline:2px solid black !important;
+  outline-offset: -15px;
+}
+
+#chatTab:focus-visible {
+  outline:2px solid black !important;
+  outline-offset: -15px;
+}
+
 #exitFullscreen {
   margin: 0 auto;
   background-color: #073863 !important;
