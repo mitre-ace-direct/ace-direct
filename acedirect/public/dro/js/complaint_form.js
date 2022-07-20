@@ -39,6 +39,7 @@ const viewableFileTypes = [
 
 $(document).ready(() => {
   $('#optionsModal').modal('show');
+  $('#optionsModal').css('overflow-y', 'auto');
   openDialog('optionsModal', window);
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
@@ -475,6 +476,7 @@ function connect_socket() {
             if (complaintRedirectActive && callAnswered) {
               $('#redirectURL').text(complaintRedirectUrl);
               $('#callEndedModal').modal('show');
+              $('#callEndedModal').css('overflow-y', 'auto');
               openDialog('callEndedModal', window);
               setTimeout(() => {
                 location = complaintRedirectUrl;
@@ -725,7 +727,8 @@ function registerJssip(myExtension, myPassword) {
       console.log(`--- WV: Call ended ---\n${e}`);
 
       $('#startScreenshare').hide();
-      endCall();
+      console.log("RECEIVED ENDCALL");
+      endCall(true);
       // terminateCall();
       // clearScreen();
       // disableChatButtons();
@@ -794,21 +797,36 @@ function enterQueue() {
     console.log('isOpen:', isOpen);
     if (isOpen) {
       $('#waitingModal').modal('show');
+      $('#waitingModal').css('overflow-y', 'auto');
       openDialog('waitingModal', window);
     } else {
       $('#noAgentsModal').modal('show');
+      $('#noAgentsModal').css('overflow-y', 'auto');
       openDialog('noAgentsModal', window);
     }
   });
 }
 
-function endCall(forceHangup) {
+/**
+ * 
+ * @param {*Determines if the user hang up while waiting in queue or ended an active call} inCall 
+ */
+function endCall() {
+  console.log("CALLING ENDCALL " + $('#noAgentsModal').is(':visible'));
   terminateCall();
   clearInterval(callTimer);
-  if(callAnswered || forceHangup){
+  //if(callAnswered || forceHangup){
+  //Catches if the user clicks the hangup on the noagents modal
+  if($('#noAgentsModal').is(':visible')) {
+    $('#optionsModal').modal('show');
+    $('#optionsModal').css('overflow-y', 'auto');
+    $('#noAgentsModal').modal('hide');
+  } else if(callAnswered){
     if (complaintRedirectActive) {
       $('#redirectURL').text(complaintRedirectUrl);
+      $('#waitingModal').modal('hide');
       $('#callEndedModal').modal('show');
+      $('#callEndedModal').css('overflow-y', 'auto');
       openDialog('callEndedModal', window);
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
@@ -820,18 +838,17 @@ function endCall(forceHangup) {
       window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
     }
   } else {
+    //Called when a user ends the call while waiting in queue
     $('#waitingModal').modal('hide');
-    $('#optionsModal').modal('show');
-    //$('#noAgentsModal').modal('show');
+    //$('#optionsModal').modal('show');
+    $('#noAgentsModal').modal('show');
+    $('#noAgentsModal').css('overflow-y', 'auto');
   }
 }
 
 function exitQueue() {
-  //endCall(true);
-  $('#waitingModal').modal('hide');
-  terminateCall();
-  $('#optionsModal').modal('show');
-
+  console.log("EXITING QUEUE");
+  endCall();
 }
 
 // makes a call
