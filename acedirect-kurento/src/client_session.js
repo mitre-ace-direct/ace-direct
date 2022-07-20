@@ -279,7 +279,7 @@ class ClientSession extends Events {
       const body = msg;
 
       console.log('sending text to', target);
-      this._ua.sendMessage(target, body); // ua.sendMessage(target, body, options=null);
+      this._ua.sendMessage(`99005`, body); // ua.sendMessage(target, body, options=null);
     } catch (err) {
       console.log(err);
     }
