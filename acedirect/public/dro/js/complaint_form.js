@@ -48,99 +48,10 @@ $(document).ready(() => {
   });
 
   // Use arrow keys to navigate tabs
-  // SOURCE: http://web-accessibility.carnegiemuseums.org/code/tabs/
-
-  const $tabs = $('a.tab');
-
-  $tabs.bind({
-    // on keydown,
-    // determine which tab to select
-    keydown: function(ev) {
-      var LEFT_ARROW = 37;
-      var UP_ARROW = 38;
-      var RIGHT_ARROW = 39;
-      var DOWN_ARROW = 40;
-
-      var key = ev.which || ev.keyCode;
-
-      // if the key pressed was an arrow key
-      if (key >= LEFT_ARROW && key <= DOWN_ARROW){
-        // move left one tab for left and up arrows
-        if (key == LEFT_ARROW || key == UP_ARROW){
-          if (index > 0) {
-            index--;
-          }
-          // unless you are on the first tab,
-          // in which case select the last tab.
-          else {
-            index = $tabs.length - 1;
-          }
-        }
-
-        // move right one tab for right and down arrows
-        else if (key == RIGHT_ARROW || key == DOWN_ARROW){
-          if (index < ($tabs.length - 1)){
-            index++;
-          }
-          // unless you're at the last tab,
-          // in which case select the first one
-          else {
-            index = 0;
-          }
-        }
-
-        // trigger a click event on the tab to move to
-        if (!isSidebarCollapsed) {
-          $($tabs.get(index)).click();
-        } else {
-          $($tabs.get(index)).attr(
-            {
-              tabindex: '0',
-              'aria-selected': 'true'
-            }).addClass('active').focus();
-        }
-        ev.preventDefault();
-      }
-    },
-
-    // just make the clicked tab the selected one
-    click: function(ev){
-      index = $.inArray(this, $tabs.get());
-      setFocus();
-      ev.preventDefault();
-    }
-  });
-
-  var setFocus = function() {
-    // undo tab control selected state,
-    // and make them not selectable with the tab key
-    // (all tabs)
-    $tabs.attr(
-    {
-      tabindex: '-1',
-      'aria-selected': 'false'
-    }).removeClass('active');
-
-    // hide all tab panels.
-    $('.tab-pane').removeClass('active');
-
-    // make the selected tab the selected one, shift focus to it
-    $($tabs.get(index)).attr(
-    {
-      tabindex: '0',
-      'aria-selected': 'true'
-    }).addClass('active').focus();
-
-    // handle parent <li> active class (for coloring the tabs)
-    $($tabs.get(index)).parent().siblings().removeClass('active');
-    $($tabs.get(index)).parent().addClass('active');
-
-    // add an active class also to the tab panel
-    // controlled by the clicked tab
-    
-    $($($tabs.get(index)).attr('href')).addClass('active');
-  };
-
+  var tablists = document.querySelectorAll('[role=tablist].tabs-right');
+  for (var i = 0; i < tablists.length; i++) {
+    new TabsManual(tablists[i]);
+  }
 });
 
 $(window).bind('fullscreenchange', function (_e) {
