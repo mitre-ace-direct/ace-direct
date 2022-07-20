@@ -599,7 +599,7 @@ const setColumnSize = function () {
   $('.tabs-right').height((chatHeight + tabsTop) - ($('#footer-container-consumer').height() + 20));
 
   // video section
-  $('#callVideoColumn').height(footer.getBoundingClientRect().top - 70);
+  $('#callVideoColumn').height(footer.getBoundingClientRect().top - 200);
 
   let buttonFeedback = document.getElementById("button-feedback");
   let speakingToRow = document.getElementById("speakingToRow");
@@ -1198,7 +1198,8 @@ $('#chatsend').submit((evt) => {
     message: msg,
     timestamp,
     displayname,
-    fromLanguage: language
+    fromLanguage: language,
+    isConsumerMessage: true
   });
 });
 
@@ -1249,7 +1250,12 @@ function newChatMessage(data) {
     $('#emptyChat').css('margin-top', '0px');
   }
 
-  $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
+  if (data.isConsumerMessage) {
+    $(msgsender).addClass('direct-chat-name pull-left').html('You').appendTo(msginfo);
+  } else {
+    $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
+  }
+
   $(msgtime).addClass('direct-chat-timestamp').html(` ${timestamp}`).appendTo(msginfo);
   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
   $(msgtext).addClass('direct-chat-text')
@@ -1423,6 +1429,7 @@ function addFileToSentList(data) {
 }
 
 function setFontSize(size) {
+  $('.fontSizeButtons').blur();
   const currentFontSize = $('.currentFontSize').text().split('%')[0];
   const newFontSize = Number(currentFontSize) + size;
 
