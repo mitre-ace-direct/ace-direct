@@ -15,6 +15,7 @@ window.onload = function () {
   let recording = false;
   let privateMode = false;
   let privateIndex = 0;
+  let participants;
   const privateMedia = [
     `https://${window.location.host}${window.location.pathname}img/private.mp4` // URL relative to Kurento on Docker
   ];
@@ -132,13 +133,19 @@ window.onload = function () {
   });
 
   document.getElementById('sendText').addEventListener('click', (_evt) => {
-    const target = () => {
-      const prefix = 'participant-';
-      const current = document.getElementById('ext');
+    const getTarget = () => {
+      if (!participants) return null;
 
-      return (current === `${prefix}0`) ? document.getElementById(`${prefix}1`) : document.getElementById(`${prefix}0`);
+      const current = document.getElementById('ext').value;
+      console.log('sending agent:', current);
+
+      return (current === participants[0].ext) ? participants[1].ext : participants[0].ext;
     };
+
+    const target = getTarget();
     const body = document.getElementById('text_message').value;
+
+    console.log('target', target);
 
     acekurento.sendSIPInstantMessage(target, body);
   });
@@ -237,6 +244,8 @@ window.onload = function () {
       while (pNode.firstChild) {
         pNode.removeChild(pNode.firstChild);
       }
+
+      participants = e.participants;
 
       for (let i = 0; i < e.participants.length; i++) {
         const p = e.participants[i];
