@@ -41,6 +41,7 @@ class WebRTCMediaSession extends Events {
     this._rtp_max_bitrate = param('kurento.video_rtp_max_bitrate') || 100;
     this._h264Config = param('kurento.h264_config');
     
+    this._virtualPeers = new Map();
     this._lastWebrtcFmtp = null;
     debug('Starting %s video call (%s)', this.id, this._videoCodec);
   }
@@ -105,6 +106,7 @@ class WebRTCMediaSession extends Events {
       extra: null
     };
     if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0) {
+      this._virtualPeers.set(ext, p);
       return;
     }
     this._participants.set(ext, p);
@@ -288,9 +290,7 @@ class WebRTCMediaSession extends Events {
 
   async leave(ext, virtual = false, disableFinishCall = false) {
     debug('LEAVE!!!', virtual, disableFinishCall);
-    if (virtual)
-      return;
-    const peers = this._participants;
+    const peers = virtual ? this._virtualPeers : this._participants;
     debug(JSON.stringify(ext));
     // debug(peers);
     const p = peers.get(ext);
@@ -323,7 +323,7 @@ class WebRTCMediaSession extends Events {
       debug(`${this._participants.size} participants in session`);
       debug(this._participants);
     }
-    if (disableFinishCall) return;
+    if (virtual || disableFinishCall) return;
 
     if (this._participants.size <= 1) {
       this.finish();
@@ -425,10 +425,7 @@ class WebRTCMediaSession extends Events {
   }
 
   handleRtpAnswer(ext, answer) {
-    if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0) 
-      return;
-
-    const p = this._participants.get(ext);
+    const p = this._participants.get(ext) || this._virtualPeers.get(ext);
     if (!p) {
       throw new Error(`No participant registered for ${ext}`);
     }
@@ -608,7 +605,7 @@ class WebRTCMediaSession extends Events {
 
   async handleReinvite(ext, offer) {
     debug(`${ext} Reinvite received`);
-    const p = this._participants.get(ext);
+    const p = this._participants.get(ext) || this._virtualPeers.get(ext);
     if (!p) {
       throw new Error(`No participant registered for ${ext}`);
     }
@@ -616,9 +613,6 @@ class WebRTCMediaSession extends Events {
     if (ASTERISK_QUEUE_EXT && ASTERISK_QUEUE_EXT.indexOf(ext) >= 0) {
       // disconnect asterisk queue finding extension
       await this.leave(ext, true);
-      const other = this.oneToOnePeer(ext);
-      await other.endpoint.connect(rtp);
-      await rtp.connect(other.endpoint);
     } else if (this.isMultiparty) {
       await replaceMediaEl(p.port, p.endpoint, rtp);
     } else {
