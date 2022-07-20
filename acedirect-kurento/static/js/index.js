@@ -132,7 +132,12 @@ window.onload = function () {
   });
 
   document.getElementById('sendText').addEventListener('click', (_evt) => {
-    const target = document.getElementById('peer').value;
+    const target = () => {
+      const prefix = 'participant-';
+      const current = document.getElementById('ext');
+
+      return (current === `${prefix}0`) ? document.getElementById(`${prefix}1`) : document.getElementById(`${prefix}0`);
+    };
     const body = document.getElementById('text_message').value;
 
     acekurento.sendSIPInstantMessage(target, body);
@@ -235,7 +240,7 @@ window.onload = function () {
 
       for (let i = 0; i < e.participants.length; i++) {
         const p = e.participants[i];
-        const li = document.createElement('li');
+        const li = document.createElement('li').setAttribute('id', `participant-${i.toString()}`);
         const type = p.type.split(':');
         const hold = p.onHold ? 'Yes' : 'No';
         const txt = document.createTextNode(`${p.ext}: ${type[1].toUpperCase()}, on hold: ${hold}`);
