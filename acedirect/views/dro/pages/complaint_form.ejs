@@ -390,7 +390,7 @@
       <div class="modal-header text-center">
         <h3 class="no-agents-header" aria-live="assertive">No agents are available to take your call at this time.</h3>
         <hr/>
-        <video controls class="video-element" id="pleaseWaitVideo" title="Play Video">
+        <video controls class="video-element" id="noAgentsVideo" title="Play Video">
           <source src="/media/<%= no_agents_video %>" type="video/mp4">
           <source src='/media/<%= no_agents_video %>' type="video/webm">
         </video>
@@ -408,7 +408,7 @@
             - OR -
           </div>
           <div class="col-xs-5">
-            <button type="button" class="btn btn-secondary modal-outline-btn" onclick="logout()" tabindex="0" aria-label="Hang Up"><i
+            <button type="button" class="btn btn-secondary modal-outline-btn" onclick="exitQueue()" tabindex="0" aria-label="Hang Up"><i
                 class="fa fa-phone rotate-phone" alt="" aria-hidden="true"></i><span class="separator"></span>Hang Up</button>
           </div>
         </div>
