@@ -104,3 +104,16 @@ div#chat-box {
 	height: 25rem;
 	outline: 2px solid #555;
 }
+
+ul#messages {
+	list-style: none;
+}
+
+li#incoming {
+	background-color: #ccc;
+}
+
+li#outgoing {
+	background-color: #fff;
+	text-align: right;
+}

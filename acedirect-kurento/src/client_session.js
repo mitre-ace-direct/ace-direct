@@ -103,7 +103,7 @@ class ClientSession extends Events {
           break;
         case 'sipMessage':
           console.log('Send message request receieved!');
-          this.sendText(message.target, message.body);
+          this.sendText(message.message);
           break;
         case 'accept':
         case 'decline':
@@ -265,8 +265,9 @@ class ClientSession extends Events {
 
   /**
    * Regulates sending a text from Kurento server to VRS device over SIP.
+   * params = { to, from, isChatMessage, msg }
    */
-  sendText(uri, msg) {
+  sendText(params) {
     // I want to add some sort of checking to make sure a call is active. Like below:
 
     // if (this._status !== CL_STATUS_BUSY) {
@@ -275,11 +276,12 @@ class ClientSession extends Events {
     // }
 
     try {
-      const target = uri;
-      const body = msg;
+      const target = params.to;
+      const body = params;
 
       console.log('sending text to', target);
-      this._ua.sendMessage(target, body); // ua.sendMessage(target, body, options=null);
+      this._ua.sendMessage(target,
+        JSON.stringify(body)); // ua.sendMessage(target, body, options=null);
     } catch (err) {
       console.log(err);
     }

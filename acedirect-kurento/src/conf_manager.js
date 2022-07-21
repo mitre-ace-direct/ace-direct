@@ -51,16 +51,14 @@ class ConfManager extends Events {
         this.handleNewSession(user, evt);
       }
       console.log('newRTCSession event handler hit from user', user);
-      console.log('JsSIP request', evt.request);
     });
     ua.on('newMessage', (evt) => {
       const peer = this._index.getByExt(user);
       debug(`Call New Message by ${evt.originator} to ${user}. Message:`);
-      console.log(`Call New Message by ${evt.originator} to ${user}. Message:`)
+
       const message = evt.message._request.body;
       debug(message);
-      console.log(message);
-      console.log('Request:', evt.request);
+      console.log('message:', evt.message._request.body);
       peer.sendNewSipMessage(message);
     });
 

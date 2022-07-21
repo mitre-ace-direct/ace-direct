@@ -5031,16 +5031,22 @@ function ACEKurento(config) {
         });
       });
     },
-    sendSIPInstantMessage: function (target, body) {
+    sendSIPInstantMessage: function (target, from, body) {
       if (acekurento.callState !== IN_CALL) {
         console.log("must be in call to send message!");
         return;
       }
 
+      const message = {
+        to: target,
+        from,
+        isChatMessage: true,
+        msg: body
+      }
+
       const options = {
         id: 'sipMessage',
-        target: target,
-        body: body
+        message
       };
       sendMessage(options);
     }
