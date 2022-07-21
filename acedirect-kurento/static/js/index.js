@@ -148,6 +148,14 @@ window.onload = function () {
     console.log('target', target);
 
     acekurento.sendSIPInstantMessage(target, body);
+
+    const messages = document.getElementById('messages');
+    const node = document.createElement('li');
+
+    node.setAttribute('id', 'outgoing');
+    node.value = body;
+
+    messages.appendChild(node);
   });
 
   // Events

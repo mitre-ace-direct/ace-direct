@@ -25,7 +25,7 @@ body {
 	padding-top: 40px;
 }
 
-video, #console {
+video, #console, #chat-box {
 	display: block;
 	font-size: 14px;
 	line-height: 1.42857143;
