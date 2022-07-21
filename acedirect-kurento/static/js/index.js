@@ -153,13 +153,26 @@ window.onload = function () {
     acekurento.sendSIPInstantMessage(target, from, body);
 
     const messages = document.getElementById('messages');
-    const node = document.createElement('li');
+    const text = document.createElement('p');
 
-    node.setAttribute('id', 'outgoing');
-    node.innerHTML = body;
+    text.setAttribute('id', 'outgoing');
+    text.innerHTML = body;
+
+    const label = document.createElement('label');
+    label.setAttribute('id', 'messageLabel');
+    label.setAttribute('for', 'outgoing');
+    label.innerText = from;
+
+    const node = document.createElement('li');
+    node.setAttribute('id', 'wholeOutgoing');
+
+    label.append(text);
+    node.append(label);
 
     textBody.value = '';
     messages.appendChild(node);
+
+    document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
   });
 
   // Events
@@ -228,6 +241,7 @@ window.onload = function () {
       while (pNode.firstChild) {
         pNode.removeChild(pNode.firstChild);
       }
+      document.getElementById('messages').innerHTML = '';
       console.log(`--- Call ended [${e.reason}] ---\n`);
     },
 
@@ -263,11 +277,23 @@ window.onload = function () {
 
             const body = jsonMsg.msg;
             const messages = document.getElementById('messages');
+            const text = document.createElement('p');
+            text.setAttribute('id', 'incoming');
+            text.innerHTML = body;
+
+            const label = document.createElement('label');
+            label.setAttribute('id', 'messageLabel');
+            label.setAttribute('for', 'incoming');
+            label.innerText = jsonMsg.from;
+
             const node = document.createElement('li');
-            node.setAttribute('id', 'incoming');
-            node.innerHTML = body;
+
+            label.append(text);
+            node.append(label);
 
             messages.appendChild(node);
+
+            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
             break;
           }
           case jsonMsg.from:
