@@ -50,7 +50,6 @@ class ConfManager extends Events {
         this._evt.set(user, evt);
         this.handleNewSession(user, evt);
       }
-      console.log('newRTCSession event handler hit from user', user);
     });
     ua.on('newMessage', (evt) => {
       const peer = this._index.getByExt(user);
@@ -58,7 +57,6 @@ class ConfManager extends Events {
 
       const message = evt.message._request.body;
       debug(message);
-      console.log('message:', evt.message._request.body);
       peer.sendNewSipMessage(message);
     });
 
@@ -415,7 +413,6 @@ class ConfManager extends Events {
 
       session.on('confirmed', (_evt) => {
         this._calls.set(calleeExt, call);
-        console.log('speaking to', calleeExt);
 
         setTimeout(() => {
           // force pfu at start of the call
