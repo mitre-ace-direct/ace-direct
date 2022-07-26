@@ -101,6 +101,10 @@ class ClientSession extends Events {
         case 'keyframe':
           this.keyframe();
           break;
+        case 'sipMessage':
+          console.log('Send message request receieved!');
+          this.sendText(message.message);
+          break;
         case 'accept':
         case 'decline':
           break;
@@ -256,6 +260,23 @@ class ClientSession extends Events {
     } catch (error) {
       debug('[%s] Couldn\'t connect call to %s', this._id, error);
       console.error(error);
+    }
+  }
+
+  /**
+   * Regulates sending a text from Kurento server to VRS device over SIP.
+   * params = { to, from, isChatMessage, msg }
+   */
+  sendText(params) {
+    try {
+      const target = params.to;
+      const body = params;
+
+      console.log('sending text to', target);
+      this._ua.sendMessage(target,
+        JSON.stringify(body)); // ua.sendMessage(target, body, options=null);
+    } catch (err) {
+      console.log(err);
     }
   }
 
