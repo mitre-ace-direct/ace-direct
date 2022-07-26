@@ -15,6 +15,7 @@ window.onload = function () {
   let recording = false;
   let privateMode = false;
   let privateIndex = 0;
+  let participants;
   const privateMedia = [
     `https://${window.location.host}${window.location.pathname}img/private.mp4` // URL relative to Kurento on Docker
   ];
@@ -131,48 +132,91 @@ window.onload = function () {
     acekurento.callTransfer(document.getElementById('peer').value, false);
   });
 
+  document.getElementById('sendText').addEventListener('click', (_evt) => {
+    const getTarget = () => {
+      if (!participants) return null;
+
+      const current = document.getElementById('ext').value;
+      console.log('sending agent:', current);
+
+      return (current === participants[0].ext) ? participants[1].ext : participants[0].ext;
+    };
+
+    const textBody = document.getElementById('text_message');
+
+    const target = getTarget();
+    const from = document.getElementById('ext').value;
+    const body = textBody.value;
+
+    console.log('target', target);
+
+    acekurento.sendSIPInstantMessage(target, from, body);
+
+    const messages = document.getElementById('messages');
+    const text = document.createElement('p');
+
+    text.setAttribute('id', 'outgoing');
+    text.innerHTML = body;
+
+    const label = document.createElement('label');
+    label.setAttribute('id', 'messageLabel');
+    label.setAttribute('for', 'outgoing');
+    label.innerText = from;
+
+    const node = document.createElement('li');
+    node.setAttribute('id', 'wholeOutgoing');
+
+    label.append(text);
+    node.append(label);
+
+    textBody.value = '';
+    messages.appendChild(node);
+
+    document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+  });
+
   // Events
   const eventHandlers = {
-    connected: function (_e) {
+    connected(_e) {
       console.log('--- Connected ---\n');
     },
 
-    registerResponse: function (error) {
+    registerResponse(error) {
       console.log('--- Register response:', error || 'Success ---');
       if (!error) {
         document.getElementById('agentAwayConf').classList.remove('invisible');
       }
     },
 
-    pausedQueue: function (_e) {
+    pausedQueue(_e) {
       console.log('--- Paused Agent Member in Queue ---\n');
     },
 
-    unpausedQueue: function (_e) {
+    unpausedQueue(_e) {
       console.log('--- Unpaused Agent Member in Queue ---\n');
     },
 
-    callResponse: function (e) {
+    callResponse(e) {
       console.log('--- Call response ---\n', e);
     },
 
-    incomingCall: function (call) {
+    incomingCall(call) {
       console.log('--- Incoming call ---\n');
       document.getElementById('prompt').style.visibility = 'visible';
       document.getElementById('from').innerHTML = call.from;
       incomingCall = call;
     },
 
-    progress: function (_e) {
+    progress(_e) {
       console.log('--- Calling... ---\n');
     },
 
-    sipConfirmed: function (_e) {
+    sipConfirmed(_e) {
       console.log('--- SIP ACK ---');
       // acekurento.sipReinvite();
     },
 
-    startedRecording: function (e) {
+    startedRecording(e) {
       console.log('--- Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
       if (e.success) {
         recording = true;
@@ -180,7 +224,7 @@ window.onload = function () {
       }
     },
 
-    stoppedRecording: function (e) {
+    stoppedRecording(e) {
       console.log('--- Stopped Recording:', (e.success) ? 'Success ---' : 'Error ---');
       if (e.success) {
         recording = false;
@@ -188,36 +232,77 @@ window.onload = function () {
       }
     },
 
-    failed: function (e) {
+    failed(e) {
       console.log(`--- Failed ---\n${e}`);
     },
 
-    ended: function (e) {
+    ended(e) {
       const pNode = document.getElementById('participants');
       while (pNode.firstChild) {
         pNode.removeChild(pNode.firstChild);
       }
+      document.getElementById('messages').innerHTML = '';
       console.log(`--- Call ended [${e.reason}] ---\n`);
     },
 
-    inviteResponse: function (e) {
+    inviteResponse(e) {
       console.log('--- Invite response (multiparty) ---\n', e);
     },
 
-    callTransferResponse: function (e) {
+    callTransferResponse(e) {
       console.log('--- Call transfer response ---\n', e);
     },
 
-    sipReinviteResponse: function (e) {
+    sipReinviteResponse(e) {
       console.log('--- Re-Invite response:', (e.success) ? 'Success ---' : 'Error ---');
     },
 
-    sipUpdateResponse: function (e) {
+    sipUpdateResponse(e) {
       console.log('--- Update response:', (e.success) ? 'Success ---' : 'Error ---');
     },
 
-    newMessage: function (e) {
+    newMessage(e) {
       console.log(`--- New Message ---\n${JSON.stringify(e.msg)}`);
+
+      const jsonMsg = JSON.parse(e.msg);
+
+      if (jsonMsg.isChatMessage) {
+        const user = document.getElementById('ext').value;
+        console.log('isChatMessage:', jsonMsg.isChatMessage);
+
+        switch (user) {
+          case jsonMsg.to: {
+            console.log('incoming message');
+            console.log(jsonMsg.msg);
+
+            const body = jsonMsg.msg;
+            const messages = document.getElementById('messages');
+            const text = document.createElement('p');
+            text.setAttribute('id', 'incoming');
+            text.innerHTML = body;
+
+            const label = document.createElement('label');
+            label.setAttribute('id', 'messageLabel');
+            label.setAttribute('for', 'incoming');
+            label.innerText = jsonMsg.from;
+
+            const node = document.createElement('li');
+
+            label.append(text);
+            node.append(label);
+
+            messages.appendChild(node);
+
+            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
+            break;
+          }
+          case jsonMsg.from:
+            console.log('outgoing');
+            break;
+          default:
+            break;
+        }
+      }
     },
 
     participantsUpdate: function (e) {
@@ -226,9 +311,11 @@ window.onload = function () {
         pNode.removeChild(pNode.firstChild);
       }
 
+      participants = e.participants;
+
       for (let i = 0; i < e.participants.length; i++) {
         const p = e.participants[i];
-        const li = document.createElement('li');
+        const li = document.createElement('li').setAttribute('id', `participant-${i.toString()}`);
         const type = p.type.split(':');
         const hold = p.onHold ? 'Yes' : 'No';
         const txt = document.createTextNode(`${p.ext}: ${type[1].toUpperCase()}, on hold: ${hold}`);

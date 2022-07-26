@@ -54,6 +54,7 @@ class ConfManager extends Events {
     ua.on('newMessage', (evt) => {
       const peer = this._index.getByExt(user);
       debug(`Call New Message by ${evt.originator} to ${user}. Message:`);
+
       const message = evt.message._request.body;
       debug(message);
       peer.sendNewSipMessage(message);

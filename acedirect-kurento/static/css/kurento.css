@@ -87,3 +87,46 @@ div.dragged {
 	width: 100%;
 	height: 36px;
 }
+
+div#sip-chat {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
+
+div#text-input {
+	padding-left: 1rem;
+	margin-bottom: 1rem;
+	align-self: flex-end;
+}
+
+div#chat-box {
+	width: 50%;
+	height: 25rem;
+	outline: 2px solid #555;
+	overflow-y: auto;
+}
+
+ul#messages {
+	list-style: none;
+}
+
+li#wholeOutgoing {
+	text-align: right;
+	padding-right: 1rem;
+}
+
+label#messageLabel {
+	font-weight: bold;
+	width: 100%;
+}
+
+p#incoming {
+	background-color: #ccc;
+	font-weight: normal;
+}
+
+p#outgoing {
+	background-color: #fff;
+	font-weight: normal;
+	text-align: right;
+}
