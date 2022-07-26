@@ -268,13 +268,6 @@ class ClientSession extends Events {
    * params = { to, from, isChatMessage, msg }
    */
   sendText(params) {
-    // I want to add some sort of checking to make sure a call is active. Like below:
-
-    // if (this._status !== CL_STATUS_BUSY) {
-    //   console.log('checking status');
-    //   return;
-    // }
-
     try {
       const target = params.to;
       const body = params;
