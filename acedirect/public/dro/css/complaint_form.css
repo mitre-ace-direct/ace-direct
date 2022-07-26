@@ -218,6 +218,22 @@ body {
   outline: none !important;
 }
 
+.tabs-right>li.active>a:focus-visible {
+  outline:2px solid black !important;
+  outline-offset: -15px;
+  background-color: white !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
+
+.tabs-right>li>a:focus-visible {
+  outline:2px solid black !important;
+  outline-offset: -15px;
+  background-color: transparent !important;
+  border-left-color: transparent !important;
+
+}
+
 .tabs-right>li>a {
   border-radius: 0 4px 4px 0;
   margin-right: 0;
@@ -462,16 +478,6 @@ body {
 .sidebarTab {
   width: 8vw;
   text-align: center;
-}
-
-#fileShareTab:focus-visible {
-  outline:2px solid black !important;
-  outline-offset: -15px;
-}
-
-#chatTab:focus-visible {
-  outline:2px solid black !important;
-  outline-offset: -15px;
 }
 
 #exitFullscreen {

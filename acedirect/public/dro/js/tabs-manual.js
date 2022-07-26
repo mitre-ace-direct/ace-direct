@@ -15,10 +15,13 @@ class TabsManual {
     this.tabs = [];
     this.firstTab = null;
     this.lastTab = null;
+    this.firstTabPanel = null;
+    this.lastTabPanel = null;
 
     this.tabs = Array.from(this.tablistNode.querySelectorAll('[role=tab]'));
     this.tabpanels = [];
     this.selectedTab = null;
+    this.selectedTabPanel = null;
 
     for (var i = 0; i < this.tabs.length; i += 1) {
       var tab = this.tabs[i];
@@ -33,8 +36,10 @@ class TabsManual {
 
       if (!this.firstTab) {
         this.firstTab = tab;
+        this.firstTabPanel = tabpanel
       }
       this.lastTab = tab;
+      this.lastTabPanel = tabpanel;
     }
 
     this.setSelectedTab(this.firstTab);
@@ -59,19 +64,20 @@ class TabsManual {
     }
   }
 
-  moveFocusToTab(currentTab) {
+  moveFocusToTab(currentTab, currentTabPanel) {
     currentTab.focus();
     this.selectedTab = currentTab;
+    this.selectedTabPanel = currentTabPanel;
   }
 
   moveFocusToPreviousTab(currentTab) {
     var index;
 
     if (currentTab === this.firstTab) {
-      this.moveFocusToTab(this.lastTab);
+      this.moveFocusToTab(this.lastTab, this.lastTabPanel);
     } else {
       index = this.tabs.indexOf(currentTab);
-      this.moveFocusToTab(this.tabs[index - 1]);
+      this.moveFocusToTab(this.tabs[index - 1], this.tabpanels[index - 1]);
     }
   }
 
@@ -79,10 +85,10 @@ class TabsManual {
     var index;
 
     if (currentTab === this.lastTab) {
-      this.moveFocusToTab(this.firstTab);
+      this.moveFocusToTab(this.firstTab, this.firstTabPanel);
     } else {
       index = this.tabs.indexOf(currentTab);
-      this.moveFocusToTab(this.tabs[index + 1]);
+      this.moveFocusToTab(this.tabs[index + 1], this.tabpanels[index + 1]);
     }
   }
 
@@ -126,6 +132,13 @@ class TabsManual {
       case ' ':
         // open the tab with the spacebar
         this.selectedTab.click();
+        this.selectedTabPanel.focus();
+        break;
+
+      case 'Enter' :
+        event.preventDefault();
+        this.selectedTab.click();
+        this.selectedTabPanel.focus();
         break;
 
       default:
