@@ -18,17 +18,17 @@
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
-
-  <section aria-label="logos">
-    <div id="logoContainer">
-      <img src="dro/images/DVC2.png" style="margin-right: 3%;" width="20%" alt="Direct Video Calling Logo">
-      <img src="dro/images/fcc-logo.jpg" width="7%" alt="FCC Logo">
-    </div>
-    <img id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100vw" aria-hidden="true" alt="">
-  </section>
-
   <main>
+    <section aria-label="logos">
+      <div id="logoContainer">
+        <img src="dro/images/DVC2.png" style="margin-right: 3%;" width="20%" alt="Direct Video Calling Logo">
+        <img src="dro/images/fcc-logo.jpg" width="7%" alt="FCC Logo">
+      </div>
+      <img id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100vw" aria-hidden="true" alt="">
+    </section>
+
     <div class="row">
+      <section aria-label="videophone number">
       <div id="VRSlogincontainer" class="col-lg-4 col-md-6 col-xs-8">
         <div id="VRScontent">
           <label id="headerBox" for="vrs_number"><b>Videophone Number</b></label>
@@ -51,10 +51,12 @@
         <div id="infoBox">
           <p font-size="14px">You are entering an Official United States Government System, which may be used only for
             authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby
-            notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized attempts
+            notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized
+            attempts
             to upload or change information on this web site is prohibited.</p>
         </div>
       </div>
+      </section>
     </div>
   </main>
 
@@ -62,7 +64,8 @@
 </body>
 
 <!--Incorrect Browser Modal-->
-<div id="notChromeModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="recommendedBrowserTitle">
+<div id="notChromeModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog"
+  aria-labelledby="recommendedBrowserTitle">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center">
