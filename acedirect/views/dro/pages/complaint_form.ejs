@@ -308,7 +308,7 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <video controls class="video-element" id="instructionsVideo" title="Play Video">
+        <video controls class="video-element" id="instructionsVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= instructions_video %>" type="video/mp4">
           <source src="/media/<%= instructions_video %>" type="video/webm">
         </video>
@@ -364,7 +364,7 @@
         <p id="callingBanner"><b>Calling...</b></p>
         <p class="waiting-header" role="heading" aria-level="3" aria-live="assertive">Waiting for the next available agent.</p>
         <hr />
-        <video controls class="video-element" id="pleaseWaitVideo" title="Play Video">
+        <video controls class="video-element" id="pleaseWaitVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= please_wait_video %>" type="video/mp4">
           <source src="/media/<%= please_wait_video %>" type="video/webm">
         </video>
@@ -406,7 +406,7 @@
       <div class="modal-header text-center">
         <h3 class="no-agents-header" aria-live="assertive">No agents are available to take your call at this time.</h3>
         <hr/>
-        <video controls class="video-element" id="noAgentsVideo" title="Play Video">
+        <video controls class="video-element" id="noAgentsVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= no_agents_video %>" type="video/mp4">
           <source src="/media/<%= no_agents_video %>" type="video/webm">
         </video>
@@ -469,8 +469,6 @@
 <div id="callEndedModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog">
   <div class="modal-dialog modal-dialog-csentered">
     <div class="modal-content">
-
-
       <div class="modal-body" style="position: relative;min-height:300px;">
         <div class="center text-center"><!--style="width: 75%"-->
           <!--<i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>-->
@@ -486,7 +484,6 @@
         <div class="text-center">
           <a href="#" onclick="logout()" style="color:#073863;" role="button" tabindex="0"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit Support Portal</a>
         </div>
-
       </div>
     </div>
   </div>
