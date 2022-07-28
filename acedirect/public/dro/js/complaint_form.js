@@ -120,8 +120,8 @@ function connect_socket() {
             hello: 'hello'
           });
         })
-          .on('ad-ticket-created', (data) => {
-            ;
+          .on('ad-ticket-created', (_data) => {
+
             /* $('#userformoverlay').removeClass('overlay').hide();
                 if (data.zendesk_ticket) {
                 $('#firstName').val(data.first_name);
@@ -232,7 +232,7 @@ function connect_socket() {
                   ended: (_e) => {
                     console.log('--- WV: Call ended ---\n');
                     // terminateCall();
-                    
+
                   }
                 };
                 acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
@@ -274,7 +274,6 @@ function connect_socket() {
           })
           .on('chat-message-new-translated', (data) => {
             newChatMessage(data);
-            ;
           })
           .on('translate-language-error', (error) => {
             console.error('Translation error:', error);
@@ -456,7 +455,7 @@ function connect_socket() {
             }, 3000);
           })
           .on('consumer-being-monitored', () => {
-            // keep self-view 
+            // keep self-view
             acekurento.isMonitoring = true;
             $('#end-call').attr('onclick', 'monitorHangup()');
           })
@@ -494,16 +493,16 @@ function connect_socket() {
 
 const setColumnSize = function () {
   // sidebar tabs
-  let chatSeparator = document.getElementById("chat-separator");
-  let fileShareSeparator = document.getElementById("fileshare-separator");
-  let footer = document.getElementById("footer-container-consumer");
+  let chatSeparator = document.getElementById('chat-separator');
+  let fileShareSeparator = document.getElementById('fileshare-separator');
+  let footer = document.getElementById('footer-container-consumer');
   let tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
   let chatHeight = footer.getBoundingClientRect().top - tabsTop;
   let fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
 
   $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
   $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
-  
+
   $('#fileshare-box-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20));
   $('#fileshare-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20));
 
@@ -512,14 +511,14 @@ const setColumnSize = function () {
   // video section
   $('#callVideoColumn').height(footer.getBoundingClientRect().top - 200);
 
-  let buttonFeedback = document.getElementById("button-feedback");
-  let speakingToRow = document.getElementById("speakingToRow");
-  let videoButtonsRow = document.getElementById("callButtonsRow");
+  let buttonFeedback = document.getElementById('button-feedback');
+  let speakingToRow = document.getElementById('speakingToRow');
+  let videoButtonsRow = document.getElementById('callButtonsRow');
   let videoTop = buttonFeedback.getBoundingClientRect().bottom || speakingToRow.getBoundingClientRect().bottom || videoButtonsRow.getBoundingClientRect().bottom;
   let videoHeight = footer.getBoundingClientRect().top - videoTop;
   $('#remoteViewCol').height(videoHeight);
   $('#remoteView').height(videoHeight);
-}
+};
 setColumnSize();
 window.addEventListener('resize', setColumnSize);
 
@@ -607,8 +606,8 @@ function registerJssip(myExtension, myPassword) {
         selfStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('SCREENSHARE ENDED SELF');
           // $('#startScreenshare').hide();
-          //acekurento.screenshare(false);
-          //document.getElementById('startScreenshare').innerText = 'Start Screenshare';
+          // acekurento.screenshare(false);
+          // document.getElementById('startScreenshare').innerText = 'Start Screenshare';
           if (monitorExt) {
             // force monitor to leave the session first
             socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
@@ -638,7 +637,7 @@ function registerJssip(myExtension, myPassword) {
       console.log(`--- WV: Call ended ---\n${e}`);
 
       $('#startScreenshare').hide();
-      console.log("RECEIVED ENDCALL");
+      console.log('RECEIVED ENDCALL');
       endCall(true);
       // terminateCall();
       // clearScreen();
@@ -719,20 +718,20 @@ function enterQueue() {
 }
 
 /**
- * 
- * @param {*Determines if the user hang up while waiting in queue or ended an active call} inCall 
+ *
+ * @param {*Determines if the user hang up while waiting in queue or ended an active call} inCall
  */
 function endCall() {
-  console.log("CALLING ENDCALL " + $('#noAgentsModal').is(':visible'));
+  console.log('CALLING ENDCALL ' + $('#noAgentsModal').is(':visible'));
   terminateCall();
   clearInterval(callTimer);
-  //if(callAnswered || forceHangup){
-  //Catches if the user clicks the hangup on the noagents modal
-  if($('#noAgentsModal').is(':visible')) {
+  // if(callAnswered || forceHangup){
+  // Catches if the user clicks the hangup on the noagents modal
+  if ($('#noAgentsModal').is(':visible')) {
     $('#optionsModal').modal('show');
     $('#optionsModal').css('overflow-y', 'auto');
     $('#noAgentsModal').modal('hide');
-  } else if(callAnswered){
+  } else if (callAnswered) {
     if (complaintRedirectActive) {
       $('#redirectURL').text(complaintRedirectUrl);
       $('#waitingModal').modal('hide');
@@ -749,16 +748,16 @@ function endCall() {
       window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
     }
   } else {
-    //Called when a user ends the call while waiting in queue
+    // Called when a user ends the call while waiting in queue
     $('#waitingModal').modal('hide');
-    //$('#optionsModal').modal('show');
+    // $('#optionsModal').modal('show');
     $('#noAgentsModal').modal('show');
     $('#noAgentsModal').css('overflow-y', 'auto');
   }
 }
 
 function exitQueue() {
-  console.log("EXITING QUEUE");
+  console.log('EXITING QUEUE');
   endCall();
 }
 
@@ -769,8 +768,6 @@ function exitQueue() {
 function startCall(otherSipUri) {
   console.log(`startCall: ${otherSipUri}`);
   selfStream.removeAttribute('hidden');
-
-  setFeedbackText('Agent connected!');
 
   $('#screenshareButton').removeAttr('disabled');
   $('#fileInput').removeAttr('disabled');
@@ -783,10 +780,10 @@ function startCallTimer() {
   let seconds = 0;
   let start = new Date;
 
-  callTimer = setInterval(function() {
+  callTimer = setInterval(function () {
     let temp = Math.round(new Date - start) / 1000;
     minutes = Math.floor(temp / 60) > 0 ? Math.floor(temp / 60) : 0;
-    seconds = Math.floor((temp -(minutes * 60)));
+    seconds = Math.floor((temp - (minutes * 60)));
 
     if (seconds < 10) {
       seconds = `0${seconds}`;
@@ -829,7 +826,7 @@ function muteAudio() {
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, true); // mute audio
   }
-  $("#mute-audio").blur();
+  $('#mute-audio').blur();
 }
 
 // unmutes self audio so remote can hear you
@@ -841,12 +838,12 @@ function unmuteAudio() {
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, true); // unmute audio
   }
-  $("#mute-audio").blur();
+  $('#mute-audio').blur();
 }
 
 function enableVideoPrivacy() {
-  $("#hide-video").blur();
-  //$('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa-stack');
+  $('#hide-video').blur();
+  // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa-stack');
   $('#mute-camera-off-icon').children().remove();
   $('#mute-camera-off-icon').append(
     '<i class="fa fa-video-camera fa-stack-1x"></i><i class="fa fa-ban fa-stack-2x text-danger"></i>'
@@ -874,8 +871,8 @@ function enableVideoPrivacy() {
 }
 
 function disableVideoPrivacy() {
-  $("#hide-video").blur();
-  //$('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa fa-video-camera');
+  $('#hide-video').blur();
+  // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa fa-video-camera');
   $('#mute-camera-off-icon').children().remove();
   $('#mute-camera-off-icon').append(
     '<i class="fa fa-video-camera fa-stack-1x"></i>'
@@ -916,34 +913,34 @@ function logout() {
 }
 
 function toggleScreenShare(toggle) {
-  $("#startScreenshare").blur();
+  $('#startScreenshare').blur();
   isScreenshareRestart = true;
   if (!toggle) {
     acekurento.screenshare(false);
-    console.log("UPDATING SCREENSHARE BUTTON FALSE");
-    //sharingScreen = false;
+    console.log('UPDATING SCREENSHARE BUTTON FALSE');
+    // sharingScreen = false;
     $('#startScreenshare').removeAttr('onclick');
     $('#startScreenshare').attr('onClick', 'toggleScreenShare(true);');
-    $('#startScreenshare').text("");
+    $('#startScreenshare').text('');
     $('#startScreenshare').children().remove();
     $('#startScreenshare').append(
       '<i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare'
-    )
+    );
     $('#startScreenshare').attr('aria-label', 'Share screen');
-    //setFeedbackText('Screenshare ended!');
+    // setFeedbackText('Screenshare ended!');
   } else {
     acekurento.screenshare(true);
-    console.log("UPDATING SCREENSHARE BUTTON TRUE");
-    //sharingScreen = true;
+    console.log('UPDATING SCREENSHARE BUTTON TRUE');
+    // sharingScreen = true;
     $('#startScreenshare').removeAttr('onclick');
     $('#startScreenshare').attr('onClick', 'toggleScreenShare(false);');
-    $('#startScreenshare').text("");
+    $('#startScreenshare').text('');
     $('#startScreenshare').children().remove();
     $('#startScreenshare').append(
       '<i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Stop Screenshare'
-    )
+    );
     $('#startScreenshare').attr('aria-label', 'Stop screen share');
-    //setFeedbackText('Screenshare started!');
+    // setFeedbackText('Screenshare started!');
   }
 }
 
@@ -1048,7 +1045,7 @@ $('#fileInput').on('change', () => {
     $('#shareFileConsumer').attr('data-original-title', 'Choose a file to send').parent().find('.tooltip-inner').html('Choose a file to send');
   } else {
     console.log('file chosen!');
-    $('#shareFileConsumer').attr('disabled', false).css('background-color','#073863');;
+    $('#shareFileConsumer').attr('disabled', false).css('background-color', '#073863');
     $('#removeFileBtn').css('display', 'block');
     // remove tooltip on send button
     $('#shareFileConsumer').attr('data-original-title', '').parent().find('.tooltip-inner').html('');
@@ -1060,7 +1057,7 @@ $('#fileInput').on('change', () => {
 
 function removeFile() {
   $('#fileInput')[0].value = '';
-  $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');;
+  $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');
   $('#removeFileBtn').css('display', 'none');
   $('#shareFileConsumer').attr('data-original-title', 'Choose a file to send').parent().find('.tooltip-inner').html('Choose a file to send');
   $('[data-toggle="tooltip"]').tooltip({
@@ -1223,10 +1220,10 @@ function shareFileConsumer() {
         $('#removeFileBtn').hide();
         $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
         $('#button-feedback').hide();
-        
+
         setTimeout(() => {
           $('#fileSent').slideUp(500);
-        }, 6000)
+        }, 6000);
       },
       error: (jXHR, textStatus, errorThrown) => {
         console.log(`ERROR: ${jXHR} ${textStatus} ${errorThrown}`);
@@ -1248,7 +1245,7 @@ function addFileToDownloadList(data) {
       // we can open this file in a new tab without downloading it
       $('#receivedFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename">${data.original_filename}</span>
+        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1259,7 +1256,7 @@ function addFileToDownloadList(data) {
       // cannot view without downloading
       $('#receivedFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename">${data.original_filename}</span>
+        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1271,7 +1268,7 @@ function addFileToDownloadList(data) {
     // file type not in file name-- cannot view without downloading
     $('#receivedFilesList').append(
       (`<span class="fileShareRow">
-      <span class="fileShareCellFilename">${data.original_filename}</span>
+      <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1299,7 +1296,7 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename">${data.original_filename}</span>
+        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1311,7 +1308,7 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename">${data.original_filename}</span>
+        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1324,7 +1321,7 @@ function addFileToSentList(data) {
     // add to sent files list
     $('#sentFilesList').append(
       (`<span class="fileShareRow">
-      <span class="fileShareCellFilename">${data.original_filename}</span>
+      <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1380,13 +1377,13 @@ function setOtherFontSize(size) {
       $('#newchatmessage').css('height', $('#chat-send').css('height'));
     } else {
       // changing the font size while the textarea has a content
-      $('#newchatmessage').css('height','0px');
+      $('#newchatmessage').css('height', '0px');
       $('#newchatmessage').css('height', `${$('#newchatmessage')[0].scrollHeight}px`);
     }
   }
 }
 
-$('#collapseButton').on('keydown', (e) =>{
+$('#collapseButton').on('keydown', (e) => {
   if (e.keyCode === 13) {
     // enter key pressed
     // do not show the collapse button tooltip on enter press
@@ -1430,7 +1427,7 @@ function collapseSidebar(tab) {
         $('#chatTab').attr('aria-selected', 'true');
         $('#fileShareTab').attr('aria-selected', 'false');
         $('#tab1').addClass('active');
-        
+
         // reset the unread messages count
         unreadMessages = 0;
         $('#unreadMessagesBadge').text('');
@@ -1472,7 +1469,7 @@ function collapseSidebar(tab) {
     }
 
     $('#remoteViewCol').css('height', '');
-    $('#remoteView').css('height','');
+    $('#remoteView').css('height', '');
     $('#remoteView').css('width', '');
     setColumnSize();
   } else {
@@ -1513,7 +1510,7 @@ function collapseSidebar(tab) {
     $('#collapseButtonIcon').addClass('fa fa-angle-double-left');
 
     // make sure remote video doesn't expand past footer
-    setColumnSize()
+    setColumnSize();
   }
 }
 
@@ -1534,7 +1531,7 @@ function toggleTab(tab) {
       // reset the unread messages count
       unreadMessages = 0;
       $('#unreadMessagesBadge').text('');
-      openTab = 'chat'
+      openTab = 'chat';
 
       $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
     } else if (tab === 'fileShareTab') {
@@ -1549,21 +1546,21 @@ function toggleTab(tab) {
       // reset the unread messages count
       unreadFiles = 0;
       $('#unreadFilesBadge').text('');
-      openTab = 'fileShare'
+      openTab = 'fileShare';
     }
   }
   setColumnSize();
 }
 
-function redirectToVideomail(){
-  if(acekurento != null){
-    acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, {ended: (e) => {
-      console.log("--Call ended by asterisk, not abandoned--");
-      window.location.href = "./videomail";
+function redirectToVideomail() {
+  if (acekurento != null) {
+    acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, { ended: (_e) => {
+      console.log('--Call ended by asterisk, not abandoned--');
+      window.location.href = './videomail';
     }
-  })
-    acekurento.callTransfer("videomail");  
+    });
+    acekurento.callTransfer('videomail');
   } else {
-    window.location.href = "./videomail";
+    window.location.href = './videomail';
   }
 }
