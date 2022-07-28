@@ -730,6 +730,8 @@ function endCall() {
   if ($('#noAgentsModal').is(':visible')) {
     $('#optionsModal').modal('show');
     $('#optionsModal').css('overflow-y', 'auto');
+    openDialog('optionsModal', window);
+
     $('#noAgentsModal').modal('hide');
   } else if (callAnswered) {
     if (complaintRedirectActive) {
@@ -753,6 +755,7 @@ function endCall() {
     // $('#optionsModal').modal('show');
     $('#noAgentsModal').modal('show');
     $('#noAgentsModal').css('overflow-y', 'auto');
+    openDialog('noAgentsModal', window);
   }
 }
 
