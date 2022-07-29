@@ -95,7 +95,7 @@ router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => 
             }
         }
         if (config.complaint_videos && config.complaint_videos.no_agents_video) {
-            instructions_video = utils.getConfigVal(config.complaint_videos.no_agents_video);
+            no_agents_video = utils.getConfigVal(config.complaint_videos.no_agents_video);
             if (!no_agents_video || no_agents_video.length === 0) {
                 no_agents_video = config.complaint_videos.no_agents_video;
             }
