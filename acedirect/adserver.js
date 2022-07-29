@@ -1068,6 +1068,18 @@ io.sockets.on('connection', (socket) => {
     }
   });
 
+  //data = ["caption-consumer",{"transcript":" 1 2 3 4 5","final":true,"language":"en-US"}]
+  socket.on('caption-consumer', (data) => {
+    if (data.final && token.vrs) {
+      // only send finals from browser based captions. Browser captions fragment phrases
+      const d = new Date();
+      data.timestamp = d.getTime();
+      data.msgid = d.getTime();
+      data.displayname = (token.first_name && token.last_name) ? token.first_name+" "+token.last_name:"Consumer";
+      io.to(Number(token.vrs)).emit('consumer-caption', data);
+    }
+  });
+
   socket.on('requestScreenshare', (data) => {
     console.log(`Receiving screenshare request to ${data.agentNumber}`);
     io.to(Number(data.agentNumber)).emit('screenshareRequest', {

@@ -754,6 +754,13 @@ function connect_socket() {
             callerNumber: extensionMe,
             displayname: transcripts.displayname
           });
+        }).on('consumer-caption', function (transcripts) {
+          // console.log(JSON.stringify(transcripts))
+          socket.emit('translate-caption', {
+            transcripts: transcripts,
+            callerNumber: extensionMe,
+            displayname: transcripts.displayname
+          });
         }).on('new-agent-chat', function(data) {
           var count = 0;
           if(!isAgentChatSaved && $('#chatHeader').html() !== data.displayname) {

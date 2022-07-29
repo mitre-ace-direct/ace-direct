@@ -676,6 +676,7 @@ function registerJssip(myExtension, myPassword) {
         document.getElementById('inCallSection').style.display = 'block';
         setColumnSize();
         callAnswered = true;
+        captionsStart();
       }
     }
   };
@@ -745,6 +746,7 @@ function endCall() {
       setTimeout(() => {
         location = complaintRedirectUrl;
       }, 10000);
+      captionsEnd();
     } else {
       // reset the page
       window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
@@ -821,10 +823,12 @@ function terminateCall() {
 // IN CALL FEATURES
 
 // mutes self audio so remote cannot hear you
+var isMuted = false;
 function muteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone').addClass('call-btn-icon fa fa-microphone-slash');
   $('#mute-audio').attr('onclick', 'unmuteAudio()');
   $('#mute-audio').attr('aria-label', 'Unmute Audio');
+  isMuted = true;
   setFeedbackText('Audio Muted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, true); // mute audio
@@ -837,6 +841,7 @@ function unmuteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone-slash').addClass('call-btn-icon fa fa-microphone');
   $('#mute-audio').attr('onclick', 'muteAudio()');
   $('#mute-audio').attr('aria-label', 'Mute Audio');
+  isMuted = false;
   setFeedbackText('Audio Unmuted!');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, true); // unmute audio
@@ -1566,4 +1571,75 @@ function redirectToVideomail() {
   } else {
     window.location.href = './videomail';
   }
+}
+
+
+var recognition = null;
+function captionsStart() {
+  var language = $('#language-select').val();
+  switch (language) {
+    case 'en': // English US
+      language = 'en-US';
+      break;
+    case 'es': // Spanish (Mexican)
+      language = 'es-US';
+      break;
+    case 'ar': // Arabic (Modern Standard)
+      language  = 'ar-EG';
+      break;
+    case 'pt': // Brazilian Portuguese
+      language = 'pt-PT';
+      break;
+    case 'zh': // Chinese (Mandarin)
+      language = 'zh';
+      break;
+    case 'nl': // Dutch
+      language = 'nl-NL';
+      break;
+    case 'fr': // French
+      language = 'fr-FR';
+      break;
+    case 'de': // German
+      language = 'de-DE';
+      break;
+    case 'it': // Italian
+      language = 'it-IT';
+      break;
+    case 'ja': // Japanese
+      language = 'ja-JP';
+      break;
+    case 'ko': // Korean
+      language = 'ko-KR';
+      break;
+    default:
+      language = 'en-US';
+    }
+  recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.lang = language;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.onresult = function (event) {
+    if (!isMuted && event && event.results && (event.results.length > 0)) {
+      var lastResult = event.results.length - 1;
+
+      socket.emit('caption-consumer', {
+        transcript:event.results[lastResult][0].transcript,
+        final: event.results[lastResult].isFinal, 
+        language: language
+      });
+    }
+  };
+
+  recognition.onend = function (event) {
+    if(true)
+      captionsStart();	
+  }
+  recognition.start();
+}
+
+function captionsEnd() {
+  if(recognition)
+    recognition.abort();
+  recognition = null;
 }
