@@ -33,6 +33,10 @@
           <button class="btn btn-secondary modal-outline-btn" id="skipGreetingButton" tabindex="0"
             aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
               class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
+
+          <a class="btn-tertiary" id="cancelButton" tabindex="0" style="cursor:pointer" onclick="logout()"
+            onkeypress="logout()"
+            aria-label="Cancel">Cancel</a>
         </div>
         <video class="fill-height video-element" id="greetingVideo" title="Play Video" aria-label="videomail greeting video">
           <source src="/media/<%= introVideo %>" type="video/mp4">
@@ -61,8 +65,11 @@
                   aria-hidden="true"></i>&nbsp;Video is
                 ON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
               <button class="btn btn-custom" id="sendVideomailButton" onclick="sendVideomail();"><i
-                  class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Send Videomail</button>
+                  class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Send Videomail
+              </button>
+              <button class="btn btn-secondary modal-outline-btn vm-cancel-button" onclick="pauseAndShowModal();">Cancel</button>
             </div>
+             
           </div>
 
           <div class="row recording-timer-bar" id="recording-timer-bar">
@@ -114,6 +121,23 @@
                   class="fa fa-sign-out"></i> Exit Support
                 Portal</a>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="pauseModal" class="modal fade" data-backdrop="static" role="dialog" aria-labelledby="pauseDescription">
+      <div class="modal-dialog modal-dialog-csentered">
+        <div class="modal-content">
+          <div class="modal-body" style="position: relative;min-height:300px;">
+            <div class="center text-center" style="width: 90%;">
+              <p id="goodbyeDescription" style="font-size: 1.5em;">Canceling will stop the recording and your videomail will not be sent.</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-custom" id="sendVideomailButton" onclick="logout();"><i
+              class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Cancel Videomail
+            </button>
+            <button class="btn btn-secondary modal-outline-btn vm-cancel-button" onclick="resumeAndCloseModal();">Return to Recording</button>
           </div>
         </div>
       </div>
