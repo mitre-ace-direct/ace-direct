@@ -89,6 +89,32 @@
   width: 190px !important;
 }
 
+.modal-outline-btn:hover {
+  color: #073863 !important;
+  border-color: #073863 !important;
+  border-width: 2px !important;
+  font-weight: bold !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  width: 190px !important;
+  background-color: #E6EBEF !important;
+}
+
+.modal-outline-btn:focus {
+  color: #073863 !important;
+  border-color: #073863 !important;
+  border-width: 2px !important;
+  font-weight: bold !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  width: 190px !important;
+  background-color: #CDD7E0 !important;
+}
+
 #recordingCountdown {
   font-size: 5em;
 }
