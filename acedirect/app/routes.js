@@ -85,19 +85,19 @@ router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => 
         if (config.complaint_videos && config.complaint_videos.please_wait_video) {
             please_wait_video = utils.getConfigVal(config.complaint_videos.please_wait_video);
             if (!please_wait_video || please_wait_video.length === 0) {
-                please_wait_video = 'sample.mp4'; // TODO: Update with real default video
+                please_wait_video = config.complaint_videos.please_wait_video;
             }
         }
         if (config.complaint_videos && config.complaint_videos.instructions_video) {
             instructions_video = utils.getConfigVal(config.complaint_videos.instructions_video);
             if (!instructions_video || instructions_video.length === 0) {
-                instructions_video = 'sample.mp4'; // TODO: Update with real default video
+                instructions_video = config.complaint_videos.instructions_video;
             }
         }
         if (config.complaint_videos && config.complaint_videos.no_agents_video) {
             instructions_video = utils.getConfigVal(config.complaint_videos.no_agents_video);
             if (!no_agents_video || no_agents_video.length === 0) {
-                no_agents_video = 'sample.mp4'; // TODO: Update with real default video
+                no_agents_video = config.complaint_videos.no_agents_video;
             }
         }
         res.render('dro/pages/complaint_form', {please_wait_video: please_wait_video, instructions_video: instructions_video, no_agents_video : no_agents_video});
