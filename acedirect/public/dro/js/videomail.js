@@ -1,4 +1,4 @@
-var recordingPaused = false;
+let recordingPaused = false;
 
 function setVideoSize() {
   const a1 = document.getElementById('greeting-controls');
@@ -158,23 +158,26 @@ function endVideomail() {
 async function pauseAndShowModal() {
   await recorder.pauseRecording();
   recordingPaused = true;
-  $('#recordingTime').html(function(index,html){
-    html = html.replace('Recording', 'Paused');
-    return html.replace('circle', 'pause')
-  });
-  
-  $('#pauseModal').modal(); 
+  $('#recordingTime').html((_index, html) => html.replace('Recording', 'Paused').replace('circle', 'pause'));
+  $('#pauseModal').modal();
+  // eslint-disable-next-line no-undef
+  openDialog('pauseModal', window);
 }
+
+$('#pauseAndShowModal').on('click', () => {
+  pauseAndShowModal();
+});
 
 async function resumeAndCloseModal() {
   await recorder.resumeRecording();
   recordingPaused = false;
-  $('#recordingTime').html(function(index,html){
-    html = html.replace('Paused', 'Recording');
-    return html.replace('pause', 'circle');
-  });
+  $('#recordingTime').html((_index, html) => html.replace('Paused', 'Recording').replace('pause', 'circle'));
   $('#pauseModal').modal('toggle');
 }
+
+$('#resumeAndCloseModalButton').on('click', () => {
+  resumeAndCloseModal();
+});
 
 async function sendVideomail() {
   console.log('sendVideomail');
@@ -240,7 +243,7 @@ function startVideomailTimer() {
         if (rTime > maxTime) {
           clearInterval(recTimerInterval);
           sendVideomail();
-        } 
+        }
       }
     }
   }, 100);
