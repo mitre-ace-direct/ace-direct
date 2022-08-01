@@ -1,3 +1,5 @@
+var recordingPaused = false;
+
 function setVideoSize() {
   const a1 = document.getElementById('greeting-controls');
   const a2 = document.getElementById('recording-timer-bar');
@@ -119,6 +121,7 @@ $('#greetingVideo')
 
 let recorder = null;
 function startRecording() {
+  recordingPaused = false;
   if (recorder == null) {
     // eslint-disable-next-line no-undef
     recorder = new RecordRTCPromisesHandler(selfVideo.srcObject, {
@@ -150,6 +153,27 @@ function endVideomail() {
   setTimeout(() => {
     redirect();
   }, 10000);
+}
+
+async function pauseAndShowModal() {
+  await recorder.pauseRecording();
+  recordingPaused = true;
+  $('#recordingTime').html(function(index,html){
+    html = html.replace('Recording', 'Paused');
+    return html.replace('circle', 'pause')
+  });
+  
+  $('#pauseModal').modal(); 
+}
+
+async function resumeAndCloseModal() {
+  await recorder.resumeRecording();
+  recordingPaused = false;
+  $('#recordingTime').html(function(index,html){
+    html = html.replace('Paused', 'Recording');
+    return html.replace('pause', 'circle');
+  });
+  $('#pauseModal').modal('toggle');
 }
 
 async function sendVideomail() {
@@ -192,29 +216,31 @@ function startVideomailTimer() {
 
   let lastAriaPercentage = 0;
   const recTimerInterval = setInterval(() => {
-    rTime += 0.1;
-    const percentage = (rTime / maxTime) * 100;
-    $('#recordingTimer span').css('width', `${percentage}%`);
+    if (!recordingPaused) {
+      rTime += 0.1;
+      const percentage = (rTime / maxTime) * 100;
+      $('#recordingTimer span').css('width', `${percentage}%`);
 
-    const intPercentage = Math.trunc(percentage);
-    if ((intPercentage % 5 === 0) && (intPercentage > lastAriaPercentage)) {
-      const percentComplete = `${intPercentage}% complete `;
-      $('#recordingTimer').attr('aria-label', percentComplete);
-      $('#recordingTimer').attr('aria-valuenow', intPercentage);
-      lastAriaPercentage = intPercentage;
+      const intPercentage = Math.trunc(percentage);
+      if ((intPercentage % 5 === 0) && (intPercentage > lastAriaPercentage)) {
+        const percentComplete = `${intPercentage}% complete `;
+        $('#recordingTimer').attr('aria-label', percentComplete);
+        $('#recordingTimer').attr('aria-valuenow', intPercentage);
+        lastAriaPercentage = intPercentage;
 
-      console.log(percentComplete);
-    }
+        console.log(percentComplete);
+      }
 
-    if (rTime % 1 !== 0) {
-      selfVideo.recTime = rTime;
-      const date = new Date(0);
-      date.setSeconds(rTime); // specify value for SECONDS here
-      const timeString = date.toISOString().substr(15, 4);
-      $('#recordingTime').html(`<i class='fa fa-circle' aria-hidden='true'></i> Recording &nbsp;&nbsp; ${timeString} / ${mTimeFormatted}`);
-      if (rTime > maxTime) {
-        clearInterval(recTimerInterval);
-        sendVideomail();
+      if (rTime % 1 !== 0) {
+        selfVideo.recTime = rTime;
+        const date = new Date(0);
+        date.setSeconds(rTime); // specify value for SECONDS here
+        const timeString = date.toISOString().substr(15, 4);
+        $('#recordingTime').html(`<i class='fa fa-circle' aria-hidden='true'></i> Recording &nbsp;&nbsp; ${timeString} / ${mTimeFormatted}`);
+        if (rTime > maxTime) {
+          clearInterval(recTimerInterval);
+          sendVideomail();
+        } 
       }
     }
   }, 100);
