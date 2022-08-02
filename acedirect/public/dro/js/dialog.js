@@ -407,7 +407,6 @@ aria.Utils.isFocusable = function (element) {
     case 'BUTTON':
     case 'SELECT':
     case 'TEXTAREA':
-    case 'VIDEO':
       return true;
     default:
       return false;
