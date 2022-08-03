@@ -71,11 +71,11 @@ function connect_socket() {
     url: './token',
     type: 'GET',
     dataType: 'json',
-    success: (sucessData) => {
-      if (sucessData.message === 'success') {
+    success: (successData) => {
+      if (successData.message === 'success') {
         socket = io.connect(`https://${window.location.host}`, {
           path: `${nginxPath}/socket.io`,
-          query: `token=${sucessData.token}`,
+          query: `token=${successData.token}`,
           forceNew: true
         });
 
@@ -86,7 +86,7 @@ function connect_socket() {
         });
 
         socket.on('connect', () => {
-          const payload = jwt_decode(sucessData.token);
+          const payload = jwt_decode(successData.token);
           // get the start/end time strings for the after hours dialog
           // const tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
 
