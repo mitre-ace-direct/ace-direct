@@ -51,8 +51,8 @@ $(window).on('load', () => {
             window.location.reload();
           } else {
             $('#message').text(`${data.message} ${$('#vrs_number').val()}`);
+            $('#message').css({ color: 'red' });
             $('#message').show();
-            $('#vrs_number').val('');
           }
         },
         error(xhr, _status, _error) {
@@ -77,6 +77,7 @@ function login() {
   $('#message').hide();
   $('#message').text('');
   $('#input-group').removeClass('has-error');
+  hideMessage();
   const vrsnumber = $('#vrs_number').val().replace(/^1|[^\d]/g, '');
   if (vrsnumber.length === 10) {
     $.ajax({
@@ -94,8 +95,8 @@ function login() {
           window.location.reload();
         } else {
           $('#message').text(`${data.message} ${$('#vrs_number').val()}`);
+          $('#message').css({ color: 'red' });
           $('#message').show();
-          $('#vrs_number').val('');
         }
       },
       error(xhr, _status, _error) {
@@ -103,6 +104,7 @@ function login() {
           window.location = xhr.responseJSON.redirectUrl;
         } else {
           $('#message').text('An Error Occured.');
+          $('#message').css({ color: 'red' });
           $('#message').show();
         }
       }
@@ -119,9 +121,6 @@ function hideMessage() {
   $('#message').hide();
 }
 
-// Hide the message so that a new error will cause
-// the message to reappear and be read by screen reader.
-$('#vrs_number').on('keydown', hideMessage);
 
 function copyURL() {
   navigator.clipboard.writeText(window.location.href).then(() => {
