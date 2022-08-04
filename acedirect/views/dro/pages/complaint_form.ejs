@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="/css/ca-portal.css">
 </head>
 
-<body style="overflow-x: hidden !important;">
+<body >
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
@@ -304,7 +304,7 @@
 </body>
 <%- include("../partials/acedirect_footer") %>
 
-<div id="optionsModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog">
+<div id="optionsModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -357,7 +357,7 @@
     </div>
   </div>
 </div>
-<div id="waitingModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="waiting-header">
+<div id="waitingModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="waiting-header">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center">
@@ -400,7 +400,7 @@
     </div>
   </div>
 </div>
-<div id="noAgentsModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="no-agents-header">
+<div id="noAgentsModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="no-agents-header">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center">
