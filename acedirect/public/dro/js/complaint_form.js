@@ -48,8 +48,8 @@ $(document).ready(() => {
   });
 
   // Use arrow keys to navigate tabs
-  var tablists = document.querySelectorAll('[role=tablist].tabs-right');
-  for (var i = 0; i < tablists.length; i++) {
+  const tablists = document.querySelectorAll('[role=tablist].tabs-right');
+  for (let i = 0; i < tablists.length; i++) {
     new TabsManual(tablists[i]);
   }
 });
@@ -71,11 +71,11 @@ function connect_socket() {
     url: './token',
     type: 'GET',
     dataType: 'json',
-    success: (data) => {
-      if (data.message === 'success') {
+    success: (successData) => {
+      if (successData.message === 'success') {
         socket = io.connect(`https://${window.location.host}`, {
           path: `${nginxPath}/socket.io`,
-          query: `token=${data.token}`,
+          query: `token=${successData.token}`,
           forceNew: true
         });
 
@@ -86,7 +86,7 @@ function connect_socket() {
         });
 
         socket.on('connect', () => {
-          const payload = jwt_decode(data.token);
+          const payload = jwt_decode(successData.token);
           // get the start/end time strings for the after hours dialog
           // const tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
 
@@ -99,7 +99,7 @@ function connect_socket() {
           vrs = payload.vrs;
           // $('#callerEmail').val(payload.email);
           $('#displayname').val(`${payload.first_name} ${payload.last_name}`);
-          isOpen = payload.isOpen;
+          const isOpen = payload.isOpen;
           if (!isOpen) { // after hours processing; if after hours, then show this modal
             // TODO Review potentially having config variable to determine if enabled per user
             // DO NOT enable for dro
@@ -164,7 +164,6 @@ function connect_socket() {
               $('#pc_config').attr('name', `stun:${data.stun_server}`);
 
               // registerJssip(data.extension, data.password); //register with the given extension
-
 
               // registerJssip(data.extension, data.password); //register with the given extension
 
@@ -232,7 +231,6 @@ function connect_socket() {
                   ended: (_e) => {
                     console.log('--- WV: Call ended ---\n');
                     // terminateCall();
-
                   }
                 };
                 acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
@@ -388,6 +386,7 @@ function connect_socket() {
               $('#callEndedModal').modal('show');
               $('#callEndedModal').css('overflow-y', 'auto');
               openDialog('callEndedModal', window);
+
               setTimeout(() => {
                 location = complaintRedirectUrl;
               }, 10000);
@@ -484,7 +483,7 @@ function connect_socket() {
         // need to handle bad connections?
       }
     },
-    error: (xhr, status, error) => {
+    error: (_xhr, _status, _error) => {
       console.log('Error');
       $('#message').text('An Error Occured.');
     }
@@ -493,12 +492,12 @@ function connect_socket() {
 
 const setColumnSize = function () {
   // sidebar tabs
-  let chatSeparator = document.getElementById('chat-separator');
-  let fileShareSeparator = document.getElementById('fileshare-separator');
-  let footer = document.getElementById('footer-container-consumer');
-  let tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
-  let chatHeight = footer.getBoundingClientRect().top - tabsTop;
-  let fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
+  const chatSeparator = document.getElementById('chat-separator');
+  const fileShareSeparator = document.getElementById('fileshare-separator');
+  const footer = document.getElementById('footer-container-consumer');
+  const tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
+  const chatHeight = footer.getBoundingClientRect().top - tabsTop;
+  const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
 
   $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
   $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
@@ -670,8 +669,13 @@ function registerJssip(myExtension, myPassword) {
 
       if (partCount >= 2 || videomailflag) {
         console.log('--- WV: CONNECTED');
+
         $('#queueModal').modal('hide');
+        //closeDialog($('#videomail-btn')[0]);
+
         $('#waitingModal').modal('hide');
+        //closeDialog($('#waitingHangUpButton')[0]);
+
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
         setColumnSize();
@@ -700,6 +704,8 @@ function unregisterJssip() {
 // CALL FLOW FUNCTIONS
 
 function enterQueue() {
+  //closeDialog($('#callQueueButton')[0]);
+
   const language = 'en';
   socket.emit('call-initiated', {
     language,
@@ -734,13 +740,18 @@ function endCall() {
     openDialog('optionsModal', window);
 
     $('#noAgentsModal').modal('hide');
+    // closeDialog($('#noAgentsHangUpButton')[0]);
   } else if (callAnswered) {
     if (complaintRedirectActive) {
       $('#redirectURL').text(complaintRedirectUrl);
+
       $('#waitingModal').modal('hide');
+      //closeDialog($('#waitingHangUpButton')[0]);
+
       $('#callEndedModal').modal('show');
       $('#callEndedModal').css('overflow-y', 'auto');
       openDialog('callEndedModal', window);
+
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
       setTimeout(() => {
@@ -754,6 +765,8 @@ function endCall() {
   } else {
     // Called when a user ends the call while waiting in queue
     $('#waitingModal').modal('hide');
+    //closeDialog($('#waitingHangUpButton')[0]);
+
     // $('#optionsModal').modal('show');
     $('#noAgentsModal').modal('show');
     $('#noAgentsModal').css('overflow-y', 'auto');
@@ -783,10 +796,10 @@ function startCall(otherSipUri) {
 function startCallTimer() {
   let minutes = 0;
   let seconds = 0;
-  let start = new Date;
+  const start = new Date();
 
   callTimer = setInterval(function () {
-    let temp = Math.round(new Date - start) / 1000;
+    const temp = Math.round(new Date() - start) / 1000;
     minutes = Math.floor(temp / 60) > 0 ? Math.floor(temp / 60) : 0;
     seconds = Math.floor((temp - (minutes * 60)));
 
@@ -823,7 +836,7 @@ function terminateCall() {
 // IN CALL FEATURES
 
 // mutes self audio so remote cannot hear you
-var isMuted = false;
+let isMuted = false;
 function muteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone').addClass('call-btn-icon fa fa-microphone-slash');
   $('#mute-audio').attr('onclick', 'unmuteAudio()');
@@ -880,7 +893,8 @@ function enableVideoPrivacy() {
 
 function disableVideoPrivacy() {
   $('#hide-video').blur();
-  // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa fa-video-camera');
+  // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera')
+  //   .addClass('call-btn-icon fa fa-video-camera');
   $('#mute-camera-off-icon').children().remove();
   $('#mute-camera-off-icon').append(
     '<i class="fa fa-video-camera fa-stack-1x"></i>'
@@ -970,7 +984,6 @@ function enterFullscreen() {
 
     // $('#remoteView').css('object-fit', 'cover');
   } else {
-
     if (document.exitFullscreen) {
       document.exitFullscreen();
     } else if (document.msExitFullscreen) {
@@ -1100,7 +1113,7 @@ $('#chatsend').submit((evt) => {
 
   const msg = $('#newchatmessage').val();
   const displayname = $('#displayname').val();
-  const date = moment();
+  const date = dayjs();
   const timestamp = date.format('h:mm a');
 
   // const language = sessionStorage.consumerLanguage;
@@ -1573,10 +1586,9 @@ function redirectToVideomail() {
   }
 }
 
-
 var recognition = null;
 function captionsStart() {
-  var language = $('#language-select').val();
+  let language = $('#language-select').val();
   switch (language) {
     case 'en': // English US
       language = 'en-US';
@@ -1585,7 +1597,7 @@ function captionsStart() {
       language = 'es-US';
       break;
     case 'ar': // Arabic (Modern Standard)
-      language  = 'ar-EG';
+      language = 'ar-EG';
       break;
     case 'pt': // Brazilian Portuguese
       language = 'pt-PT';
@@ -1613,7 +1625,7 @@ function captionsStart() {
       break;
     default:
       language = 'en-US';
-    }
+  }
   recognition = new webkitSpeechRecognition();
   recognition.continuous = true;
   recognition.lang = language;
@@ -1621,25 +1633,25 @@ function captionsStart() {
   recognition.maxAlternatives = 1;
   recognition.onresult = function (event) {
     if (!isMuted && event && event.results && (event.results.length > 0)) {
-      var lastResult = event.results.length - 1;
+      const lastResult = event.results.length - 1;
 
       socket.emit('caption-consumer', {
-        transcript:event.results[lastResult][0].transcript,
-        final: event.results[lastResult].isFinal, 
+        transcript: event.results[lastResult][0].transcript,
+        final: event.results[lastResult].isFinal,
         language: language
       });
     }
   };
 
-  recognition.onend = function (event) {
-    if(true)
-      captionsStart();	
-  }
+  recognition.onend = function (_event) {
+    if (true)
+      captionsStart();
+  };
   recognition.start();
 }
 
 function captionsEnd() {
-  if(recognition)
+  if (recognition)
     recognition.abort();
   recognition = null;
 }
