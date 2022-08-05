@@ -39,7 +39,7 @@ const viewableFileTypes = [
 
 $(document).ready(() => {
   $('#optionsModal').modal('show');
-  $('#optionsModal').css('overflow-y', 'auto');
+  // $('#optionsModal').css('overflow-y', 'auto');
   openDialog('optionsModal', window);
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();

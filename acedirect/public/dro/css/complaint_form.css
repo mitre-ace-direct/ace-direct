@@ -470,10 +470,17 @@ body {
   font-size: 14px;
 }
 
-#optionsModal {
+.complaint-modal {
   min-width: 600px;
   position: absolute;
+  overflow-y: hidden !important;
 }
+
+
+.complaint-modal .modal-dialog {
+  width: 600px;
+}
+
 
 .sidebarTab {
   width: 8vw;
