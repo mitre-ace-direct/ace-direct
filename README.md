@@ -612,7 +612,9 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   ```
 
 * All services appear to be working, but calls are not queuing - The signaling server (`acedirect-kurento`) may have trouble connecting to Asterisk. There will be reconnect messages in the signaling server. Asterisk may have a successful status, but it is responsive. Try restarting the Asterisk service: `sudo service asterisk restart`.
-* On an incoming consumer portal call, the agent portal sees the consumer extension instead of the VRS number as the caller ID number. Also, the agent has no incoming video after answering the call. Try restarting REDIS: `sudo service redis restart` .
+* On an incoming consumer portal call, the agent portal sees the consumer extension instead of the VRS number as the caller ID number. Also, the agent has no incoming video after answering the call.
+  * Solution 1: Try restarting REDIS: `sudo service redis restart` .
+  * Solution 2: Make sure the agent URL environment is the same as the consumer portal URL environment.
 * To use a custom videomail intro video for Consumer videomail, put the video in `acedirect/public/media/` . Set the filename in `dat/config.json`: `web_videomail.introVideo` .
 
 ---
