@@ -3581,7 +3581,7 @@ function resetLayout() {
       x: 8,
       y: 11,
       width: 4,
-      height: 10
+      height: 4
     },
   ];
   loadGridLayout(defaultLayout);
