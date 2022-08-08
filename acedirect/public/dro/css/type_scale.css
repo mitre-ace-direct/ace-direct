@@ -65,4 +65,13 @@
     font-weight: 700 !important;
     font-size: 14px !important;
   }
+
+  .link {
+    color: #004c97;
+  }
+
+  .link:hover {
+    color: #112e51;
+    text-decoration: underline;
+  }
   

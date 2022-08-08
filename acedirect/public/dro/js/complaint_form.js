@@ -287,13 +287,13 @@ function connect_socket() {
                 $('#rtt-typing').css('display', 'block');
                 setTimeout(() => {
                   $('#rtt-typing').css('display', 'block');
-                  $('#rtt-typing').html(`<b>${data.displayname}</b>` + `<br/>${data.rttmsg}`).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+                  $('#rtt-typing').html(`<b>${data.displayname}</b>` + `<br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
                   $('#rtt-typing').appendTo($('#chat-messages'));
                   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
                 }, 100);
               } else {
                 $('#rtt-typing').css('display', 'block');
-                $('#rtt-typing').html(`<b>${data.displayname}</b>` + `<br/>${data.rttmsg}`).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+                $('#rtt-typing').html(`<b>${data.displayname}</b>` + `<br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
                 $('#rtt-typing').appendTo($('#chat-messages'));
                 $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
               }
@@ -313,7 +313,7 @@ function connect_socket() {
               }
               $('#rtt-typing').css('display', 'none');
               $('#chat-messages').remove($('#rtt-typing'));
-              $('#rtt-typing').html('').removeClass('direct-chat-text').removeClass('direct-chat-timestamp text-bold');
+              $('#rtt-typing').html('').removeClass('direct-chat-text chat-body1').removeClass('direct-chat-timestamp text-bold chat-body2');
               $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
             }
           })
@@ -374,7 +374,7 @@ function connect_socket() {
             $('#newchatmessage').val('');
             $('#chat-messages').removeClass('populatedMessages');
             $('#chat-messages').addClass('emptyMessages');
-            $('#chat-messages').html('<div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble" id="rtt-typing" style="min-height: 20px; display: none;"></div>\
+            $('#chat-messages').html('<div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble chat-body2" id="rtt-typing" style="min-height: 20px; display: none;"></div>\
             <span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No messages yet to display</span>');
 
             // reset buttons and ticket form
@@ -385,6 +385,8 @@ function connect_socket() {
 
             if (complaintRedirectActive && callAnswered) {
               $('#redirectURL').text(complaintRedirectUrl);
+              $('#redirectUrlDesc').text(complaintRedirectDesc);
+              $('#redirectUrlDesc').attr('href', complaintRedirectUrl);
               $('#callEndedModal').modal('show');
               $('#callEndedModal').css('overflow-y', 'auto');
               openDialog('callEndedModal', window);
@@ -737,6 +739,8 @@ function endCall() {
   } else if (callAnswered) {
     if (complaintRedirectActive) {
       $('#redirectURL').text(complaintRedirectUrl);
+      $('#redirectUrlDesc').text(complaintRedirectDesc);
+      $('#redirectUrlDesc').attr('href', complaintRedirectUrl);
       $('#waitingModal').modal('hide');
       $('#callEndedModal').modal('show');
       $('#callEndedModal').css('overflow-y', 'auto');
@@ -1167,14 +1171,14 @@ function newChatMessage(data) {
   }
 
   if (data.isConsumerMessage) {
-    $(msgsender).addClass('direct-chat-name pull-left').html('You').appendTo(msginfo);
+    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html('You').css('font-weight','700 !important').appendTo(msginfo);
   } else {
-    $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
+    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html(displayname).css('font-weight','700 !important').appendTo(msginfo);
   }
 
-  $(msgtime).addClass('direct-chat-timestamp').html(` ${timestamp}`).appendTo(msginfo);
+  $(msgtime).addClass('direct-chat-timestamp chat-body2').html(` ${timestamp}`).appendTo(msginfo);
   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-  $(msgtext).addClass('direct-chat-text')
+  $(msgtext).addClass('direct-chat-text chat-body1')
     .html(msg)
     .appendTo(msgblock);
 
@@ -1188,7 +1192,7 @@ function newChatMessage(data) {
     isAgentTyping = false;
     $('#rtt-typing').css('display', 'none');
     $('#chat-messages').remove($('#rtt-typing'));
-    $('#rtt-typing').html('').removeClass('direct-chat-text');
+    $('#rtt-typing').html('').removeClass('direct-chat-text chat-body1');
     $(msgblock).addClass('alert alert-secondary receivedChat')
       .attr('aria-live', 'assertive')
       .appendTo($('#chat-messages'));
@@ -1253,7 +1257,7 @@ function addFileToDownloadList(data) {
       // we can open this file in a new tab without downloading it
       $('#receivedFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1264,7 +1268,7 @@ function addFileToDownloadList(data) {
       // cannot view without downloading
       $('#receivedFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1276,7 +1280,7 @@ function addFileToDownloadList(data) {
     // file type not in file name-- cannot view without downloading
     $('#receivedFilesList').append(
       (`<span class="fileShareRow">
-      <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+      <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1304,7 +1308,7 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1316,7 +1320,7 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1329,7 +1333,7 @@ function addFileToSentList(data) {
     // add to sent files list
     $('#sentFilesList').append(
       (`<span class="fileShareRow">
-      <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+      <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1348,13 +1352,18 @@ function setFontSize(size) {
   $('.fontSizeButtons').blur();
   const currentFontSize = $('.currentFontSize').text().split('%')[0];
   const newFontSize = Number(currentFontSize) + size;
+  const body1FontSizeInPx = (16 * newFontSize) / 100; // 16px is the default font size for body1
+  const body2FontSizeInPx = (14 * newFontSize) / 100; // 14px is the default font size for body2
 
   if (newFontSize >= 50 && size === -10 || newFontSize <= 200 && size === 10) {
     if (newFontSize >= 80 && newFontSize <= 150) {
       setOtherFontSize(size);
     }
 
-    $('.tabFontSize').css('font-size', `${newFontSize.toString()}%`);
+    $('.tabFontSize').css('font-size', `${body1FontSizeInPx.toString()}px`);
+    $('.chat-body1').css('font-size', `${body1FontSizeInPx.toString()}px`);
+    $('.chat-body2').css('font-size', `${body2FontSizeInPx.toString()}px`);
+
     $('.currentFontSize').text(`${newFontSize.toString()}%`);
   }
 }
