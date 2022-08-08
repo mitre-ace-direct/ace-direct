@@ -1575,10 +1575,11 @@ function toggleTab(tab) {
 
 function redirectToVideomail() {
   if (acekurento != null) {
-    acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, { ended: (_e) => {
-      console.log('--Call ended by asterisk, not abandoned--');
-      window.location.href = './videomail';
-    }
+    acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, {
+      ended: (_e) => {
+        console.log('--Call ended by asterisk, not abandoned--');
+        window.location.href = './videomail';
+      }
     });
     acekurento.callTransfer('videomail');
   } else {

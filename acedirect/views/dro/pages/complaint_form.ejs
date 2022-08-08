@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="/css/ca-portal.css">
 </head>
 
-<body >
+<body>
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
@@ -86,10 +86,9 @@
             <!-- Nav tabs -->
             <div id="tab-options" class="col-xs-3" style="order:2;">
               <ul class="nav nav-tabs tabs-right" style="height: 90vh;" role="tablist">
-                <li id="collapseTab" class="collapseTab">
+                <li id="collapseTab" role="none" class="collapseTab">
                   <a id="collapseTabTitle" class="collapseTab sidebarTab" title="Collapse Sidebar"
-                    style="padding-bottom: 20px; padding-top:20px; border:solid 1px transparent;" role="button" tabindex="-1"
-                    aria-hidden="true">
+                    style="padding-bottom: 20px; padding-top:20px; border:solid 1px transparent;" tabindex="-1">
                     <button id="collapseButton" data-toggle="tooltip" title="Collapse" aria-label="Collapse Sidebar"
                       onclick="collapseSidebar('')" tabindex="0" aria-expanded="true">
                       <i id="collapseButtonIcon" class="fa fa-angle-double-right fa-lg" style="vertical-align: -10% !important;"
@@ -98,22 +97,22 @@
                     </button>
                   </a>
                 </li>
-                <li class="active" id="tab1">
+                <li class="active" id="tab1" role="tab" aria-controls="chatBody" aria-selected="true">
                   <a id="chatTab" href="#chatBody" data-toggle="tab" class="sidebarTab tab selected"
-                    onclick="toggleTab('chatTab')" aria-controls="chatBody" role="tab" aria-selected="true">
+                    onclick="toggleTab('chatTab')" alt="" aria-label="">
                     <i class="fa fa-comments fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;"
-                      aria-hidden="true" alt="">
+                      aria-hidden="true" tabindex="-1" alt="">
                       <span id="unreadMessagesBadge" class="badge tabNotificationBadge"></span>
                     </i>
                     <br>
                     <p style="color: #073863;">Chat</p>
                   </a>
                 </li>
-                <li id="tab2">
+                <li id="tab2" role="tab" aria-controls="fileBody" aria-selected="false" tabindex="-1">
                   <a id="fileShareTab" href="#fileBody" data-toggle="tab" class="sidebarTab tab"
-                    onclick="toggleTab('fileShareTab')" aria-controls="fileBody" role="tab" aria-selected="false" tabindex="-1">
+                    onclick="toggleTab('fileShareTab')" alt="" aria-label="">
                     <i class="fa fa-file fa-2x" style="color: #073863; padding-top:10px; padding-bottom: 10px;"
-                      aria-hidden="true" alt="">
+                      aria-hidden="true" tabindex="-1" alt="">
                       <span id="unreadFilesBadge" class="badge tabNotificationBadge"></span>
                     </i>
                     <br>
@@ -128,7 +127,7 @@
               <div class="tab-content">
                 <!--Chat pane-->
                 <div class="tab-pane active tabFontSize" id="chatBody" tabindex="0" aria-label="Chat tab content"
-                  aria-role="tabpanel">
+                  role="tabpanel">
                   <div class="box-header" style="overflow: hidden;" id="chat-header">
                     <h1 style="float:left">Chat</h1>
                     <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
@@ -220,7 +219,7 @@
                 <!-- end chat pane-->
                 <!--File Share Pane-->
                 <div class="tab-pane tabFontSize" id="fileBody" tabindex="0" aria-label="File share tab content"
-                  aria-role="tabpanel">
+                  role="tabpanel">
                   <div class="box-header" style="overflow: hidden;" id="fileshare-header">
                     <h1 style="float:left">File Sharing</h1>
                     <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
