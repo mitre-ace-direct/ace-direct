@@ -618,7 +618,7 @@ function connect_socket() {
             }, 3000);
           })
           .on('consumer-being-monitored', () => {
-            // keep self-view and don't enable multiparty 
+            // keep self-view and don't enable multiparty
             // captions during a monitored one-to-one call
             acekurento.isMonitoring = true;
             $('#end-call').attr('onclick', 'monitorHangup()');
@@ -755,7 +755,7 @@ $('#chatsend').submit((evt) => {
 
   const msg = $('#newchatmessage').val();
   const displayname = $('#displayname').val();
-  const date = moment();
+  const date = dayjs();
   const timestamp = date.format('D MMM h:mm a');
 
   const language = sessionStorage.consumerLanguage;
