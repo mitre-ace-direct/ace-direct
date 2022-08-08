@@ -7,8 +7,6 @@
  *   Desc:   Tablist widget that implements ARIA Authoring Practices
  */
 
-'use strict';
-
 class TabsManual {
   constructor(groupNode) {
     this.tablistNode = groupNode;
@@ -23,9 +21,9 @@ class TabsManual {
     this.selectedTab = null;
     this.selectedTabPanel = null;
 
-    for (var i = 0; i < this.tabs.length; i += 1) {
-      var tab = this.tabs[i];
-      var tabpanel = document.getElementById(tab.getAttribute('aria-controls'));
+    for (let i = 0; i < this.tabs.length; i += 1) {
+      const tab = this.tabs[i];
+      const tabpanel = document.getElementById(tab.getAttribute('aria-controls'));
 
       tab.tabIndex = -1;
       tab.setAttribute('aria-selected', 'false');
@@ -36,7 +34,7 @@ class TabsManual {
 
       if (!this.firstTab) {
         this.firstTab = tab;
-        this.firstTabPanel = tabpanel
+        this.firstTabPanel = tabpanel;
       }
       this.lastTab = tab;
       this.lastTabPanel = tabpanel;
@@ -46,32 +44,35 @@ class TabsManual {
   }
 
   setSelectedTab(currentTab) {
-    const $tabs = $('a.tab');
-    for (var i = 0; i < this.tabs.length; i += 1) {
+    console.log(currentTab);
+
+    // const $tabs = $('li.tab');
+    for (let i = 0; i < this.tabs.length; i += 1) {
       if (currentTab === this.tabs[i]) {
         this.tabs[i].setAttribute('aria-selected', 'true');
-        this.tabs[i].removeAttribute('tabindex');
-        this.tabs[i].classList.add('active')
+        this.tabs[i].children[0].removeAttribute('tabindex');
+        this.tabs[i].classList.add('active');
         this.tabpanels[i].classList.add('active');
       } else {
         this.tabs[i].setAttribute('aria-selected', 'false');
-        this.tabs[i].tabIndex = -1;
-        this.tabs[i].classList.remove('active')
+        this.tabs[i].children[0].tabIndex = -1;
+        this.tabs[i].classList.remove('active');
         this.tabpanels[i].classList.remove('active');
       }
-      $($tabs.get(index)).parent().siblings().removeClass('active');
-      $($tabs.get(index)).parent().addClass('active');
+
+      // $($tabs.get(i)).parent().siblings().removeClass('active');
+      // $($tabs.get(i)).parent().addClass('active');
     }
   }
 
   moveFocusToTab(currentTab, currentTabPanel) {
-    currentTab.focus();
+    currentTab.children[0].focus();
     this.selectedTab = currentTab;
     this.selectedTabPanel = currentTabPanel;
   }
 
   moveFocusToPreviousTab(currentTab) {
-    var index;
+    let index;
 
     if (currentTab === this.firstTab) {
       this.moveFocusToTab(this.lastTab, this.lastTabPanel);
@@ -82,7 +83,7 @@ class TabsManual {
   }
 
   moveFocusToNextTab(currentTab) {
-    var index;
+    let index;
 
     if (currentTab === this.lastTab) {
       this.moveFocusToTab(this.firstTab, this.firstTabPanel);
@@ -93,10 +94,9 @@ class TabsManual {
   }
 
   /* EVENT HANDLERS */
-
   onKeydown(event) {
-    var tgt = event.currentTarget,
-      flag = false;
+    const tgt = event.currentTarget;
+    let flag = false;
 
     switch (event.key) {
       case 'ArrowLeft':
@@ -105,7 +105,7 @@ class TabsManual {
         break;
 
       case 'ArrowUp':
-        this.moveFocusToNextTab(tgt);
+        this.moveFocusToPreviousTab(tgt);
         flag = true;
         break;
 
@@ -128,14 +128,14 @@ class TabsManual {
         this.moveFocusToTab(this.lastTab);
         flag = true;
         break;
-      
+
       case ' ':
         // open the tab with the spacebar
         this.selectedTab.click();
         this.selectedTabPanel.focus();
         break;
 
-      case 'Enter' :
+      case 'Enter':
         event.preventDefault();
         this.selectedTab.click();
         this.selectedTabPanel.focus();
