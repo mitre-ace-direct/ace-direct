@@ -29,7 +29,7 @@
           </div>
 
           <div class="body1"><span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
-          <div id="custom-seekbar" aria-label="seek bar"><span></span></div>
+          <div id="custom-seekbar" role="progressbar" aria-label="progress bar"><span></span></div>
 
           <button class="btn btn-secondary modal-outline-btn button" id="skipGreetingButton" tabindex="0"
             aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
@@ -65,10 +65,10 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-video-camera"
                   aria-hidden="true"></i>&nbsp;Video is
                 ON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <button class="btn btn-custom sendVideomailButton button" onclick="sendVideomail();"><i
+              <button class="btn btn-custom" id="sendVideomailButton" onclick="sendVideomail();"><i
                   class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Send Videomail
               </button>
-              <button id="pauseAndShowModal" class="btn btn-secondary modal-outline-btn vm-cancel-button button">Cancel</button>
+              <button id="pauseAndShowModal" class="btn btn-secondary modal-outline-btn vm-cancel-button button" onclick="pauseAndShowModal();">Cancel</button>
             </div>
 
           </div>
@@ -132,14 +132,14 @@
         <div class="modal-content">
           <div class="modal-body" style="position: relative;min-height:300px;">
             <div class="center text-center" style="width: 90%;">
-              <p id="goodbyeDescriptionPauseModal" style="font-size: 26px;">Canceling will stop the recording and your videomail will not be sent.</p>
+              <p id="pauseDescription" style="font-size: 26px;">Canceling will stop the recording and your videomail will not be sent.</p>
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-custom sendVideomailButton button" onclick="logout();"><i
+            <button class="btn btn-custom button" id="sendVideomailButton" onclick="logout();"><i
               class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Cancel Videomail
             </button>
-            <button id="resumeAndCloseModalButton" class="btn btn-secondary modal-outline-btn vm-cancel-button button">Return to Recording</button>
+            <button class="btn btn-secondary modal-outline-btn vm-cancel-button button" onclick="resumeAndCloseModal();">Return to Recording</button>
           </div>
         </div>
       </div>
@@ -148,9 +148,7 @@
 
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/js/bootstrap.min.js" async></script>
-<!-- <script type="text/javascript" src="/assets/js/moment.min.js" async></script> -->
 <script type="text/javascript" src="/dro/js/videomail.js" async></script>
-<script type="text/javascript" src="/dro/js/dialog.js" async></script>
 <script type="text/javascript" src="/assets/js/RecordRTC.min.js" async></script>
 
 </html>

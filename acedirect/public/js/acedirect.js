@@ -89,7 +89,7 @@ var isMultipartyTransfer = false;
 var allAgentCall = false;
 var consumerType;
 
-// call monitoring 
+// call monitoring
 var isMonitoring = false;
 var beingMonitored = false;
 var monitorExt;
@@ -108,8 +108,8 @@ $(document).ready(function () {
   packetsLostElem = document.getElementById('packets-lost-a');
   packetsLostValElem = document.getElementById('connection-packets-lost');
   meterelem.high = fpsHigh;
-  meterelem.low = fpsLow; 
-  meterelem.max = fpsMax; 
+  meterelem.low = fpsLow;
+  meterelem.max = fpsMax;
   meterelem.min = fpsMin
   meterelem.optimum = fpsOptimum;
 
@@ -442,8 +442,8 @@ function connect_socket() {
               '<tr><td>Name</td>' +
               '<td>Extension</td>' +
               '<td>Status</td>' +
-              '<td>Monitor Call</td>' + 
-              '<td>Transfer Call</td>' + 
+              '<td>Monitor Call</td>' +
+              '<td>Transfer Call</td>' +
               '<td>Multi-Party Invite</td>'+
               '<td>Chat</td></tr>'
             );
@@ -523,11 +523,11 @@ function connect_socket() {
 
               // Disable chat button to one's self
               let chatButtonString = '<Button class="demo-btn" style="width: 100%;height: 5rem;" onClick="showChatMessage(' + data.agents[i].extension + ',\'' + data.agents[i].name + '\')" ><i class="fa fa-comments"></i></Button>';
-              
+
               if (extensionMe ===  data.agents[i].extension) {
                 chatButtonString = '<Button style="width: 100%;height: 5rem;" onClick="showChatMessage(' + data.agents[i].extension + ',\'' + data.agents[i].name + '\')" disabled><i class="fa fa-comments"></i></Button>';
               }
-              
+
               tabledata['data'].push({
                 status: $(statusDiv).html(),
                 name: data.agents[i].name,
@@ -558,7 +558,7 @@ function connect_socket() {
             if (tabledata.data.length > 0) {
               $('#agenttable').dataTable().fnAddData(tabledata.data);
             }
-            alignDataTableHeaders();	
+            alignDataTableHeaders();
           }
         }).on('new-caller-ringing', function (data) {
           debugtxt('new-caller-ringing', data);
@@ -566,7 +566,7 @@ function connect_socket() {
 
           if (isTransfer) {
             // automatically accept the incoming call so the agent doesn't have to do it twice
-            
+
             if (data.phoneNumber) {
               $('#myRingingModalPhoneNumber').html(data.phoneNumber);
               recipientNumber = data.phoneNumber;
@@ -574,7 +574,7 @@ function connect_socket() {
             } else {
               $('#myRingingModalPhoneNumber').html(data.callerNumber);
             }
-            
+
             $('#myRingingModal').modal({
               show: false,
               backdrop: 'static',
@@ -982,7 +982,7 @@ function connect_socket() {
           originalExt = data.originalExt;
           transferVRS = data.vrs;
           transferExt = data.transferExt;
-                    
+
           $('#modalTransferCall').show();
           $('#modalTransferCall').addClass('fade');
           $('#incomingTransferExtension').html(data.originalExt)
@@ -1046,7 +1046,7 @@ function connect_socket() {
             unpauseQueues();
             autoAnswer = true;
           }
-          
+
           isTransfer = true;
           isMultipartyTransfer = true;
           hostAgent = extensionMe;
@@ -1182,14 +1182,14 @@ function alignDataTableHeaders() {
 }
 
 function monitorAvailability(status, name, ext) {
-  return (($('#user-status').text() == 'Ready' || $('#user-status').text() == 'Away') && status == 'INCALL' && $('#agentname-sidebar').text() != name) 
+  return (($('#user-status').text() == 'Ready' || $('#user-status').text() == 'Away') && status == 'INCALL' && $('#agentname-sidebar').text() != name)
   ? '<Button class=\"demo-btn\" style=\"width: 100%;height: 5rem;\" onClick=startMonitoringCall(' + ext + ')><i class=\"fa fa-eye\"></i></Button>'
   : '<Button class=\"secondary\" style=\"width: 100%;height: 5rem;\" disabled><i class=\"fa fa-eye\"></i></Button>'
 }
 
 function transferAvailability(status, name, ext) {
-  return (status == 'READY' && $('#user-status').text() == 'In Call' && $('#agentname-sidebar').text() != name) 
-    ? '<Button class=\"demo-btn\" style=\"width: 100%;height: 5rem;\" onClick="getTransferType(' + ext + ')"><i class=\"fa fa-share-square\"></i></Button>' 
+  return (status == 'READY' && $('#user-status').text() == 'In Call' && $('#agentname-sidebar').text() != name)
+    ? '<Button class=\"demo-btn\" style=\"width: 100%;height: 5rem;\" onClick="getTransferType(' + ext + ')"><i class=\"fa fa-share-square\"></i></Button>'
   : '<Button class=\"secondary\" style=\"width: 100%;height: 5rem;\" disabled><i class=\"fa fa-share-square\"></i></Button>'
 }
 
@@ -1258,7 +1258,7 @@ $('#chatsend').submit(function (evt) {
   var msg = $('#newchatmessage').val();
   var displayname = $('#displayname').val();
   var vrs = $('#callerPhone').val();
-  var date = moment();
+  var date = dayjs();
   var timestamp = date.format('h:mm a');
 
   // var language = 'en';
@@ -1301,7 +1301,7 @@ $('#agent-chat-send').on('click',function (evt) {
     var msg = $('#agentnewchatmessage').val();
     var displayname = $('#agentname-sidebar').html();
     var ext = $('#agent-ext').html();
-    var date = moment();
+    var date = dayjs();
     var timestamp = date.format('h:mm a');
     var destname = $('#chatHeader').html();
     var exactTime = Date.now();
@@ -1622,7 +1622,7 @@ function updateColors(data) {
     return (className.match(/\btext-\S+/g) || []).join(' ');
   });
 
-  // remove colors from transfer wrapup modal 
+  // remove colors from transfer wrapup modal
   $('#away-btn-transfer').removeClass(function (index, className) {
     return (className.match(/\bbtn-\S+/g) || []).join(' ');
   });
@@ -1811,7 +1811,7 @@ $('#Videomail_Table tbody').on('click', 'tr', function () {
   }).get();
 
   console.log('Click event for playing video');
-  
+
   console.log('vidId: ' + tableData[4]);
   $('#videomailId').attr('name', tableData[4]);
   $('#callbacknum').attr('name', tableData[0]);
@@ -1937,7 +1937,7 @@ function updateVideomailTable(data) {
     durationCell.innerHTML = vidDuration;
 
     callbackCell.innerHTML = '<button class=\"demo-btn\" onclick="outbound_call(\'' + data[i].callbacknumber + '\')"><i class="fa fa-phone-square"></i></button>';
-    
+
 
     if (vidStatus === 'UNREAD')
       statusCell.innerHTML = '<span style="font-weight:bold">' + vidStatus + '</span>';
@@ -1947,7 +1947,7 @@ function updateVideomailTable(data) {
 }
 
 /**
- * Call Recording Logic 
+ * Call Recording Logic
  */
 
 function updateCallRecordingTable(data){
@@ -1960,7 +1960,7 @@ function updateCallRecordingTable(data){
   var consumerNumberCell;
   var timeStampCell;
   var lengthCell;
-  
+
   for (var i = 0; i < data.length; i++) {
     var recordFilename = data[i].fileName;
     var recordConsumer = data[i].participants;
@@ -1988,7 +1988,7 @@ $('#callRecordingTbody').on('click', 'tr', function () {
   var tableData = $(this).children('td').map(function () {
     return $(this).text();
   }).get();
-  
+
   $('#recordId').attr('name', tableData[0]);
 
   if (agentStatus !== 'IN_CALL') {
@@ -2017,7 +2017,7 @@ function playCallRecording(filename) {
   recording_status_change(filename,'IN PROGRESS');
   seekBar.value = 0;
   remoteView.currentTime = 0;
-  
+
   // Add the event listener for when the videomail finishes playing
   document.getElementById('remoteView').addEventListener('ended', (event) => {
     console.log('Finished playing recording');
@@ -2378,7 +2378,7 @@ function showCallRecordingTab() {
     if(err){
       console.log('Error', err);
     } else {
-      console.log('Success', 'Loading recordings ' + data); 
+      console.log('Success', 'Loading recordings ' + data);
     }
   })*/
 }
@@ -2407,7 +2407,7 @@ function playVideomail(id, duration, vidStatus) {
   videomail_status_change(document.getElementById('videomailId').getAttribute('name'),'IN PROGRESS');
   seekBar.value = 0;
   remoteView.currentTime = 0;
-  
+
   // Add the event listener for when the videomail finishes playing
   document.getElementById('remoteView').addEventListener('ended', (event) => {
     console.log('Finished playing videomail');
@@ -2851,7 +2851,7 @@ function sendBroadcast() {
   } else {
     var msg = 'BROADCAST: ' +$('#agentnewchatmessage').val();
     var displayname = $('#agentname-sidebar').html();
-    var date = moment();
+    var date = dayjs();
     var timestamp = date.format('D MMM h:mm a');
     var exactTime = Date.now();
 
@@ -3044,7 +3044,7 @@ function transferResponse(isAccepted) {
   if (!isAccepted) {
     socket.emit('denyingTransfer', { originalExt: originalExt })
     unpauseQueues();
-  
+
     isTransfer = false;
     originalExt = null;
     transferExt = null;
@@ -3568,7 +3568,7 @@ function resetLayout() {
       y: 0,
       width: 8,
       height: 16
-    }, 
+    },
     {
       id: 'gschatbox',
       x: 8,
@@ -3581,7 +3581,7 @@ function resetLayout() {
       x: 8,
       y: 11,
       width: 4,
-      height: 10
+      height: 4
     },
   ];
   loadGridLayout(defaultLayout);
