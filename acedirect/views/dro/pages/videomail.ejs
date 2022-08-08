@@ -111,10 +111,11 @@
                 message.</p>
               <hr class="text-black"
                 style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
-                You are being redirected in <b>10</b> seconds to <b id="redirectSiteURL">
-                  <%= redirectURL%>
-                </b>
+                You are being redirected in <b>10</b> seconds to <a id="redirectUrlDesc" class="link" href="<%= redirectURL%>">
+                  <%= redirectDesc%>
+                </a>
             </div>
+            <div id="redirectSiteURL" hidden><%= redirectURL%></div>
           </div>
           <div class="modal-footer">
             <div class="text-center">
