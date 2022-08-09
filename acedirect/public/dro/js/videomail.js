@@ -8,6 +8,12 @@ function setVideoSize() {
   const videoHeight = b.getBoundingClientRect().top - top;
   console.log(videoHeight);
   $('.video-element').height(videoHeight);
+
+  // transition countdown page
+    const navbar = document.getElementById('consumerNavbar');
+    const countdownTop = navbar.getBoundingClientRect().bottom;
+    const countdownHeight = b.getBoundingClientRect().top - countdownTop
+    $('#countDownDiv').height(countdownHeight)
 }
 
 const selfVideo = document.querySelector('#selfVideo');
