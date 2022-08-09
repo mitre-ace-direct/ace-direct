@@ -8,8 +8,8 @@ This document describes how to install, configure, and deploy ACE Direct.
 
 ## Prerequisites and assumptions
 
-* The acedirect-kurento signaling server has been tested with JsSIP library version `3.5.1`. All interoperability tests have been completed with this version. **Important**: when upgrading JsSIP library version, the files in `jssip-modifications` must be ported to the next JsSIP version. Ensure that the files are compatible. Complete _diffs_ and make the same changes in the same files in the new JsSIP library version.
-* _Acquire domain names for the servers_. Domain names must be _three-level domain names_ with _no special characters_: `acenode.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
+* The acedirect-kurento signaling server has been tested with JsSIP library version `3.5.1`. All interoperability tests have been completed with this version. **IMPORTANT**: ACE Direct is tied to JsSIP `3.5.1`. To upgrade the JsSIP library version, the files in `jssip-modifications` must be ported/developed.
+* _Acquire[] domain names for the servers_. Domain names must be _three-level domain names_ with _no special characters_, for example: `acenode.domain.com`, `acestun.domain.com`, `aceturn.domain.com`, `aceproxy.domain.com`, `acesip.domain.com`, `acekms.domain.com`, and `portal.domain.com`.
 * Deploy all servers as Amazon Web Services (AWS) EC2 instances. Use the _Amazon Linux 2_ operating system, unless specified otherwise. Other Linux flavors _may_ work with slight or no changes to the instructions.
 * Set all servers to the _UTC timezone_. Use `chronyd` or `ntp` to synchronize time across all servers.
 * On `acenode.domain.com`, modify SE Linux: `sudo setsebool -P httpd_can_network_connect 1`. You will need to do this after any reboot.
@@ -22,7 +22,7 @@ This document describes how to install, configure, and deploy ACE Direct.
   * Certificates should be _wildcard_ certs to allow domain name flexibility.
   * Name the certificates `cert.pem` and `key.pem`.
   * Place certificates in the expected folders on all the servers: `/etc/ssl/`. Certificates must have `644` permissions.
-  * For new certificates, you may need to execute `restorecon`, for example: `restorecon -R -v cert.pem`
+  * For _new_ certificates, you may need to execute `restorecon`, for example: `restorecon -R -v cert.pem`
 
 * _Internet access_. An Internet connection is required to install, build, and update the ACE Direct software. This allows the build processes to download external software and other dependencies.
 
@@ -90,18 +90,18 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 ## acenode
 
-`acenode` hosts the Redis, MongoDB, MySQL, and application servers. Log into `acenode.domain.com` and follow the directions below.
+`acenode` hosts the Redis, MongoDB, MySQL, and Node.js application servers. Log into `acenode.domain.com` and follow the directions below.
 
 ### Automatic installer for acenode
 
 > :warning: **This installer assumes that you already installed:**: Asterisk, NGINX, STUN, TURN, Kurento, and Kamailio.
 
-For convenience, the automatic installer installs all the core components on `acenode`. The recommended instance size for `acenode` is `t3a.medium`. `acenode` should not have a public FQDN.
+For convenience, the automatic installer installs all the core components on `acenode`. The recommended instance size for `acenode` is `t3a.medium`. `acenode` should **not** have a public FQDN.
 
 The automatic installer script is [install.sh](install.sh). This script will perform the following on `acenode`:
 
 * Install prerequisites
-* Install Redis, MongoDB, MySQL, and Node app servers
+* Install Redis, MongoDB, MySQL, and Node.js app servers
 * Populate databases
 * Deploy ACE Direct
 * Perform status checks
@@ -124,9 +124,8 @@ For example...
 $  ./install.sh -u ec2-user \
      -s acestun.domain.com \
      -t aceturn.domain.com \
-     -o acenode.domain.com \
      -m "acenode.domain.com 1.0.0.1" \
-     -n "acenode.domain.com 1.0.0.1" \
+     -n "portal.domain.com 1.0.0.1" \
      -k "acekms.domain.com  1.0.0.2" \
      -a "acesip.domain.com  1.0.0.3" \
      -c /etc/ssl/cert.pem \
@@ -147,7 +146,7 @@ Complete these prerequisite prior to installation:
 
 1. An Internet connection is required during the build process.
 1. Log into the `acenode` server.
-1. Create/identify an ACE Direct user account, for example `/home/ec2-user`. Select the `bash` shell for the user. The user must have `sudo` capabilities.
+1. Create/identify an ACE Direct user account, for example `/home/ec2-user`. Select the `bash` shell for the user.
 1. Install in the home folder `/home/ec2-user`.
 1. Make sure Git is installed: `git --version`, otherwise, install it: `sudo yum install git -y`
 1. Make sure `cc` is present: `which cc`, othwerise, install _Development Tools_: `sudo yum groupinstall "Development Tools"`
@@ -398,9 +397,8 @@ The ACE Direct application servers are Node.js servers.
     $
     $  # full build
     $  npm run clean
-    $  npm install
     $  npm run build
-    $  npm run config
+    $  npm run config  # only needed once
     $
     $  # other useful commands
     $  npm run test  # automated tests, make sure all Node servers are down
@@ -454,7 +452,7 @@ The ACE Direct application servers are Node.js servers.
     $  cd ~/ace-direct
     $
     $  pm2 start all  # start ACE Direct
-    $  npm run status  # self-test
+    $  npm run status  # self-test; requires ssh between internal servers
     ```
 
 1. Another way to build and deploy the application servers the script:
@@ -614,8 +612,9 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 * All services appear to be working, but calls are not queuing - The signaling server (`acedirect-kurento`) may have trouble connecting to Asterisk. There will be reconnect messages in the signaling server. Asterisk may have a successful status, but it is responsive. Try restarting the Asterisk service: `sudo service asterisk restart`.
 * On an incoming consumer portal call, the agent portal sees the consumer extension instead of the VRS number as the caller ID number. Also, the agent has no incoming video after answering the call.
   * Solution 1: Try restarting REDIS: `sudo service redis restart` .
-  * Solution 2: Make sure the agent URL environment is the same as the consumer portal URL environment.
+  * Solution 2: Make sure the agent URL environment matches the consumer portal URL environment.
 * To use a custom videomail intro video for Consumer videomail, put the video in `acedirect/public/media/` . Set the filename in `dat/config.json`: `web_videomail.introVideo` .
+* To use custom Consumer portal intro videos, put them in `acedirect/public/media` and update the `complaint_videos` section in `dat/config.json`.
 
 ---
 
