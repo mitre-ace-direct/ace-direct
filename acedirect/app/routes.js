@@ -706,7 +706,7 @@ router.get('/videomail', consumerRestrict, (req, res) => {
         introVideo = 'videomailGreeting.mp4';
       }
     }
-    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs), introVideo });
+    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), redirectDesc: utils.getConfigVal(config.complaint_redirect.desc), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs), introVideo });
 });
 
 router.post('/videomailupload', consumerRestrict,  (req, res) => { //add restrict. this is for testing only

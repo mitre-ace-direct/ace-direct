@@ -9,11 +9,15 @@
 
   <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="/dro/css/complaint_form.css">
+  <link rel="stylesheet" href="/dro/css/type_scale.css">
   <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
   <link rel="stylesheet" href="/css/ca-portal.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap">
 </head>
 
-<body>
+<body style="font-family: 'Roboto', sans-serif;">
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
@@ -31,7 +35,7 @@
           <div id="inCallSection" hidden>
             <section aria-label="video options">
               <div id="callButtonsRow" class="row">
-                <span id="callTime" class="pull-left"></span>
+                <span id="callTime" class="pull-left body1"></span>
                 <button id="mute-audio" type="button" class="btn btn-gray circleButton" onclick="muteAudio()"
                   aria-label="Mute Audio">
                   <i id="mute-audio-icon" class="call-btn-icon fa fa-microphone"></i>
@@ -46,11 +50,11 @@
                 <button type="button" class="btn btn-gray circleButton" onclick="enterFullscreen()" aria-label="Enter Fullscreen">
                   <i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
                 </button>
-                <button type="button" class="btn btn-gray" id="startScreenshare" onclick="toggleScreenShare(true)"
+                <button type="button" class="btn btn-gray button" id="startScreenshare" onclick="toggleScreenShare(true)"
                   aria-label="Toggle Screenshare">
                   <i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare
                 </button>
-                <button id="end-call" type="button" class="btn btn-danger" style="background-color: #C70000 !important;"
+                <button id="end-call" type="button" class="btn btn-danger button" style="background-color: #C70000 !important;"
                   onclick="terminateCall()" aria-label="End Call">
                   <i id="end-call-icon" class="call-btn-icon fa fa-phone fa-rotate-135"></i> End Call
                 </button>
@@ -58,11 +62,11 @@
             </section>
 
             <div id="speakingToRow" class="row">
-              <span id="CommunicationText" aria-live="assertive"></span>
+              <span id="CommunicationText" aria-live="assertive" class="body2"></span>
             </div>
 
             <div style="box-sizing: border-box;" class="row">
-              <p class="alert alert-info" id="button-feedback" style="display: flex;margin-bottom: 0px;text-indent: 30px;" aria-live="assertive"></p>
+              <p class="alert alert-info body2" id="button-feedback" style="display: flex;margin-bottom: 0px;text-indent: 30px;" aria-live="assertive"></p>
             </div>
 
             <div class="box-body" id="fullscreen-element">
@@ -105,7 +109,7 @@
                       <span id="unreadMessagesBadge" class="badge tabNotificationBadge"></span>
                     </i>
                     <br>
-                    <p style="color: #073863;">Chat</p>
+                    <p class="caption" style="color: #073863;">Chat</p>
                   </a>
                 </li>
                 <li id="tab2" role="tab" aria-controls="fileBody" aria-selected="false" tabindex="-1">
@@ -116,7 +120,7 @@
                       <span id="unreadFilesBadge" class="badge tabNotificationBadge"></span>
                     </i>
                     <br>
-                    <p style="color: #073863;">File Share</p>
+                    <p class="caption" style="color: #073863;">File Share</p>
                   </a>
                 </li>
               </ul>
@@ -129,11 +133,11 @@
                 <div class="tab-pane active tabFontSize" id="chatBody" tabindex="0" aria-label="Chat tab content"
                   role="tabpanel">
                   <div class="box-header" style="overflow: hidden;" id="chat-header">
-                    <h1 style="float:left">Chat</h1>
+                    <h1 class="h1" style="float:left">Chat</h1>
                     <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                       <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)"
                         aria-label="Decrease font size by 10%">A</button>
-                      <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize"
+                      <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize body1"
                         aria-live="assertive">100%</button>
                       <button type="button" class="btn fontSizeButtons" style="font-size:large;" onclick="setFontSize(10)"
                         aria-label="Increase font size by 10%">A</button>
@@ -147,7 +151,7 @@
                       <div class="direct-chat-messages emptyMessages" id="chat-messages" tabindex="0">
                         <div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble" id="rtt-typing"
                           style="min-height: 20px; display: none;"></div>
-                        <span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No
+                        <span id="emptyChat" style="font-weight:400; font-size: 14px;" class="chat-body2">This is the start of your chat<span class="agentChatName"></span>. No
                           messages yet to display</span>
                       </div>
                     </div>
@@ -203,11 +207,11 @@
                             </span>
                           </span>
                           <textarea id="newchatmessage" placeholder="Type a message" aria-label="Type a message"
-                            class="form-control col-xs-1 buttonFontSize" maxlength="500" autocomplete="off" required></textarea>
+                            class="form-control col-xs-1 buttonFontSize chat-body1" maxlength="500" autocomplete="off" required></textarea>
 
                           <span class="input-group-btn" style="vertical-align: bottom;">
                             <button id="chat-send" class="btn btn-primary btn-flat buttonFontSize" aria-label="Send message"
-                              style="background-color: #073863 !important; margin-left: 10px; border-radius: 6px; border: 2px solid #073863">Send</button>
+                              style="background-color: #073863 !important; margin-left: 10px; border-radius: 6px; border: 2px solid #073863; font-weight:700; font-size: 14px;">Send</button>
                           </span>
                         </div>
                       </form>
@@ -221,11 +225,11 @@
                 <div class="tab-pane tabFontSize" id="fileBody" tabindex="0" aria-label="File share tab content"
                   role="tabpanel">
                   <div class="box-header" style="overflow: hidden;" id="fileshare-header">
-                    <h1 style="float:left">File Sharing</h1>
+                    <h1 class="h1" style="float:left">File Sharing</h1>
                     <div class="btn-group" style="float:right; margin-top: 20px; height: 40px">
                       <button type="button" class="btn fontSizeButtons" onclick="setFontSize(-10)"
                         aria-label="Decrease font size by 10%">A</button>
-                      <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize"
+                      <button type="button" class="btn btn-secondary fontSizeButtons currentFontSize body1"
                         aria-live="assertive">100%</button>
                       <button type="button" class="btn fontSizeButtons" style="font-size:large;" onclick="setFontSize(10)"
                         aria-label="Increase font size by 10%">A</button>
@@ -234,9 +238,9 @@
                   <hr id="fileshare-separator" />
                   <div class="box-body" id="fileshare-box-body">
                     <div id="fileshare-body" style="overflow-y: auto; padding-right: 2rem;">
-                      <p style="line-height: inherit;">Select a file to send by clicking 'Choose File'; send the file by
+                      <p class="chat-body1" style="line-height: inherit;">Select a file to send by clicking 'Choose File'; send the file by
                         clicking 'Send'.</p>
-                      <p style="line-height: inherit;">View and/or download sent and received files in the 'Sent' and 'Received'
+                      <p class="chat-body1" style="line-height: inherit;">View and/or download sent and received files in the 'Sent' and 'Received'
                         sections, respectively.</p>
                       <br>
                       <br>
@@ -246,46 +250,46 @@
                           <input type="file" id="fileInput" name="fileInput" aria-label="Choose a File"
                             class="form-control-file btn btn-default fileInput buttonFontSize"
                             style="background-color:transparent; border: transparent; padding-left: 0px; width: 80%; padding-right: 0px;">
-                          <span id="removeFileBtn" class="btn btn-secondary" onclick="removeFile()" style="display: none;"
+                          <span id="removeFileBtn" class="btn btn-secondary button" onclick="removeFile()" style="display: none;"
                             tabindex="0" aria-label="Remove selected file" role="button">x</span>
                         </div>
-                        <a class="btn pull-right buttonFontSize" id="shareFileConsumer" onclick="shareFileConsumer()"
+                        <a class="btn pull-right buttonFontSize button" id="shareFileConsumer" onclick="shareFileConsumer()"
                           style="background-color:rgb(15, 42, 66) !important; color: white !important; margin-top: 5px; margin-bottom: 5px;"
                           data-toggle="tooltip" title="You must choose a file" role="button" tabindex="0" disabled
                           aria-label="Send file">Send</a>
 
                       </div>
                       <div class="row" style="max-width: 100%; display: contents;">
-                        <div class="alert alert-success" alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
+                        <div class="alert alert-success body2" alert-dismissable id="fileSent" style="margin-top: 10px;" hidden>
                           <span class="close closeFileResponse" onclick="$('#fileSent').hide();" style="text-decoration:none"
                             tabindex="0" aria-label="Close file upload message" role="button">×</span>
-                          <strong aria-live="assertive" aria-label="Success file sent">Success!</strong> File Sent
+                          <strong aria-live="assertive" aria-label="Success file sent" class="body2" style="font-weight:700 !important">Success!</strong> File Sent
                         </div>
                         <div class="alert alert-danger" alert-dismissable id="fileSentError" style="margin-top: 10px;" hidden>
                           <span class="close  closeFileResponse" onclick="$('#fileSentError').hide();"
                             style="text-decoration:none" tabindex="0" aria-label="Close file upload error message"
                             role="button">×</span>
-                          <strong aria-live="assertive" aria-label="Error sending file">Error!</strong> Error sending file.
+                          <strong aria-live="assertive" aria-label="Error sending file" class="body2" style="font-weight:700 !important">Error!</strong> Error sending file.
                         </div>
                       </div>
                       <!--end file selection section-->
                       <br>
                       <br>
                       <!--send files section-->
-                      <h2>Sent</h2>
+                      <h2 class="h2">Sent</h2>
                       <hr id="sentFilesDivider" style="border:1px solid grey; background-color: grey;" />
 
                       <div id="sentFilesList">
-                        <span id="noSentFiles" class="noFiles">None</span>
+                        <span id="noSentFiles" class="noFiles chat-body1">None</span>
                       </div>
                       <!--end sent files section-->
                       <br>
                       <br>
                       <!--received files section-->
-                      <h2>Received</h2>
+                      <h2 class="h2">Received</h2>
                       <hr id="receivedFilesDivider" style="border:1px solid grey; background-color: grey;" />
                       <div id="receivedFilesList" style="display: flex; flex-direction: column;">
-                        <span id="noReceivedFiles" class="noFiles">None</span>
+                        <span id="noReceivedFiles" class="noFiles chat-body1">None</span>
                       </div>
                       <!--end received files section-->
                     </div>
@@ -318,28 +322,28 @@
           <div class="col-xs-5 panel-col">
             <div class="panel panel-default button-panel">
               <div class="panel-body">
-                <span class="panel-header">Videocall with an agent</span>
-
+                <span class="panel-header body1"><b>Videocall with an agent</b></span>
+                <br />
                 <i class="fa fa-user big-icon" alt="" aria-hidden="true"></i>
                 <div class="button-area text-center">
-                  <button type="button" id="callQueueButton" class="btn btn-primary btn-style" data-dismiss="modal"
+                  <button type="button" id="callQueueButton" class="btn btn-primary btn-style button" data-dismiss="modal"
                     onclick="enterQueue()" tabindex="0">Call</button>
                 </div>
               </div>
 
             </div>
           </div>
-          <div class="col-xs-2 or-column">
-            OR
+          <div class="col-xs-2 or-column body1">
+            <b>OR</b>
           </div>
           <div class="col-xs-5 panel-col">
             <div class="panel panel-default button-panel">
               <div class="panel-body">
-                <span class="panel-header">Leave a message</span>
-
+                <span class="panel-header body1"><b>Leave a message</b></span>
+                <br />
                 <i class="fa fa-envelope big-icon" alt="" aria-hidden="true"></i>
                 <div class="button-area text-center">
-                  <a href="./videomail" id="leaveVideomailButton" type="button" role="button" class="btn btn-primary btn-style" tabindex="0">
+                  <a href="./videomail" id="leaveVideomailButton" type="button" role="button" class="btn btn-primary btn-style button" tabindex="0">
                     Leave Videomail
                   </a>
                 </div>
@@ -351,7 +355,7 @@
 
       </div>
       <div class="modal-footer">
-        <a href="#" onclick="logout()" style="color:#073863" role="button" tabindex="0"><i class="fa fa-sign-out" alt="" aria-hidden="true"></i> Exit Support Portal</a>
+        <a href="#" onclick="logout()" style="color:#073863" role="button" tabindex="0" class="body2"><i class="fa fa-sign-out" alt="" aria-hidden="true"></i> Exit Support Portal</a>
       </div>
     </div>
   </div>
@@ -361,7 +365,7 @@
     <div class="modal-content">
       <div class="modal-header text-center">
         <p id="callingBanner"><b>Calling...</b></p>
-        <p class="waiting-header" role="heading" aria-level="3" aria-live="assertive">Waiting for the next available agent.</p>
+        <p class="waiting-header body1" role="heading" aria-level="3" aria-live="assertive" style="padding-bottom:0px"><b>Waiting for the next available agent</b></p>
         <hr />
         <video controls class="video-element" id="pleaseWaitVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= please_wait_video %>" type="video/mp4">
@@ -370,31 +374,31 @@
       </div>
       <div class="modal-body text-center my-body">
         <div class="row">
-          <div class="col-xs-12 text-center">
+          <div class="col-xs-12 text-center body1">
             If you do not wish to wait for an agent, you may:
           </div>
         </div>
         <br />
         <div class="row button-row">
           <div class="col-xs-5">
-            <a href="#" onclick="redirectToVideomail();" type="button" role="button" class="btn btn-secondary modal-outline-btn" tabindex="0" aria-label="Leave Videomail">
+            <a href="#" onclick="redirectToVideomail();" type="button" role="button" class="btn btn-secondary modal-outline-btn button" tabindex="0" aria-label="Leave Videomail">
               <i class="fa fa-envelope"  alt="" aria-hidden="true"></i>
               <span class="separator"></span>
               Leave Videomail
             </a>
           </div>
-          <div class="col-xs-2 second-or">
+          <div class="col-xs-2 second-or body1">
             - OR -
           </div>
           <div class="col-xs-5">
-            <button type="button" id="waitingHangUpButton" class="btn btn-secondary modal-outline-btn" onclick="exitQueue()" tabindex="0" aria-label="Hang Up"><i
+            <button type="button" id="waitingHangUpButton" class="btn btn-secondary modal-outline-btn button" onclick="exitQueue()" tabindex="0" aria-label="Hang Up"><i
                 class="fa fa-phone rotate-phone" alt="" aria-hidden="true"></i><span class="separator"></span>Hang Up</button>
           </div>
         </div>
 
       </div>
       <div class="modal-footer">
-        <a href="#" onclick="logout()" style="color:#073863" role="button" tabindex="0"><i class="fa fa-sign-out" alt="" aria-hidden="true"></i> Exit Support Portal</a>
+        <a href="#" onclick="logout()" style="color:#073863" role="button" tabindex="0" class="body2"><i class="fa fa-sign-out" alt="" aria-hidden="true"></i> Exit Support Portal</a>
       </div>
     </div>
   </div>
@@ -403,7 +407,7 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header text-center">
-        <h3 class="no-agents-header" aria-live="assertive">No agents are available to take your call at this time.</h3>
+        <div class="no-agents-header" aria-live="assertive" style="font-size:26px !important">No agents are available to take your call at this time.</div>
         <hr/>
         <video controls class="video-element" id="noAgentsVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= no_agents_video %>" type="video/mp4">
@@ -419,7 +423,7 @@
               Leave Videomail
             </a>
           </div>
-          <div class="col-xs-2 second-or">
+          <div class="col-xs-2 second-or body1">
             - OR -
           </div>
           <div class="col-xs-5">
@@ -430,7 +434,7 @@
 
       </div>
       <div class="modal-footer">
-        <a href="#" onclick="logout()" style="color:#073863" role="button" tabindex="0"><i class="fa fa-sign-out" alt="" aria-hidden="true"></i> Exit Support Portal</a>
+        <a href="#" onclick="logout()" style="color:#073863" role="button" tabindex="0" class="body2"><i class="fa fa-sign-out" alt="" aria-hidden="true"></i> Exit Support Portal</a>
       </div>
     </div>
   </div>
@@ -468,20 +472,20 @@
 <div id="callEndedModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog">
   <div class="modal-dialog modal-dialog-csentered">
     <div class="modal-content">
-      <div class="modal-body" style="position: relative;min-height:300px;">
-        <div class="center text-center"><!--style="width: 75%"-->
+      <div class="modal-body" style="position: relative;min-height:300px; padding: 0px;">
+        <div class="center text-center body1" style="width:100%; padding: 30px;"><!--style="width: 75%"-->
           <!--<i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>-->
           <br /><br />
-          <p id="goodbyeDescription" style="font-size: 1.5em;">Your call with an FCC ASL Consumer Support agent has ended.</p>
+          <p id="goodbyeDescription" style="font-size: 26px; line-height: 32.5px;">Your call with an FCC ASL Consumer Support agent has ended.</p>
           <hr class="text-black"
             style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
-          You are being redirected in <b>10</b> seconds to <b id="redirectURL">
+            You are being redirected in <b>10</b> seconds to <a id="redirectUrlDesc" class="link"></a>
             </b>
         </div>
       </div>
       <div class="modal-footer">
         <div class="text-center">
-          <a href="#" onclick="logout()" style="color:#073863;" role="button" tabindex="0"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit Support Portal</a>
+          <a href="#" onclick="logout()" style="color:#073863;" role="button" tabindex="0" class="body2"><i class="fa fa-sign-out" aria-hidden="true"></i> Exit Support Portal</a>
         </div>
       </div>
     </div>
