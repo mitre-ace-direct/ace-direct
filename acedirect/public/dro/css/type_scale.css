@@ -1,0 +1,77 @@
+/* font categories */
+
+.h1 {
+    font-weight: 700 !important;
+    font-size: 32px !important;
+  }
+  
+  .h2 {
+    font-weight: 500 !important;
+    font-size: 29px !important;
+  }
+  
+  .h3 {
+    font-weight: 500 !important;
+    font-size: 26px !important;
+  }
+  
+  .h4 {
+    font-weight: 500 !important;
+    font-size: 23px !important;
+  }
+  
+  .h5 {
+    font-weight: 500 !important;
+    font-size: 20px !important;
+  }
+  
+  .h6 {
+    font-weight: 500 !important;
+    font-size: 18px !important;
+  }
+  
+  .subtitle1 {
+    font-weight: 400 !important;
+    font-size: 16px !important;
+  }
+  
+  .subtitle2 {
+    font-weight: 500 !important;
+    font-size: 14px !important;
+  }
+  
+  .body1 {
+    font-weight: 400 !important;
+    font-size: 16px !important;
+  }
+  
+  .body2 {
+    font-weight: 400 !important;
+    font-size: 14px !important;
+  }
+  
+  .caption {
+    font-weight: 400 !important;
+    font-size: 12px !important;
+  }
+  
+  .overline {
+    font-weight: 400 !important;
+    font-size: 11px !important;
+    text-transform: uppercase;
+  }
+
+  .button {
+    font-weight: 700 !important;
+    font-size: 14px !important;
+  }
+
+  .link {
+    color: #004c97;
+  }
+
+  .link:hover {
+    color: #112e51;
+    text-decoration: underline;
+  }
+  
