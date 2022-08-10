@@ -24,6 +24,7 @@ let feedbackTimeoutID;
 let unreadMessages = 0;
 let unreadFiles = 0;
 let openTab = 'chat';
+let exitingQueue = false;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -765,6 +766,12 @@ function endCall() {
       // reset the page
       window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
     }
+  } else if(exitingQueue) {
+    // User left the queue
+    $('#waitingModal').modal('hide');
+    $('#optionsModal').modal('show');
+    $('#optionsModal').css('overflow-y', 'auto');
+    openDialog('optionsModal', window);
   } else {
     // Called when a user ends the call while waiting in queue
     $('#waitingModal').modal('hide');
@@ -779,6 +786,7 @@ function endCall() {
 
 function exitQueue() {
   console.log('EXITING QUEUE');
+  exitingQueue = true;
   endCall();
 }
 
