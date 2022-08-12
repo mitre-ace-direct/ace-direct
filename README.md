@@ -615,6 +615,16 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   * Solution 2: Make sure the agent URL environment matches the consumer portal URL environment.
 * To use a custom videomail intro video for Consumer videomail, put the video in `acedirect/public/media/` . Set the filename in `dat/config.json`: `web_videomail.introVideo` .
 * To use custom Consumer portal intro videos, put them in `acedirect/public/media` and update the `complaint_videos` section in `dat/config.json`.
+* If you see a message like [agent] _has an account but ACE Direct Agent extensions have not yet been configured by a Manager_, make sure the `agent_table` has been updated for `v6.1`: `ALTER TABLE agent_data ADD profile_picture varchar(50);`
+* If Node clients have a MySQL error: _ER_NOT_SUPPORTED_AUTH_MODE: Client does not support authentication protocol requested by server; consider upgrading MySQL client_. Make sure to grant full privileges to the primary database user has on all databases, for example:
+
+    ```bash
+    GRANT ALL PRIVILEGES ON acedirect.* TO 'acedirect'@'%';
+    GRANT ALL PRIVILEGES ON media_server.* TO 'acedirect'@'%';
+    GRANT SELECT ON asterisk.* to 'acedirect'@'%';
+    ```
+
+* When upgrading to MySQL8, make sure to disable strict mode, e.g.: `USE acedirect; SET GLOBAL sql_mode='';`
 
 ---
 
