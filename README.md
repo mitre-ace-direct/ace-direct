@@ -624,7 +624,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
     GRANT SELECT ON asterisk.* to 'acedirect'@'%';
     ```
 
-* When upgrading to MySQL8, make sure to disable strict mode, e.g.: `USE acedirect; SET GLOBAL sql_mode='';`
+* When upgrading to MySQL8, make sure to disable strict mode, e.g.: `USE acedirect; SET GLOBAL sql_mode='';`. When strict mode is on, [fognito/db/create-user.sh](fognito/db/create-user.sh) may fail to add MySQL users.
 
 ---
 
