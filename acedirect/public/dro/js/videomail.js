@@ -65,6 +65,10 @@ function skipGreeting() {
   gotoCountDown();
 }
 
+function goToCallPage() {
+  window.location.href = './call';
+}
+
 $('#skipGreetingButton').on('click', () => {
   skipGreeting();
 });
