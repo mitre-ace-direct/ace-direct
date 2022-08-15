@@ -35,8 +35,8 @@
             aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
               class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
 
-          <a class="btn-tertiary button" id="cancelButton" tabindex="0" style="cursor:pointer" onclick="logout()"
-            onkeypress="logout()"
+          <a class="btn-tertiary button" id="cancelButton" tabindex="0" style="cursor:pointer;color:#073863;" onclick="goToCallPage()"
+            onkeypress="goToCallPage()"
             aria-label="Cancel">Cancel</a>
         </div>
         <video class="fill-height video-element" id="greetingVideo" title="Play Video" aria-label="videomail greeting video">
@@ -136,8 +136,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button class="btn btn-custom button" id="sendVideomailButton" onclick="logout();"><i
-              class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Cancel Videomail
+            <button class="btn btn-custom button" id="sendVideomailButton" onclick="goToCallPage();">Cancel Videomail
             </button>
             <button class="btn btn-secondary modal-outline-btn vm-cancel-button button" onclick="resumeAndCloseModal();">Return to Recording</button>
           </div>
