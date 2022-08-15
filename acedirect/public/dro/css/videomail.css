@@ -211,12 +211,11 @@
 .recordingInfoBanner {
   position: absolute;
   bottom: 0;
-  height: 100px;
   width: 100%;
   text-align: center;
-  background-color: rgba(0, 0, 0, 0.3);
-  color: white;
-  font-weight: bold;
+  background-color: rgba(221, 221, 221, 0.8);
+  color:  #000000;
+  font-weight: 700;
   z-index: 1;
   padding-top: 40px;
 }
@@ -257,4 +256,12 @@
 .circleButton:focus {
   color : white;
   background-color: #396082 !important;
+}
+
+.button-container {
+  padding: 20px;
+}
+
+#pauseAndShowModal {
+  margin-left: 10px;
 }

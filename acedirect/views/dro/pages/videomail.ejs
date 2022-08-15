@@ -65,10 +65,7 @@
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-video-camera"
                   aria-hidden="true"></i>&nbsp;Video is
                 ON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              <button class="btn btn-custom" id="sendVideomailButton" onclick="sendVideomail();"><i
-                  class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Send Videomail
-              </button>
-              <button id="pauseAndShowModal" class="btn btn-secondary modal-outline-btn vm-cancel-button button" onclick="pauseAndShowModal();">Cancel</button>
+              
             </div>
 
           </div>
@@ -86,6 +83,12 @@
             <div class="recordingInfoBanner body2">
               <span role="alert" aria-live="assertive" style="font-weight: 700;">To send your Videomail before the 90 second time limit elapses,
                 click the 'Send Videomail' button.</span>
+              <div class="button-container">
+                <button class="btn btn-custom" id="sendVideomailButton" onclick="sendVideomail();"><i
+                  class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Send Videomail
+                </button>
+                <button id="pauseAndShowModal" class="btn btn-secondary modal-outline-btn vm-cancel-button button" onclick="pauseAndShowModal();">Cancel</button>
+              </div>
             </div>
           </div>
         </div>

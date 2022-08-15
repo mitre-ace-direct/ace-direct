@@ -167,11 +167,12 @@ function endVideomail() {
 
 async function pauseAndShowModal() {
   await recorder.pauseRecording();
+  selfVideo.pause();
   recordingPaused = true;
   $('#recordingTime').html((_index, html) => html.replace('Recording', 'Paused').replace('circle', 'pause'));
   $('#pauseModal').modal();
   // eslint-disable-next-line no-undef
-  openDialog('pauseModal', window);
+  // openDialog('pauseModal', window);
 }
 
 $('#pauseAndShowModal').on('click', () => {
@@ -180,6 +181,7 @@ $('#pauseAndShowModal').on('click', () => {
 
 async function resumeAndCloseModal() {
   await recorder.resumeRecording();
+  selfVideo.play();
   recordingPaused = false;
   $('#recordingTime').html((_index, html) => html.replace('Paused', 'Recording').replace('pause', 'circle'));
   $('#pauseModal').modal('toggle');
