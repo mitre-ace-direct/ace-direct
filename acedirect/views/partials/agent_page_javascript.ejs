@@ -37,9 +37,18 @@
     var fpsOptimum = '<%= fpsOptimum %>';
 </script>
 <!-- Custom Javascript for ACEDirect index.html page-->
+<script type="importmap">
+    {
+        "imports": {
+            "detect-gpu": "https://unpkg.com/detect-gpu@4.0.35/dist/detect-gpu.esm.js"
+        }
+    }
+</script>
+
 <script type="text/javascript" src="/js/jssip_agent.js"></script>
 <script type="text/javascript" src="/js/busylight.js"></script>
 <script type="text/javascript" src="/js/acedirect.js"></script>
+<script type="module" src="/js/hardware_acc.js"></script>
 
 <script src="/assets/js/getStats.js"></script>
 <script src="/js/ACEKurento-1.0.0.js"></script>
