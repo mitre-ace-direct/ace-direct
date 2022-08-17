@@ -608,6 +608,7 @@ function registerJssip(myExtension, myPassword) {
       if (selfStream && selfStream.srcObject) {
         selfStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('SCREENSHARE ENDED SELF');
+          isScreenshareRestart = true;
           // $('#startScreenshare').hide();
           // acekurento.screenshare(false);
           // document.getElementById('startScreenshare').innerText = 'Start Screenshare';
@@ -627,6 +628,7 @@ function registerJssip(myExtension, myPassword) {
       if (remoteStream && remoteStream.srcObject) {
         remoteStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended remote');
+          isScreenshareRestart = true;
           acekurento.screenshare(false);
         };
       }
