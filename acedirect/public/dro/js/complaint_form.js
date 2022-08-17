@@ -55,6 +55,7 @@ $(document).ready(() => {
     new TabsManual(tablists[i]);
   }
 
+  // Extend dayjs with utc plugin
   dayjs.extend(window.dayjs_plugin_utc);
 });
 
