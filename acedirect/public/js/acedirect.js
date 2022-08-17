@@ -153,6 +153,9 @@ $(document).ready(function () {
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
     alignDataTableHeaders();
   });
+
+  // Extend dayjs with utc plugin
+  dayjs.extend(window.dayjs_plugin_utc);
 });
 
 function checkProfilePic() {
@@ -1260,6 +1263,7 @@ $('#chatsend').submit(function (evt) {
   var vrs = $('#callerPhone').val();
   var date = dayjs();
   var timestamp = date.format('h:mm a');
+  // const timestamp = date.utc();
 
   // var language = 'en';
   var language = $('#language-select').val();
@@ -1303,6 +1307,7 @@ $('#agent-chat-send').on('click',function (evt) {
     var ext = $('#agent-ext').html();
     var date = dayjs();
     var timestamp = date.format('h:mm a');
+    // const timestamp = date.utc();
     var destname = $('#chatHeader').html();
     var exactTime = Date.now();
 
