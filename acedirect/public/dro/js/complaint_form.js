@@ -25,6 +25,7 @@ let unreadMessages = 0;
 let unreadFiles = 0;
 let openTab = 'chat';
 let exitingQueue = false;
+let isCaptioning = false;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -607,6 +608,7 @@ function registerJssip(myExtension, myPassword) {
       if (selfStream && selfStream.srcObject) {
         selfStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('SCREENSHARE ENDED SELF');
+          isScreenshareRestart = true;
           // $('#startScreenshare').hide();
           // acekurento.screenshare(false);
           // document.getElementById('startScreenshare').innerText = 'Start Screenshare';
@@ -626,6 +628,7 @@ function registerJssip(myExtension, myPassword) {
       if (remoteStream && remoteStream.srcObject) {
         remoteStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended remote');
+          isScreenshareRestart = true;
           acekurento.screenshare(false);
         };
       }
@@ -683,7 +686,9 @@ function registerJssip(myExtension, myPassword) {
         document.getElementById('inCallSection').style.display = 'block';
         setColumnSize();
         callAnswered = true;
-        captionsStart();
+        if (!isCaptioning) {
+          captionsStart();
+        }
       }
     }
   };
@@ -1605,6 +1610,7 @@ function redirectToVideomail() {
 
 var recognition = null;
 function captionsStart() {
+  isCaptioning = true;
   let language = $('#language-select').val();
   switch (language) {
     case 'en': // English US
@@ -1668,6 +1674,7 @@ function captionsStart() {
 }
 
 function captionsEnd() {
+  isCaptioning = false;
   if (recognition)
     recognition.abort();
   recognition = null;
