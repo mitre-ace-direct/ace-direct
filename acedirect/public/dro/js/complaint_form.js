@@ -54,6 +54,8 @@ $(document).ready(() => {
   for (let i = 0; i < tablists.length; i++) {
     new TabsManual(tablists[i]);
   }
+
+  dayjs.extend(window.dayjs_plugin_utc);
 });
 
 $(window).bind('fullscreenchange', function (_e) {
@@ -1132,6 +1134,10 @@ $('#chatsend').submit((evt) => {
   const date = dayjs();
   const timestamp = date.format('h:mm a');
 
+  // console.log('local time: ' + date.format());
+  // console.log('utc time: ' + date.utc().format());
+  // const timestamp = date.utc();
+
   // const language = sessionStorage.consumerLanguage;
   const language = 'en';
 
@@ -1202,6 +1208,8 @@ function newChatMessage(data) {
   }
 
   $(msgtime).addClass('direct-chat-timestamp chat-body2').html(` ${timestamp}`).appendTo(msginfo);
+  // $(msgtime).addClass('direct-chat-timestamp chat-body2')
+  //   .html(` ${dayjs(timestamp).local().format('h:mm a')}`).appendTo(msginfo);
   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
   $(msgtext).addClass('direct-chat-text chat-body1')
     .html(msg)

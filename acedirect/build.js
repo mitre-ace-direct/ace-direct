@@ -33,6 +33,7 @@ const JS = [
   'bootstrap/dist/js/bootstrap.min.js',
   'bootstrap-toggle/js/bootstrap-toggle.js',
   'dayjs/dayjs.min.js',
+  'dayjs/plugin/utc.js',
   'jquery/dist/jquery.min.js',
   'inputmask/dist/min/inputmask/inputmask.min.js',
   'inputmask/dist/min/inputmask/jquery.inputmask.min.js',
