@@ -784,6 +784,7 @@ function endCall(userInitiated = false) {
     openDialog('optionsModal', window);
   } else {
     // Called when a user ends the call while waiting in queue
+    closeDialog($('#waitingHangUpButton')[0]);
     $('#waitingModal').modal('hide');
     $('#optionsModal').modal('hide');
     $('#noAgentsModal').modal('show');
