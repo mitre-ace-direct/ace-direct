@@ -1,3 +1,5 @@
+let recordingPaused = false;
+
 function setVideoSize() {
   const a1 = document.getElementById('greeting-controls');
   const a2 = document.getElementById('recording-timer-bar');
@@ -6,6 +8,12 @@ function setVideoSize() {
   const videoHeight = b.getBoundingClientRect().top - top;
   console.log(videoHeight);
   $('.video-element').height(videoHeight);
+
+  // transition countdown page
+    const navbar = document.getElementById('consumerNavbar');
+    const countdownTop = navbar.getBoundingClientRect().bottom;
+    const countdownHeight = b.getBoundingClientRect().top - countdownTop
+    $('#countDownDiv').height(countdownHeight)
 }
 
 const selfVideo = document.querySelector('#selfVideo');
@@ -119,6 +127,7 @@ $('#greetingVideo')
 
 let recorder = null;
 function startRecording() {
+  recordingPaused = false;
   if (recorder == null) {
     // eslint-disable-next-line no-undef
     recorder = new RecordRTCPromisesHandler(selfVideo.srcObject, {
@@ -151,6 +160,30 @@ function endVideomail() {
     redirect();
   }, 10000);
 }
+
+async function pauseAndShowModal() {
+  await recorder.pauseRecording();
+  recordingPaused = true;
+  $('#recordingTime').html((_index, html) => html.replace('Recording', 'Paused').replace('circle', 'pause'));
+  $('#pauseModal').modal();
+  // eslint-disable-next-line no-undef
+  openDialog('pauseModal', window);
+}
+
+$('#pauseAndShowModal').on('click', () => {
+  pauseAndShowModal();
+});
+
+async function resumeAndCloseModal() {
+  await recorder.resumeRecording();
+  recordingPaused = false;
+  $('#recordingTime').html((_index, html) => html.replace('Paused', 'Recording').replace('pause', 'circle'));
+  $('#pauseModal').modal('toggle');
+}
+
+$('#resumeAndCloseModalButton').on('click', () => {
+  resumeAndCloseModal();
+});
 
 async function sendVideomail() {
   console.log('sendVideomail');
@@ -192,29 +225,31 @@ function startVideomailTimer() {
 
   let lastAriaPercentage = 0;
   const recTimerInterval = setInterval(() => {
-    rTime += 0.1;
-    const percentage = (rTime / maxTime) * 100;
-    $('#recordingTimer span').css('width', `${percentage}%`);
+    if (!recordingPaused) {
+      rTime += 0.1;
+      const percentage = (rTime / maxTime) * 100;
+      $('#recordingTimer span').css('width', `${percentage}%`);
 
-    const intPercentage = Math.trunc(percentage);
-    if ((intPercentage % 5 === 0) && (intPercentage > lastAriaPercentage)) {
-      const percentComplete = `${intPercentage}% complete `;
-      $('#recordingTimer').attr('aria-label', percentComplete);
-      $('#recordingTimer').attr('aria-valuenow', intPercentage);
-      lastAriaPercentage = intPercentage;
+      const intPercentage = Math.trunc(percentage);
+      if ((intPercentage % 5 === 0) && (intPercentage > lastAriaPercentage)) {
+        const percentComplete = `${intPercentage}% complete `;
+        $('#recordingTimer').attr('aria-label', percentComplete);
+        $('#recordingTimer').attr('aria-valuenow', intPercentage);
+        lastAriaPercentage = intPercentage;
 
-      console.log(percentComplete);
-    }
+        console.log(percentComplete);
+      }
 
-    if (rTime % 1 !== 0) {
-      selfVideo.recTime = rTime;
-      const date = new Date(0);
-      date.setSeconds(rTime); // specify value for SECONDS here
-      const timeString = date.toISOString().substr(15, 4);
-      $('#recordingTime').html(`<i class='fa fa-circle' aria-hidden='true'></i> Recording &nbsp;&nbsp; ${timeString} / ${mTimeFormatted}`);
-      if (rTime > maxTime) {
-        clearInterval(recTimerInterval);
-        sendVideomail();
+      if (rTime % 1 !== 0) {
+        selfVideo.recTime = rTime;
+        const date = new Date(0);
+        date.setSeconds(rTime); // specify value for SECONDS here
+        const timeString = date.toISOString().substr(15, 4);
+        $('#recordingTime').html(`<i class='fa fa-circle' aria-hidden='true'></i> Recording &nbsp;&nbsp; ${timeString} / ${mTimeFormatted}`);
+        if (rTime > maxTime) {
+          clearInterval(recTimerInterval);
+          sendVideomail();
+        }
       }
     }
   }, 100);

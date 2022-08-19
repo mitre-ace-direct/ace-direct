@@ -115,6 +115,12 @@
   background-color: #CDD7E0 !important;
 }
 
+.vm-cancel-button, .vm-cancel-button:hover, .vm-cancel-button:focus {
+  padding-top: 9px !important;
+  padding-bottom: 9px !important;
+}
+
+
 #recordingCountdown {
   font-size: 5em;
 }
@@ -218,12 +224,12 @@
   font-size: 24px;
 }
 
-#sendVideomailButton:hover {
+.sendVideomailButton:hover {
   color: white;
   background-color: #205493 !important;
 }
 
-#sendVideomailButton:focus {
+.sendVideomailButton:focus {
   color: white;
   background-color: #396082 !important;
 }

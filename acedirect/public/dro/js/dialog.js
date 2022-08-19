@@ -30,12 +30,12 @@ aria.Utils = aria.Utils || {};
    * @returns {boolean}
    *  true if a focusable element is found and focus is set.
    */
-  aria.Utils.focusFirstDescendant = function (element) {
-    for (var i = 0; i < element.childNodes.length; i++) {
-      var child = element.childNodes[i];
+  aria.Utils.focusFirstDescendant = function focusFirstDescendant(element) {
+    for (let i = 0; i < element.childNodes.length; i++) {
+      const child = element.childNodes[i];
       if (
-        aria.Utils.attemptFocus(child) ||
-        aria.Utils.focusFirstDescendant(child)
+        aria.Utils.attemptFocus(child)
+        || aria.Utils.focusFirstDescendant(child)
       ) {
         return true;
       }
@@ -50,12 +50,12 @@ aria.Utils = aria.Utils || {};
    * @returns {boolean}
    *  true if a focusable element is found and focus is set.
    */
-  aria.Utils.focusLastDescendant = function (element) {
-    for (var i = element.childNodes.length - 1; i >= 0; i--) {
-      var child = element.childNodes[i];
+  aria.Utils.focusLastDescendant = function focusLastDescendant(element) {
+    for (let i = element.childNodes.length - 1; i >= 0; i--) {
+      const child = element.childNodes[i];
       if (
-        aria.Utils.attemptFocus(child) ||
-        aria.Utils.focusLastDescendant(child)
+        aria.Utils.attemptFocus(child)
+        || aria.Utils.focusLastDescendant(child)
       ) {
         return true;
       }
@@ -70,7 +70,7 @@ aria.Utils = aria.Utils || {};
    * @returns {boolean}
    *  true if element is focused.
    */
-  aria.Utils.attemptFocus = function (element) {
+  aria.Utils.attemptFocus = function attemptFocus(element) {
     if (!aria.Utils.isFocusable(element)) {
       return false;
     }
@@ -91,14 +91,14 @@ aria.Utils = aria.Utils || {};
   /**
    * @returns {object} the last opened dialog (the current dialog)
    */
-  aria.getCurrentDialog = function () {
+  aria.getCurrentDialog = function getCurrentDialog() {
     if (aria.OpenDialogList && aria.OpenDialogList.length) {
       return aria.OpenDialogList[aria.OpenDialogList.length - 1];
     }
   };
 
-  aria.closeCurrentDialog = function () {
-    var currentDialog = aria.getCurrentDialog();
+  aria.closeCurrentDialog = function closeCurrentDialog() {
+    const currentDialog = aria.getCurrentDialog();
     if (currentDialog) {
       currentDialog.close();
       return true;
@@ -123,14 +123,14 @@ aria.Utils = aria.Utils || {};
    *          DOM node to focus when the dialog opens. If not specified, the
    *          first focusable element in the dialog will receive focus.
    */
-  aria.Dialog = function (dialogId, focusAfterClosed, focusFirst) {
+  aria.Dialog = function Dialog(dialogId, focusAfterClosed, focusFirst) {
     this.dialogNode = document.getElementById(dialogId);
     if (this.dialogNode === null) {
       throw new Error('No element found with id="' + dialogId + '".');
     }
 
-    var validRoles = ['dialog', 'alertdialog'];
-    var isDialog = (this.dialogNode.getAttribute('role') || '')
+    const validRoles = ['dialog', 'alertdialog'];
+    const isDialog = (this.dialogNode.getAttribute('role') || '')
       .trim()
       .split(/\s+/g)
       .some(function (token) {
@@ -147,7 +147,8 @@ aria.Utils = aria.Utils || {};
     // Wrap in an individual backdrop element if one doesn't exist
     // Native <dialog> elements use the ::backdrop pseudo-element, which
     // works similarly.
-    /**/var backdropClass = 'dialog-backdrop';
+    /**/
+    const backdropClass = 'dialog-backdrop';
     if (this.dialogNode.parentNode.classList.contains(backdropClass)) {
       this.backdropNode = this.dialogNode.parentNode;
     } else {
@@ -185,13 +186,13 @@ aria.Utils = aria.Utils || {};
     // Bracket the dialog node with two invisible, focusable nodes.
     // While this dialog is open, we use these to make sure that focus never
     // leaves the document even if dialogNode is the first or last node.
-    var preDiv = document.createElement('div');
+    const preDiv = document.createElement('div');
     this.preNode = this.dialogNode.parentNode.insertBefore(
       preDiv,
       this.dialogNode
     );
     this.preNode.tabIndex = 0;
-    var postDiv = document.createElement('div');
+    const postDiv = document.createElement('div');
     this.postNode = this.dialogNode.parentNode.insertBefore(
       postDiv,
       this.dialogNode.nextSibling
@@ -217,7 +218,7 @@ aria.Utils = aria.Utils || {};
     this.lastFocus = document.activeElement;
   }; // end Dialog constructor
 
-  aria.Dialog.prototype.clearDialog = function () {
+  aria.Dialog.prototype.clearDialog = function clearDialog() {
     Array.prototype.map.call(
       this.dialogNode.querySelectorAll('input'),
       function (input) {
@@ -233,7 +234,7 @@ aria.Utils = aria.Utils || {};
    *  restore listeners of a parent dialog if one was open under the one that just closed,
    *  and sets focus on the element specified for focusAfterClosed.
    */
-  aria.Dialog.prototype.close = function () {
+  aria.Dialog.prototype.close = function close() {
     aria.OpenDialogList.pop();
     this.removeListeners();
     aria.Utils.remove(this.preNode);
@@ -262,7 +263,7 @@ aria.Utils = aria.Utils || {};
    *  Optional ID or DOM node specifying where to place focus in the new dialog when it opens.
    *  If not specified, the first focusable element will receive focus.
    */
-  aria.Dialog.prototype.replace = function (
+  aria.Dialog.prototype.replace = function replace(
     newDialogId,
     newFocusAfterClosed,
     newFocusFirst
@@ -274,61 +275,61 @@ aria.Utils = aria.Utils || {};
     this.dialogNode.className = 'hidden';
     this.backdropNode.classList.remove('active');
 
-    var focusAfterClosed = newFocusAfterClosed || this.focusAfterClosed;
+    const focusAfterClosed = newFocusAfterClosed || this.focusAfterClosed;
     new aria.Dialog(newDialogId, focusAfterClosed, newFocusFirst);
   }; // end replace
 
-  aria.Dialog.prototype.addListeners = function () {
+  aria.Dialog.prototype.addListeners = function addListeners() {
     document.addEventListener('focus', this.trapFocus, true);
   }; // end addListeners
 
-  aria.Dialog.prototype.removeListeners = function () {
+  aria.Dialog.prototype.removeListeners = function removeListeners() {
     document.removeEventListener('focus', this.trapFocus, true);
   }; // end removeListeners
 
-  aria.Dialog.prototype.trapFocus = function (event) {
+  aria.Dialog.prototype.trapFocus = function trapFocus(event) {
     if (aria.Utils.IgnoreUtilFocusChanges) {
       return;
     }
-    var currentDialog = aria.getCurrentDialog();
+    const currentDialog = aria.getCurrentDialog();
     if (currentDialog.dialogNode.contains(event.target)) {
       currentDialog.lastFocus = event.target;
     } else {
       aria.Utils.focusFirstDescendant(currentDialog.dialogNode);
-      if (currentDialog.lastFocus == document.activeElement) {
+      if (currentDialog.lastFocus === document.activeElement) {
         aria.Utils.focusLastDescendant(currentDialog.dialogNode);
       }
       currentDialog.lastFocus = document.activeElement;
     }
   }; // end trapFocus
 
-  window.openDialog = function (dialogId, focusAfterClosed, focusFirst) {
+  window.openDialog = function openDialog(dialogId, focusAfterClosed, focusFirst) {
     new aria.Dialog(dialogId, focusAfterClosed, focusFirst);
   };
 
-  window.closeDialog = function (closeButton) {
-    var topDialog = aria.getCurrentDialog();
+  window.closeDialog = function closeDialog(closeButton) {
+    const topDialog = aria.getCurrentDialog();
     if (topDialog.dialogNode.contains(closeButton)) {
       topDialog.close();
     }
   }; // end closeDialog
 
-  window.replaceDialog = function (
+  window.replaceDialog = function replaceDialog(
     newDialogId,
     newFocusAfterClosed,
     newFocusFirst
   ) {
-    var topDialog = aria.getCurrentDialog();
+    const topDialog = aria.getCurrentDialog();
     if (topDialog.dialogNode.contains(document.activeElement)) {
       topDialog.replace(newDialogId, newFocusAfterClosed, newFocusFirst);
     }
   }; // end replaceDialog
-})();
+}());
 /**
  * @namespace aria
  */
 
-var aria = aria || {};
+// var aria = aria || {};
 
 /**
  * @description
@@ -349,7 +350,7 @@ aria.KeyCode = {
   UP: 38,
   RIGHT: 39,
   DOWN: 40,
-  DELETE: 46,
+  DELETE: 46
 };
 
 aria.Utils = aria.Utils || {};
@@ -358,14 +359,14 @@ aria.Utils = aria.Utils || {};
 aria.Utils.matches = function (element, selector) {
   if (!Element.prototype.matches) {
     Element.prototype.matches =
-      Element.prototype.matchesSelector ||
-      Element.prototype.mozMatchesSelector ||
-      Element.prototype.msMatchesSelector ||
-      Element.prototype.oMatchesSelector ||
-      Element.prototype.webkitMatchesSelector ||
-      function (s) {
-        var matches = element.parentNode.querySelectorAll(s);
-        var i = matches.length;
+      Element.prototype.matchesSelector
+      || Element.prototype.mozMatchesSelector
+      || Element.prototype.msMatchesSelector
+      || Element.prototype.oMatchesSelector
+      || Element.prototype.webkitMatchesSelector
+      || function (s) {
+        const matches = element.parentNode.querySelectorAll(s);
+        let i = matches.length;
         while (--i >= 0 && matches.item(i) !== this) {
           // empty
         }
@@ -376,21 +377,21 @@ aria.Utils.matches = function (element, selector) {
   return element.matches(selector);
 };
 
-aria.Utils.remove = function (item) {
+aria.Utils.remove = function remove(item) {
   if (item.remove && typeof item.remove === 'function') {
     return item.remove();
   }
   if (
-    item.parentNode &&
-    item.parentNode.removeChild &&
-    typeof item.parentNode.removeChild === 'function'
+    item.parentNode
+    && item.parentNode.removeChild
+    && typeof item.parentNode.removeChild === 'function'
   ) {
     return item.parentNode.removeChild(item);
   }
   return false;
 };
 
-aria.Utils.isFocusable = function (element) {
+aria.Utils.isFocusable = function isFocusable(element) {
   if (element.tabIndex < 0) {
     return false;
   }
@@ -401,28 +402,28 @@ aria.Utils.isFocusable = function (element) {
 
   switch (element.nodeName) {
     case 'A':
-      return !!element.href && element.rel != 'ignore';
+      return !!element.href && element.rel !== 'ignore';
     case 'INPUT':
-      return element.type != 'hidden';
+      return element.type !== 'hidden';
     case 'BUTTON':
     case 'SELECT':
     case 'TEXTAREA':
-    case 'VIDEO':
+      // case 'VIDEO':
       return true;
     default:
       return false;
   }
 };
 
-aria.Utils.getAncestorBySelector = function (element, selector) {
-  if (!aria.Utils.matches(element, selector + ' ' + element.tagName)) {
+aria.Utils.getAncestorBySelector = function getAncestorBySelector(element, selector) {
+  if (!aria.Utils.matches(element, `${selector} ${element.tagName}`)) {
     // Element is not inside an element that matches selector
     return null;
   }
 
   // Move up the DOM tree until a parent matching the selector is found
-  var currentNode = element;
-  var ancestor = null;
+  let currentNode = element;
+  let ancestor = null;
   while (ancestor === null) {
     if (aria.Utils.matches(currentNode.parentNode, selector)) {
       ancestor = currentNode.parentNode;
@@ -434,23 +435,23 @@ aria.Utils.getAncestorBySelector = function (element, selector) {
   return ancestor;
 };
 
-aria.Utils.hasClass = function (element, className) {
+aria.Utils.hasClass = function hasClass(element, className) {
   return new RegExp('(\\s|^)' + className + '(\\s|$)').test(element.className);
 };
 
-aria.Utils.addClass = function (element, className) {
+aria.Utils.addClass = function addClass(element, className) {
   if (!aria.Utils.hasClass(element, className)) {
     element.className += ' ' + className;
   }
 };
 
-aria.Utils.removeClass = function (element, className) {
-  var classRegex = new RegExp('(\\s|^)' + className + '(\\s|$)');
+aria.Utils.removeClass = function removeClass(element, className) {
+  const classRegex = new RegExp('(\\s|^)' + className + '(\\s|$)');
   element.className = element.className.replace(classRegex, ' ').trim();
 };
 
-aria.Utils.bindMethods = function (object /* , ...methodNames */) {
-  var methodNames = Array.prototype.slice.call(arguments, 1);
+aria.Utils.bindMethods = function bindMethods(object /* , ...methodNames */) {
+  const methodNames = Array.prototype.slice.call(arguments, 1);
   methodNames.forEach(function (method) {
     object[method] = object[method].bind(object);
   });
