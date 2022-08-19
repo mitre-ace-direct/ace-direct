@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
   <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
   <link rel="stylesheet" href="/dro/css/videomail.css">
+  <link rel="stylesheet" href="/dro/css/type_scale.css">
   <!-- <link rel="stylesheet" href="/css/ca-portal.css"> -->
 </head>
 
@@ -27,12 +28,16 @@
             </button>
           </div>
 
-          <div><span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
-          <div id="custom-seekbar" aria-label="seek bar"><span></span></div>
+          <div class="body1"><span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
+          <div id="custom-seekbar" role="progressbar" aria-label="progress bar"><span></span></div>
 
-          <button class="btn btn-secondary modal-outline-btn" id="skipGreetingButton" tabindex="0"
+          <button class="btn btn-secondary modal-outline-btn button" id="skipGreetingButton" tabindex="0"
             aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
               class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
+
+          <a class="btn-tertiary button" id="cancelButton" tabindex="0" style="cursor:pointer" onclick="logout()"
+            onkeypress="logout()"
+            aria-label="Cancel">Cancel</a>
         </div>
         <video class="fill-height video-element" id="greetingVideo" title="Play Video" aria-label="videomail greeting video">
           <source src="/media/<%= introVideo %>" type="video/mp4">
@@ -41,17 +46,17 @@
       </div>
 
       <div class="row text-center" style="display:none; vertical-align: -webkit-baseline-middle;" id="countDownDiv">
-        <div class="col-12 text-center align-self-center">
-          <br /><br /><br /><br /><br />
-          <p class="lead"><strong>Recording will start in:</strong></p>
-          <span id="recordingCountdown">5</span>
+        <div class="col-12 text-center align-self-center" style="height:100%; display: flex; align-items: center;">
+          <span style="font-size:26px; font-weight:400 !important; flex:4;">Recording will start in: <br/>
+            <span id="recordingCountdown" style="font-size: 54px; font-weight:700;">5</span>
+          </span>
         </div>
       </div>
 
       <div class="row" style="display:none" id="recordingDiv">
         <div class="col-12 text-center">
 
-          <div class="row  recording-controls">
+          <div class="row recording-controls body1">
             <div class="col-md-12">
               <span class="text-danger" id="recordingTime"><i class="fa fa-circle" aria-hidden="true"></i> Recording
                 &nbsp;&nbsp; 0:00 / 0:00</span>
@@ -61,8 +66,11 @@
                   aria-hidden="true"></i>&nbsp;Video is
                 ON&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
               <button class="btn btn-custom" id="sendVideomailButton" onclick="sendVideomail();"><i
-                  class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Send Videomail</button>
+                  class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Send Videomail
+              </button>
+              <button id="pauseAndShowModal" class="btn btn-secondary modal-outline-btn vm-cancel-button button" onclick="pauseAndShowModal();">Cancel</button>
             </div>
+
           </div>
 
           <div class="row recording-timer-bar" id="recording-timer-bar">
@@ -75,8 +83,8 @@
           <div class="video-container">
             <video autoplay="true" class="video-element self-view" id="selfVideo">
             </video>
-            <div class="recordingInfoBanner">
-              <span role="alert" aria-live="assertive">To send your Videomail before the 90 second time limit elapses,
+            <div class="recordingInfoBanner body2">
+              <span role="alert" aria-live="assertive" style="font-weight: 700;">To send your Videomail before the 90 second time limit elapses,
                 click the 'Send Videomail' button.</span>
             </div>
           </div>
@@ -94,26 +102,44 @@
     <div id="goodbyeModal" class="modal fade" data-backdrop="static" role="dialog" aria-labelledby="goodbyeDescription">
       <div class="modal-dialog modal-dialog-csentered">
         <div class="modal-content">
-          <div class="modal-body" style="position: relative;min-height:300px;">
-            <div class="center text-center" style="width: 90%;">
+          <div class="modal-body" style="position: relative;min-height:300px; margin-top: 20px; margin-bottom: 20px; padding: 0px;">
+            <div class="center text-center body1" style="width: 100%; padding: 30px;">
               <i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>
               <br /><br />
-              <p id="goodbyeDescription" style="font-size: 1.5em;">Thank you for leaving videomail. An agent will review
+              <p id="goodbyeDescription" style="font-size: 26px; line-height:32.5px;">Thank you for leaving videomail. An agent will review
                 your videomail
                 message.</p>
               <hr class="text-black"
                 style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
-              <p>You are being redirected in <b>10</b> seconds to <b id="redirectSiteURL">
-                  <%= redirectURL%>
-                </b></p>
+                You are being redirected in <b>10</b> seconds to <a id="redirectUrlDesc" class="link" href="<%= redirectURL%>">
+                  <%= redirectDesc%>
+                </a>
             </div>
+            <div id="redirectSiteURL" hidden><%= redirectURL%></div>
           </div>
           <div class="modal-footer">
             <div class="text-center">
-              <a id="goodbyeExit" href="#" style="color:#073863;" role="button" tabindex="0"><i
+              <a id="goodbyeExit" href="#" style="color:#073863;" role="button" tabindex="0" class="body2"><i
                   class="fa fa-sign-out"></i> Exit Support
                 Portal</a>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="pauseModal" class="modal fade" data-backdrop="static" role="dialog" aria-labelledby="pauseDescription">
+      <div class="modal-dialog modal-dialog-csentered">
+        <div class="modal-content">
+          <div class="modal-body" style="position: relative;min-height:300px;">
+            <div class="center text-center" style="width: 90%;">
+              <p id="pauseDescription" style="font-size: 26px;">Canceling will stop the recording and your videomail will not be sent.</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-custom button" id="sendVideomailButton" onclick="logout();"><i
+              class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Cancel Videomail
+            </button>
+            <button class="btn btn-secondary modal-outline-btn vm-cancel-button button" onclick="resumeAndCloseModal();">Return to Recording</button>
           </div>
         </div>
       </div>
@@ -122,7 +148,6 @@
 
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/js/bootstrap.min.js" async></script>
-<!-- <script type="text/javascript" src="/assets/js/moment.min.js" async></script> -->
 <script type="text/javascript" src="/dro/js/videomail.js" async></script>
 <script type="text/javascript" src="/assets/js/RecordRTC.min.js" async></script>
 

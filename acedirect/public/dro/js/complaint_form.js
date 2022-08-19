@@ -24,6 +24,8 @@ let feedbackTimeoutID;
 let unreadMessages = 0;
 let unreadFiles = 0;
 let openTab = 'chat';
+let exitingQueue = false;
+let isCaptioning = false;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -39,7 +41,7 @@ const viewableFileTypes = [
 
 $(document).ready(() => {
   $('#optionsModal').modal('show');
-  $('#optionsModal').css('overflow-y', 'auto');
+  // $('#optionsModal').css('overflow-y', 'auto');
   openDialog('optionsModal', window);
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
@@ -48,10 +50,13 @@ $(document).ready(() => {
   });
 
   // Use arrow keys to navigate tabs
-  var tablists = document.querySelectorAll('[role=tablist].tabs-right');
-  for (var i = 0; i < tablists.length; i++) {
+  const tablists = document.querySelectorAll('[role=tablist].tabs-right');
+  for (let i = 0; i < tablists.length; i++) {
     new TabsManual(tablists[i]);
   }
+
+  // Extend dayjs with utc plugin
+  dayjs.extend(window.dayjs_plugin_utc);
 });
 
 $(window).bind('fullscreenchange', function (_e) {
@@ -71,11 +76,11 @@ function connect_socket() {
     url: './token',
     type: 'GET',
     dataType: 'json',
-    success: (data) => {
-      if (data.message === 'success') {
+    success: (successData) => {
+      if (successData.message === 'success') {
         socket = io.connect(`https://${window.location.host}`, {
           path: `${nginxPath}/socket.io`,
-          query: `token=${data.token}`,
+          query: `token=${successData.token}`,
           forceNew: true
         });
 
@@ -86,7 +91,7 @@ function connect_socket() {
         });
 
         socket.on('connect', () => {
-          const payload = jwt_decode(data.token);
+          const payload = jwt_decode(successData.token);
           // get the start/end time strings for the after hours dialog
           // const tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
 
@@ -99,7 +104,7 @@ function connect_socket() {
           vrs = payload.vrs;
           // $('#callerEmail').val(payload.email);
           $('#displayname').val(`${payload.first_name} ${payload.last_name}`);
-          isOpen = payload.isOpen;
+          const isOpen = payload.isOpen;
           if (!isOpen) { // after hours processing; if after hours, then show this modal
             // TODO Review potentially having config variable to determine if enabled per user
             // DO NOT enable for dro
@@ -164,7 +169,6 @@ function connect_socket() {
               $('#pc_config').attr('name', `stun:${data.stun_server}`);
 
               // registerJssip(data.extension, data.password); //register with the given extension
-
 
               // registerJssip(data.extension, data.password); //register with the given extension
 
@@ -232,7 +236,6 @@ function connect_socket() {
                   ended: (_e) => {
                     console.log('--- WV: Call ended ---\n');
                     // terminateCall();
-
                   }
                 };
                 acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, eventHandlers);
@@ -287,13 +290,13 @@ function connect_socket() {
                 $('#rtt-typing').css('display', 'block');
                 setTimeout(() => {
                   $('#rtt-typing').css('display', 'block');
-                  $('#rtt-typing').html(`<b>${data.displayname}</b>` + `<br/>${data.rttmsg}`).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+                  $('#rtt-typing').html(`<b>${data.displayname}</b>` + `<br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
                   $('#rtt-typing').appendTo($('#chat-messages'));
                   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
                 }, 100);
               } else {
                 $('#rtt-typing').css('display', 'block');
-                $('#rtt-typing').html(`<b>${data.displayname}</b>` + `<br/>${data.rttmsg}`).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+                $('#rtt-typing').html(`<b>${data.displayname}</b>` + `<br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
                 $('#rtt-typing').appendTo($('#chat-messages'));
                 $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
               }
@@ -313,7 +316,7 @@ function connect_socket() {
               }
               $('#rtt-typing').css('display', 'none');
               $('#chat-messages').remove($('#rtt-typing'));
-              $('#rtt-typing').html('').removeClass('direct-chat-text').removeClass('direct-chat-timestamp text-bold');
+              $('#rtt-typing').html('').removeClass('direct-chat-text chat-body1').removeClass('direct-chat-timestamp text-bold chat-body2');
               $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
             }
           })
@@ -374,7 +377,7 @@ function connect_socket() {
             $('#newchatmessage').val('');
             $('#chat-messages').removeClass('populatedMessages');
             $('#chat-messages').addClass('emptyMessages');
-            $('#chat-messages').html('<div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble" id="rtt-typing" style="min-height: 20px; display: none;"></div>\
+            $('#chat-messages').html('<div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble chat-body2" id="rtt-typing" style="min-height: 20px; display: none;"></div>\
             <span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No messages yet to display</span>');
 
             // reset buttons and ticket form
@@ -385,9 +388,12 @@ function connect_socket() {
 
             if (complaintRedirectActive && callAnswered) {
               $('#redirectURL').text(complaintRedirectUrl);
+              $('#redirectUrlDesc').text(complaintRedirectDesc);
+              $('#redirectUrlDesc').attr('href', complaintRedirectUrl);
               $('#callEndedModal').modal('show');
               $('#callEndedModal').css('overflow-y', 'auto');
               openDialog('callEndedModal', window);
+
               setTimeout(() => {
                 location = complaintRedirectUrl;
               }, 10000);
@@ -484,7 +490,7 @@ function connect_socket() {
         // need to handle bad connections?
       }
     },
-    error: (xhr, status, error) => {
+    error: (_xhr, _status, _error) => {
       console.log('Error');
       $('#message').text('An Error Occured.');
     }
@@ -493,12 +499,12 @@ function connect_socket() {
 
 const setColumnSize = function () {
   // sidebar tabs
-  let chatSeparator = document.getElementById('chat-separator');
-  let fileShareSeparator = document.getElementById('fileshare-separator');
-  let footer = document.getElementById('footer-container-consumer');
-  let tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
-  let chatHeight = footer.getBoundingClientRect().top - tabsTop;
-  let fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
+  const chatSeparator = document.getElementById('chat-separator');
+  const fileShareSeparator = document.getElementById('fileshare-separator');
+  const footer = document.getElementById('footer-container-consumer');
+  const tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
+  const chatHeight = footer.getBoundingClientRect().top - tabsTop;
+  const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
 
   $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
   $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
@@ -605,6 +611,7 @@ function registerJssip(myExtension, myPassword) {
       if (selfStream && selfStream.srcObject) {
         selfStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('SCREENSHARE ENDED SELF');
+          isScreenshareRestart = true;
           // $('#startScreenshare').hide();
           // acekurento.screenshare(false);
           // document.getElementById('startScreenshare').innerText = 'Start Screenshare';
@@ -624,6 +631,7 @@ function registerJssip(myExtension, myPassword) {
       if (remoteStream && remoteStream.srcObject) {
         remoteStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended remote');
+          isScreenshareRestart = true;
           acekurento.screenshare(false);
         };
       }
@@ -670,13 +678,20 @@ function registerJssip(myExtension, myPassword) {
 
       if (partCount >= 2 || videomailflag) {
         console.log('--- WV: CONNECTED');
+
         $('#queueModal').modal('hide');
+        //closeDialog($('#videomail-btn')[0]);
+
         $('#waitingModal').modal('hide');
+        //closeDialog($('#waitingHangUpButton')[0]);
+
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
         setColumnSize();
         callAnswered = true;
-        captionsStart();
+        if (!isCaptioning) {
+          captionsStart();
+        }
       }
     }
   };
@@ -700,6 +715,8 @@ function unregisterJssip() {
 // CALL FLOW FUNCTIONS
 
 function enterQueue() {
+  //closeDialog($('#callQueueButton')[0]);
+
   const language = 'en';
   socket.emit('call-initiated', {
     language,
@@ -734,13 +751,19 @@ function endCall(userInitiated = false) {
     openDialog('optionsModal', window);
 
     $('#noAgentsModal').modal('hide');
+    // closeDialog($('#noAgentsHangUpButton')[0]);
   } else if (callAnswered) {
     if (complaintRedirectActive) {
       $('#redirectURL').text(complaintRedirectUrl);
+      $('#redirectUrlDesc').text(complaintRedirectDesc);
+      $('#redirectUrlDesc').attr('href', complaintRedirectUrl);
       $('#waitingModal').modal('hide');
+      //closeDialog($('#waitingHangUpButton')[0]);
+
       $('#callEndedModal').modal('show');
       $('#callEndedModal').css('overflow-y', 'auto');
       openDialog('callEndedModal', window);
+
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
       setTimeout(() => {
@@ -771,6 +794,7 @@ function endCall(userInitiated = false) {
 
 function exitQueue() {
   console.log('EXITING QUEUE');
+  exitingQueue = true;
   endCall();
 }
 
@@ -791,10 +815,10 @@ function startCall(otherSipUri) {
 function startCallTimer() {
   let minutes = 0;
   let seconds = 0;
-  let start = new Date;
+  const start = new Date();
 
   callTimer = setInterval(function () {
-    let temp = Math.round(new Date - start) / 1000;
+    const temp = Math.round(new Date() - start) / 1000;
     minutes = Math.floor(temp / 60) > 0 ? Math.floor(temp / 60) : 0;
     seconds = Math.floor((temp - (minutes * 60)));
 
@@ -831,7 +855,7 @@ function terminateCall() {
 // IN CALL FEATURES
 
 // mutes self audio so remote cannot hear you
-var isMuted = false;
+let isMuted = false;
 function muteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone').addClass('call-btn-icon fa fa-microphone-slash');
   $('#mute-audio').attr('onclick', 'unmuteAudio()');
@@ -888,7 +912,8 @@ function enableVideoPrivacy() {
 
 function disableVideoPrivacy() {
   $('#hide-video').blur();
-  // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa fa-video-camera');
+  // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera')
+  //   .addClass('call-btn-icon fa fa-video-camera');
   $('#mute-camera-off-icon').children().remove();
   $('#mute-camera-off-icon').append(
     '<i class="fa fa-video-camera fa-stack-1x"></i>'
@@ -978,7 +1003,6 @@ function enterFullscreen() {
 
     // $('#remoteView').css('object-fit', 'cover');
   } else {
-
     if (document.exitFullscreen) {
       document.exitFullscreen();
     } else if (document.msExitFullscreen) {
@@ -1108,8 +1132,12 @@ $('#chatsend').submit((evt) => {
 
   const msg = $('#newchatmessage').val();
   const displayname = $('#displayname').val();
-  const date = moment();
+  const date = dayjs();
   const timestamp = date.format('h:mm a');
+
+  // console.log('local time: ' + date.format());
+  // console.log('utc time: ' + date.utc().format());
+  // const timestamp = date.utc();
 
   // const language = sessionStorage.consumerLanguage;
   const language = 'en';
@@ -1175,14 +1203,16 @@ function newChatMessage(data) {
   }
 
   if (data.isConsumerMessage) {
-    $(msgsender).addClass('direct-chat-name pull-left').html('You').appendTo(msginfo);
+    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html('You').css('font-weight','700 !important').appendTo(msginfo);
   } else {
-    $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
+    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html(displayname).css('font-weight','700 !important').appendTo(msginfo);
   }
 
-  $(msgtime).addClass('direct-chat-timestamp').html(` ${timestamp}`).appendTo(msginfo);
+  $(msgtime).addClass('direct-chat-timestamp chat-body2').html(` ${timestamp}`).appendTo(msginfo);
+  // $(msgtime).addClass('direct-chat-timestamp chat-body2')
+  //   .html(` ${dayjs(timestamp).local().format('h:mm a')}`).appendTo(msginfo);
   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-  $(msgtext).addClass('direct-chat-text')
+  $(msgtext).addClass('direct-chat-text chat-body1')
     .html(msg)
     .appendTo(msgblock);
 
@@ -1196,7 +1226,7 @@ function newChatMessage(data) {
     isAgentTyping = false;
     $('#rtt-typing').css('display', 'none');
     $('#chat-messages').remove($('#rtt-typing'));
-    $('#rtt-typing').html('').removeClass('direct-chat-text');
+    $('#rtt-typing').html('').removeClass('direct-chat-text chat-body1');
     $(msgblock).addClass('alert alert-secondary receivedChat')
       .attr('aria-live', 'assertive')
       .appendTo($('#chat-messages'));
@@ -1261,7 +1291,7 @@ function addFileToDownloadList(data) {
       // we can open this file in a new tab without downloading it
       $('#receivedFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1272,7 +1302,7 @@ function addFileToDownloadList(data) {
       // cannot view without downloading
       $('#receivedFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1284,7 +1314,7 @@ function addFileToDownloadList(data) {
     // file type not in file name-- cannot view without downloading
     $('#receivedFilesList').append(
       (`<span class="fileShareRow">
-      <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+      <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1312,7 +1342,7 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1324,7 +1354,7 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1337,7 +1367,7 @@ function addFileToSentList(data) {
     // add to sent files list
     $('#sentFilesList').append(
       (`<span class="fileShareRow">
-      <span class="fileShareCellFilename" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+      <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
@@ -1356,13 +1386,18 @@ function setFontSize(size) {
   $('.fontSizeButtons').blur();
   const currentFontSize = $('.currentFontSize').text().split('%')[0];
   const newFontSize = Number(currentFontSize) + size;
+  const body1FontSizeInPx = (16 * newFontSize) / 100; // 16px is the default font size for body1
+  const body2FontSizeInPx = (14 * newFontSize) / 100; // 14px is the default font size for body2
 
   if (newFontSize >= 50 && size === -10 || newFontSize <= 200 && size === 10) {
     if (newFontSize >= 80 && newFontSize <= 150) {
       setOtherFontSize(size);
     }
 
-    $('.tabFontSize').css('font-size', `${newFontSize.toString()}%`);
+    $('.tabFontSize').css('font-size', `${body1FontSizeInPx.toString()}px`);
+    $('.chat-body1').css('font-size', `${body1FontSizeInPx.toString()}px`);
+    $('.chat-body2').css('font-size', `${body2FontSizeInPx.toString()}px`);
+
     $('.currentFontSize').text(`${newFontSize.toString()}%`);
   }
 }
@@ -1570,10 +1605,11 @@ function toggleTab(tab) {
 
 function redirectToVideomail() {
   if (acekurento != null) {
-    acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, { ended: (_e) => {
-      console.log('--Call ended by asterisk, not abandoned--');
-      window.location.href = './videomail';
-    }
+    acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, {
+      ended: (_e) => {
+        console.log('--Call ended by asterisk, not abandoned--');
+        window.location.href = './videomail';
+      }
     });
     acekurento.callTransfer('videomail');
   } else {
@@ -1581,10 +1617,10 @@ function redirectToVideomail() {
   }
 }
 
-
 var recognition = null;
 function captionsStart() {
-  var language = $('#language-select').val();
+  isCaptioning = true;
+  let language = $('#language-select').val();
   switch (language) {
     case 'en': // English US
       language = 'en-US';
@@ -1593,7 +1629,7 @@ function captionsStart() {
       language = 'es-US';
       break;
     case 'ar': // Arabic (Modern Standard)
-      language  = 'ar-EG';
+      language = 'ar-EG';
       break;
     case 'pt': // Brazilian Portuguese
       language = 'pt-PT';
@@ -1621,7 +1657,7 @@ function captionsStart() {
       break;
     default:
       language = 'en-US';
-    }
+  }
   recognition = new webkitSpeechRecognition();
   recognition.continuous = true;
   recognition.lang = language;
@@ -1629,25 +1665,26 @@ function captionsStart() {
   recognition.maxAlternatives = 1;
   recognition.onresult = function (event) {
     if (!isMuted && event && event.results && (event.results.length > 0)) {
-      var lastResult = event.results.length - 1;
+      const lastResult = event.results.length - 1;
 
       socket.emit('caption-consumer', {
-        transcript:event.results[lastResult][0].transcript,
-        final: event.results[lastResult].isFinal, 
+        transcript: event.results[lastResult][0].transcript,
+        final: event.results[lastResult].isFinal,
         language: language
       });
     }
   };
 
-  recognition.onend = function (event) {
-    if(true)
-      captionsStart();	
-  }
+  recognition.onend = function (_event) {
+    if (true)
+      captionsStart();
+  };
   recognition.start();
 }
 
 function captionsEnd() {
-  if(recognition)
+  isCaptioning = false;
+  if (recognition)
     recognition.abort();
   recognition = null;
 }
