@@ -786,10 +786,13 @@ function endCall(userInitiated = false) {
     // Called when a user ends the call while waiting in queue
     closeDialog($('#waitingHangUpButton')[0]);
     $('#waitingModal').modal('hide');
-    $('#optionsModal').modal('hide');
-    $('#noAgentsModal').modal('show');
-    $('#noAgentsModal').css('overflow-y', 'auto');
-    openDialog('noAgentsModal', window);
+    //$('#optionsModal').modal('hide');
+    //$('#noAgentsModal').modal('show');
+    //$('#noAgentsModal').css('overflow-y', 'auto');
+    //openDialog('noAgentsModal', window);
+    $('#optionsModal').modal('show');
+    $('#optionsModal').css('overflow-y', 'auto');
+    openDialog('optionsModal', window);
   }
 }
 
