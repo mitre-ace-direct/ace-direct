@@ -24,6 +24,8 @@ let feedbackTimeoutID;
 let unreadMessages = 0;
 let unreadFiles = 0;
 let openTab = 'chat';
+let exitingQueue = false;
+let isCaptioning = false;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -52,6 +54,9 @@ $(document).ready(() => {
   for (let i = 0; i < tablists.length; i++) {
     new TabsManual(tablists[i]);
   }
+
+  // Extend dayjs with utc plugin
+  dayjs.extend(window.dayjs_plugin_utc);
 });
 
 $(window).bind('fullscreenchange', function (_e) {
@@ -606,6 +611,7 @@ function registerJssip(myExtension, myPassword) {
       if (selfStream && selfStream.srcObject) {
         selfStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('SCREENSHARE ENDED SELF');
+          isScreenshareRestart = true;
           // $('#startScreenshare').hide();
           // acekurento.screenshare(false);
           // document.getElementById('startScreenshare').innerText = 'Start Screenshare';
@@ -625,6 +631,7 @@ function registerJssip(myExtension, myPassword) {
       if (remoteStream && remoteStream.srcObject) {
         remoteStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended remote');
+          isScreenshareRestart = true;
           acekurento.screenshare(false);
         };
       }
@@ -638,8 +645,8 @@ function registerJssip(myExtension, myPassword) {
       console.log(`--- WV: Call ended ---\n${e}`);
 
       $('#startScreenshare').hide();
-      console.log('RECEIVED ENDCALL');
-      endCall(true);
+      //console.log('RECEIVED ENDCALL');
+      endCall(false);
       // terminateCall();
       // clearScreen();
       // disableChatButtons();
@@ -682,7 +689,9 @@ function registerJssip(myExtension, myPassword) {
         document.getElementById('inCallSection').style.display = 'block';
         setColumnSize();
         callAnswered = true;
-        captionsStart();
+        if (!isCaptioning) {
+          captionsStart();
+        }
       }
     }
   };
@@ -730,13 +739,13 @@ function enterQueue() {
  *
  * @param {*Determines if the user hang up while waiting in queue or ended an active call} inCall
  */
-function endCall() {
-  console.log('CALLING ENDCALL ' + $('#noAgentsModal').is(':visible'));
+function endCall(userInitiated = false) {
+  console.log('CALLING ENDCALL ' + userInitiated);
   terminateCall();
   clearInterval(callTimer);
   // if(callAnswered || forceHangup){
   // Catches if the user clicks the hangup on the noagents modal
-  if ($('#noAgentsModal').is(':visible')) {
+  if (($('#noAgentsModal').is(':visible') || $('#optionsModal').is(':visible')) && !userInitiated) {
     $('#optionsModal').modal('show');
     $('#optionsModal').css('overflow-y', 'auto');
     openDialog('optionsModal', window);
@@ -765,20 +774,31 @@ function endCall() {
       // reset the page
       window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
     }
-  } else {
+  } else if(userInitiated) {
     // Called when a user ends the call while waiting in queue
     $('#waitingModal').modal('hide');
-    //closeDialog($('#waitingHangUpButton')[0]);
-
+    $('#noAgentsModal').modal('hide');
     // $('#optionsModal').modal('show');
-    $('#noAgentsModal').modal('show');
-    $('#noAgentsModal').css('overflow-y', 'auto');
-    openDialog('noAgentsModal', window);
+    $('#optionsModal').modal('show');
+    $('#optionsModal').css('overflow-y', 'auto');
+    openDialog('optionsModal', window);
+  } else {
+    // Called when a user ends the call while waiting in queue
+    closeDialog($('#waitingHangUpButton')[0]);
+    $('#waitingModal').modal('hide');
+    //$('#optionsModal').modal('hide');
+    //$('#noAgentsModal').modal('show');
+    //$('#noAgentsModal').css('overflow-y', 'auto');
+    //openDialog('noAgentsModal', window);
+    $('#optionsModal').modal('show');
+    $('#optionsModal').css('overflow-y', 'auto');
+    openDialog('optionsModal', window);
   }
 }
 
 function exitQueue() {
   console.log('EXITING QUEUE');
+  exitingQueue = true;
   endCall();
 }
 
@@ -1119,6 +1139,10 @@ $('#chatsend').submit((evt) => {
   const date = dayjs();
   const timestamp = date.format('h:mm a');
 
+  // console.log('local time: ' + date.format());
+  // console.log('utc time: ' + date.utc().format());
+  // const timestamp = date.utc();
+
   // const language = sessionStorage.consumerLanguage;
   const language = 'en';
 
@@ -1189,6 +1213,8 @@ function newChatMessage(data) {
   }
 
   $(msgtime).addClass('direct-chat-timestamp chat-body2').html(` ${timestamp}`).appendTo(msginfo);
+  // $(msgtime).addClass('direct-chat-timestamp chat-body2')
+  //   .html(` ${dayjs(timestamp).local().format('h:mm a')}`).appendTo(msginfo);
   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
   $(msgtext).addClass('direct-chat-text chat-body1')
     .html(msg)
@@ -1597,6 +1623,7 @@ function redirectToVideomail() {
 
 var recognition = null;
 function captionsStart() {
+  isCaptioning = true;
   let language = $('#language-select').val();
   switch (language) {
     case 'en': // English US
@@ -1660,6 +1687,7 @@ function captionsStart() {
 }
 
 function captionsEnd() {
+  isCaptioning = false;
   if (recognition)
     recognition.abort();
   recognition = null;

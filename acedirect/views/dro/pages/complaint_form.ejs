@@ -18,6 +18,13 @@
 </head>
 
 <body style="font-family: 'Roboto', sans-serif;">
+  <div id="hardware-acc-warning" class="alert alert-info" style="margin-bottom:0px;display:flex;">
+    <p>We noticed you have hardware acceleration turned on! For better performance, 
+      consider turning hardware acceleration off in your Google Chrome Settings.
+    </p>
+    <button type="button" class="close" data-dismiss="alert" style="flex:1;margin:1rem;"><span>x</span></button>
+  </div>
+  
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
@@ -391,7 +398,7 @@
             - OR -
           </div>
           <div class="col-xs-5">
-            <button type="button" id="waitingHangUpButton" class="btn btn-secondary modal-outline-btn button" onclick="exitQueue()" tabindex="0" aria-label="Hang Up"><i
+            <button type="button" id="waitingHangUpButton" class="btn btn-secondary modal-outline-btn" onclick="endCall(true)" tabindex="0" aria-label="Hang Up"><i
                 class="fa fa-phone rotate-phone" alt="" aria-hidden="true"></i><span class="separator"></span>Hang Up</button>
           </div>
         </div>
@@ -427,7 +434,7 @@
             - OR -
           </div>
           <div class="col-xs-5">
-            <button type="button" id="noAgentsHangUpButton" class="btn btn-secondary modal-outline-btn" onclick="exitQueue()" tabindex="0" aria-label="Hang Up"><i
+            <button type="button" id="noAgentsHangUpButton" class="btn btn-secondary modal-outline-btn" onclick="endCall(true)" tabindex="0" aria-label="Hang Up"><i
                 class="fa fa-phone rotate-phone" alt="" aria-hidden="true"></i><span class="separator"></span>Hang Up</button>
           </div>
         </div>
@@ -509,14 +516,24 @@
   let logWebRTCMongo = '';
 </script>
 
+<script type="importmap">
+  {
+      "imports": {
+          "detect-gpu": "https://unpkg.com/detect-gpu@4.0.35/dist/detect-gpu.esm.js"
+      }
+  }
+</script>
+
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/dro/js/complaint_form.js"></script>
 <script type="text/javascript" src="/dro/js/tabs-manual.js"></script>
 <script type="text/javascript" src="/dro/js/dialog.js"></script>
 <script type="text/javascript" src="/assets/js/jwt-decode.js"></script>
-<script type="text/javascript" src="/assets/js/dayjs.min.js" async></script>
+<script type="text/javascript" src="/assets/js/dayjs.min.js"></script>
+<script type="text/javascript" src='/assets/js/utc.js'></script>
 <script type="text/javascript" src="./socket.io/socket.io.js"></script>
+<script type="module" src="/js/hardware_acc.js"></script>
 <script src="/js/ACEKurento-1.0.0.js"></script>
 
 </html>
