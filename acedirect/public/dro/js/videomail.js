@@ -1,4 +1,5 @@
 let recordingPaused = false;
+let isFirstPlay = true;
 
 function setVideoSize() {
   const a1 = document.getElementById('greeting-controls');
@@ -233,6 +234,7 @@ function startVideomailTimer() {
   const recTimerInterval = setInterval(() => {
     if (!recordingPaused) {
       rTime += 0.1;
+      console.log(rTime);
       const percentage = (rTime / maxTime) * 100;
       $('#recordingTimer span').css('width', `${percentage}%`);
 
@@ -262,8 +264,12 @@ function startVideomailTimer() {
 }
 
 $('#selfVideo').on('play', (_evt) => {
-  console.log('playing');
-  startVideomailTimer();
+  console.log('playing', isFirstPlay);
+  if (isFirstPlay) {
+    startVideomailTimer();
+    isFirstPlay = false;
+  }
+  
   startRecording();
 });
 
