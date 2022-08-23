@@ -210,28 +210,32 @@
 
 .recordingInfoBanner {
   position: absolute;
-  bottom: 0;
+  bottom: 5px;
   width: 100%;
   text-align: center;
   background-color: rgba(221, 221, 221, 0.8);
   color:  #000000;
   font-weight: 700;
   z-index: 1;
-  padding-top: 40px;
+  padding-top: 20px;
 }
 
 #RecordingNotif {
   font-size: 24px;
 }
 
-.sendVideomailButton:hover {
+#sendVideomailButton:hover {
   color: white;
   background-color: #205493 !important;
 }
 
-.sendVideomailButton:focus {
+#sendVideomailButton:focus {
   color: white;
   background-color: #396082 !important;
+}
+
+.dark-hr {
+  border-top: 1px solid black;
 }
 
 .circleButton {
