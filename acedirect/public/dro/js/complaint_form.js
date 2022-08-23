@@ -524,6 +524,9 @@ const setColumnSize = function () {
   let videoHeight = footer.getBoundingClientRect().top - videoTop;
   $('#remoteViewCol').height(videoHeight);
   $('#remoteView').height(videoHeight);
+
+  // set remote video column width
+  $('#remoteViewCol').width(`${ ($('#callVideosRow').width() - $('#selfViewCol').width()) - 30 }px`);
 };
 setColumnSize();
 window.addEventListener('resize', setColumnSize);
