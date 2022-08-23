@@ -25,7 +25,7 @@
   <div class="container" id="pageContainer">
     <div class="row">
       <main>
-        <div id="callVideoColumn" class="col-xs-6 col-lg-8 text-center">
+        <div id="callVideoColumn" class="col-xs-8 text-center">
           <!--Only appear outside of a call-->
           <div id="noCallPoster">
             <img id="DVC" src="dro/images/DVC2.png" alt="Direct Video Call logo">
@@ -71,11 +71,11 @@
 
             <div class="box-body" id="fullscreen-element">
               <div id="callVideosRow" class="row">
-                <div class="col-md-3" id="selfViewCol">
+                <div class="col-xs-3" id="selfViewCol">
                   <video id="selfView" autoplay muted="true" class="mirror-mode" aria-label="Self Video"></video>
                   <button id="exitFullscreen" onclick="exitFullscreen()" aria-label="Exit Fullscreen">Exit Fullscreen</button>
                 </div>
-                <div class="col-md-9" id="remoteViewCol">
+                <div class="col-xs-9" id="remoteViewCol">
                   <video id="remoteView" autoplay aria-label="Remote Video"></video>
                 </div>
               </div>
@@ -86,9 +86,9 @@
 
         <!-- Collapse/Expand, Chat, and File Share -->
         <section aria-label="chat and file share">
-          <div id="callFeaturesColumn" class="col-xs-6 col-lg-4" style="border-left:1px solid #ddd; height:100%; display:flex;">
+          <div id="callFeaturesColumn" class="col-xs-4" style="border-left:1px solid #ddd; height:100%; display:flex; padding-right: 0 !important;">
             <!-- Nav tabs -->
-            <div id="tab-options" class="col-xs-3" style="order:2;">
+            <div id="tab-options" class="col-xs-3" style="order:2; padding-right: 0 !important;">
               <ul class="nav nav-tabs tabs-right" style="height: 90vh;" role="tablist">
                 <li id="collapseTab" role="none" class="collapseTab">
                   <a id="collapseTabTitle" class="collapseTab sidebarTab" title="Collapse Sidebar"

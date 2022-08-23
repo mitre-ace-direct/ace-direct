@@ -1,6 +1,7 @@
 body {
-  min-width: 992px;
-  overflow-x: auto !important;
+  min-width: 1300px !important;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
 #selfView {
@@ -30,7 +31,6 @@ body {
   padding-left: 0px !important;
   /*padding-right: 15px !important;*/
   width: 100% !important;
-  min-width: 992px !important;
 }
 
 .container {
@@ -292,11 +292,17 @@ body {
   flex-direction: column;
   justify-content: center;
   overflow-y: auto;
-  min-height: calc(100vh - 60px);
+  overflow-x: auto;
+  min-height: calc(100vh - 100px);
 
   @media (max-width: 767px) {
     min-height: calc(100vh - 20px);
   }
+}
+
+.modal-open .modal {
+  overflow-x: auto !important;
+  min-width: 600px;
 }
 
 .modal-outline-btn {
@@ -477,7 +483,6 @@ body {
 .complaint-modal {
   min-width: 600px;
   position: absolute;
-  overflow-y: hidden !important;
 }
 
 
@@ -505,6 +510,7 @@ body {
 }
 
 #selfViewCol {
+  min-width: 200px !important;
   height : 100%;
 }
 
