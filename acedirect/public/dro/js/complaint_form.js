@@ -645,8 +645,8 @@ function registerJssip(myExtension, myPassword) {
       console.log(`--- WV: Call ended ---\n${e}`);
 
       $('#startScreenshare').hide();
-      console.log('RECEIVED ENDCALL');
-      endCall(true);
+      //console.log('RECEIVED ENDCALL');
+      endCall(false);
       // terminateCall();
       // clearScreen();
       // disableChatButtons();
@@ -739,13 +739,13 @@ function enterQueue() {
  *
  * @param {*Determines if the user hang up while waiting in queue or ended an active call} inCall
  */
-function endCall() {
-  console.log('CALLING ENDCALL ' + $('#noAgentsModal').is(':visible'));
+function endCall(userInitiated = false) {
+  console.log('CALLING ENDCALL ' + userInitiated);
   terminateCall();
   clearInterval(callTimer);
   // if(callAnswered || forceHangup){
   // Catches if the user clicks the hangup on the noagents modal
-  if ($('#noAgentsModal').is(':visible')) {
+  if (($('#noAgentsModal').is(':visible') || $('#optionsModal').is(':visible')) && !userInitiated) {
     $('#optionsModal').modal('show');
     $('#optionsModal').css('overflow-y', 'auto');
     openDialog('optionsModal', window);
@@ -774,21 +774,25 @@ function endCall() {
       // reset the page
       window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
     }
-  } else if(exitingQueue) {
-    // User left the queue
+  } else if(userInitiated) {
+    // Called when a user ends the call while waiting in queue
     $('#waitingModal').modal('hide');
+    $('#noAgentsModal').modal('hide');
+    // $('#optionsModal').modal('show');
     $('#optionsModal').modal('show');
     $('#optionsModal').css('overflow-y', 'auto');
     openDialog('optionsModal', window);
   } else {
     // Called when a user ends the call while waiting in queue
+    closeDialog($('#waitingHangUpButton')[0]);
     $('#waitingModal').modal('hide');
-    //closeDialog($('#waitingHangUpButton')[0]);
-
-    // $('#optionsModal').modal('show');
-    $('#noAgentsModal').modal('show');
-    $('#noAgentsModal').css('overflow-y', 'auto');
-    openDialog('noAgentsModal', window);
+    //$('#optionsModal').modal('hide');
+    //$('#noAgentsModal').modal('show');
+    //$('#noAgentsModal').css('overflow-y', 'auto');
+    //openDialog('noAgentsModal', window);
+    $('#optionsModal').modal('show');
+    $('#optionsModal').css('overflow-y', 'auto');
+    openDialog('optionsModal', window);
   }
 }
 
