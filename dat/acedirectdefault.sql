@@ -370,3 +370,7 @@ GRANT SELECT ON asterisk.* to 'acedirect'@'%';
 
 FLUSH PRIVILEGES;
 
+-- Need to turn off strict mode so our DB operations work in MySQL 8
+USE acedirect; SET GLOBAL sql_mode=''
+USE asterisk; SET GLOBAL sql_mode=''
+USE media_server; SET GLOBAL sql_mode=''
