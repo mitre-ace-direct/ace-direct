@@ -115,6 +115,10 @@
   background-color: #CDD7E0 !important;
 }
 
+#continue-button {
+  width: 200px !important;
+}
+
 .vm-cancel-button, .vm-cancel-button:hover, .vm-cancel-button:focus {
   padding-top: 9px !important;
   padding-bottom: 9px !important;
@@ -268,4 +272,17 @@
 
 #pauseAndShowModal {
   margin-left: 10px;
+}
+
+#pauseModal .modal-body {
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 10px;
+  padding-bottom: 20px;
+  min-height: 0px !important;
+}
+
+#pause-body-container {
+  width: 538px;
+  height: 165px;
 }
