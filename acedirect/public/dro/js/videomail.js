@@ -1,4 +1,5 @@
 let recordingPaused = false;
+let isFirstPlay = true;
 
 function setVideoSize() {
   const a1 = document.getElementById('greeting-controls');
@@ -63,6 +64,10 @@ function gotoCountDown() {
 
 function skipGreeting() {
   gotoCountDown();
+}
+
+function goToCallPage() {
+  window.location.href = './call';
 }
 
 $('#skipGreetingButton').on('click', () => {
@@ -163,10 +168,10 @@ function endVideomail() {
 
 async function pauseAndShowModal() {
   await recorder.pauseRecording();
+  selfVideo.pause();
   recordingPaused = true;
   $('#recordingTime').html((_index, html) => html.replace('Recording', 'Paused').replace('circle', 'pause'));
   $('#pauseModal').modal();
-  // eslint-disable-next-line no-undef
   openDialog('pauseModal', window);
 }
 
@@ -176,6 +181,7 @@ $('#pauseAndShowModal').on('click', () => {
 
 async function resumeAndCloseModal() {
   await recorder.resumeRecording();
+  selfVideo.play();
   recordingPaused = false;
   $('#recordingTime').html((_index, html) => html.replace('Paused', 'Recording').replace('pause', 'circle'));
   $('#pauseModal').modal('toggle');
@@ -256,8 +262,12 @@ function startVideomailTimer() {
 }
 
 $('#selfVideo').on('play', (_evt) => {
-  console.log('playing');
-  startVideomailTimer();
+  console.log('playing', isFirstPlay);
+  if (isFirstPlay) {
+    startVideomailTimer();
+    isFirstPlay = false;
+  }
+  
   startRecording();
 });
 
