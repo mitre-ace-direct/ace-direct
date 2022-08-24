@@ -172,8 +172,7 @@ async function pauseAndShowModal() {
   recordingPaused = true;
   $('#recordingTime').html((_index, html) => html.replace('Recording', 'Paused').replace('circle', 'pause'));
   $('#pauseModal').modal();
-  // eslint-disable-next-line no-undef
-  // openDialog('pauseModal', window);
+  openDialog('pauseModal', window);
 }
 
 $('#pauseAndShowModal').on('click', () => {
@@ -234,7 +233,6 @@ function startVideomailTimer() {
   const recTimerInterval = setInterval(() => {
     if (!recordingPaused) {
       rTime += 0.1;
-      console.log(rTime);
       const percentage = (rTime / maxTime) * 100;
       $('#recordingTimer span').css('width', `${percentage}%`);
 
