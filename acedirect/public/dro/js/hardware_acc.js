@@ -10,6 +10,9 @@ $(document).ready(async () => {
 
   const gpu = await getGPUTier();
 
+  /* ERT - disable for now */
+  gpu.tier = 0;
+
   if (gpu.tier > 1) {
     console.log('Hardware Acceleration is on.');
     $('#hardware-acc-warning').show();
