@@ -26,6 +26,10 @@ let unreadFiles = 0;
 let openTab = 'chat';
 let exitingQueue = false;
 let isCaptioning = false;
+//This variable is for catching the double end call that occurs when a user clicks the button
+// that ends the call while in queue as if causes both the normal end call and the asterisk
+//end call method to fire
+let callAlreadyTerminated = false;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -56,7 +60,7 @@ $(document).ready(() => {
   }
 
   // Extend dayjs with utc plugin
-  dayjs.extend(window.dayjs_plugin_utc);
+  //dayjs.extend(window.dayjs_plugin_utc);
 });
 
 $(window).bind('fullscreenchange', function (_e) {
@@ -716,6 +720,7 @@ function unregisterJssip() {
 
 function enterQueue() {
   //closeDialog($('#callQueueButton')[0]);
+  callAlreadyTerminated = false;
 
   const language = 'en';
   socket.emit('call-initiated', {
@@ -740,12 +745,14 @@ function enterQueue() {
  * @param {*Determines if the user hang up while waiting in queue or ended an active call} inCall
  */
 function endCall(userInitiated = false) {
-  console.log('CALLING ENDCALL ' + userInitiated);
-  terminateCall();
+  if(callAlreadyTerminated && !userInitiated){
+    return; //Prevents a doubel call from someone leaving the queue from occurring.
+  }
+  console.log('CALLING ENDCALL COMPARING' + userInitiated);
   clearInterval(callTimer);
   // if(callAnswered || forceHangup){
   // Catches if the user clicks the hangup on the noagents modal
-  if (($('#noAgentsModal').is(':visible') || $('#optionsModal').is(':visible')) && !userInitiated) {
+  if (($('#noAgentsModal').hasClass('in') || $('#optionsModal').hasClass('in')) && !userInitiated) {
     $('#optionsModal').modal('show');
     $('#optionsModal').css('overflow-y', 'auto');
     openDialog('optionsModal', window);
@@ -784,16 +791,19 @@ function endCall(userInitiated = false) {
     openDialog('optionsModal', window);
   } else {
     // Called when a user ends the call while waiting in queue
-    closeDialog($('#waitingHangUpButton')[0]);
+    //closeDialog($('#waitingHangUpButton')[0]);
     $('#waitingModal').modal('hide');
-    //$('#optionsModal').modal('hide');
-    //$('#noAgentsModal').modal('show');
-    //$('#noAgentsModal').css('overflow-y', 'auto');
-    //openDialog('noAgentsModal', window);
-    $('#optionsModal').modal('show');
-    $('#optionsModal').css('overflow-y', 'auto');
-    openDialog('optionsModal', window);
+    $('#optionsModal').modal('hide');
+    $('#noAgentsModal').modal('show');
+    $('#noAgentsModal').css('overflow-y', 'auto');
+    openDialog('noAgentsModal', window);
+    //$('#optionsModal').modal('show');
+    //$('#optionsModal').css('overflow-y', 'auto');
+    //openDialog('optionsModal', window);
   }
+  
+  callAlreadyTerminated = true;
+  terminateCall();
 }
 
 function exitQueue() {
