@@ -3,6 +3,7 @@
   z-index: 1;
   left: 0;
   right: 0;
+  top: 0;
   /* width: 34%; */
   height: 50%;
   text-align: center;
@@ -13,7 +14,7 @@
 
 #VRScontent {
   background-color: rgba(255, 255, 255, 0.85);
-  margin-top: 10%;
+  margin-top: 40%;
   padding: 20px;
   border: 1px solid #888;
 }

@@ -5,19 +5,26 @@
 
 import { getGPUTier } from 'detect-gpu';
 
-$(document).ready(async () => {
-  $('#hardware-acc-warning').hide();
+$(window).on('load', async () => {
+  const gpuBannerValue = sessionStorage.getItem('gpu-banner');
+  console.log(gpuBannerValue);
+  // $('#hardware-acc-warning').hide();
+
+  $('#gpu-close').click(() => {
+    console.log('close button clicked');
+    sessionStorage.setItem('gpu-banner', 'hidden');
+  });
 
   const gpu = await getGPUTier();
 
-  /* ERT - disable for now */
-  gpu.tier = 0;
-
-  if (gpu.tier > 1) {
+  if (gpuBannerValue === 'hidden') {
+    $('#hardware-acc-warning').addClass('hidden');
+  } else if (gpu.tier > 1 && gpuBannerValue !== 'hidden') {
     console.log('Hardware Acceleration is on.');
-    $('#hardware-acc-warning').show();
+    $('#hardware-acc-warning').removeClass('hidden');
+    sessionStorage.setItem('gpu-banner', 'shown');
   } else {
     console.log('Hardware Acceleration is off.');
-    $('#hardware-acc-warning').hide();
+    $('#hardware-acc-warning').addClass('hidden');
   }
 });
