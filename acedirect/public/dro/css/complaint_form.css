@@ -594,3 +594,19 @@ body {
   font-weight: 400;
   font-size: 12px;
 }
+
+
+@media only screen and (max-width: 500px) {
+  .complaint-modal .modal-dialog {
+    width: 70%;
+  }
+
+  .body1 b {
+    font-size: .9em;
+  }
+
+  #callQueueButton,
+  #leaveVideomailButton {
+    font-size: .8em !important;
+  }
+}
