@@ -701,6 +701,7 @@ function connect_socket() {
           if (!data) {
             // cannot ping Asterisk
             showErrorAlert('Error! Asterisk is unavailable.');
+            console.error('Error! Asterisk is unavailable.');
           }
         }).on('got-unread-count', function (data) {
           updateVideomailNotification(data);
