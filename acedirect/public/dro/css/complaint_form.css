@@ -595,7 +595,6 @@ body {
   font-size: 12px;
 }
 
-
 @media only screen and (max-width: 500px) {
   .complaint-modal .modal-dialog {
     width: 70%;
