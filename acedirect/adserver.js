@@ -3277,33 +3277,9 @@ setInterval(() => {
   });
 }, 5000);
 
-setInterval(() => {
+setInterval(async () => {
   // Keeps connection from Inactivity Timeout
   dbConnection.ping();
-}, 60000);
-
-setInterval(async () => {
-  // query for after hours
-  const ohurl = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:mserver'), 10)}/operatinghours`;
-  request({
-    method: 'GET',
-    url: ohurl,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    json: true
-  }, (error, response, data) => {
-    if (error) {
-      logger.error(`GET operatinghours: ${error}`);
-    } else {
-      isOpen = data.isOpen;
-
-      // operating hours
-      startTimeUTC = data.start; // hh:mm in UTC
-      endTimeUTC = data.end; // hh:mm in UTC
-    }
-    sendEmit('call-center-closed', { closed: !isOpen });
-  });
 
   // asterisk ping
   const isAlive = await pingServer(getConfigVal('servers:asterisk_private_ip'));
@@ -3330,7 +3306,30 @@ setInterval(async () => {
     sendEmit('asterisk-available', false);
     console.log('\n*** ERROR! Cannot ping Asterisk. ***\n');
   }
-  
+}, 60000);
+
+setInterval(() => {
+  // query for after hours
+  const ohurl = `https://${getConfigVal('servers:main_private_ip')}:${parseInt(getConfigVal('app_ports:mserver'), 10)}/operatinghours`;
+  request({
+    method: 'GET',
+    url: ohurl,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    json: true
+  }, (error, response, data) => {
+    if (error) {
+      logger.error(`GET operatinghours: ${error}`);
+    } else {
+      isOpen = data.isOpen;
+
+      // operating hours
+      startTimeUTC = data.start; // hh:mm in UTC
+      endTimeUTC = data.end; // hh:mm in UTC
+    }
+    sendEmit('call-center-closed', { closed: !isOpen });
+  });
 }, 5000);
 
 
