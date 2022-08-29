@@ -3318,7 +3318,7 @@ function showErrorAlert(alertText) {
   $('#errorAlert').show();
   setTimeout(function() {
     $('#errorAlert').hide();
-  },3000)
+  },20000)
 }
 
 // Keypress for DTMF toggle
