@@ -201,6 +201,7 @@
           }
         });
         if (!pc) {
+          console.log(JSON.stringify(configuration,null,2))
           pc = new RTCPeerConnection(configuration);
           if (useDataChannels && !dataChannel) {
             var dcId = 'WebRtcPeer-' + self.id;
@@ -447,10 +448,12 @@
             self.showLocalVideo();
           }
           if (videoStream) {
-            pc.addStream(videoStream);
+            // pc.addStream(videoStream);
+            videoStream.getTracks().forEach(track => pc.addTrack(track, videoStream))
           }
           if (audioStream) {
-            pc.addStream(audioStream);
+            // pc.addStream(audioStream); // mic still works on chrome with either this or below .. 
+            audioStream.getTracks().forEach(track => pc.addTrack(track, audioStream))
           }
           var browser = parser.getBrowser();
           if (mode === 'sendonly' && (browser.name === 'Chrome' || browser.name === 'Chromium') && browser.major === 39) {
@@ -1098,7 +1101,8 @@
       turnPort = turnPort.trim();
       if (turnPort.length > 0)
         url1 = url1 + ':' + turnPort;
-      module.exports = [{ "url": url1, "username": turnUser, "credential": turnCred }];
+      // module.exports = [{ "url": url1, "username": turnUser, "credential": turnCred }];
+      module.exports = [{ "urls": url1, "username": turnUser, "credential": turnCred }];
     }, {}], 8: [function (require, module, exports) {
       var WildEmitter = require('wildemitter');
 
