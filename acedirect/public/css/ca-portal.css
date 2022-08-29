@@ -990,7 +990,7 @@ div#call-controls button#button-hangup {
 }
 
 .cap-setting {
-  padding: 7px 10px !important;
+  /* padding: 7px 10px !important; */
   display: flex;
   justify-content: space-between;
 }
