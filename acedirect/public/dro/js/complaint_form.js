@@ -40,9 +40,9 @@ const viewableFileTypes = [
 ];
 
 $(document).ready(() => {
-  $('#optionsModal').modal('show');
+  //$('#optionsModal').modal('show');
   // $('#optionsModal').css('overflow-y', 'auto');
-  openDialog('optionsModal', window);
+  //openDialog('optionsModal', window);
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
   $('[data-toggle="tooltip"]').tooltip({
@@ -1503,12 +1503,14 @@ function collapseSidebar(tab) {
       $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
     }
 
-    $('.sidebarTab').css('width', '8vw');
+    //$('.sidebarTab').css('width', '8vw');
 
-    $('#callFeaturesColumn').removeClass('col-md-1');
-    $('#callFeaturesColumn').addClass('col-xs-6 col-lg-4');
-    $('#callVideoColumn').removeClass('col-md-11');
-    $('#callVideoColumn').addClass('col-xs-6 col-lg-8');
+    $('#callFeaturesColumn').removeClass('col-xs-1');
+    $('#callFeaturesColumn').addClass('col-xs-4');
+    $('#callVideoColumn').removeClass('col-xs-11');
+    $('#callVideoColumn').addClass('col-xs-8');
+    $('#tab-options').removeClass('collapsedTabWidth');
+
 
     $('#callFeaturesColumn').css('border-left', '1px solid #ddd');
     $('#callFeaturesColumn').css('padding-left', '');
@@ -1538,7 +1540,7 @@ function collapseSidebar(tab) {
     $('#tab-options').css('padding-left', '0px');
     $('li').removeClass('active');
     $('.tab-pane').removeClass('active');
-    $('.sidebarTab').css('width', '8.8vw');
+    //$('.sidebarTab').css('width', '8.48vw');
 
     $('#chatTab').attr('aria-selected', 'false');
     $('#fileShareTab').attr('aria-selected', 'false');
@@ -1546,11 +1548,11 @@ function collapseSidebar(tab) {
     $('#fileShareTab').attr('tabindex', '-1');
     $('#fileShareTab').attr('aria-label', 'Collapsed file share tab');
     $('#chatTab').attr('aria-label', 'Collapsed chat tab');
-
-    $('#callFeaturesColumn').removeClass('col-xs-6 col-lg-4');
-    $('#callFeaturesColumn').addClass('col-md-1');
-    $('#callVideoColumn').removeClass('col-xs-6 col-lg-8');
-    $('#callVideoColumn').addClass('col-md-11');
+    $('#callFeaturesColumn').removeClass('col-xs-4');
+    $('#callFeaturesColumn').addClass('col-xs-1');
+    $('#callVideoColumn').removeClass('col-xs-8');
+    $('#callVideoColumn').addClass('col-xs-11');
+    $('#tab-options').addClass('collapsedTabWidth');
 
     $('#callFeaturesColumn').css('border-left', '');
     $('#callFeaturesColumn').css('padding-left', '0px');
