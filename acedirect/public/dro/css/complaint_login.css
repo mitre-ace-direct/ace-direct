@@ -148,3 +148,97 @@
 .toast.active {
   transform: translateY(0);
 }
+
+
+/* MEDIA QUERIES FOR MOBILE */
+@media only screen and (max-width: 500px) {
+
+  /* entire grid */
+  #consumerBackground {
+    display: grid;
+    grid-template-rows: min-content 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+    align-items: center;
+    height: 90vh;
+  }
+
+  header {
+    grid-area: 'header';
+  }
+
+  main {
+    grid-area: main;
+    position: relative;
+    height: 90vh;
+  }
+
+  main>section:first-child {
+    display: grid;
+    grid-template-rows: min-content 1fr;
+    height: 90vh;
+    position: relative;
+  }
+
+  #heroLogo {
+    /* center the hero */
+    position: inherit;
+    object-fit: initial;
+    background-size: initial;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+
+    display: none;
+
+  }
+
+  main .row {
+    position: absolute;
+    margin-right: 0;
+    margin-left: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  #VRSlogincontainer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    left: inherit;
+    right: inherit;
+    top: inherit;
+    margin: 0 10vw;
+  }
+
+  #VRScontent {
+    margin-top: 0;
+    padding: 20px;
+  }
+
+  /* undo min width and adjust logo image width */
+  #logoContainer {
+    min-width: 0;
+    height: 100%;
+  }
+
+  #logoContainer img:nth-child(1) {
+    width: 30%;
+  }
+
+  #logoContainer img:nth-child(2) {
+    width: 10%;
+  }
+
+  /* font adjustments */
+  .appTitle,
+  #headerBox {
+    font-size: 1.3em !important;
+  }
+}
