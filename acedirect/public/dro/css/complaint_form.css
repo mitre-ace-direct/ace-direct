@@ -242,6 +242,9 @@ body {
 .tab:first-child {
   border-right: transparent !important;
 }
+.tabsWidthClass {
+  width: 110%;
+}
 
 #collapseButton {
   border-radius: 50%;

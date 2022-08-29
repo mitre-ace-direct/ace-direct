@@ -1447,7 +1447,7 @@ $('#collapseButton').on('keydown', (e) => {
   }
 });
 
-function collapseSidebar(tab) {
+function collapseSidebar(tab) {  
   if (isSidebarCollapsed) {
     // open the sidebar
     isSidebarCollapsed = false;
@@ -1456,7 +1456,7 @@ function collapseSidebar(tab) {
     $('#collapseButton').attr('aria-expanded', 'true');
     $('.tab-content').attr('hidden', false);
     $('#tab-pane').attr('hidden', false);
-    $('#tab-options').css('padding-left', '');
+   // $('#tab-options').css('padding-left', '');
 
     $('#fileShareTab').attr('aria-label', 'File share tab');
     $('#chatTab').attr('aria-label', 'Chat tab');
@@ -1514,6 +1514,7 @@ function collapseSidebar(tab) {
 
     $('#callFeaturesColumn').css('border-left', '1px solid #ddd');
     $('#callFeaturesColumn').css('padding-left', '');
+    $('#callFeaturesColumn').css('padding-right', '');
 
     $('#collapseButtonIcon').removeClass('fa fa-angle-double-left');
     $('#collapseButtonIcon').addClass('fa fa-angle-double-right');
@@ -1527,8 +1528,9 @@ function collapseSidebar(tab) {
     $('#remoteViewCol').css('height', '');
     $('#remoteView').css('height', '');
     $('#remoteView').css('width', '');
+    $('#tabRightGroup').addClass('tabsWidthClass')
     setColumnSize();
-  } else {
+  } else {    
     // close the sidebar
     isSidebarCollapsed = true;
     openTab = '';
@@ -1553,9 +1555,11 @@ function collapseSidebar(tab) {
     $('#callVideoColumn').removeClass('col-xs-8');
     $('#callVideoColumn').addClass('col-xs-11');
     $('#tab-options').addClass('collapsedTabWidth');
+    $('#tabRightGroup').removeClass('tabsWidthClass')
 
     $('#callFeaturesColumn').css('border-left', '');
     $('#callFeaturesColumn').css('padding-left', '0px');
+    $('#callFeaturesColumn').css('padding-right', '0px');
 
     // update the collapse button tooltip
     $('#collapseButton').attr('data-original-title', 'Expand').parent().find('.tooltip-inner').html('Expand');
