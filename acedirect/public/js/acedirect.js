@@ -432,9 +432,6 @@ function connect_socket() {
           $('#subject').val(data.subject);
           $('#problemdesc').val(data.description);
           $('#ticketId').val(data.zendesk_ticket);
-        }).on('asterisk-ami', function (data) {
-          showErrorAlert('Error! Asterisk AMI is unavailable.');
-          console.error('Error! Asterisk AMI is unavailable.');
         }).on('agent-status-list', function (data) {
           if (data.message === 'success') {
             var tabledata = {
@@ -697,11 +694,12 @@ function connect_socket() {
           }
         }).on('got-videomail-recs', function (data) {
           updateVideomailTable(data);
-        }).on('asterisk-available', function (data) {
-          if (!data) {
-            // cannot ping Asterisk
-            showErrorAlert('Error! Asterisk is unavailable.');
-            console.error('Error! Asterisk is unavailable.');
+        }).on('asterisk-check', function (data) {
+          data = data.trim();
+          showErrorAlert(data);
+          if (data.length !== 0) {
+            // server or AMI ping failed
+            console.error(data);
           }
         }).on('got-unread-count', function (data) {
           updateVideomailNotification(data);
@@ -3314,11 +3312,19 @@ function showAlert(alertType, alertText) {
 
 // Error Alert message function
 function showErrorAlert(alertText) {
-  $('#errorAlertText').html(alertText);
-  $('#errorAlert').show();
-  setTimeout(function() {
-    $('#errorAlert').hide();
-  },20000)
+  const visible = $('#errorAlert').is(':visible');
+  if (alertText.length === 0) {
+    // success
+    if (visible) {
+      $('#errorAlert').hide();
+    }
+  } else {
+    // error
+    if (!visible) {
+      $('#errorAlertText').html(alertText);
+      $('#errorAlert').show();
+    }
+  }
 }
 
 // Keypress for DTMF toggle

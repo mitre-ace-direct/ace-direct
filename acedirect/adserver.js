@@ -26,7 +26,7 @@ const AWS = require('aws-sdk');
 const proxy = require('proxy-agent');
 const ping = require('ping');
 const AmiClient = require('asterisk-ami-client');
-const asteriskAmiClient = new AmiClient();
+const asteriskAmiClient = new AmiClient({maxAttemptsCount: 1});
 
 AWS.config.update({
   region: datConfig.s3.region,
@@ -41,36 +41,48 @@ let dbConnection = null;
 let dbconn = null;
 
 // ping a server to see if it is reachable
-const pingServer = (hostIP) => new Promise((resolve, reject) => {
-  ping.sys.probe(hostIP, (isAlive) => {
+const pingCfg = {
+    timeout: 1
+};
+const checkAsterisk = (asteriskIp, amiId, amiPass, amiPort) => {
+  let asteriskError = ''; // success
+  ping.sys.probe(asteriskIp, (isAlive) => {
     if (isAlive) {
-      resolve(true);
-      return;
-    } else {
-      resolve(false);
-      return;
-    }
-  });
-});
-
-const pingAsteriskAMI = (amiId, amiPass, asteriskIp, amiPort) => new Promise((resolve, reject) => {
-  asteriskAmiClient.connect(amiId, amiPass, { host: asteriskIp, port: amiPort })
-    .then((_amiConnection) => {
-      asteriskAmiClient 
-        .on('response', (response) => {
-          resolve(0);
+      // server ping success, now check AMI
+      asteriskAmiClient.connect(amiId, amiPass, { host: asteriskIp, port: amiPort })
+        .then((_amiConnection) => {
+          asteriskAmiClient 
+            .on('response', (response) => {
+              // AMI ping success
+              sendEmit('asterisk-check', asteriskError);
+            })
+            .on('internalError', (error) => {
+              // AMI ping internal error
+              asteriskError = 'ERROR! Asterisk AMI is unavailable.'; // AMI Ping internal error
+              console.log(`*** ${asteriskError} ; AMI ping internal error. ***`);
+            })
+            .action({
+              Action: 'Ping'
+            });
         })
-        .on('internalError', (error) => {
-          reject(new Error('ERROR - Asterisk AMI error!'));
+        .catch((_error) => {
+          // AMI ping failed
+          asteriskError = 'ERROR! Asterisk AMI is unavailable.'; // AMI Ping error
+          console.log(`*** ${asteriskError} ; AMI ping failed. ***`);
         })
-        .action({
-          Action: 'Ping'
+        .finally(() => {
+          // send results
+          sendEmit('asterisk-check', asteriskError);
+          asteriskAmiClient.disconnect();
         });
-    })
-    .catch((_error) => {
-      reject(new Error('ERROR pinging Asterisk'));
-    });
-});
+    } else {
+      // server ping failed
+      asteriskError = 'ERROR! Asterisk is unreachable.'; // ping failed
+      sendEmit('asterisk-check', asteriskError);
+      console.log(`*** ${asteriskError} ; Asterisk server ping failed.***\n`);
+    }
+  }, pingCfg);
+};
 
 // For fileshare
 // var upload = multer();
@@ -3277,35 +3289,9 @@ setInterval(() => {
   });
 }, 5000);
 
-setInterval(async () => {
+setInterval(() => {
   // Keeps connection from Inactivity Timeout
   dbConnection.ping();
-
-  // asterisk ping
-  const isAlive = await pingServer(getConfigVal('servers:asterisk_private_ip'));
-  if (isAlive) {
-    sendEmit('asterisk-available', true);
-
-    // ping Asterisk AMI
-    const asteriskIp = getConfigVal('servers:asterisk_private_ip');
-    const amiId = getConfigVal('asterisk:ami:id');
-    const amiPass = getConfigVal('asterisk:ami:passwd');
-    const amiPort = getConfigVal('app_ports:asterisk_ami').toString();
-    let rc = 1;
-    try {
-      rc = await pingAsteriskAMI(amiId, amiPass, asteriskIp, amiPort);
-      if (rc !== 0) {
-        sendEmit('asterisk-ami', { message: 'error' });
-        console.log('\n*** ERROR! Asterisk AMI ping failed. ***\n');
-      }
-    } catch (e) {
-      sendEmit('asterisk-ami', { message: 'error' });
-      console.log('\n*** ERROR! Asterisk AMI ping error. ***\n');
-    }
-  } else {
-    sendEmit('asterisk-available', false);
-    console.log('\n*** ERROR! Cannot ping Asterisk. ***\n');
-  }
 }, 60000);
 
 setInterval(() => {
@@ -3330,6 +3316,14 @@ setInterval(() => {
     }
     sendEmit('call-center-closed', { closed: !isOpen });
   });
+
+  // asterisk checks
+  const asteriskIp = getConfigVal('servers:asterisk_private_ip');
+  const amiId = getConfigVal('asterisk:ami:id');
+  const amiPass = getConfigVal('asterisk:ami:passwd');
+  const amiPort = getConfigVal('app_ports:asterisk_ami').toString();
+  checkAsterisk(asteriskIp, amiId, amiPass, amiPort);
+
 }, 5000);
 
 
