@@ -432,9 +432,12 @@ function connect_socket() {
           $('#subject').val(data.subject);
           $('#problemdesc').val(data.description);
           $('#ticketId').val(data.zendesk_ticket);
-        }).on('asterisk-ami', function (data) {
-          showErrorAlert('Error! Asterisk AMI is unavailable.');
-          console.error('Error! Asterisk AMI is unavailable.');
+        }).on('asterisk-ami-check', function (data) {
+          if (!data) {
+            // ami check failed
+            showErrorAlert('Error! Asterisk AMI is unavailable.');
+            console.error('Error! Asterisk AMI is unavailable.');
+          }
         }).on('agent-status-list', function (data) {
           if (data.message === 'success') {
             var tabledata = {
@@ -3314,11 +3317,12 @@ function showAlert(alertType, alertText) {
 
 // Error Alert message function
 function showErrorAlert(alertText) {
+  $('#errorAlert').hide();
   $('#errorAlertText').html(alertText);
   $('#errorAlert').show();
   setTimeout(function() {
     $('#errorAlert').hide();
-  },20000)
+  },3000)
 }
 
 // Keypress for DTMF toggle
