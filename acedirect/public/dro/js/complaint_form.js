@@ -61,6 +61,16 @@ $(document).ready(() => {
 
   // Extend dayjs with utc plugin
   //dayjs.extend(window.dayjs_plugin_utc);
+
+  // update the page height when the accelerated hardware banner appears/disappears
+  var observer = new MutationObserver(function(mutations) {
+    console.log('setting setColumnSize()')
+    setColumnSize();
+  });
+  var target = document.querySelector('#hardware-acc-warning');
+  observer.observe(target, {
+    attributes: true
+  });
 });
 
 $(window).bind('fullscreenchange', function (_e) {
@@ -502,6 +512,11 @@ function connect_socket() {
 }
 
 const setColumnSize = function () {
+  let acceleratedBannerHeight = 0;
+  if ($('#hardware-acc-warning').is(':visible')) {
+    acceleratedBannerHeight = $('#hardware-acc-warning').height()
+  }
+
   // sidebar tabs
   const chatSeparator = document.getElementById('chat-separator');
   const fileShareSeparator = document.getElementById('fileshare-separator');
@@ -510,13 +525,13 @@ const setColumnSize = function () {
   const chatHeight = footer.getBoundingClientRect().top - tabsTop;
   const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
 
-  $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
-  $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
+  $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
+  $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
 
-  $('#fileshare-box-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20));
-  $('#fileshare-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20));
+  $('#fileshare-box-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
+  $('#fileshare-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
 
-  $('.tabs-right').height((chatHeight + tabsTop) - ($('#footer-container-consumer').height() + 20));
+  $('.tabs-right').height((chatHeight + tabsTop) - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
 
   // video section
   $('#callVideoColumn').height(footer.getBoundingClientRect().top - 200);

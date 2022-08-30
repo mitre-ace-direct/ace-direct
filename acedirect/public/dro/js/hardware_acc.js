@@ -12,6 +12,7 @@ $(window).on('load', async () => {
 
   $('#gpu-close').click(() => {
     console.log('close button clicked');
+    $('#hardware-acc-warning').addClass('hidden');
     sessionStorage.setItem('gpu-banner', 'hidden');
   });
 
