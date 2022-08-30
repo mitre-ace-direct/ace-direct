@@ -45,6 +45,7 @@ const pingCfg = {
     timeout: 1
 };
 const checkAsterisk = (asteriskIp, amiId, amiPass, amiPort) => {
+  let asteriskError = ''; // success
   ping.sys.probe(asteriskIp, (isAlive) => {
     if (isAlive) {
       // server ping success, now check AMI
@@ -53,13 +54,12 @@ const checkAsterisk = (asteriskIp, amiId, amiPass, amiPort) => {
           asteriskAmiClient 
             .on('response', (response) => {
               // AMI ping success
-              asteriskAmiClient.disconnect();
+              sendEmit('asterisk-check', asteriskError);
             })
             .on('internalError', (error) => {
               // AMI ping internal error
-              sendEmit('asterisk-ami-check', false);
-              console.log('*** ERROR! Asterisk AMI ping internal error. ***');
-              asteriskAmiClient.disconnect();
+              asteriskError = 'ERROR! Asterisk AMI is unavailable.'; // AMI Ping internal error
+              console.log(`*** ${asteriskError} ; AMI ping internal error. ***`);
             })
             .action({
               Action: 'Ping'
@@ -67,14 +67,19 @@ const checkAsterisk = (asteriskIp, amiId, amiPass, amiPort) => {
         })
         .catch((_error) => {
           // AMI ping failed
-          sendEmit('asterisk-ami-check', false);
-          console.log('*** ERROR! Asterisk AMI ping failed. ***');
+          asteriskError = 'ERROR! Asterisk AMI is unavailable.'; // AMI Ping error
+          console.log(`*** ${asteriskError} ; AMI ping failed. ***`);
+        })
+        .finally(() => {
+          // send results
+          sendEmit('asterisk-check', asteriskError);
           asteriskAmiClient.disconnect();
         });
     } else {
       // server ping failed
-      sendEmit('asterisk-available', false);
-      console.log('*** ERROR! Cannot ping Asterisk. ***\n');
+      asteriskError = 'ERROR! Asterisk is unreachable.'; // ping failed
+      sendEmit('asterisk-check', asteriskError);
+      console.log(`*** ${asteriskError} ; Asterisk server ping failed.***\n`);
     }
   }, pingCfg);
 };
