@@ -705,6 +705,10 @@ function connect_socket() {
           if (data.length !== 0) {
             // server or AMI ping failed
             console.error(data);
+            pauseQueues();
+            document.getElementById('status-dropdown-button').disabled = true;
+          } else {
+            document.getElementById('status-dropdown-button').disabled = false;
           }
         }).on('got-unread-count', function (data) {
           updateVideomailNotification(data);
