@@ -12,6 +12,8 @@ var config = require('./../../dat/config.json');
 const path = require('path');
 const formidable = require('formidable');
 
+const fileSharingEnabled = (utils.getConfigVal(config.filesharing.enabled) === 'true') ? true : false;
+
 AWS.config.update({
     region: utils.getConfigVal(config.s3.region),
     httpOptions: {
@@ -406,7 +408,7 @@ router.get('/getRecording', agentRestrict, (req, res) => {
 // Clam AV
 const NodeClam = require('clamscan');
 let ClamScan = null;
-if (utils.getConfigVal(config.filesharing.virus_scan_enabled) === 'true') {
+if (utils.getConfigVal(config.filesharing.virus_scan_enabled) === 'true' && fileSharingEnabled) {
   ClamScan = new NodeClam().init({
       remove_infected: true, // If true, removes infected files
       quarantine_infected: false, // False: Don't quarantine, Path: Moves files to this place.
@@ -441,6 +443,12 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 router.post('/fileUpload', restrict, upload.single('uploadfile'), (req, res) => {
     let uploadedBy = req.session.user.vrs || ((req.session.user.role === 'AD Agent') ? req.body.vrs : false);
+
+    if (!fileSharingEnabled) {
+      // file sharing is disabled, do nothing
+      res.status(200).send('Success');
+      return;
+    }
 
     // sometimes the consumer doesn't have it's vrs number in req.session
     // also sometimes the req.session doesn't update?? **** This is the issue

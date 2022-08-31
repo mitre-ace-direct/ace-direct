@@ -156,7 +156,6 @@ const cfile = '../dat/config.json';
 try {
   const content = fs.readFileSync(cfile, 'utf8');
   const myjson = JSON.parse(content);
-  console.log('Valid JSON config file');
 } catch (ex) {
   console.log('');
   console.log('*******************************************************');
@@ -206,7 +205,7 @@ function getConfigVal(paramName) {
 // REMOVE the field or set it to "" if config.json is encoded
 let clearText = false;
 if (typeof (nconf.get('common:cleartext')) !== 'undefined' && nconf.get('common:cleartext') !== '') {
-  console.log('common:cleartext field is in config.json. assuming file is in clear text');
+  // common:cleartext field is in config.json. assuming file is in clear text
   clearText = true;
 }
 
@@ -335,7 +334,6 @@ if (agentPath.length === 0) {
 }
 
 let consumerPath = getConfigVal('nginx:consumer_route');
-console.log(consumerPath.length);
 if (consumerPath.length === 0) {
   consumerPath = '/complaint';
 }
@@ -419,6 +417,9 @@ const zendeskClient = zendeskApi.createClient({
   remoteUri: zenUrl
 });
 
+// filesharing enabled
+const fileSharingEnabled = (getConfigVal('filesharing:enabled') === 'true') ? true : false;
+
 const dbHost = getConfigVal('servers:mysql_fqdn');
 const dbUser = getConfigVal('database_servers:mysql:user');
 const dbPassword = getConfigVal('database_servers:mysql:password');
@@ -501,13 +502,8 @@ if (mongodbUri) {
       process.exit(-99);
     }
 
-    console.log('MongoDB Connection Successful');
     mongodb = database.db();
     dbconn = database;
-
-    // Start the application after the database connection is ready
-    // httpsServer.listen(port);
-    // console.log('https web server listening on ' + port);
 
     // prepare an entry into MongoDB to log the acedirect restart
     const data = {
@@ -547,8 +543,6 @@ if (mongodbUri) {
 } else {
   console.log('Missing MongoDB servers:mongodb_fqdn value in dat/config.json');
   logger.error('Missing MongoDB servers:mongodb_fqdn value in dat/config.json');
-  // httpsServer.listen(port);
-  // console.log('https web server listening on ' + port);
 }
 
 const credentials = {
@@ -556,7 +550,6 @@ const credentials = {
   cert: fs.readFileSync(getConfigVal('common:https:certificate'))
 };
 
-console.log("..",mongodbUri)
 const sessionStore = new MongoDBStore({
   uri: mongodbUri,
   collection: 'mySessions'
@@ -620,8 +613,7 @@ app.use(cors({
 }));
 
 httpsServer.listen(parseInt(getConfigVal('app_ports:acedirect'), 10));
-logger.info(`https web server listeningprocess on ${parseInt(getConfigVal('app_ports:acedirect'), 10)}`);
-console.log(`https web server listeningprocess on ${parseInt(getConfigVal('app_ports:acedirect'), 10)}`);
+console.log(`https webserver listening on ${parseInt(getConfigVal('app_ports:acedirect'), 10)}...`);
 logger.info(`Config file: ${cfile}`);
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -3933,6 +3925,7 @@ app.use((req, res, next) => {
     startTimeUTC,
     csrfToken: req.csrfToken(),
     version,
+    fileSharingEnabled,
     year
   };
   next();
