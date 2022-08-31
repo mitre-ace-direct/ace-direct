@@ -119,7 +119,6 @@ function getConfigVal(val){
         logger.error('');
         decodedString = '';
     }
-    console.log(decodedString.toString())
     return (decodedString.toString());
 }
 
