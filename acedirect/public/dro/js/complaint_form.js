@@ -44,12 +44,11 @@ const viewableFileTypes = [
 ];
 
 $(document).ready(() => {
-
   if (fileSharingEnabled === 'false') {
-    // hide filesharing dialog
-    $("#tab2").hide();
+    // remove filesharing tab
+    $('#tab2').remove();
   }
-  
+
   $('#optionsModal').modal('show');
   // $('#optionsModal').css('overflow-y', 'auto');
   openDialog('optionsModal', window);
@@ -822,7 +821,7 @@ function endCall(userInitiated = false) {
     //$('#optionsModal').css('overflow-y', 'auto');
     //openDialog('optionsModal', window);
   }
-  
+
   callAlreadyTerminated = true;
   terminateCall();
 }
