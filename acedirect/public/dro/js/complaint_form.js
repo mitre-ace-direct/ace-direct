@@ -729,18 +729,26 @@ function enterQueue() {
     console.log('isOpen:', isOpen);
     if (isOpen) {
       // wait for the options modal to fully close before opening another modal
+      let openWaitingModal = true;
       $('#optionsModal').on('hidden.bs.modal', function (e) {
-        $('#waitingModal').modal('show');
-        $('#waitingModal').css('overflow-y', 'auto');
-        openDialog('waitingModal', window);
+        if (openWaitingModal) {
+          $('#waitingModal').modal('show');
+          $('#waitingModal').css('overflow-y', 'auto');
+          openDialog('waitingModal', window);
+          openWaitingModal = false;
+        }
       });
 
     } else {
       // wait for the options modal to fully close before opening another modal
+      let openNoAgentsModal = true;
       $('#optionsModal').on('hidden.bs.modal', function (e) {
-        $('#noAgentsModal').modal('show');
-        $('#noAgentsModal').css('overflow-y', 'auto');
-        openDialog('noAgentsModal', window);
+        if (openNoAgentsModal) {
+          $('#noAgentsModal').modal('show');
+          $('#noAgentsModal').css('overflow-y', 'auto');
+          openDialog('noAgentsModal', window);
+          openNoAgentsModal = false;
+        }
       });
     }
   });
@@ -758,11 +766,14 @@ function endCall() {
   // Catches if the user clicks the hangup on the noagents modal
   if ($('#noAgentsModal').is(':visible')) {
     $('#noAgentsModal').modal('hide');
+    let openOptionsModal = true;
     $('#noAgentsModal').on('hidden.bs.modal', function (e) {
-      console.log('no agents modal is closed for good. (HIDDEN) ')
-      $('#optionsModal').modal('show');
-      $('#optionsModal').css('overflow-y', 'auto');
-      openDialog('optionsModal', window);
+      if (openOptionsModal) {
+        $('#optionsModal').modal('show');
+        $('#optionsModal').css('overflow-y', 'auto');
+        openDialog('optionsModal', window);
+        openOptionsModal = false;
+      }
     });
 
   } else if (callAnswered) {
@@ -773,10 +784,14 @@ function endCall() {
       $('#waitingModal').modal('hide');
       //closeDialog($('#waitingHangUpButton')[0]);
       // wait for the modal to fully close before opening another modal
+      let openCallEndedModal = true;
       $('#waitingModal').on('hidden.bs.modal', function (e) {
-        $('#callEndedModal').modal('show');
-        $('#callEndedModal').css('overflow-y', 'auto');
-        openDialog('callEndedModal', window);
+        if (openCallEndedModal) {
+          $('#callEndedModal').modal('show');
+          $('#callEndedModal').css('overflow-y', 'auto');
+          openDialog('callEndedModal', window);
+          openCallEndedModal = false;
+        }
       });
 
       document.getElementById('noCallPoster').style.display = 'block';
@@ -793,21 +808,28 @@ function endCall() {
     // User left the queue
     $('#waitingModal').modal('hide');
     // wait for the modal to fully close before opening another modal
+    let openOptionsModal = true;
     $('#waitingModal').on('hidden.bs.modal', function (e) {
-      $('#optionsModal').modal('show');
-      $('#optionsModal').css('overflow-y', 'auto');
-      openDialog('optionsModal', window);
+      if (openOptionsModal) {
+        $('#optionsModal').modal('show');
+        $('#optionsModal').css('overflow-y', 'auto');
+        openDialog('optionsModal', window);
+        openOptionsModal = false;
+      }
     });
   } else {
     // Called when a user ends the call while waiting in queue
     $('#waitingModal').modal('hide');
     //closeDialog($('#waitingHangUpButton')[0]);
     // wait for the modal to fully close before opening another modal
+    let openNoAgentsModal = true;
     $('#waitingModal').on('hidden.bs.modal', function (e) {
-      console.log('no agents modal is closed for good. (HIDDEN) ')
-      $('#noAgentsModal').modal('show');
-      $('#noAgentsModal').css('overflow-y', 'auto');
-      openDialog('noAgentsModal', window);
+      if (openNoAgentsModal) {
+        $('#noAgentsModal').modal('show');
+        $('#noAgentsModal').css('overflow-y', 'auto');
+        openDialog('noAgentsModal', window);
+        openNoAgentsModal = false;
+      }
     });
   }
 }
