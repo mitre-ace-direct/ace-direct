@@ -305,7 +305,6 @@ body {
 
 .modal-open .modal {
   overflow-x: auto !important;
-  min-width: 600px;
 }
 
 .modal-outline-btn {
@@ -484,7 +483,6 @@ body {
 }
 
 .complaint-modal {
-  min-width: 600px;
   position: absolute;
 }
 
