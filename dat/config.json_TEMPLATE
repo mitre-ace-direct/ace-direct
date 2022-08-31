@@ -273,6 +273,7 @@
     ]
   },
   "filesharing": {
+    "enabled": "false",
     "virus_scan_enabled": "false"
   },
   "complaint_videos": {

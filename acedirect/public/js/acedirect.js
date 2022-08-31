@@ -102,6 +102,11 @@ setInterval(function () {
 
 $(document).ready(function () {
 
+  if (fileSharingEnabled === 'false') {
+    // hide filesharing dialog
+    $("#filebox").hide();
+  }
+
   // connection elements
   meterelem = document.getElementById('speedMeter');
   meterelemval = document.getElementById('speedval');
@@ -432,8 +437,6 @@ function connect_socket() {
           $('#subject').val(data.subject);
           $('#problemdesc').val(data.description);
           $('#ticketId').val(data.zendesk_ticket);
-        }).on('asterisk-is-gone', function (data) {
-          showAlert('danger', 'Error! Asterisk is unreachable.');
         }).on('agent-status-list', function (data) {
           if (data.message === 'success') {
             var tabledata = {
@@ -696,6 +699,13 @@ function connect_socket() {
           }
         }).on('got-videomail-recs', function (data) {
           updateVideomailTable(data);
+        }).on('asterisk-check', function (data) {
+          data = data.trim();
+          showErrorAlert(data);
+          if (data.length !== 0) {
+            // server or AMI ping failed
+            console.error(data);
+          }
         }).on('got-unread-count', function (data) {
           updateVideomailNotification(data);
         }).on('got-call-recordings', function (data) {
@@ -3303,6 +3313,23 @@ function showAlert(alertType, alertText) {
   setTimeout(function() {
     $('#generalAlert').hide();
   },4000)
+}
+
+// Error Alert message function
+function showErrorAlert(alertText) {
+  const visible = $('#errorAlert').is(':visible');
+  if (alertText.length === 0) {
+    // success
+    if (visible) {
+      $('#errorAlert').hide();
+    }
+  } else {
+    // error
+    if (!visible) {
+      $('#errorAlertText').html(alertText);
+      $('#errorAlert').show();
+    }
+  }
 }
 
 // Keypress for DTMF toggle

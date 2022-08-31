@@ -303,10 +303,27 @@ aria.Utils = aria.Utils || {};
     }
   }; // end trapFocus
 
+  /**
+ * @description Trap input focus on a dialog container
+ * @param dialogId
+ *          The ID of the element serving as the dialog container.
+ * @param focusAfterClosed
+ *          Either the DOM node or the ID of the DOM node to focus when the
+ *          dialog closes.
+ * @param focusFirst
+ *          Optional parameter containing either the DOM node or the ID of the
+ *          DOM node to focus when the dialog opens. If not specified, the
+ *          first focusable element in the dialog will receive focus.
+ */
   window.openDialog = function openDialog(dialogId, focusAfterClosed, focusFirst) {
     new aria.Dialog(dialogId, focusAfterClosed, focusFirst);
   };
 
+  /**
+   * @description Release input focus from a dialog
+   * @param closeButton
+   * Id of a button on the dialog.
+   */
   window.closeDialog = function closeDialog(closeButton) {
     const topDialog = aria.getCurrentDialog();
     if (topDialog.dialogNode.contains(closeButton)) {

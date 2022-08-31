@@ -19,6 +19,13 @@
 </head>
 
 <body id="consumerBackground" style="font-family: 'Roboto', sans-serif;">
+  <div id="hardware-acc-warning" class="alert alert-info hidden" style="margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; display: flex; align-items: center;">
+    <p style="padding-bottom: 0px;flex:1;">We noticed you have hardware acceleration turned on! For better performance, 
+      consider turning hardware acceleration off in your Google Chrome Settings.
+    </p>
+    <button type="button" id="gpu-close" class="fa fa-times" data-dismiss="alert" style="margin:1rem;background:none;border:none;"></button>
+  </div>
+  
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
@@ -33,7 +40,7 @@
 
     <div class="row">
       <section aria-label="videophone number">
-      <div id="VRSlogincontainer" class="col-lg-4 col-md-6 col-xs-8">
+      <div id="VRSlogincontainer" class="col-lg-4 col-md-6 col-xs-10">
         <div id="VRScontent">
           <h1 id="headerBox" class="h1" style="padding-bottom:15px">Welcome to ASL Consumer Support</h1>
           <div>
@@ -107,11 +114,20 @@
   </div>
 </div>
 
+<script type="importmap">
+  {
+      "imports": {
+          "detect-gpu": "https://unpkg.com/detect-gpu@4.0.35/dist/detect-gpu.esm.js"
+      }
+  }
+</script>
+
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/dro/js/dialog.js"></script>
 <script type="text/javascript" src="/dro/js/complaint_login.js" async></script>
 <script type="text/javascript" src="/assets/js/inputmask.min.js"></script>
 <script type="text/javascript" src="/assets/js/jquery.inputmask.min.js" async></script>
+<script type="module" src="/dro/js/hardware_acc.js"></script>
 
 </html>

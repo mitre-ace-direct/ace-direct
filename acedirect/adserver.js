@@ -24,6 +24,9 @@ const utils = require('./app/utils.js')
 const datConfig = require('./../dat/config.json')
 const AWS = require('aws-sdk');
 const proxy = require('proxy-agent');
+const ping = require('ping');
+const AmiClient = require('asterisk-ami-client');
+const asteriskAmiClient = new AmiClient({maxAttemptsCount: 1});
 
 AWS.config.update({
   region: datConfig.s3.region,
@@ -36,11 +39,50 @@ const s3 = new AWS.S3();
 
 let dbConnection = null;
 let dbconn = null;
-let asteriskCheckTimer = null;
 
-
-
-
+// ping a server to see if it is reachable
+const pingCfg = {
+    timeout: 1
+};
+const checkAsterisk = (asteriskIp, amiId, amiPass, amiPort) => {
+  let asteriskError = ''; // success
+  ping.sys.probe(asteriskIp, (isAlive) => {
+    if (isAlive) {
+      // server ping success, now check AMI
+      asteriskAmiClient.connect(amiId, amiPass, { host: asteriskIp, port: amiPort })
+        .then((_amiConnection) => {
+          asteriskAmiClient 
+            .on('response', (response) => {
+              // AMI ping success
+              sendEmit('asterisk-check', asteriskError);
+            })
+            .on('internalError', (error) => {
+              // AMI ping internal error
+              asteriskError = 'ERROR! Asterisk AMI is unavailable.'; // AMI Ping internal error
+              console.log(`*** ${asteriskError} ; AMI ping internal error. ***`);
+            })
+            .action({
+              Action: 'Ping'
+            });
+        })
+        .catch((_error) => {
+          // AMI ping failed
+          asteriskError = 'ERROR! Asterisk AMI is unavailable.'; // AMI Ping error
+          console.log(`*** ${asteriskError} ; AMI ping failed. ***`);
+        })
+        .finally(() => {
+          // send results
+          sendEmit('asterisk-check', asteriskError);
+          asteriskAmiClient.disconnect();
+        });
+    } else {
+      // server ping failed
+      asteriskError = 'ERROR! Asterisk is unreachable.'; // ping failed
+      sendEmit('asterisk-check', asteriskError);
+      console.log(`*** ${asteriskError} ; Asterisk server ping failed.***\n`);
+    }
+  }, pingCfg);
+};
 
 // For fileshare
 // var upload = multer();
@@ -114,7 +156,6 @@ const cfile = '../dat/config.json';
 try {
   const content = fs.readFileSync(cfile, 'utf8');
   const myjson = JSON.parse(content);
-  console.log('Valid JSON config file');
 } catch (ex) {
   console.log('');
   console.log('*******************************************************');
@@ -164,7 +205,7 @@ function getConfigVal(paramName) {
 // REMOVE the field or set it to "" if config.json is encoded
 let clearText = false;
 if (typeof (nconf.get('common:cleartext')) !== 'undefined' && nconf.get('common:cleartext') !== '') {
-  console.log('common:cleartext field is in config.json. assuming file is in clear text');
+  // common:cleartext field is in config.json. assuming file is in clear text
   clearText = true;
 }
 
@@ -293,7 +334,6 @@ if (agentPath.length === 0) {
 }
 
 let consumerPath = getConfigVal('nginx:consumer_route');
-console.log(consumerPath.length);
 if (consumerPath.length === 0) {
   consumerPath = '/complaint';
 }
@@ -377,6 +417,9 @@ const zendeskClient = zendeskApi.createClient({
   remoteUri: zenUrl
 });
 
+// filesharing enabled
+const fileSharingEnabled = (getConfigVal('filesharing:enabled') === 'true') ? true : false;
+
 const dbHost = getConfigVal('servers:mysql_fqdn');
 const dbUser = getConfigVal('database_servers:mysql:user');
 const dbPassword = getConfigVal('database_servers:mysql:password');
@@ -459,13 +502,8 @@ if (mongodbUri) {
       process.exit(-99);
     }
 
-    console.log('MongoDB Connection Successful');
     mongodb = database.db();
     dbconn = database;
-
-    // Start the application after the database connection is ready
-    // httpsServer.listen(port);
-    // console.log('https web server listening on ' + port);
 
     // prepare an entry into MongoDB to log the acedirect restart
     const data = {
@@ -505,8 +543,6 @@ if (mongodbUri) {
 } else {
   console.log('Missing MongoDB servers:mongodb_fqdn value in dat/config.json');
   logger.error('Missing MongoDB servers:mongodb_fqdn value in dat/config.json');
-  // httpsServer.listen(port);
-  // console.log('https web server listening on ' + port);
 }
 
 const credentials = {
@@ -514,7 +550,6 @@ const credentials = {
   cert: fs.readFileSync(getConfigVal('common:https:certificate'))
 };
 
-console.log("..",mongodbUri)
 const sessionStore = new MongoDBStore({
   uri: mongodbUri,
   collection: 'mySessions'
@@ -578,8 +613,7 @@ app.use(cors({
 }));
 
 httpsServer.listen(parseInt(getConfigVal('app_ports:acedirect'), 10));
-logger.info(`https web server listeningprocess on ${parseInt(getConfigVal('app_ports:acedirect'), 10)}`);
-console.log(`https web server listeningprocess on ${parseInt(getConfigVal('app_ports:acedirect'), 10)}`);
+console.log(`https webserver listening on ${parseInt(getConfigVal('app_ports:acedirect'), 10)}...`);
 logger.info(`Config file: ${cfile}`);
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -1319,33 +1353,6 @@ io.sockets.on('connection', (socket) => {
     }, (_err, _res) => { });
   }
 
-  function pingAsterisk() {
-    if (asteriskCheckTimer) {
-      clearTimeout(asteriskCheckTimer);
-    }
-    asteriskCheckTimer = setTimeout(asteriskIsGone, 5000);
-    ami.action({
-      Action: 'Ping',
-      ActionId: 'Asterisk, are you there?'
-    }, (_err, _res) => { 
-      if (asteriskCheckTimer) {
-        clearTimeout(asteriskCheckTimer);
-      }
-      if (_err){
-        console.error('Asterisk AMI Ping error: ' + JSON.stringify(_err));
-        logger.error(`Asterisk AMI Ping error: ${JSON.stringify(_err)}`);
-      }
-      console.log(JSON.stringify(_res));
-    }); 
-  }
-
-  function asteriskIsGone() {
-    // FUTURE: send broadcast messages to browsers to indicate that Asterisk is gone
-    console.error('\n\n**** ERROR: ASTERISK IS GONE ****\n\n');
-    logger.error('\n\n**** ERROR: ASTERISK IS GONE ****\n\n');
-    io.to('my room').emit('asterisk-is-gone', { message: 'error' });
-  }
-
   /*
    * Handler catches a Socket.IO message to pause both queues. Note, we are
    * pausing both queues, but, the extension is the same for both.
@@ -1461,7 +1468,6 @@ io.sockets.on('connection', (socket) => {
    * unpausing both queues, but, the extension is the same for both.
    */
   socket.on('unpause-queues', () => {
-    pingAsterisk(); // check if asterisk is there
     if (token.queue_name) {
       logger.info(`UNPAUSING QUEUE: PJSIP/${token.extension}, queue name ${token.queue_name}`);
       pauseQueue(false, token.extension, token.queue_name);
@@ -3302,6 +3308,14 @@ setInterval(() => {
     }
     sendEmit('call-center-closed', { closed: !isOpen });
   });
+
+  // asterisk checks
+  const asteriskIp = getConfigVal('servers:asterisk_private_ip');
+  const amiId = getConfigVal('asterisk:ami:id');
+  const amiPass = getConfigVal('asterisk:ami:passwd');
+  const amiPort = getConfigVal('app_ports:asterisk_ami').toString();
+  checkAsterisk(asteriskIp, amiId, amiPass, amiPort);
+
 }, 5000);
 
 
@@ -3911,6 +3925,7 @@ app.use((req, res, next) => {
     startTimeUTC,
     csrfToken: req.csrfToken(),
     version,
+    fileSharingEnabled,
     year
   };
   next();
