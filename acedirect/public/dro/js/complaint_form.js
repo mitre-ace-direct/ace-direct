@@ -26,6 +26,10 @@ let unreadFiles = 0;
 let openTab = 'chat';
 let exitingQueue = false;
 let isCaptioning = false;
+//This variable is for catching the double end call that occurs when a user clicks the button
+// that ends the call while in queue as if causes both the normal end call and the asterisk
+//end call method to fire
+let callAlreadyTerminated = false;
 // this list may be incomplete
 const viewableFileTypes = [
   'png',
@@ -40,6 +44,11 @@ const viewableFileTypes = [
 ];
 
 $(document).ready(() => {
+  if (fileSharingEnabled === 'false') {
+    // remove filesharing tab
+    $('#tab2').remove();
+  }
+
   $('#optionsModal').modal('show');
   $('#optionsModal').css('overflow-y', 'auto');
   openDialog('optionsModal', window);
@@ -57,7 +66,17 @@ $(document).ready(() => {
   }
 
   // Extend dayjs with utc plugin
-  dayjs.extend(window.dayjs_plugin_utc);
+  //dayjs.extend(window.dayjs_plugin_utc);
+
+  // update the page height when the accelerated hardware banner appears/disappears
+  var observer = new MutationObserver(function(mutations) {
+    console.log('setting setColumnSize()')
+    setColumnSize();
+  });
+  var target = document.querySelector('#hardware-acc-warning');
+  observer.observe(target, {
+    attributes: true
+  });
 });
 
 $(window).bind('fullscreenchange', function (_e) {
@@ -499,6 +518,11 @@ function connect_socket() {
 }
 
 const setColumnSize = function () {
+  let acceleratedBannerHeight = 0;
+  if ($('#hardware-acc-warning').is(':visible')) {
+    acceleratedBannerHeight = $('#hardware-acc-warning').height()
+  }
+
   // sidebar tabs
   const chatSeparator = document.getElementById('chat-separator');
   const fileShareSeparator = document.getElementById('fileshare-separator');
@@ -507,13 +531,13 @@ const setColumnSize = function () {
   const chatHeight = footer.getBoundingClientRect().top - tabsTop;
   const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
 
-  $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
-  $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20));
+  $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
+  $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
 
-  $('#fileshare-box-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20));
-  $('#fileshare-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20));
+  $('#fileshare-box-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
+  $('#fileshare-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
 
-  $('.tabs-right').height((chatHeight + tabsTop) - ($('#footer-container-consumer').height() + 20));
+  $('.tabs-right').height((chatHeight + tabsTop) - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
 
   // video section
   $('#callVideoColumn').height(footer.getBoundingClientRect().top - 200);
@@ -649,8 +673,8 @@ function registerJssip(myExtension, myPassword) {
       console.log(`--- WV: Call ended ---\n${e}`);
 
       $('#startScreenshare').hide();
-      console.log('RECEIVED ENDCALL');
-      endCall(true);
+      //console.log('RECEIVED ENDCALL');
+      endCall(false);
       // terminateCall();
       // clearScreen();
       // disableChatButtons();
@@ -720,6 +744,7 @@ function unregisterJssip() {
 
 function enterQueue() {
   //closeDialog($('#callQueueButton')[0]);
+  callAlreadyTerminated = false;
 
   const language = 'en';
   socket.emit('call-initiated', {
@@ -758,13 +783,15 @@ function enterQueue() {
  *
  * @param {*Determines if the user hang up while waiting in queue or ended an active call} inCall
  */
-function endCall() {
-  console.log('CALLING ENDCALL ' + $('#noAgentsModal').is(':visible'));
-  terminateCall();
+function endCall(userInitiated = false) {
+  if(callAlreadyTerminated && !userInitiated){
+    return; //Prevents a doubel call from someone leaving the queue from occurring.
+  }
+  console.log('CALLING ENDCALL COMPARING' + userInitiated);
   clearInterval(callTimer);
   // if(callAnswered || forceHangup){
   // Catches if the user clicks the hangup on the noagents modal
-  if ($('#noAgentsModal').is(':visible')) {
+  if (($('#noAgentsModal').hasClass('in') || $('#optionsModal').hasClass('in')) && !userInitiated) {
     $('#noAgentsModal').modal('hide');
     let openOptionsModal = true;
     $('#noAgentsModal').on('hidden.bs.modal', function (e) {
@@ -804,11 +831,10 @@ function endCall() {
       // reset the page
       window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
     }
-  } else if(exitingQueue) {
-    // User left the queue
+  } else if(userInitiated) {
+    // Called when a user ends the call while waiting in queue
     $('#waitingModal').modal('hide');
-    // wait for the modal to fully close before opening another modal
-    let openOptionsModal = true;
+    let openOptionsModal1 = true;
     $('#waitingModal').on('hidden.bs.modal', function (e) {
       if (openOptionsModal) {
         $('#optionsModal').modal('show');
@@ -817,12 +843,23 @@ function endCall() {
         openOptionsModal = false;
       }
     });
+
+    $('#noAgentsModal').modal('hide');
+    let openOptionsModal2 = true;
+    $('#noAgentsModal').on('hidden.bs.modal', function (e) {
+      if (openOptionsModal2) {
+        $('#optionsModal').modal('show');
+        $('#optionsModal').css('overflow-y', 'auto');
+        openDialog('optionsModal', window);
+        openOptionsModal2 = false;
+      }
+    });
   } else {
     // Called when a user ends the call while waiting in queue
-    $('#waitingModal').modal('hide');
     //closeDialog($('#waitingHangUpButton')[0]);
+    $('#waitingModal').modal('hide');
     // wait for the modal to fully close before opening another modal
-    let openNoAgentsModal = true;
+    let openNoAgentsModal1 = true;
     $('#waitingModal').on('hidden.bs.modal', function (e) {
       if (openNoAgentsModal) {
         $('#noAgentsModal').modal('show');
@@ -831,7 +868,21 @@ function endCall() {
         openNoAgentsModal = false;
       }
     });
+    $('#optionsModal').modal('hide');
+    // wait for the modal to fully close before opening another modal
+    let openNoAgentsModal2 = true;
+    $('#optionsModal').on('hidden.bs.modal', function (e) {
+      if (openNoAgentsModal2) {
+        $('#noAgentsModal').modal('show');
+        $('#noAgentsModal').css('overflow-y', 'auto');
+        openDialog('noAgentsModal', window);
+        openNoAgentsModal2 = false;
+      }
+    });
   }
+
+  callAlreadyTerminated = true;
+  terminateCall();
 }
 
 function exitQueue() {
