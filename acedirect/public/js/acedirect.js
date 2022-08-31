@@ -102,6 +102,11 @@ setInterval(function () {
 
 $(document).ready(function () {
 
+  if (fileSharingEnabled === 'false') {
+    // hide filesharing dialog
+    $("#filebox").hide();
+  }
+
   // connection elements
   meterelem = document.getElementById('speedMeter');
   meterelemval = document.getElementById('speedval');

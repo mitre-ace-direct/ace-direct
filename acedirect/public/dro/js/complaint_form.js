@@ -44,6 +44,12 @@ const viewableFileTypes = [
 ];
 
 $(document).ready(() => {
+
+  if (fileSharingEnabled === 'false') {
+    // hide filesharing dialog
+    $("#tab2").hide();
+  }
+  
   $('#optionsModal').modal('show');
   // $('#optionsModal').css('overflow-y', 'auto');
   openDialog('optionsModal', window);
