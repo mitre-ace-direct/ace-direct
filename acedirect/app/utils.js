@@ -104,17 +104,17 @@ module.exports.createToken = () => {
 function getConfigVal(val){
     let decodedString = null;
     if (typeof val !== 'undefined' && val !== null) {
-        // found value for paramName
+        // found value for parameter named val
         if (config.clearText != true) {
             decodedString = val;
         } else {
             decodedString = Buffer.alloc(val.length, val, 'base64');
         }
     } else {
-        // did not find value for paramName
+        // did not find value for parameter named val
         logger.error('');
         logger.error('*******************************************************');
-        logger.error(`ERROR!!! Config parameter is missing: ${paramName}`);
+        logger.error(`ERROR!!! Config parameter is missing: ${val}`);
         logger.error('*******************************************************');
         logger.error('');
         decodedString = '';
