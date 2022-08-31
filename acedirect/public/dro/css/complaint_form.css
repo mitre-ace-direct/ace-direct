@@ -609,10 +609,6 @@ body {
 }
 
 @media only screen and (max-width: 500px) {
-  .complaint-modal .modal-dialog {
-    width: 70%;
-  }
-
   .body1 b {
     font-size: .9em;
   }
