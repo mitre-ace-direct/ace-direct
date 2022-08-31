@@ -40,9 +40,9 @@ const viewableFileTypes = [
 ];
 
 $(document).ready(() => {
-  //$('#optionsModal').modal('show');
+  $('#optionsModal').modal('show');
   // $('#optionsModal').css('overflow-y', 'auto');
-  //openDialog('optionsModal', window);
+  openDialog('optionsModal', window);
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
   $('[data-toggle="tooltip"]').tooltip({
@@ -728,13 +728,20 @@ function enterQueue() {
   }, (isOpen) => {
     console.log('isOpen:', isOpen);
     if (isOpen) {
-      $('#waitingModal').modal('show');
-      $('#waitingModal').css('overflow-y', 'auto');
-      openDialog('waitingModal', window);
+      // wait for the options modal to fully close before opening another modal
+      $('#optionsModal').on('hidden.bs.modal', function (e) {
+        $('#waitingModal').modal('show');
+        $('#waitingModal').css('overflow-y', 'auto');
+        openDialog('waitingModal', window);
+      });
+
     } else {
-      $('#noAgentsModal').modal('show');
-      $('#noAgentsModal').css('overflow-y', 'auto');
-      openDialog('noAgentsModal', window);
+      // wait for the options modal to fully close before opening another modal
+      $('#optionsModal').on('hidden.bs.modal', function (e) {
+        $('#noAgentsModal').modal('show');
+        $('#noAgentsModal').css('overflow-y', 'auto');
+        openDialog('noAgentsModal', window);
+      });
     }
   });
 }
@@ -750,12 +757,14 @@ function endCall() {
   // if(callAnswered || forceHangup){
   // Catches if the user clicks the hangup on the noagents modal
   if ($('#noAgentsModal').is(':visible')) {
-    $('#optionsModal').modal('show');
-    $('#optionsModal').css('overflow-y', 'auto');
-    openDialog('optionsModal', window);
-
     $('#noAgentsModal').modal('hide');
-    // closeDialog($('#noAgentsHangUpButton')[0]);
+    $('#noAgentsModal').on('hidden.bs.modal', function (e) {
+      console.log('no agents modal is closed for good. (HIDDEN) ')
+      $('#optionsModal').modal('show');
+      $('#optionsModal').css('overflow-y', 'auto');
+      openDialog('optionsModal', window);
+    });
+
   } else if (callAnswered) {
     if (complaintRedirectActive) {
       $('#redirectURL').text(complaintRedirectUrl);
@@ -763,10 +772,12 @@ function endCall() {
       $('#redirectUrlDesc').attr('href', complaintRedirectUrl);
       $('#waitingModal').modal('hide');
       //closeDialog($('#waitingHangUpButton')[0]);
-
-      $('#callEndedModal').modal('show');
-      $('#callEndedModal').css('overflow-y', 'auto');
-      openDialog('callEndedModal', window);
+      // wait for the modal to fully close before opening another modal
+      $('#waitingModal').on('hidden.bs.modal', function (e) {
+        $('#callEndedModal').modal('show');
+        $('#callEndedModal').css('overflow-y', 'auto');
+        openDialog('callEndedModal', window);
+      });
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
@@ -781,18 +792,23 @@ function endCall() {
   } else if(exitingQueue) {
     // User left the queue
     $('#waitingModal').modal('hide');
-    $('#optionsModal').modal('show');
-    $('#optionsModal').css('overflow-y', 'auto');
-    openDialog('optionsModal', window);
+    // wait for the modal to fully close before opening another modal
+    $('#waitingModal').on('hidden.bs.modal', function (e) {
+      $('#optionsModal').modal('show');
+      $('#optionsModal').css('overflow-y', 'auto');
+      openDialog('optionsModal', window);
+    });
   } else {
     // Called when a user ends the call while waiting in queue
     $('#waitingModal').modal('hide');
     //closeDialog($('#waitingHangUpButton')[0]);
-
-    // $('#optionsModal').modal('show');
-    $('#noAgentsModal').modal('show');
-    $('#noAgentsModal').css('overflow-y', 'auto');
-    openDialog('noAgentsModal', window);
+    // wait for the modal to fully close before opening another modal
+    $('#waitingModal').on('hidden.bs.modal', function (e) {
+      console.log('no agents modal is closed for good. (HIDDEN) ')
+      $('#noAgentsModal').modal('show');
+      $('#noAgentsModal').css('overflow-y', 'auto');
+      openDialog('noAgentsModal', window);
+    });
   }
 }
 
