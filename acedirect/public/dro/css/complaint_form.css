@@ -518,6 +518,7 @@ body {
   max-width: 250px;
   width: 250px;
   height : 100%;
+  padding-right: 0 !important;
 }
 
 #fullscreen-element {
