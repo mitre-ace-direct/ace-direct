@@ -46,7 +46,8 @@ $(document).ready(() => {
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
   $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover'
+    trigger: 'hover',
+    viewport: $('#collapseTab')
   });
 
   // Use arrow keys to navigate tabs
@@ -1328,7 +1329,8 @@ function addFileToDownloadList(data) {
 
   // need to call this every time we add a new tooltip
   $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover'
+    trigger: 'hover',
+    viewport: $('.fileShareCellFilename')
   });
 }
 
@@ -1381,7 +1383,8 @@ function addFileToSentList(data) {
 
   // need to call this every time we add a new tooltip
   $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover'
+    trigger: 'hover',
+    viewport: $('.fileShareCellFilename')
   });
 }
 
