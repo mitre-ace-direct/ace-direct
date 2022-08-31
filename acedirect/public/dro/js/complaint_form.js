@@ -792,8 +792,8 @@ function endCall(userInitiated = false) {
   // if(callAnswered || forceHangup){
   // Catches if the user clicks the hangup on the noagents modal
   if (($('#noAgentsModal').hasClass('in') || $('#optionsModal').hasClass('in')) && !userInitiated) {
-    $('#noAgentsModal').modal('hide');
     let openOptionsModal = true;
+    $('#noAgentsModal').modal('hide');
     $('#noAgentsModal').on('hidden.bs.modal', function (e) {
       if (openOptionsModal) {
         $('#optionsModal').modal('show');
@@ -833,8 +833,9 @@ function endCall(userInitiated = false) {
     }
   } else if(userInitiated) {
     // Called when a user ends the call while waiting in queue
+    let openOptionsModal = true;
     $('#waitingModal').modal('hide');
-    let openOptionsModal1 = true;
+    $('#noAgentsModal').modal('hide');
     $('#waitingModal').on('hidden.bs.modal', function (e) {
       if (openOptionsModal) {
         $('#optionsModal').modal('show');
@@ -843,23 +844,21 @@ function endCall(userInitiated = false) {
         openOptionsModal = false;
       }
     });
-
-    $('#noAgentsModal').modal('hide');
-    let openOptionsModal2 = true;
     $('#noAgentsModal').on('hidden.bs.modal', function (e) {
-      if (openOptionsModal2) {
+      if (openOptionsModal) {
         $('#optionsModal').modal('show');
         $('#optionsModal').css('overflow-y', 'auto');
         openDialog('optionsModal', window);
-        openOptionsModal2 = false;
+        openOptionsModal = false;
       }
     });
   } else {
     // Called when a user ends the call while waiting in queue
+    let openNoAgentsModal = true;
     //closeDialog($('#waitingHangUpButton')[0]);
     $('#waitingModal').modal('hide');
+    $('#optionsModal').modal('hide');
     // wait for the modal to fully close before opening another modal
-    let openNoAgentsModal1 = true;
     $('#waitingModal').on('hidden.bs.modal', function (e) {
       if (openNoAgentsModal) {
         $('#noAgentsModal').modal('show');
@@ -868,15 +867,13 @@ function endCall(userInitiated = false) {
         openNoAgentsModal = false;
       }
     });
-    $('#optionsModal').modal('hide');
     // wait for the modal to fully close before opening another modal
-    let openNoAgentsModal2 = true;
     $('#optionsModal').on('hidden.bs.modal', function (e) {
-      if (openNoAgentsModal2) {
+      if (openNoAgentsModal) {
         $('#noAgentsModal').modal('show');
         $('#noAgentsModal').css('overflow-y', 'auto');
         openDialog('noAgentsModal', window);
-        openNoAgentsModal2 = false;
+        openNoAgentsModal = false;
       }
     });
   }
