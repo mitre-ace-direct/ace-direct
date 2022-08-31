@@ -40,9 +40,9 @@ const viewableFileTypes = [
 ];
 
 $(document).ready(() => {
-  $('#optionsModal').modal('show');
+ // $('#optionsModal').modal('show');
   // $('#optionsModal').css('overflow-y', 'auto');
-  openDialog('optionsModal', window);
+  //openDialog('optionsModal', window);
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
   $('[data-toggle="tooltip"]').tooltip({
