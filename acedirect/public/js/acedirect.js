@@ -704,7 +704,6 @@ function connect_socket() {
           showErrorAlert(data);
           if (data.length !== 0) {
             // server or AMI ping failed
-            console.log('button disabled', document.getElementById('status-dropdown-button').disabled);
             console.error(data);
             document.getElementById('status-dropdown-button').disabled = true;
           } else {
