@@ -271,6 +271,7 @@ function register_jssip() {
     },
     progress: function (e) {
       console.log('--- WV: Calling... ---\n');
+      $('#call-duration-div').show();
     },
     startedRecording: function (e) {
       console.log('--- WV: Started Recording:', (e.success) ? 'Success ---' : 'Error ---');
@@ -374,6 +375,7 @@ function register_jssip() {
           }
         } */
         $('#duration').timer('pause');
+        $('#call-duration-div').hide();
         $('#user-status').text('Wrap Up');
         $('#complaintsInCall').hide();
         $('#geninfoInCall').hide();
@@ -431,6 +433,7 @@ function register_jssip() {
 $('#modalOutboundFailed').on('hidden.bs.modal', function () {
   console.log('wrapping up...');
   $('#duration').timer('pause');
+  $('#call-duration-div').hide();
   $('#user-status').text('Wrap Up');
   $('#complaintsInCall').hide();
   $('#geninfoInCall').hide();
