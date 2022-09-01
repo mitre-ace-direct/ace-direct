@@ -50,12 +50,13 @@ $(document).ready(() => {
   }
 
   $('#optionsModal').modal('show');
-  // $('#optionsModal').css('overflow-y', 'auto');
+  $('#optionsModal').css('overflow-y', 'auto');
   openDialog('optionsModal', window);
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
   $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover'
+    trigger: 'hover',
+    viewport: $('#collapseTab')
   });
 
   // Use arrow keys to navigate tabs
@@ -548,6 +549,9 @@ const setColumnSize = function () {
   let videoHeight = footer.getBoundingClientRect().top - videoTop;
   $('#remoteViewCol').height(videoHeight);
   $('#remoteView').height(videoHeight);
+
+  // set remote video column width
+  $('#remoteViewCol').width(`${ ($('#callVideosRow').width() - $('#selfViewCol').width()) - 19 }px`);
 };
 setColumnSize();
 window.addEventListener('resize', setColumnSize);
@@ -749,13 +753,28 @@ function enterQueue() {
   }, (isOpen) => {
     console.log('isOpen:', isOpen);
     if (isOpen) {
-      $('#waitingModal').modal('show');
-      $('#waitingModal').css('overflow-y', 'auto');
-      openDialog('waitingModal', window);
+      // wait for the options modal to fully close before opening another modal
+      let openWaitingModal = true;
+      $('#optionsModal').on('hidden.bs.modal', function (e) {
+        if (openWaitingModal) {
+          $('#waitingModal').modal('show');
+          $('#waitingModal').css('overflow-y', 'auto');
+          openDialog('waitingModal', window);
+          openWaitingModal = false;
+        }
+      });
+
     } else {
-      $('#noAgentsModal').modal('show');
-      $('#noAgentsModal').css('overflow-y', 'auto');
-      openDialog('noAgentsModal', window);
+      // wait for the options modal to fully close before opening another modal
+      let openNoAgentsModal = true;
+      $('#optionsModal').on('hidden.bs.modal', function (e) {
+        if (openNoAgentsModal) {
+          $('#noAgentsModal').modal('show');
+          $('#noAgentsModal').css('overflow-y', 'auto');
+          openDialog('noAgentsModal', window);
+          openNoAgentsModal = false;
+        }
+      });
     }
   });
 }
@@ -773,12 +792,17 @@ function endCall(userInitiated = false) {
   // if(callAnswered || forceHangup){
   // Catches if the user clicks the hangup on the noagents modal
   if (($('#noAgentsModal').hasClass('in') || $('#optionsModal').hasClass('in')) && !userInitiated) {
-    $('#optionsModal').modal('show');
-    $('#optionsModal').css('overflow-y', 'auto');
-    openDialog('optionsModal', window);
-
+    let openOptionsModal = true;
     $('#noAgentsModal').modal('hide');
-    // closeDialog($('#noAgentsHangUpButton')[0]);
+    $('#noAgentsModal').on('hidden.bs.modal', function (e) {
+      if (openOptionsModal) {
+        $('#optionsModal').modal('show');
+        $('#optionsModal').css('overflow-y', 'auto');
+        openDialog('optionsModal', window);
+        openOptionsModal = false;
+      }
+    });
+
   } else if (callAnswered) {
     if (complaintRedirectActive) {
       $('#redirectURL').text(complaintRedirectUrl);
@@ -786,10 +810,16 @@ function endCall(userInitiated = false) {
       $('#redirectUrlDesc').attr('href', complaintRedirectUrl);
       $('#waitingModal').modal('hide');
       //closeDialog($('#waitingHangUpButton')[0]);
-
-      $('#callEndedModal').modal('show');
-      $('#callEndedModal').css('overflow-y', 'auto');
-      openDialog('callEndedModal', window);
+      // wait for the modal to fully close before opening another modal
+      let openCallEndedModal = true;
+      $('#waitingModal').on('hidden.bs.modal', function (e) {
+        if (openCallEndedModal) {
+          $('#callEndedModal').modal('show');
+          $('#callEndedModal').css('overflow-y', 'auto');
+          openDialog('callEndedModal', window);
+          openCallEndedModal = false;
+        }
+      });
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
@@ -803,23 +833,49 @@ function endCall(userInitiated = false) {
     }
   } else if(userInitiated) {
     // Called when a user ends the call while waiting in queue
+    let openOptionsModal = true;
     $('#waitingModal').modal('hide');
     $('#noAgentsModal').modal('hide');
-    // $('#optionsModal').modal('show');
-    $('#optionsModal').modal('show');
-    $('#optionsModal').css('overflow-y', 'auto');
-    openDialog('optionsModal', window);
+    $('#waitingModal').on('hidden.bs.modal', function (e) {
+      if (openOptionsModal) {
+        $('#optionsModal').modal('show');
+        $('#optionsModal').css('overflow-y', 'auto');
+        openDialog('optionsModal', window);
+        openOptionsModal = false;
+      }
+    });
+    $('#noAgentsModal').on('hidden.bs.modal', function (e) {
+      if (openOptionsModal) {
+        $('#optionsModal').modal('show');
+        $('#optionsModal').css('overflow-y', 'auto');
+        openDialog('optionsModal', window);
+        openOptionsModal = false;
+      }
+    });
   } else {
     // Called when a user ends the call while waiting in queue
+    let openNoAgentsModal = true;
     //closeDialog($('#waitingHangUpButton')[0]);
     $('#waitingModal').modal('hide');
     $('#optionsModal').modal('hide');
-    $('#noAgentsModal').modal('show');
-    $('#noAgentsModal').css('overflow-y', 'auto');
-    openDialog('noAgentsModal', window);
-    //$('#optionsModal').modal('show');
-    //$('#optionsModal').css('overflow-y', 'auto');
-    //openDialog('optionsModal', window);
+    // wait for the modal to fully close before opening another modal
+    $('#waitingModal').on('hidden.bs.modal', function (e) {
+      if (openNoAgentsModal) {
+        $('#noAgentsModal').modal('show');
+        $('#noAgentsModal').css('overflow-y', 'auto');
+        openDialog('noAgentsModal', window);
+        openNoAgentsModal = false;
+      }
+    });
+    // wait for the modal to fully close before opening another modal
+    $('#optionsModal').on('hidden.bs.modal', function (e) {
+      if (openNoAgentsModal) {
+        $('#noAgentsModal').modal('show');
+        $('#noAgentsModal').css('overflow-y', 'auto');
+        openDialog('noAgentsModal', window);
+        openNoAgentsModal = false;
+      }
+    });
   }
 
   callAlreadyTerminated = true;
@@ -1362,7 +1418,8 @@ function addFileToDownloadList(data) {
 
   // need to call this every time we add a new tooltip
   $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover'
+    trigger: 'hover',
+    viewport: $('.fileShareCellFilename')
   });
 }
 
@@ -1418,7 +1475,8 @@ function addFileToSentList(data) {
 
   // need to call this every time we add a new tooltip
   $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover'
+    trigger: 'hover',
+    viewport: $('.fileShareCellFilename')
   });
 }
 
@@ -1484,7 +1542,7 @@ $('#collapseButton').on('keydown', (e) => {
   }
 });
 
-function collapseSidebar(tab) {
+function collapseSidebar(tab) {  
   if (isSidebarCollapsed) {
     // open the sidebar
     isSidebarCollapsed = false;
@@ -1493,7 +1551,7 @@ function collapseSidebar(tab) {
     $('#collapseButton').attr('aria-expanded', 'true');
     $('.tab-content').attr('hidden', false);
     $('#tab-pane').attr('hidden', false);
-    $('#tab-options').css('padding-left', '');
+   // $('#tab-options').css('padding-left', '');
 
     $('#fileShareTab').attr('aria-label', 'File share tab');
     $('#chatTab').attr('aria-label', 'Chat tab');
@@ -1540,15 +1598,18 @@ function collapseSidebar(tab) {
       $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
     }
 
-    $('.sidebarTab').css('width', '8vw');
+    //$('.sidebarTab').css('width', '8vw');
 
-    $('#callFeaturesColumn').removeClass('col-md-1');
-    $('#callFeaturesColumn').addClass('col-xs-6 col-lg-4');
-    $('#callVideoColumn').removeClass('col-md-11');
-    $('#callVideoColumn').addClass('col-xs-6 col-lg-8');
+    $('#callFeaturesColumn').removeClass('col-xs-1');
+    $('#callFeaturesColumn').addClass('col-xs-4');
+    $('#callVideoColumn').removeClass('col-xs-11');
+    $('#callVideoColumn').addClass('col-xs-8');
+    $('#tab-options').removeClass('collapsedTabWidth');
+
 
     $('#callFeaturesColumn').css('border-left', '1px solid #ddd');
     $('#callFeaturesColumn').css('padding-left', '');
+    $('#callFeaturesColumn').css('padding-right', '');
 
     $('#collapseButtonIcon').removeClass('fa fa-angle-double-left');
     $('#collapseButtonIcon').addClass('fa fa-angle-double-right');
@@ -1562,8 +1623,9 @@ function collapseSidebar(tab) {
     $('#remoteViewCol').css('height', '');
     $('#remoteView').css('height', '');
     $('#remoteView').css('width', '');
+    $('#tabRightGroup').addClass('tabsWidthClass')
     setColumnSize();
-  } else {
+  } else {    
     // close the sidebar
     isSidebarCollapsed = true;
     openTab = '';
@@ -1575,7 +1637,7 @@ function collapseSidebar(tab) {
     $('#tab-options').css('padding-left', '0px');
     $('li').removeClass('active');
     $('.tab-pane').removeClass('active');
-    $('.sidebarTab').css('width', '8.8vw');
+    //$('.sidebarTab').css('width', '8.48vw');
 
     $('#chatTab').attr('aria-selected', 'false');
     $('#fileShareTab').attr('aria-selected', 'false');
@@ -1583,14 +1645,16 @@ function collapseSidebar(tab) {
     $('#fileShareTab').attr('tabindex', '-1');
     $('#fileShareTab').attr('aria-label', 'Collapsed file share tab');
     $('#chatTab').attr('aria-label', 'Collapsed chat tab');
-
-    $('#callFeaturesColumn').removeClass('col-xs-6 col-lg-4');
-    $('#callFeaturesColumn').addClass('col-md-1');
-    $('#callVideoColumn').removeClass('col-xs-6 col-lg-8');
-    $('#callVideoColumn').addClass('col-md-11');
+    $('#callFeaturesColumn').removeClass('col-xs-4');
+    $('#callFeaturesColumn').addClass('col-xs-1');
+    $('#callVideoColumn').removeClass('col-xs-8');
+    $('#callVideoColumn').addClass('col-xs-11');
+    $('#tab-options').addClass('collapsedTabWidth');
+    $('#tabRightGroup').removeClass('tabsWidthClass')
 
     $('#callFeaturesColumn').css('border-left', '');
     $('#callFeaturesColumn').css('padding-left', '0px');
+    $('#callFeaturesColumn').css('padding-right', '0px');
 
     // update the collapse button tooltip
     $('#collapseButton').attr('data-original-title', 'Expand').parent().find('.tooltip-inner').html('Expand');
