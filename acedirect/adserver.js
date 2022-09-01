@@ -45,7 +45,7 @@ const pingCfg = {
     timeout: 1
 };
 const checkAsterisk = (asteriskIp, amiId, amiPass, amiPort) => {
-  let asteriskError = ''; // success
+  let asteriskError = ''; // success - should be equal to '', set it to something else to test fail case.
   ping.sys.probe(asteriskIp, (isAlive) => {
     if (isAlive) {
       // server ping success, now check AMI
