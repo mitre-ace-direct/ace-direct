@@ -276,6 +276,9 @@
     "enabled": "false",
     "virus_scan_enabled": "false"
   },
+  "goodbye_video": {
+    "enabled": "false"
+  },  
   "complaint_videos": {
     "instructions_video": "sample.mp4",
     "please_wait_video": "sample.mp4",

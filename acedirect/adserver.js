@@ -209,6 +209,12 @@ if (nginxPath.length === 0) {
   nginxPath = '/ACEDirect';
 }
 
+// goodbye video parameter
+let goodbyeVideo = getConfigVal('goodbye_video:enabled');
+if (goodbyeVideo.length === 0) {
+  goodbyeVideo = 'false'; // default
+}
+
 // outbound videomail timeout parameter
 let outVidTimeout = getConfigVal('videomail:outbound_timeout_secs');
 if (!outVidTimeout) {
@@ -3913,6 +3919,7 @@ app.use((req, res, next) => {
     csrfToken: req.csrfToken(),
     version,
     fileSharingEnabled,
+    goodbyeVideo,
     year
   };
   next();

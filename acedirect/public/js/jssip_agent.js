@@ -785,7 +785,9 @@ function terminate_call() {
   mute_audio_button.setAttribute('onclick', 'javascript: mute_audio();');
   mute_audio_icon.classList.add('fa-microphone');
   mute_audio_icon.classList.remove('fa-microphone-slash');
-  if (false && !acekurento.isMultiparty) { // placeholder for transfer hangups.
+  const goodbyeProcessing = (goodbyeVideo === 'true') ? true : false;
+  console.log(`*** goodbyeProcessing: ${goodbyeProcessing}`);
+  if (goodbyeProcessing && !acekurento.isMultiparty) { // placeholder for transfer hangups.
     acekurento.callTransfer('hangup', true);
   }
   acekurento.stop(false);
