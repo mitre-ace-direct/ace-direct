@@ -25,8 +25,9 @@ const datConfig = require('./../dat/config.json')
 const AWS = require('aws-sdk');
 const proxy = require('proxy-agent');
 const ping = require('ping');
-const AmiClient = require('asterisk-ami-client');
-const asteriskAmiClient = new AmiClient({maxAttemptsCount: 1});
+
+const AMI_PING_ID = 'PING123';
+const AMI_PING_MS = 5000;
 
 AWS.config.update({
   region: datConfig.s3.region,
@@ -48,37 +49,12 @@ const checkAsterisk = (asteriskIp, amiId, amiPass, amiPort) => {
   let asteriskError = ''; // success - should be equal to '', set it to something else to test fail case.
   ping.sys.probe(asteriskIp, (isAlive) => {
     if (isAlive) {
-      // server ping success, now check AMI
-      asteriskAmiClient.connect(amiId, amiPass, { host: asteriskIp, port: amiPort })
-        .then((_amiConnection) => {
-          asteriskAmiClient 
-            .on('response', (response) => {
-              // AMI ping success
-              sendEmit('asterisk-check', asteriskError);
-            })
-            .on('internalError', (error) => {
-              // AMI ping internal error
-              asteriskError = 'ERROR! Asterisk AMI is unavailable.'; // AMI Ping internal error
-              console.log(`*** ${asteriskError} ; AMI ping internal error. ***`);
-            })
-            .action({
-              Action: 'Ping'
-            });
-        })
-        .catch((_error) => {
-          // AMI ping failed
-          asteriskError = 'ERROR! Asterisk AMI is unavailable.'; // AMI Ping error
-          console.log(`*** ${asteriskError} ; AMI ping failed. ***`);
-        })
-        .finally(() => {
-          // send results
-          sendEmit('asterisk-check', asteriskError);
-          asteriskAmiClient.disconnect();
-        });
+      // server ping success
+      sendEmit('asterisk-ping-check', '');
     } else {
       // server ping failed
       asteriskError = 'ERROR! Asterisk is unreachable.'; // ping failed
-      sendEmit('asterisk-check', asteriskError);
+      sendEmit('asterisk-ping-check', asteriskError);
       console.log(`*** ${asteriskError} ; Asterisk server ping failed.***\n`);
     }
   }, pingCfg);
@@ -2385,10 +2361,11 @@ function sendAgentStatusList(agent, value) {
  * @param {type} evt Incoming Asterisk AMI event.
  * @returns {undefined} Not used
  */
-function handleActionResponse(_evt) {
-  // logger.info('\n######################################');
-  // logger.info('Received an AMI action response: ' + evt);
-  // logger.info(util.inspect(evt, false, null));
+function handleActionResponse(data) {
+  // only checking ping responses right now
+  if (data.actionid.startsWith(AMI_PING_ID) && data.response === 'Success') {
+    sendEmit('asterisk-ami-check', ''); // healthy AMI
+  }
 }
 
 // this method requires "popticket": {"url": "https://someurl.com/...."}, in the config file
@@ -3240,6 +3217,14 @@ function init_ami() {
       ami.on('queuecallerjoin', handleManagerEvent);
       ami.on('queuecallerleave', handleManagerEvent);
 
+      // for Asterisk health
+      ami.on('end', ()=>{
+        sendEmit('asterisk-ami-check', 'ERROR - AMI connection end.');
+      });
+      ami.on('close', (c,d)=>{
+        sendEmit('asterisk-ami-check', 'ERROR - AMI connection close.');
+      });      
+
       // handle the response
       ami.on('response', handleActionResponse);
 
@@ -3318,6 +3303,8 @@ setInterval(() => {
 
 }, 5000);
 
+// AMI Ping for status and keepalive
+setInterval(() => { ami.action({Action: "Ping", actionid: AMI_PING_ID}); }, AMI_PING_MS);
 
 /**
  * Removes the interface (e.g. SIP/6001) from Asterisk when the agent logs out.
