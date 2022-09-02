@@ -91,6 +91,7 @@ class ConfManager extends Events {
     const jssip_session = this._jssipRTCSessions.get(caller._ext);
     if (ext == 'hangup') {
       jssip_session.sendDTMF('1990#');
+      jssip_session.refer('hangup');
     } else if (ext == 'videomail') {
       jssip_session.sendDTMF('1980#');
     } else {
