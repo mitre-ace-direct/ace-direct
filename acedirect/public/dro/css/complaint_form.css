@@ -298,6 +298,7 @@ body {
   overflow-y: auto;
   overflow-x: auto;
   min-height: calc(100vh - 100px);
+  margin: 30px auto !important;
 
   @media (max-width: 767px) {
     min-height: calc(100vh - 20px);
