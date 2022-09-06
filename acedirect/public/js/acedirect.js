@@ -96,6 +96,9 @@ var monitorExt;
 var extensionBeingMonitored;
 var monitorTransition = false;
 
+let asteriskPingError = false;
+let asteriskAmiError = false;
+
 setInterval(function () {
   busylight.light(this.agentStatus);
 }, 2000);
@@ -699,16 +702,36 @@ function connect_socket() {
           }
         }).on('got-videomail-recs', function (data) {
           updateVideomailTable(data);
-        }).on('asterisk-check', function (data) {
+        }).on('asterisk-ami-check', function (data) {
           data = data.trim();
-          showErrorAlert(data);
+          showErrorAlert(data, 2);
           if (data.length !== 0) {
-            // server or AMI ping failed
+            // AMI ping failed
+            asteriskAmiError = true;
             console.error(data);
             pauseQueues();
             document.getElementById('status-dropdown-button').disabled = true;
           } else {
-            document.getElementById('status-dropdown-button').disabled = false;
+            asteriskAmiError = false;
+            if (!asteriskPingError) {
+              document.getElementById('status-dropdown-button').disabled = false;
+            }            
+          }
+        })
+        .on('asterisk-ping-check', function (data) {
+          data = data.trim();
+          showErrorAlert(data, 1);
+          if (data.length !== 0) {
+            // server ping failed
+            asteriskPingError = true;
+            console.error(data);
+            pauseQueues();
+            document.getElementById('status-dropdown-button').disabled = true;
+          } else {
+            asteriskPingError = false;
+            if (!asteriskAmiError) {
+              document.getElementById('status-dropdown-button').disabled = false;
+            }
           }
         }).on('got-unread-count', function (data) {
           updateVideomailNotification(data);
@@ -3320,18 +3343,18 @@ function showAlert(alertType, alertText) {
 }
 
 // Error Alert message function
-function showErrorAlert(alertText) {
-  const visible = $('#errorAlert').is(':visible');
+function showErrorAlert(alertText, num) {
+  const visible = $('#errorAlert' + num).is(':visible');
   if (alertText.length === 0) {
     // success
     if (visible) {
-      $('#errorAlert').hide();
+      $('#errorAlert' + num).hide();
     }
   } else {
     // error
     if (!visible) {
-      $('#errorAlertText').html(alertText);
-      $('#errorAlert').show();
+      $('#errorAlertText' + num).html(alertText);
+      $('#errorAlert' + num).show();
     }
   }
 }
