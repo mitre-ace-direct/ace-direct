@@ -42,6 +42,13 @@ const viewableFileTypes = [
   'json',
   'html'
 ];
+const syntaxCharacters = [
+  {symbol: '&', replacement: '&amp;'},
+  {symbol: '>', replacement: '&gt;'},
+  {symbol: '<', replacement: '&lt;'},
+  {symbol: '"', replacement: '&quot;'},
+  {symbol: '\'', replacement: '&apos'},
+];
 
 $(document).ready(() => {
   if (fileSharingEnabled === 'false') {
@@ -1375,14 +1382,22 @@ function addFileToDownloadList(data) {
     $('#receivedFilesDivider').addClass('populatedFilesDivider');
   }
   setFeedbackText('File received from agent!');
-  let filename = data.original_filename;
+  let tempFilename = data.original_filename
+  let filename = tempFilename;
+
+  syntaxCharacters.forEach((e) => {
+    if (tempFilename.includes(e.symbol)) {
+      filename = tempFilename.replace(e.symbol, e.replacement);
+    }
+  });
+
   let fileType = filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
   if (fileType) {
     if (viewableFileTypes.includes(fileType.toLowerCase())) {
       // we can open this file in a new tab without downloading it
       $('#receivedFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${filename}</span>
         <span class="fileShareFiller"></span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
@@ -1394,7 +1409,7 @@ function addFileToDownloadList(data) {
       // cannot view without downloading
       $('#receivedFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${filename}</span>
         <span class="fileShareFiller"></span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
@@ -1407,7 +1422,7 @@ function addFileToDownloadList(data) {
     // file type not in file name-- cannot view without downloading
     $('#receivedFilesList').append(
       (`<span class="fileShareRow">
-      <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+      <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${filename}</span>
       <span class="fileShareFiller"></span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
@@ -1429,7 +1444,14 @@ function addFileToSentList(data) {
     $('#sentFilesDivider').addClass('populatedFilesDivider');
   }
 
-  let filename = data.original_filename;
+  let tempFilename = data.original_filename
+  let filename = tempFilename;
+
+  syntaxCharacters.forEach((e) => {
+    if (tempFilename.includes(e.symbol)) {
+      filename = tempFilename.replace(e.symbol, e.replacement);
+    }
+  });
   let fileType = filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
 
   if (fileType) {
@@ -1438,7 +1460,7 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${filename}</span>
         <span class="fileShareFiller"></span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
@@ -1451,7 +1473,7 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${filename}</span>
         <span class="fileShareFiller"></span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
           <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
@@ -1465,7 +1487,7 @@ function addFileToSentList(data) {
     // add to sent files list
     $('#sentFilesList').append(
       (`<span class="fileShareRow">
-      <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${data.original_filename}</span>
+      <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${data.original_filename}">${filename}</span>
       <span class="fileShareFiller"></span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
         <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
