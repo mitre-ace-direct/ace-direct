@@ -1505,9 +1505,7 @@ function testCaptions() {
 
 
 function createCaptionHtml(displayName, transcripts) {
-  console.log(`createCaptionHtml: ${displayName}`)
-  console.log(`createCaptionHtml: ${JSON.stringify(transcripts, null, 2)}`)
-  console.log(`mediaDevices: ${JSON.stringify(navigator.mediaDevices)}`)
+  console.log(displayName, transcripts);
   let caption = transcripts.transcript;
   if (!transcripts.final) {
     caption += '...';
