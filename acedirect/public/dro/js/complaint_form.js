@@ -1418,8 +1418,7 @@ function addFileToDownloadList(data) {
 
   // need to call this every time we add a new tooltip
   $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover',
-    viewport: $('.fileShareCellFilename')
+    trigger: 'hover'
   });
 }
 
@@ -1475,8 +1474,7 @@ function addFileToSentList(data) {
 
   // need to call this every time we add a new tooltip
   $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover',
-    viewport: $('.fileShareCellFilename')
+    trigger: 'hover'
   });
 }
 
