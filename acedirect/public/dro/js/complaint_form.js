@@ -1375,7 +1375,8 @@ function addFileToDownloadList(data) {
     $('#receivedFilesDivider').addClass('populatedFilesDivider');
   }
   setFeedbackText('File received from agent!');
-  let fileType = data.original_filename.split('.')[1];
+  let filename = data.original_filename;
+  let fileType = filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
   if (fileType) {
     if (viewableFileTypes.includes(fileType.toLowerCase())) {
       // we can open this file in a new tab without downloading it
@@ -1427,7 +1428,9 @@ function addFileToSentList(data) {
   if (!$('#sentFilesDivider').hasClass('populatedFilesDivider')) {
     $('#sentFilesDivider').addClass('populatedFilesDivider');
   }
-  let fileType = data.original_filename.split('.')[1];
+
+  let filename = data.original_filename;
+  let fileType = filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
 
   if (fileType) {
     if (viewableFileTypes.includes(fileType.toLowerCase())) {
