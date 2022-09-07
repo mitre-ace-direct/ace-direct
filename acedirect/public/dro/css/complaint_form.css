@@ -629,3 +629,8 @@ body {
     font-size: .8em !important;
   }
 }
+
+.tooltip.top .tooltip-inner {
+  line-break: anywhere;
+  white-space: normal;
+}
