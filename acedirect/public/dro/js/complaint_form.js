@@ -26,6 +26,7 @@ let unreadFiles = 0;
 let openTab = 'chat';
 let exitingQueue = false;
 let isCaptioning = false;
+let captionsEnabled = false;
 //This variable is for catching the double end call that occurs when a user clicks the button
 // that ends the call while in queue as if causes both the normal end call and the asterisk
 //end call method to fire
@@ -505,6 +506,15 @@ function connect_socket() {
           }).on('agentScreenshare', () => {
             // agent is stopping/starting screenshare
             isScreenshareRestart = true;
+          }).on('caption-config', (data) => {
+            if (data) {
+              captionsEnabled = data;
+            }
+          }).on('caption-translated', (transcripts) => {
+            console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
+            updateCaptions(transcripts);
+          }).on('multiparty-caption', (data) => {
+            updateCaptions(data)
           });
       } else {
         // need to handle bad connections?
@@ -555,6 +565,11 @@ const setColumnSize = function () {
 };
 setColumnSize();
 window.addEventListener('resize', setColumnSize);
+
+function updateCaptions(transcript) {
+  console.log(transcript)
+  // TODO display captions
+}
 
 // Function to change the text of the feedback for the buttons.
 function setFeedbackText(text) {
@@ -700,6 +715,13 @@ function registerJssip(myExtension, myPassword) {
 
       if (partCount === 2 && !isScreenshareRestart) {
         startCallTimer();
+        if (captionsEnabled) {
+          e.participants.forEach((part) => {
+            if (part.isAgent) {
+              socket.emit('consumer-captions-enabled', {agentExt: part.ext});
+            }
+          });
+        }
       } else if (isScreenshareRestart) {
         isScreenshareRestart = false;
       }

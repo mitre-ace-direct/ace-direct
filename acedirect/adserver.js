@@ -1061,6 +1061,10 @@ io.sockets.on('connection', (socket) => {
     });
   });
 
+  socket.on('consumer-captions-enabled', (data) => {
+    io.to(Number(data.agentExt)).emit('begin-captioning');
+  });
+
   socket.on('multiparty-caption-agent', (data) => {
     if (data.final) {
       // only send finals during a multiparty call, browser caption engine fragments sentences
