@@ -32,6 +32,8 @@ var isMonitorInSession = false;
 var reinviteMonitorMultipartyInvite = false;
 var reinviteMonitorMultipartyTransition = false;
 var monitorCaptions = false;
+var consumerCaptionsEnabled = false;
+var multipartyCaptionsStarted = false;
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
 function register_jssip() {
@@ -177,7 +179,7 @@ function register_jssip() {
         document.getElementById('screenShareButton').removeAttribute('style');
         $('#end-call').attr('onclick', 'stopMonitoringCall(' + extensionBeingMonitored + ')');
       } else if(activeParticipantCount > 2) {
-        if (!isMultipartyCall && !monitorCaptions) {
+        if (!isMultipartyCall && !monitorCaptions && !multipartyCaptionsStarted) {
           // new multiparty call
           multipartyCaptionsStart();
           monitorCaptions = true;
@@ -208,7 +210,9 @@ function register_jssip() {
         }
       } else if (activeParticipantCount === 2) {
         isMultipartyCall = false;
-        multipartyCaptionsEnd();
+        if (multipartyCaptionsStarted && !consumerCaptionsEnabled) {
+          multipartyCaptionsEnd();
+        }
 
         if (allAgentCall) {
           $('#end-call').attr('onclick', 'terminate_call()');
@@ -1559,6 +1563,7 @@ $('#language-select').on('change', function () {
 
 var recognition = null;
 function multipartyCaptionsStart() {
+  multipartyCaptionsStarted = true;
   var language = $('#language-select').val();
   switch (language) {
     case 'en': // English US
@@ -1621,7 +1626,7 @@ function multipartyCaptionsStart() {
   };
 
   recognition.onend = function (event) {
-    if((acekurento.isMultiparty && (activeParticipantCount > 2)) || (beingMonitored && isMonitorInSession))
+    if((acekurento.isMultiparty && (activeParticipantCount > 2)) || (beingMonitored && isMonitorInSession) || consumerCaptionsEnabled)
       multipartyCaptionsStart();	
   }
   recognition.start();
@@ -1633,4 +1638,6 @@ function multipartyCaptionsEnd() {
   recognition = null;
   callParticipantsExt = [];
   monitorCaptions = false;
+  consumerCaptionsEnabled = false;
+  multipartyCaptionsStarted = false;
 }

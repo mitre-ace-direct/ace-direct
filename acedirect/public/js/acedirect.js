@@ -785,7 +785,9 @@ function connect_socket() {
           if (acekurento.isMultiparty || isMonitoring) {
             updateCaptionsMultiparty(transcripts);
           } else {
-            updateCaptions(transcripts); // in jssip_agent.js
+            if (transcripts.displayname !== $('#agentname-sidebar').html()) {
+              updateCaptions(transcripts); // in jssip_agent.js
+            }
           }
         }).on('multiparty-caption', function (transcripts) {
           // console.log(JSON.stringify(transcripts))
@@ -1118,7 +1120,7 @@ function connect_socket() {
           }
           beingMonitored = true;
           monitorExt = data.monitorExt;
-          if (!isMultipartyCall && !monitorCaptions) {
+          if (!isMultipartyCall && !monitorCaptions && !multipartyCaptionsStarted) {
             multipartyCaptionsStart();
             monitorCaptions = true;
           }
@@ -1169,6 +1171,9 @@ function connect_socket() {
           }
         }).on('monitor-rejoin-session', function() {
           startMonitoringCall(extensionBeingMonitored);
+        }).on('begin-captioning', function() {
+          consumerCaptionsEnabled = true;
+          multipartyCaptionsStart();
         });
 
       } else {
