@@ -99,6 +99,8 @@ var monitorTransition = false;
 let asteriskPingError = false;
 let asteriskAmiError = false;
 
+let answerTimer = null;
+
 setInterval(function () {
   busylight.light(this.agentStatus);
 }, 2000);
@@ -571,6 +573,16 @@ function connect_socket() {
           }
         }).on('new-caller-ringing', function (data) {
           debugtxt('new-caller-ringing', data);
+
+          // temp fix for Asterisk hangup timing issue - auto decline incoming call if user
+          // (or auto-click) doesn't accept by 8 seconds
+          answerTimer = setTimeout(() => {
+            $("#accept-btn").addClass('disabled');
+            console.log('\n*** auto decline');
+            $('#decline-btn').trigger('click');
+            $("#accept-btn").removeClass('disabled');
+          }, 8000);
+
           $('#myRingingModal').addClass('fade');
 
           if (isTransfer) {
@@ -3102,6 +3114,7 @@ function transferResponse(isAccepted) {
 
 // Check if status needs to be changed
 $('#accept-btn').click(function () {
+  clearTimeout(answerTimer);
   if($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#shortcuts-tab').hasClass('active')) {
     $('#mail-btn').trigger('click');
   }
