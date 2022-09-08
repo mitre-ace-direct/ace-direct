@@ -574,13 +574,15 @@ function connect_socket() {
         }).on('new-caller-ringing', function (data) {
           debugtxt('new-caller-ringing', data);
 
-          // temp fix for Asterisk hangup timing issue - auto decline incoming call if user
-          // (or auto-click) doesn't accept by 8 seconds
+          // temp fix for Asterisk hangup timing issue - AUTO DECLINE incoming call if user
+          // (or auto-click) doesn't accept/decline by 8 seconds
           answerTimer = setTimeout(() => {
             $("#accept-btn").addClass('disabled');
+            $("#decline-btn").addClass('disabled');
             console.log('\n*** auto decline');
             $('#decline-btn').trigger('click');
             $("#accept-btn").removeClass('disabled');
+            $("#decline-btn").removeClass('disabled');
           }, 8000);
 
           $('#myRingingModal').addClass('fade');
@@ -3147,6 +3149,7 @@ $('#accept-btn').click(function () {
 });
 
 $('#decline-btn').click(function () {
+  clearTimeout(answerTimer);
   $('#myRingingModalPhoneNumber').html('');
   $('#myRingingModal').modal('hide');
   unpauseQueues();
