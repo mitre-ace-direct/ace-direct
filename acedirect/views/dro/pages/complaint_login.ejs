@@ -15,17 +15,20 @@
   <link rel="stylesheet" href="/assets/css/inputmask.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap">
 </head>
 
 <body id="consumerBackground" style="font-family: 'Roboto', sans-serif;">
-  <div id="hardware-acc-warning" class="alert alert-info hidden" style="margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; display: flex; align-items: center;">
-    <p style="padding-bottom: 0px;flex:1;">We noticed you have hardware acceleration turned on! For better performance, 
+  <div id="hardware-acc-warning" class="alert alert-info hidden"
+    style="margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; display: flex; align-items: center;">
+    <p style="padding-bottom: 0px;flex:1;">We noticed you have hardware acceleration turned on! For better performance,
       consider turning hardware acceleration off in your Google Chrome Settings.
     </p>
-    <button type="button" id="gpu-close" class="fa fa-times" data-dismiss="alert" style="margin:1rem;background:none;border:none;"></button>
+    <button type="button" id="gpu-close" class="fa fa-times" data-dismiss="alert"
+      aria-label="close chrome hardware acceleration message" style="margin:1rem;background:none;border:none;"></button>
   </div>
-  
+
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
@@ -40,35 +43,36 @@
 
     <div class="row">
       <section aria-label="videophone number">
-      <div id="VRSlogincontainer" class="col-lg-4 col-md-6 col-xs-10">
-        <div id="VRScontent">
-          <h1 id="headerBox" class="h1" style="padding-bottom:15px">Welcome to ASL Consumer Support</h1>
-          <div>
-            <p class="body1">Enter your videophone number to get started</p>
+        <div id="VRSlogincontainer" class="col-lg-4 col-md-6 col-xs-10">
+          <div id="VRScontent">
+            <h1 id="headerBox" class="h1" style="padding-bottom:15px">Welcome to ASL Consumer Support</h1>
+            <div>
+              <p class="body1">Enter your videophone number to get started</p>
+            </div>
+            <hr style="border: 1px solid black; width: 100px;" />
+            <div id="input-group" class="input-group">
+              <label for="vrs_number" style="float:left">Videophone Number</label>
+              <input type="text" class="form-control input-lg" id="vrs_number" data-inputmask="'mask': '(999) 999-9999'"
+                data-mask required tabindex="0">
+              <span class="input-group-btn" style="vertical-align:bottom">
+                <button id="continueButton" class="btn input-lg button"
+                  style="background-color: #073863; color: white !important; margin-left: 15px; border-top-left-radius:4px !important; border-bottom-left-radius:4px !important;"
+                  tabindex="0">
+                  Continue <span class="fa fa-angle-double-right" aria-hidden="true" />
+                </button>
+              </span>
+            </div>
+            <div id="message" hidden aria-live="assertive" style="text-align:left;"></div>
           </div>
-          <hr style="border: 1px solid black; width: 100px;" />
-          <div id="input-group" class="input-group">
-            <label for="vrs_number" style="float:left">Videophone Number</label>
-            <input type="text" class="form-control input-lg" id="vrs_number" data-inputmask="'mask': '(999) 999-9999'"
-              data-mask required tabindex="0">
-            <span class="input-group-btn" style="vertical-align:bottom">
-              <button id="continueButton" class="btn input-lg button"
-                style="background-color: #073863; color: white !important; margin-left: 15px; border-top-left-radius:4px !important; border-bottom-left-radius:4px !important;" tabindex="0">
-                Continue <span class="fa fa-angle-double-right" aria-hidden="true" />
-              </button>
-            </span>
-          </div>
-          <div id="message" hidden aria-live="assertive" style="text-align:left;"></div>
-        </div>
 
-        <div id="infoBox">
-          <p class="caption">You are entering an Official United States Government System, which may be used only for
-            authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby
-            notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized
-            attempts
-            to upload or change information on this web site is prohibited.</p>
+          <div id="infoBox">
+            <p class="caption">You are entering an Official United States Government System, which may be used only for
+              authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby
+              notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized
+              attempts
+              to upload or change information on this web site is prohibited.</p>
+          </div>
         </div>
-      </div>
       </section>
     </div>
   </main>
