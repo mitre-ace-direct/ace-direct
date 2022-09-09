@@ -528,7 +528,7 @@ body {
 }
 
 #callVideosRow {
-  height: 100%;
+  /* height: 100%; */
 }
 
 #mute-camera-off-icon {
@@ -628,4 +628,31 @@ body {
   #leaveVideomailButton {
     font-size: .8em !important;
   }
+}
+
+#captions-area {
+  background-color: white;
+  border: 2px solid gray;
+  height: 300px;
+  text-align: left;
+  font-size: 16px;
+}
+
+
+#captions-area ul {
+  list-style-type: none;
+}
+
+#captionHr {
+  border: 1px solid lightgray;
+}
+
+#currentCaptions {
+  margin-top: 20px;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.speaker {
+  font-weight: 700;
 }

@@ -515,7 +515,10 @@ function connect_socket() {
             updateCaptions(transcripts);
           }).on('multiparty-caption', (data) => {
             updateCaptions(data)
-          });
+          }).on('consumer-caption', function (transcripts) {
+            // receiving own captions
+            updateCaptions(transcripts)
+         });
       } else {
         // need to handle bad connections?
       }
@@ -556,9 +559,17 @@ const setColumnSize = function () {
   let speakingToRow = document.getElementById('speakingToRow');
   let videoButtonsRow = document.getElementById('callButtonsRow');
   let videoTop = buttonFeedback.getBoundingClientRect().bottom || speakingToRow.getBoundingClientRect().bottom || videoButtonsRow.getBoundingClientRect().bottom;
-  let videoHeight = footer.getBoundingClientRect().top - videoTop;
-  $('#remoteViewCol').height(videoHeight);
-  $('#remoteView').height(videoHeight);
+  let captionAreaHeight = 0;
+  CAPTIONS_ON = true; // FIXME
+  if (CAPTIONS_ON) { // FIXME
+    captionAreaHeight = 300;
+  }
+
+  let videoHeight = footer.getBoundingClientRect().top - videoTop - captionAreaHeight;
+  
+
+  $('#remoteViewCol').height(videoHeight + 'px');
+  $('#remoteView').height(videoHeight + 'px');
 
   // set remote video column width
   $('#remoteViewCol').width(`${ ($('#callVideosRow').width() - $('#selfViewCol').width()) - 19 }px`);
@@ -570,6 +581,7 @@ function updateCaptions(transcript) {
   console.log(transcript)
   // TODO display captions
 }
+
 
 // Function to change the text of the feedback for the buttons.
 function setFeedbackText(text) {
@@ -845,6 +857,7 @@ function endCall(userInitiated = false) {
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
+      
       setTimeout(() => {
         location = complaintRedirectUrl;
       }, 10000);
