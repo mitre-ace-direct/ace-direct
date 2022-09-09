@@ -1085,6 +1085,19 @@ io.sockets.on('connection', (socket) => {
           });
         });
       }
+    } else {
+      const d = new Date();
+      data.timestamp = d.getTime();
+      data.msgid = d.getTime();
+      data.participants.forEach((p) => {
+        redisClient.hget(c.R_EXTENSION_TO_VRS, Number(p), (err, vrsNum) => {
+          if (!err) {
+            // p = (vrsNum) ? vrsNum : p;
+            p = (vrsNum) || p;
+            io.to(Number(p)).emit('multiparty-caption', data);
+          }
+        });
+      });
     }
   });
 
