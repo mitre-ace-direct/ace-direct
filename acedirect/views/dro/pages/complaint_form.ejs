@@ -57,6 +57,15 @@
                 <button type="button" class="btn btn-gray circleButton" onclick="enterFullscreen()" aria-label="Enter Fullscreen">
                   <i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
                 </button>
+                <button id="mute-captions" type="button" class="btn btn-gray circleButton" onclick="toggleCaptions()" style="display:none">
+                  <span class="fa-stack">
+                    <i id="mute-captions-icon" class="fa fa-cc fa-lg fa-stack-1x"></i>
+                    <i id="mute-captions-off-icon"
+                      class="fa fa-ban fa-stack-2x text-danger"
+                      style="display:none;"></i>
+                  </span>
+                </button>
+
                 <button type="button" class="btn btn-gray button" id="startScreenshare" onclick="toggleScreenShare(true)"
                   aria-label="Toggle Screenshare">
                   <i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare
@@ -86,7 +95,7 @@
                   <video id="remoteView" autoplay aria-label="Remote Video"></video>
                 </div>
               </div>
-              <div id="captions-area" class="row">
+              <div id="captions-area" class="row" style="display:none">
                 <ul id="currentCaptions"> ...no one is speaking, no captions to display</ul>
                 <hr id="captionHr" />
                 <ul id="historicalCaptions">
