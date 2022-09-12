@@ -1103,7 +1103,7 @@ io.sockets.on('connection', (socket) => {
 
   //data = ["caption-consumer",{"transcript":" 1 2 3 4 5","final":true,"language":"en-US"}]
   socket.on('caption-consumer', (data) => {
-    if (data.final && token.vrs) {
+    if (token.vrs) {
       // only send finals from browser based captions. Browser captions fragment phrases
       const d = new Date();
       data.timestamp = d.getTime();
@@ -2282,7 +2282,8 @@ io.sockets.on('connection', (socket) => {
               displayname: data.transcripts.displayname,
               agent: data.transcripts.agent,
               msgid,
-              final
+              final,
+              speakerExt: data.speakerExt
             });
           } else {
             console.log('trying', translationUrl);
