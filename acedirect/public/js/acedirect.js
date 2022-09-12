@@ -801,7 +801,8 @@ function connect_socket() {
           socket.emit('translate-caption', {
             transcripts: transcripts,
             callerNumber: extensionMe,
-            displayname: transcripts.displayname
+            displayname: transcripts.displayname,
+            speakerExt: transcripts.extension
           });
         }).on('new-agent-chat', function(data) {
           var count = 0;

@@ -1605,13 +1605,7 @@ function multipartyCaptionsStart() {
   recognition = new webkitSpeechRecognition();
   recognition.continuous = true;
   recognition.lang = language;
-
-  if (!acekurento.isMultiparty && consumerCaptionsEnabled) {
-    recognition.interimResults = true;
-  } else {
-    recognition.interimResults = false;
-  }
-
+  recognition.interimResults = true;
   recognition.maxAlternatives = 1;
   recognition.onresult = function (event) {
     if (!isMuted && event && event.results && (event.results.length > 0)) {
