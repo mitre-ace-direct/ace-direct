@@ -1521,21 +1521,23 @@ function createCaptionHtml(displayName, transcripts) {
 function updateCaptions(transcripts) {
   
   console.log('transcripts in UC are ', transcripts)
-  var tDiv = document.getElementById(transcripts.msgid);
-  
-  if (!tDiv) {
-    var temp = document.createElement('div');
-    temp.id = transcripts.msgid;
-    temp.innerHTML = createCaptionHtml('Consumer', transcripts); 
+  if (transcripts.final) { // For now, only show final captions on agent side
+    var tDiv = document.getElementById(transcripts.msgid);
     
-    temp.classList.add('transcripttext');
-    document.getElementById('transcriptoverlay').prepend(temp);
-  } else {
-    tDiv.innerHTML = createCaptionHtml('Consumer', transcripts); 
-    if (transcripts.final) {
-      $('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
-      $('#caption-messages').scrollTop($('#caption-messages')[0].scrollHeight);
+    if (!tDiv) {
+      var temp = document.createElement('div');
+      temp.id = transcripts.msgid;
+      temp.innerHTML = createCaptionHtml('Consumer', transcripts); 
+      
+      temp.classList.add('transcripttext');
+      document.getElementById('transcriptoverlay').prepend(temp);
+    } else {
+      tDiv.innerHTML = createCaptionHtml('Consumer', transcripts); 
+      if (transcripts.final) {
+        $('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
+        $('#caption-messages').scrollTop($('#caption-messages')[0].scrollHeight);
 
+      }
     }
   }
 }

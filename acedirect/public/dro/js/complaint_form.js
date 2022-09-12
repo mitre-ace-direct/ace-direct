@@ -11,6 +11,7 @@ let vrs;
 let acekurento = null;
 const ua = null;
 const videomailflag = false;
+const muteCaptionsOffIcon = document.getElementById('mute-captions-off-icon');
 let hasMessages = false;
 let isAgentTyping = false;
 let sharingScreen = false;
@@ -27,6 +28,7 @@ let openTab = 'chat';
 let exitingQueue = false;
 let isCaptioning = false;
 let captionsEnabled = false;
+let captionsOn = true; // irrelevant if captionsEnabled is false, represents whether user has captions turn on or off via the cc button when enabled
 let currentCaptions = [];
 let historicalCaptions = [];
 
@@ -511,8 +513,13 @@ function connect_socket() {
             // agent is stopping/starting screenshare
             isScreenshareRestart = true;
           }).on('caption-config', (data) => {
-            if (data) {
+            if (data && data !== 'false') {
+              console.log(data, typeof data);
               captionsEnabled = data;
+              if (captionsEnabled) {
+                $('#mute-captions').show();
+                $('#captions-area').show();
+              }
             }
           }).on('caption-translated', (transcripts) => {
             console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
@@ -564,8 +571,8 @@ const setColumnSize = function () {
   let videoButtonsRow = document.getElementById('callButtonsRow');
   let videoTop = buttonFeedback.getBoundingClientRect().bottom || speakingToRow.getBoundingClientRect().bottom || videoButtonsRow.getBoundingClientRect().bottom;
   let captionAreaHeight = 0;
-  CAPTIONS_ON = true; // FIXME
-  if (CAPTIONS_ON) { // FIXME
+  
+  if (captionsEnabled && captionsOn) {
     captionAreaHeight = 300;
   }
 
@@ -615,8 +622,7 @@ function updateCaptions(caption) {
     console.log('final!');
     // Remove caption from current captions
     currentCaptions.forEach((element, index) => {
-      console.log(element.displayname, caption.displayname, element.displayname === caption.displayname)
-      if(element.displayname === caption.displayname) { // Fixme?  Relying on displayname to be unique because msgids aren't consistent
+      if(element.extension === caption.extension) { 
         currentCaptions.splice(index, 1);  
       };
     });
@@ -627,7 +633,7 @@ function updateCaptions(caption) {
   else {
     let found = false;
     currentCaptions.forEach((element, index) => {
-      if(element.displayname === caption.displayname) { // Fixme?  Relying on displayname to be unique because msgids aren't consistent
+      if(element.extension === caption.extension) {
         found = true;
         currentCaptions[index] = caption;
       }
@@ -637,6 +643,24 @@ function updateCaptions(caption) {
     }
   }
   refreshCaptions();
+}
+
+function captionsMuted() {
+  return muteCaptionsOffIcon.style.display === 'block';
+}
+
+function toggleCaptions() {
+  if (!captionsMuted()) {
+    captionsOn = false;
+    muteCaptionsOffIcon.style.display = 'block';
+    $('#captions-area').hide();
+  } else {
+    captionsOn = true;
+    muteCaptionsOffIcon.style.display = 'none';
+    $('#captions-area').show();
+  }
+
+  setColumnSize();
 }
 
 

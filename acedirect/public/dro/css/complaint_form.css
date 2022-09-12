@@ -657,3 +657,7 @@ body {
 .speaker {
   font-weight: 700;
 }
+
+.fa-cc {
+  left: -4px !important;
+}
