@@ -27,6 +27,7 @@ let openTab = 'chat';
 let exitingQueue = false;
 let isCaptioning = false;
 let captionsEnabled = false;
+let exten;
 //This variable is for catching the double end call that occurs when a user clicks the button
 // that ends the call while in queue as if causes both the normal end call and the asterisk
 //end call method to fire
@@ -1787,7 +1788,7 @@ function captionsStart() {
   recognition = new webkitSpeechRecognition();
   recognition.continuous = true;
   recognition.lang = language;
-  recognition.interimResults = false;
+  recognition.interimResults = true;
   recognition.maxAlternatives = 1;
   recognition.onresult = function (event) {
     if (!isMuted && event && event.results && (event.results.length > 0)) {
@@ -1796,7 +1797,8 @@ function captionsStart() {
       socket.emit('caption-consumer', {
         transcript: event.results[lastResult][0].transcript,
         final: event.results[lastResult].isFinal,
-        language: language
+        language: language,
+        extension: exten
       });
     }
   };
