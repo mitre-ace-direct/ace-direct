@@ -27,6 +27,9 @@ let openTab = 'chat';
 let exitingQueue = false;
 let isCaptioning = false;
 let captionsEnabled = false;
+let currentCaptions = [];
+let historicalCaptions = [];
+
 //This variable is for catching the double end call that occurs when a user clicks the button
 // that ends the call while in queue as if causes both the normal end call and the asterisk
 //end call method to fire
@@ -577,9 +580,62 @@ const setColumnSize = function () {
 setColumnSize();
 window.addEventListener('resize', setColumnSize);
 
-function updateCaptions(transcript) {
-  console.log(transcript)
-  // TODO display captions
+
+// Updates the unordered lists in the caption area with the contents of the caption arrays
+function refreshCaptions() {
+  // Clear both unordered lists
+  $('#currentCaptions').empty();
+  $('#historicalCaptions').empty();
+
+  // Populate current captions
+  if (currentCaptions.length < 1) {
+    $('#currentCaptions').prepend('<li>...no one is speaking, no captions to display</li>');
+  }
+  else {
+    currentCaptions.forEach((caption, index) => {
+      const date = dayjs(caption.timestamp);
+      const timestamp = date.format('h:mm a');
+      $('#currentCaptions').prepend('<li><span class="timestamp">' + timestamp + '</span> <span class="speaker">' + caption.displayname + '</span> <span class="caption">' + caption.transcript + '</span></li>');
+    });
+  }
+
+  // Populate historical captions
+  historicalCaptions.forEach((caption, index) => {
+    const date = dayjs(caption.timestamp);
+    const timestamp = date.format('h:mm a');
+    $('#historicalCaptions').append('<li><span class="timestamp">' + timestamp + '</span> <span class="speaker">' + caption.displayname + '</span> <span class="caption">' + caption.transcript + '</span></li>');
+  });
+}
+
+// Updates the caption arrays and calls refreshCaptions()
+function updateCaptions(caption) {
+  console.log(caption)
+  if (caption.final) {
+    console.log('final!');
+    // Remove caption from current captions
+    currentCaptions.forEach((element, index) => {
+      console.log(element.displayname, caption.displayname, element.displayname === caption.displayname)
+      if(element.displayname === caption.displayname) { // Fixme?  Relying on displayname to be unique because msgids aren't consistent
+        currentCaptions.splice(index, 1);  
+      };
+    });
+
+    // Add to historical
+    historicalCaptions.unshift(caption);
+  }
+  else {
+    let found = false;
+    currentCaptions.forEach((element, index) => {
+      if(element.displayname === caption.displayname) { // Fixme?  Relying on displayname to be unique because msgids aren't consistent
+        found = true;
+        currentCaptions[index] = caption;
+      }
+    });
+    if (!found) {
+      currentCaptions.unshift(caption);
+    }
+  }
+  refreshCaptions();
 }
 
 
