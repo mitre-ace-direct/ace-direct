@@ -1527,12 +1527,12 @@ function updateCaptions(transcripts) {
     if (!tDiv) {
       var temp = document.createElement('div');
       temp.id = transcripts.msgid;
-      temp.innerHTML = createCaptionHtml('Consumer', transcripts); 
+      temp.innerHTML = createCaptionHtml(transcripts.displayname, transcripts); 
       
       temp.classList.add('transcripttext');
       document.getElementById('transcriptoverlay').prepend(temp);
     } else {
-      tDiv.innerHTML = createCaptionHtml('Consumer', transcripts); 
+      tDiv.innerHTML = createCaptionHtml(transcripts.displayname, transcripts); 
       if (transcripts.final) {
         $('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
         $('#caption-messages').scrollTop($('#caption-messages')[0].scrollHeight);
