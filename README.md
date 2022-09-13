@@ -161,17 +161,19 @@ Complete these prerequisite prior to installation:
 
       ```bash
       $  cd /home/ec2-user  # go to the ACE Direct user home folder
-      $  sudo rm -rf .nvm >/dev/null 2>&1
-      $  mkdir -p .nvm
+      $  rm -rf .nvm >/dev/null 2>&1
+      $  rm -rf .n >/dev/null 2>&1
       $
-      $  # install NVM
-      $  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+      $  # Install NVM: get curl from https://nvm.sh - Installing and Updating
+      $  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
       $
-      $  . ~/.nvm/nvm.sh
-      $  nvm install node
+      $  *CLOSE and REOPEN your termninal*
       $
-      $  # if prompted, run...
-      $  npm config delete prefix
+      $  nvm install 16
+      $  npm install -g n
+      $  npm install -g pm2
+      $
+      $  which node ; which n ; which pm2  # should all be local
       ```
 
     * Add the following lines to the _end_ of the  `~/.bash_profile` file:
@@ -182,22 +184,12 @@ Complete these prerequisite prior to installation:
       export PATH N_PREFIX
       ```
 
-    * From a terminal, install Node `n` manager and Node.js:
+    * Select Node version:
 
       ```bash
-      $  cd
-      $
       $  source ~/.bash_profile
-      $  rm -rf .n >/dev/null 2>&1
-      $  mkdir .n
-      $  npm install -g n
-      $  n 16.15.1  # require Node.js version
-      $  node -v  # verify the version
       $
-      $  npm install -g pm2  # for process management
-      $
-      $  # on Windows computers...
-      $  npm config set script-shell bash
+      $  n 16.15.1  # required Node version
       ```
 
 #### Redis
