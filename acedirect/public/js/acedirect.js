@@ -785,9 +785,9 @@ function connect_socket() {
           if (acekurento.isMultiparty || isMonitoring) {
             updateCaptionsMultiparty(transcripts);
           } else {
-            if (transcripts.displayname !== $('#agentname-sidebar').html()) {
+            // if (transcripts.displayname !== $('#agentname-sidebar').html()) {
               updateCaptions(transcripts); // in jssip_agent.js
-            }
+            // }
           }
         }).on('multiparty-caption', function (transcripts) {
           // console.log(JSON.stringify(transcripts))
