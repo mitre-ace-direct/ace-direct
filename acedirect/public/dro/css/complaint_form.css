@@ -659,5 +659,11 @@ body {
 }
 
 .fa-cc {
-  left: -4px !important;
+  left: -9px !important;
+  top: -3px;
+}
+
+.mute-ban {
+  left: -9px !important;
+  top: -3px;
 }

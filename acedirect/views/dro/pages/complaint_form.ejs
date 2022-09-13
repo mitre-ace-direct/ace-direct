@@ -57,13 +57,11 @@
                 <button type="button" class="btn btn-gray circleButton" onclick="enterFullscreen()" aria-label="Enter Fullscreen">
                   <i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
                 </button>
-                <button id="mute-captions" type="button" class="btn btn-gray circleButton" onclick="toggleCaptions()" style="display:none">
-                  <span class="fa-stack">
-                    <i id="mute-captions-icon" class="fa fa-cc fa-lg fa-stack-1x"></i>
-                    <i id="mute-captions-off-icon"
-                      class="fa fa-ban fa-stack-2x text-danger"
-                      style="display:none;"></i>
-                  </span>
+                <button id="mute-captions" type="button" class="btn btn-gray circleButton" onclick="toggleCaptions()" style="display:none" aria-label="Toggle Captions">
+                  <i class="call-btn-icon fa-stack">
+                    <i id="mute-captions-icon" class="fa fa-cc fa-stack-1x"></i>
+                    <i id="mute-captions-off-icon" class="fa fa-ban fa-stack-2x text-danger mute-ban" style="display:none;"></i>
+                  </i>
                 </button>
 
                 <button type="button" class="btn btn-gray button" id="startScreenshare" onclick="toggleScreenShare(true)"
@@ -98,10 +96,7 @@
               <div id="captions-area" class="row" style="display:none">
                 <ul id="currentCaptions"> ...no one is speaking, no captions to display</ul>
                 <hr id="captionHr" />
-                <ul id="historicalCaptions">
-                  <li><span class="timestamp">9:39:30 AM</span> <span class="speaker">Joel K:</span> <span class="caption">testing one two three</span></li>
-                  <li><span class="timestamp">9:39:20 AM</span> <span class="speaker">Jackie G:</span> <span class="caption">can you hear me?</span></li>
-                </ul>
+                <ul id="historicalCaptions"></ul>
               </div>
             </div>
           </div>
