@@ -575,15 +575,12 @@ function connect_socket() {
           debugtxt('new-caller-ringing', data);
 
           // temp fix for Asterisk hangup timing issue - AUTO DECLINE incoming call if user
-          // (or auto-click) doesn't accept/decline by 8 seconds
+          // (or auto-click) doesn't accept/decline by 10 seconds
           answerTimer = setTimeout(() => {
-            $("#accept-btn").addClass('disabled');
-            $("#decline-btn").addClass('disabled');
             console.log('\n*** auto decline');
-            $('#decline-btn').trigger('click');
-            $("#accept-btn").removeClass('disabled');
-            $("#decline-btn").removeClass('disabled');
-          }, 8000);
+            terminate_call()
+            declineCall();
+          }, 10000);
 
           $('#myRingingModal').addClass('fade');
 
@@ -3150,12 +3147,15 @@ $('#accept-btn').click(function () {
 
 $('#decline-btn').click(function () {
   clearTimeout(answerTimer);
+  declineCall();
+});
+
+function declineCall() {
   $('#myRingingModalPhoneNumber').html('');
   $('#myRingingModal').modal('hide');
   unpauseQueues();
   $('#callerPhone').val('');
-});
-
+}
 // Dialpad functionality
 $('.keypad-button').click(function (e) {
   var etemp = $(e.currentTarget);
