@@ -542,8 +542,20 @@ class WebRTCMediaSession extends Events {
           const comp = await this._composite.createHubPort();
           await comp.connect(recorder);
         } else {
+          if (!this._composite) {
+            this._composite = this._pipeline.create('Composite');
+          }
+          const currentPeerEP = participant.endpoint;
+          const currentPeerHub = this._composite.createHubPort();
+          await currentPeerEP.connect(currentPeerHub);
+
           const otherPeer = this.oneToOnePeer(ext);
-          await otherPeer.endpoint.connect(recorder);
+          const otherPeerEP = otherPeer.endpoint;
+          const otherPeerHub = this._composite.createHubPort();
+          await otherPeerEP.connect(otherPeerHub);
+
+          currentPeerHub.connect(recorder);
+          // await otherPeer.endpoint.connect(recorder);
         }
 
         let timeoutRecording;
