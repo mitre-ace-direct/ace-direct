@@ -1064,6 +1064,10 @@ io.sockets.on('connection', (socket) => {
     });
   });
 
+  socket.on('consumer-captions-enabled', (data) => {
+    io.to(Number(data.agentExt)).emit('begin-captioning');
+  });
+
   socket.on('multiparty-caption-agent', (data) => {
     if (data.final) {
       // only send finals during a multiparty call, browser caption engine fragments sentences
@@ -1084,12 +1088,25 @@ io.sockets.on('connection', (socket) => {
           });
         });
       }
+    } else {
+      const d = new Date();
+      data.timestamp = d.getTime();
+      data.msgid = d.getTime();
+      data.participants.forEach((p) => {
+        redisClient.hget(c.R_EXTENSION_TO_VRS, Number(p), (err, vrsNum) => {
+          if (!err) {
+            // p = (vrsNum) ? vrsNum : p;
+            p = (vrsNum) || p;
+            io.to(Number(p)).emit('multiparty-caption', data);
+          }
+        });
+      });
     }
   });
 
   //data = ["caption-consumer",{"transcript":" 1 2 3 4 5","final":true,"language":"en-US"}]
   socket.on('caption-consumer', (data) => {
-    if (data.final && token.vrs) {
+    if (token.vrs) {
       // only send finals from browser based captions. Browser captions fragment phrases
       const d = new Date();
       data.timestamp = d.getTime();
@@ -2268,7 +2285,8 @@ io.sockets.on('connection', (socket) => {
               displayname: data.transcripts.displayname,
               agent: data.transcripts.agent,
               msgid,
-              final
+              final,
+              speakerExt: data.speakerExt
             });
           } else {
             console.log('trying', translationUrl);

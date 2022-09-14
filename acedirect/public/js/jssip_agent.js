@@ -32,6 +32,8 @@ var isMonitorInSession = false;
 var reinviteMonitorMultipartyInvite = false;
 var reinviteMonitorMultipartyTransition = false;
 var monitorCaptions = false;
+var consumerCaptionsEnabled = false;
+var multipartyCaptionsStarted = false;
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
 function register_jssip() {
@@ -177,7 +179,7 @@ function register_jssip() {
         document.getElementById('screenShareButton').removeAttribute('style');
         $('#end-call').attr('onclick', 'stopMonitoringCall(' + extensionBeingMonitored + ')');
       } else if(activeParticipantCount > 2) {
-        if (!isMultipartyCall && !monitorCaptions) {
+        if (!isMultipartyCall && !monitorCaptions && !multipartyCaptionsStarted) {
           // new multiparty call
           multipartyCaptionsStart();
           monitorCaptions = true;
@@ -208,7 +210,9 @@ function register_jssip() {
         }
       } else if (activeParticipantCount === 2) {
         isMultipartyCall = false;
-        multipartyCaptionsEnd();
+        if (multipartyCaptionsStarted && !consumerCaptionsEnabled) {
+          multipartyCaptionsEnd();
+        }
 
         if (allAgentCall) {
           $('#end-call').attr('onclick', 'terminate_call()');
@@ -1517,21 +1521,23 @@ function createCaptionHtml(displayName, transcripts) {
 function updateCaptions(transcripts) {
   
   console.log('transcripts in UC are ', transcripts)
-  var tDiv = document.getElementById(transcripts.msgid);
-  
-  if (!tDiv) {
-    var temp = document.createElement('div');
-    temp.id = transcripts.msgid;
-    temp.innerHTML = createCaptionHtml('Consumer', transcripts); 
+  if (transcripts.final) { // For now, only show final captions on agent side
+    var tDiv = document.getElementById(transcripts.msgid);
     
-    temp.classList.add('transcripttext');
-    document.getElementById('transcriptoverlay').prepend(temp);
-  } else {
-    tDiv.innerHTML = createCaptionHtml('Consumer', transcripts); 
-    if (transcripts.final) {
-      $('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
-      $('#caption-messages').scrollTop($('#caption-messages')[0].scrollHeight);
+    if (!tDiv) {
+      var temp = document.createElement('div');
+      temp.id = transcripts.msgid;
+      temp.innerHTML = createCaptionHtml(transcripts.displayname, transcripts); 
+      
+      temp.classList.add('transcripttext');
+      document.getElementById('transcriptoverlay').prepend(temp);
+    } else {
+      tDiv.innerHTML = createCaptionHtml(transcripts.displayname, transcripts); 
+      if (transcripts.final) {
+        $('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
+        $('#caption-messages').scrollTop($('#caption-messages')[0].scrollHeight);
 
+      }
     }
   }
 }
@@ -1559,6 +1565,7 @@ $('#language-select').on('change', function () {
 
 var recognition = null;
 function multipartyCaptionsStart() {
+  multipartyCaptionsStarted = true;
   var language = $('#language-select').val();
   switch (language) {
     case 'en': // English US
@@ -1600,7 +1607,7 @@ function multipartyCaptionsStart() {
   recognition = new webkitSpeechRecognition();
   recognition.continuous = true;
   recognition.lang = language;
-  recognition.interimResults = false;
+  recognition.interimResults = true;
   recognition.maxAlternatives = 1;
   recognition.onresult = function (event) {
     if (!isMuted && event && event.results && (event.results.length > 0)) {
@@ -1621,7 +1628,7 @@ function multipartyCaptionsStart() {
   };
 
   recognition.onend = function (event) {
-    if((acekurento.isMultiparty && (activeParticipantCount > 2)) || (beingMonitored && isMonitorInSession))
+    if((acekurento.isMultiparty && (activeParticipantCount > 2)) || (beingMonitored && isMonitorInSession) || consumerCaptionsEnabled)
       multipartyCaptionsStart();	
   }
   recognition.start();
@@ -1633,4 +1640,6 @@ function multipartyCaptionsEnd() {
   recognition = null;
   callParticipantsExt = [];
   monitorCaptions = false;
+  consumerCaptionsEnabled = false;
+  multipartyCaptionsStarted = false;
 }
