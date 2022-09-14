@@ -11,6 +11,7 @@ let vrs;
 let acekurento = null;
 const ua = null;
 const videomailflag = false;
+const muteCaptionsOffIcon = document.getElementById('mute-captions-off-icon');
 let hasMessages = false;
 let isAgentTyping = false;
 let sharingScreen = false;
@@ -26,6 +27,12 @@ let unreadFiles = 0;
 let openTab = 'chat';
 let exitingQueue = false;
 let isCaptioning = false;
+let captionsEnabled = false;
+let captionsOn = true; // irrelevant if captionsEnabled is false, represents whether user has captions turn on or off via the cc button when enabled
+let currentCaptions = [];
+let historicalCaptions = [];
+
+let exten;
 //This variable is for catching the double end call that occurs when a user clicks the button
 // that ends the call while in queue as if causes both the normal end call and the asterisk
 //end call method to fire
@@ -505,7 +512,24 @@ function connect_socket() {
           }).on('agentScreenshare', () => {
             // agent is stopping/starting screenshare
             isScreenshareRestart = true;
-          });
+          }).on('caption-config', (data) => {
+            if (data && data !== 'false') {
+              console.log(data, typeof data);
+              captionsEnabled = data;
+              if (captionsEnabled) {
+                $('#mute-captions').show();
+                $('#captions-area').show();
+              }
+            }
+          }).on('caption-translated', (transcripts) => {
+            console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
+            updateCaptions(transcripts);
+          }).on('multiparty-caption', (data) => {
+            updateCaptions(data)
+          }).on('consumer-caption', function (transcripts) {
+            // receiving own captions
+            updateCaptions(transcripts)
+         });
       } else {
         // need to handle bad connections?
       }
@@ -546,15 +570,99 @@ const setColumnSize = function () {
   let speakingToRow = document.getElementById('speakingToRow');
   let videoButtonsRow = document.getElementById('callButtonsRow');
   let videoTop = buttonFeedback.getBoundingClientRect().bottom || speakingToRow.getBoundingClientRect().bottom || videoButtonsRow.getBoundingClientRect().bottom;
-  let videoHeight = footer.getBoundingClientRect().top - videoTop;
-  $('#remoteViewCol').height(videoHeight);
-  $('#remoteView').height(videoHeight);
+  let captionAreaHeight = 0;
+  
+  if (captionsEnabled && captionsOn) {
+    captionAreaHeight = 300;
+  }
+
+  let videoHeight = footer.getBoundingClientRect().top - videoTop - captionAreaHeight;
+  
+
+  $('#remoteViewCol').height(videoHeight + 'px');
+  $('#remoteView').height(videoHeight + 'px');
 
   // set remote video column width
   $('#remoteViewCol').width(`${ ($('#callVideosRow').width() - $('#selfViewCol').width()) - 19 }px`);
 };
 setColumnSize();
 window.addEventListener('resize', setColumnSize);
+
+
+// Updates the unordered lists in the caption area with the contents of the caption arrays
+function refreshCaptions() {
+  // Clear both unordered lists
+  $('#currentCaptions').empty();
+  $('#historicalCaptions').empty();
+
+  // Populate current captions
+  if (currentCaptions.length < 1) {
+    $('#currentCaptions').prepend('<li>...no one is speaking, no captions to display</li>');
+  }
+  else {
+    currentCaptions.forEach((caption, index) => {
+      const date = dayjs(caption.timestamp);
+      const timestamp = date.format('h:mm a');
+      $('#currentCaptions').prepend('<li><span class="timestamp">' + timestamp + '</span> <span class="speaker">' + caption.displayname + '</span> <span class="caption">' + caption.transcript + '</span></li>');
+    });
+  }
+
+  // Populate historical captions
+  historicalCaptions.forEach((caption, index) => {
+    const date = dayjs(caption.timestamp);
+    const timestamp = date.format('h:mm a');
+    $('#historicalCaptions').append('<li><span class="timestamp">' + timestamp + '</span> <span class="speaker">' + caption.displayname + '</span> <span class="caption">' + caption.transcript + '</span></li>');
+  });
+}
+
+// Updates the caption arrays and calls refreshCaptions()
+function updateCaptions(caption) {
+  console.log(caption)
+  if (caption.final) {
+    console.log('final!');
+    // Remove caption from current captions
+    currentCaptions.forEach((element, index) => {
+      if(element.extension === caption.extension) { 
+        currentCaptions.splice(index, 1);  
+      };
+    });
+
+    // Add to historical
+    historicalCaptions.unshift(caption);
+  }
+  else {
+    let found = false;
+    currentCaptions.forEach((element, index) => {
+      if(element.extension === caption.extension) {
+        found = true;
+        currentCaptions[index] = caption;
+      }
+    });
+    if (!found) {
+      currentCaptions.unshift(caption);
+    }
+  }
+  refreshCaptions();
+}
+
+function captionsMuted() {
+  return muteCaptionsOffIcon.style.display === 'block';
+}
+
+function toggleCaptions() {
+  if (!captionsMuted()) {
+    captionsOn = false;
+    muteCaptionsOffIcon.style.display = 'block';
+    $('#captions-area').hide();
+  } else {
+    captionsOn = true;
+    muteCaptionsOffIcon.style.display = 'none';
+    $('#captions-area').show();
+  }
+
+  setColumnSize();
+}
+
 
 // Function to change the text of the feedback for the buttons.
 function setFeedbackText(text) {
@@ -700,6 +808,13 @@ function registerJssip(myExtension, myPassword) {
 
       if (partCount === 2 && !isScreenshareRestart) {
         startCallTimer();
+        if (captionsEnabled) {
+          e.participants.forEach((part) => {
+            if (part.isAgent) {
+              socket.emit('consumer-captions-enabled', {agentExt: part.ext});
+            }
+          });
+        }
       } else if (isScreenshareRestart) {
         isScreenshareRestart = false;
       }
@@ -823,6 +938,7 @@ function endCall(userInitiated = false) {
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
+      
       setTimeout(() => {
         location = complaintRedirectUrl;
       }, 10000);
@@ -987,6 +1103,8 @@ function enableVideoPrivacy() {
       setTimeout(() => {
         selfStream.classList.remove('mirror-mode');
         acekurento.enableDisableTrack(false, false); // mute video
+        muteAudio(); // 
+        captionsEnd();
         hideVideoButton.setAttribute('onclick', 'javascript: disableVideoPrivacy();');
         hideVideoIcon.style.display = 'block';
         acekurento.privateMode(true, privacyVideoUrl);
@@ -995,6 +1113,8 @@ function enableVideoPrivacy() {
     } else {
       selfStream.classList.remove('mirror-mode');
       acekurento.enableDisableTrack(false, false); // mute video
+      muteAudio(); //
+      captionsEnd();
       acekurento.privateMode(true, privacyVideoUrl);
     }
   }
@@ -1017,6 +1137,8 @@ function disableVideoPrivacy() {
       setTimeout(() => {
         selfStream.classList.add('mirror-mode');
         acekurento.enableDisableTrack(true, false); // unmute video
+        unmuteAudio(); //
+        captionsStart();
         hideVideoButton.setAttribute('onclick', 'javascript: enableVideoPrivacy();');
         hideVideoIcon.style.display = 'none';
         acekurento.privateMode(false);
@@ -1026,6 +1148,8 @@ function disableVideoPrivacy() {
     } else {
       selfStream.classList.add('mirror-mode');
       acekurento.enableDisableTrack(true, false); // unmute video
+      unmuteAudio(); //
+      captionsStart();
       acekurento.privateMode(false);
     }
   }
@@ -1765,7 +1889,7 @@ function captionsStart() {
   recognition = new webkitSpeechRecognition();
   recognition.continuous = true;
   recognition.lang = language;
-  recognition.interimResults = false;
+  recognition.interimResults = true;
   recognition.maxAlternatives = 1;
   recognition.onresult = function (event) {
     if (!isMuted && event && event.results && (event.results.length > 0)) {
@@ -1774,14 +1898,16 @@ function captionsStart() {
       socket.emit('caption-consumer', {
         transcript: event.results[lastResult][0].transcript,
         final: event.results[lastResult].isFinal,
-        language: language
+        language: language,
+        extension: exten
       });
     }
   };
 
   recognition.onend = function (_event) {
     if (true)
-      captionsStart();
+      captionsEnd();
+      // console.log('captionsEnd onEnd');
   };
   recognition.start();
 }
