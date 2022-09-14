@@ -402,6 +402,9 @@ const zendeskClient = zendeskApi.createClient({
 // filesharing enabled
 const fileSharingEnabled = (getConfigVal('filesharing:enabled') === 'true') ? true : false;
 
+// screensharing enabled
+const screenSharingEnabled = (getConfigVal('screensharing:enabled') === 'true') ? true : false;
+
 const dbHost = getConfigVal('servers:mysql_fqdn');
 const dbUser = getConfigVal('database_servers:mysql:user');
 const dbPassword = getConfigVal('database_servers:mysql:password');
@@ -3919,6 +3922,7 @@ app.use((req, res, next) => {
     csrfToken: req.csrfToken(),
     version,
     fileSharingEnabled,
+    screenSharingEnabled,
     goodbyeVideo,
     year
   };

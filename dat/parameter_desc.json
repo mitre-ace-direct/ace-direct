@@ -267,6 +267,9 @@
     "enabled": "Enable/disable filesharing in ACE Direct; this also hides all filesharing components; the default is 'false' ",
     "virus_scan_enabled": "Virus scan will be enabled if set to 'true' but clamdscan must be set up on the machine for it to work. The default is false"
   },
+  "screensharing": {
+    "enabled": "Enable/disable screensharing in ACE Direct; this also hides all screensharing components; the default is 'false' "
+  },
   "goodbye_video": {
     "enabled": "some installations have good-bye video processing at the end of VRS calls; default is 'false' "
   }, 
