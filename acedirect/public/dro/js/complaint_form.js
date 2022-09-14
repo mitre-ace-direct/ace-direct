@@ -987,6 +987,8 @@ function enableVideoPrivacy() {
       setTimeout(() => {
         selfStream.classList.remove('mirror-mode');
         acekurento.enableDisableTrack(false, false); // mute video
+        muteAudio();
+        captionsEnd();
         hideVideoButton.setAttribute('onclick', 'javascript: disableVideoPrivacy();');
         hideVideoIcon.style.display = 'block';
         acekurento.privateMode(true, privacyVideoUrl);
@@ -995,6 +997,8 @@ function enableVideoPrivacy() {
     } else {
       selfStream.classList.remove('mirror-mode');
       acekurento.enableDisableTrack(false, false); // mute video
+      muteAudio();
+      captionsEnd();
       acekurento.privateMode(true, privacyVideoUrl);
     }
   }
@@ -1017,6 +1021,8 @@ function disableVideoPrivacy() {
       setTimeout(() => {
         selfStream.classList.add('mirror-mode');
         acekurento.enableDisableTrack(true, false); // unmute video
+        unmuteAudio();
+        captionsStart();
         hideVideoButton.setAttribute('onclick', 'javascript: enableVideoPrivacy();');
         hideVideoIcon.style.display = 'none';
         acekurento.privateMode(false);
@@ -1026,6 +1032,8 @@ function disableVideoPrivacy() {
     } else {
       selfStream.classList.add('mirror-mode');
       acekurento.enableDisableTrack(true, false); // unmute video
+      unmuteAudio();
+      captionsStart();
       acekurento.privateMode(false);
     }
   }
@@ -1723,6 +1731,7 @@ function redirectToVideomail() {
 
 var recognition = null;
 function captionsStart() {
+  // console.log('captionsStart()');
   isCaptioning = true;
   let language = $('#language-select').val();
   switch (language) {
@@ -1781,12 +1790,14 @@ function captionsStart() {
 
   recognition.onend = function (_event) {
     if (true)
-      captionsStart();
+      captionsEnd();
+      // console.log('captionsEnd onEnd');
   };
   recognition.start();
 }
 
 function captionsEnd() {
+  // console.log('captionsEnd()');
   isCaptioning = false;
   if (recognition)
     recognition.abort();
