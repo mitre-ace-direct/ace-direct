@@ -799,7 +799,9 @@ function connect_socket() {
           if (acekurento.isMultiparty || isMonitoring) {
             updateCaptionsMultiparty(transcripts);
           } else {
-            updateCaptions(transcripts); // in jssip_agent.js
+            // if (transcripts.displayname !== $('#agentname-sidebar').html()) {
+              updateCaptions(transcripts); // in jssip_agent.js
+            // }
           }
         }).on('multiparty-caption', function (transcripts) {
           // console.log(JSON.stringify(transcripts))
@@ -813,7 +815,8 @@ function connect_socket() {
           socket.emit('translate-caption', {
             transcripts: transcripts,
             callerNumber: extensionMe,
-            displayname: transcripts.displayname
+            displayname: transcripts.displayname,
+            speakerExt: transcripts.extension
           });
         }).on('new-agent-chat', function(data) {
           var count = 0;
@@ -1132,7 +1135,7 @@ function connect_socket() {
           }
           beingMonitored = true;
           monitorExt = data.monitorExt;
-          if (!isMultipartyCall && !monitorCaptions) {
+          if (!isMultipartyCall && !monitorCaptions && !multipartyCaptionsStarted) {
             multipartyCaptionsStart();
             monitorCaptions = true;
           }
@@ -1183,6 +1186,9 @@ function connect_socket() {
           }
         }).on('monitor-rejoin-session', function() {
           startMonitoringCall(extensionBeingMonitored);
+        }).on('begin-captioning', function() {
+          consumerCaptionsEnabled = true;
+          multipartyCaptionsStart();
         });
 
       } else {
