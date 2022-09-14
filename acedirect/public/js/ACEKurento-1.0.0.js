@@ -5486,8 +5486,11 @@ function ACEKurento(config) {
     console.log("Handling incoming call");
     // If busy just reject without disturbing user
     if (acekurento.callState !== NO_CALL && !acekurento.isLoopback && !message.isWarmTransfer) {
-      console.log("mw:",message, acekurento.callState)
-      return //acekurento.declineCall(message);
+      if (acekurento.callState === PROCESSING_CALL){
+        return; //call is being processed don't do anything irrational 
+      } else {
+        return acekurento.declineCall(message);
+      }
     }
     console.log("Message was not declined.")
     acekurento.eventHandlers.incomingCall({
