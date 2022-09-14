@@ -576,12 +576,13 @@ function connect_socket() {
 
           // temp fix for Asterisk hangup timing issue - AUTO DECLINE incoming call if user
           // (or auto-click) doesn't accept/decline by 10 seconds
+          /*
           answerTimer = setTimeout(() => {
             console.log('\n*** auto decline');
             terminate_call()
             declineCall();
           }, 10000);
-
+          */
           $('#myRingingModal').addClass('fade');
 
           if (isTransfer) {
