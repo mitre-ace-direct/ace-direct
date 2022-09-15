@@ -652,6 +652,7 @@ function connect_socket() {
             totalMissedCalls = 0;
           } else {
             unpauseQueues();
+            toggle_incall_buttons(false);
           }
           debugtxt('new-missed-call', data);
           $('#myRingingModal').modal('hide');
