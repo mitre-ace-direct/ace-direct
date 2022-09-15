@@ -5487,7 +5487,12 @@ function ACEKurento(config) {
     // If busy just reject without disturbing user
     if (acekurento.callState !== NO_CALL && !acekurento.isLoopback && !message.isWarmTransfer) {
       if (acekurento.callState === PROCESSING_CALL){
-        return; //call is being processed don't do anything irrational 
+        // stuck in previous call state. Clean up the webRtcPeer and proceed.  
+        if (webRtcPeer) {
+          webRtcPeer.dispose();
+          webRtcPeer = null;
+        }
+        setCallState(NO_CALL)
       } else {
         return acekurento.declineCall(message);
       }
