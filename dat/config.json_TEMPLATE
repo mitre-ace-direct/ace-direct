@@ -265,13 +265,6 @@
     "conference_max_participants": 4,
     "mediapath": "/home/ubuntu/kms-share/media/"
   },
-  "videomailss": {
-    "directory": "/tmp/videomail/",
-    "instructions_media": [
-      "/tmp/videomail/instructions/video.mp4",
-      "/tmp/videomail/instructions/final.jpg"
-    ]
-  },
   "filesharing": {
     "enabled": "false",
     "virus_scan_enabled": "false"
