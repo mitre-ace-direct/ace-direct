@@ -269,6 +269,9 @@
     "enabled": "false",
     "virus_scan_enabled": "false"
   },
+  "screensharing": {
+    "enabled": "false"
+  },  
   "goodbye_video": {
     "enabled": "false"
   },  
