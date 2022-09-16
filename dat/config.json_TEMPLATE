@@ -283,5 +283,8 @@
     "instructions_video": "sample.mp4",
     "please_wait_video": "sample.mp4",
     "no_agents_video": "sample.mp4"
+  },
+  "autoplay_videos": {
+    "enabled": "false"
   }
 }
