@@ -12,7 +12,15 @@ var config = require('./../../dat/config.json');
 const path = require('path');
 const formidable = require('formidable');
 
-const fileSharingEnabled = (utils.getConfigVal(config.filesharing.enabled) === 'true') ? true : false;
+let fileSharingEnabled = false;
+if (config.filesharing && config.filesharing.enabled) {
+  fileSharingEnabled = (utils.getConfigVal(config.filesharing.enabled) === 'true') ? true : false;
+}
+
+let autoplayVideos = '';
+if (config.autoplay_videos && config.autoplay_videos.enabled) {
+  autoplayVideos = (utils.getConfigVal(config.autoplay_videos.enabled) === 'true') ? 'autoplay' : '';
+}
 
 AWS.config.update({
     region: utils.getConfigVal(config.s3.region),
@@ -714,7 +722,7 @@ router.get('/videomail', consumerRestrict, (req, res) => {
         introVideo = 'videomailGreeting.mp4';
       }
     }
-    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), redirectDesc: utils.getConfigVal(config.complaint_redirect.desc), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs), introVideo });
+    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), redirectDesc: utils.getConfigVal(config.complaint_redirect.desc), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs), introVideo, autoplayVideos });
 });
 
 router.post('/videomailupload', consumerRestrict,  (req, res) => { //add restrict. this is for testing only
