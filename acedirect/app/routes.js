@@ -22,7 +22,6 @@ if (config.autoplay_videos && config.autoplay_videos.enabled) {
   autoplayVideos = (utils.getConfigVal(config.autoplay_videos.enabled) === 'true') ? 'autoplay' : '';
 }
 
-//const screenSharingEnabled = (getConfigVal('screensharing:enabled') === 'true') ? true : false;
 let screenSharingVisibility = 'invisible';
 if (config.screensharing && config.screensharing.enabled) {
   screenSharingVisibility = (utils.getConfigVal(config.screensharing.enabled) === 'true') ? 'visible' : 'invisible';
