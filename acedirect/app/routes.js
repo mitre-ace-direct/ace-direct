@@ -110,7 +110,7 @@ router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => 
                 no_agents_video = config.complaint_videos.no_agents_video;
             }
         }
-        res.render('dro/pages/complaint_form', {please_wait_video: please_wait_video, instructions_video: instructions_video, no_agents_video : no_agents_video, autoplayVideos});
+        res.render('dro/pages/complaint_form', {please_wait_video: please_wait_video, instructions_video: instructions_video, no_agents_video : no_agents_video});
     } else {
         //TODO This is the old path to the previous consumer portal
         //res.render('pages/complaint_login');

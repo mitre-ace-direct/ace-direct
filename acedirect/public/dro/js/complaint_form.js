@@ -51,6 +51,20 @@ const viewableFileTypes = [
 ];
 
 $(document).ready(() => {
+  // autoplay videos (configurable)
+  if (autoplayEnabled === 'true') {
+    console.log(`autoplayEnabled: ${autoplayEnabled}`);
+    $( "#optionsModal" ).on('shown.bs.modal', (e) => {
+      $('#instructionsVideo').trigger('play');
+    });
+    $( "#waitingModal" ).on('shown.bs.modal', (e) => {
+      $('#pleaseWaitVideo').trigger('play');
+    });
+    $( "#noAgentsModal" ).on('shown.bs.modal', (e) => {
+      $('#noAgentsVideo').trigger('play');
+    });
+  }
+
   if (fileSharingEnabled === 'false') {
     // remove filesharing tab
     $('#tab2').remove();
