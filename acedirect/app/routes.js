@@ -22,6 +22,12 @@ if (config.autoplay_videos && config.autoplay_videos.enabled) {
   autoplayVideos = (utils.getConfigVal(config.autoplay_videos.enabled) === 'true') ? 'autoplay' : '';
 }
 
+//const screenSharingEnabled = (getConfigVal('screensharing:enabled') === 'true') ? true : false;
+let screenSharingVisibility = 'invisible';
+if (config.screensharing && config.screensharing.enabled) {
+  screenSharingVisibility = (utils.getConfigVal(config.screensharing.enabled) === 'true') ? 'visible' : 'invisible';
+}
+
 AWS.config.update({
     region: utils.getConfigVal(config.s3.region),
     httpOptions: {
@@ -110,7 +116,7 @@ router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => 
                 no_agents_video = config.complaint_videos.no_agents_video;
             }
         }
-        res.render('dro/pages/complaint_form', {please_wait_video: please_wait_video, instructions_video: instructions_video, no_agents_video : no_agents_video});
+        res.render('dro/pages/complaint_form', {please_wait_video: please_wait_video, instructions_video: instructions_video, no_agents_video : no_agents_video, screenSharingVisibility});
     } else {
         //TODO This is the old path to the previous consumer portal
         //res.render('pages/complaint_login');
@@ -347,7 +353,7 @@ router.get(utils.getConfigVal(config.nginx.agent_route), agentRestrict, (req, re
 * @param {function} function(req, res)
 */
 router.get(utils.getConfigVal(config.nginx.agent_route), agentRestrict, (req, res) => {
-    res.render('pages/agent_home');
+    res.render('pages/agent_home', {screenSharingVisibility});
 });
 
 /**
