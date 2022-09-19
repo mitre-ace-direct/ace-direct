@@ -68,7 +68,7 @@
                   </i>
                 </button>
 
-                <button type="button" class="btn btn-gray button" id="startScreenshare" onclick="toggleScreenShare(true)"
+                <button type="button" class="btn btn-gray button <%= screenSharingVisibility %>" id="startScreenshare" onclick="toggleScreenShare(true)"
                   aria-label="Toggle Screenshare">
                   <i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare
                 </button>
@@ -334,7 +334,7 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <video controls class="video-element" id="instructionsVideo" title="Play Video" tabindex="0">
+        <video muted controls class="video-element" id="instructionsVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= instructions_video %>" type="video/mp4">
           <source src="/media/<%= instructions_video %>" type="video/webm">
         </video>
@@ -390,7 +390,7 @@
         <p id="callingBanner"><b>Calling...</b></p>
         <p class="waiting-header body1" role="heading" aria-level="3" aria-live="assertive" style="padding-bottom:0px"><b>Waiting for the next available agent</b></p>
         <hr />
-        <video controls class="video-element" id="pleaseWaitVideo" title="Play Video" tabindex="0">
+        <video muted controls class="video-element" id="pleaseWaitVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= please_wait_video %>" type="video/mp4">
           <source src="/media/<%= please_wait_video %>" type="video/webm">
         </video>
@@ -432,7 +432,7 @@
       <div class="modal-header text-center">
         <div class="no-agents-header" aria-live="assertive" style="font-size:26px !important">No agents are available to take your call at this time.</div>
         <hr/>
-        <video controls class="video-element" id="noAgentsVideo" title="Play Video" tabindex="0">
+        <video muted controls class="video-element" id="noAgentsVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= no_agents_video %>" type="video/mp4">
           <source src="/media/<%= no_agents_video %>" type="video/webm">
         </video>
@@ -527,6 +527,7 @@
   let turnCred = '<%= turnCred %>';
   let fileSharingEnabled = '<%= fileSharingEnabled %>';
   let screenSharingEnabled = '<%= screenSharingEnabled %>';
+  let autoplayEnabled = '<%= autoplayEnabled %>';
 
   //not instrumenting complaint web page right now
   let logWebRTCStats = false;

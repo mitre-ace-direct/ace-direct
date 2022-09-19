@@ -405,6 +405,9 @@ const fileSharingEnabled = (getConfigVal('filesharing:enabled') === 'true') ? tr
 // screensharing enabled
 const screenSharingEnabled = (getConfigVal('screensharing:enabled') === 'true') ? true : false;
 
+// autoplay enabled
+const autoplayEnabled = (getConfigVal('autoplay_videos:enabled') === 'true') ? true : false;
+
 const dbHost = getConfigVal('servers:mysql_fqdn');
 const dbUser = getConfigVal('database_servers:mysql:user');
 const dbPassword = getConfigVal('database_servers:mysql:password');
@@ -3942,6 +3945,7 @@ app.use((req, res, next) => {
     fileSharingEnabled,
     screenSharingEnabled,
     goodbyeVideo,
+    autoplayEnabled,
     year
   };
   next();
