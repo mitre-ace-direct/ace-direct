@@ -121,7 +121,6 @@ function hideMessage() {
   $('#message').hide();
 }
 
-
 function copyURL() {
   navigator.clipboard.writeText(window.location.href).then(() => {
     /* clipboard write success */
