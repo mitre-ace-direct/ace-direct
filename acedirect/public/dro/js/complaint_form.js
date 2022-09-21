@@ -31,6 +31,8 @@ let captionsEnabled = false;
 let captionsOn = true; // irrelevant if captionsEnabled is false, represents whether user has captions turn on or off via the cc button when enabled
 let currentCaptions = [];
 let historicalCaptions = [];
+let body1globalFontSize;
+let body2globalFontSize;
 
 let exten;
 //This variable is for catching the double end call that occurs when a user clicks the button
@@ -1431,7 +1433,7 @@ function newChatMessage(data) {
   }
 
   if (data.isConsumerMessage) {
-    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html('You').css('font-weight','700 !important').appendTo(msginfo);
+    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html('You').css('font-weight','700 !important').css('font-size', body2globalFontSize).appendTo(msginfo);
   } else {
     $(msgsender).addClass('direct-chat-name pull-left chat-body2').html(displayname).css('font-weight','700 !important').appendTo(msginfo);
   }
@@ -1442,6 +1444,7 @@ function newChatMessage(data) {
   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
   $(msgtext).addClass('direct-chat-text chat-body1')
     .html(msg)
+    .css('font-size', body1globalFontSize)
     .appendTo(msgblock);
 
   if ($('#displayname').val() === displayname) {
@@ -1624,6 +1627,8 @@ function setFontSize(size) {
   const newFontSize = Number(currentFontSize) + size;
   const body1FontSizeInPx = (16 * newFontSize) / 100; // 16px is the default font size for body1
   const body2FontSizeInPx = (14 * newFontSize) / 100; // 14px is the default font size for body2
+  body1globalFontSize = body1FontSizeInPx;
+  body2globalFontSize = body2FontSizeInPx;
 
   if (newFontSize >= 50 && size === -10 || newFontSize <= 200 && size === 10) {
     if (newFontSize >= 80 && newFontSize <= 150) {
