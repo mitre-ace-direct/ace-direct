@@ -35,9 +35,9 @@ let body1globalFontSize;
 let body2globalFontSize;
 
 let exten;
-//This variable is for catching the double end call that occurs when a user clicks the button
+// This variable is for catching the double end call that occurs when a user clicks the button
 // that ends the call while in queue as if causes both the normal end call and the asterisk
-//end call method to fire
+// end call method to fire
 let callAlreadyTerminated = false;
 // this list may be incomplete
 const viewableFileTypes = [
@@ -56,13 +56,13 @@ $(document).ready(() => {
   // autoplay videos (configurable)
   if (autoplayEnabled === 'true') {
     console.log(`autoplayEnabled: ${autoplayEnabled}`);
-    $( "#optionsModal" ).on('shown.bs.modal', (e) => {
+    $('#optionsModal').on('shown.bs.modal', () => {
       $('#instructionsVideo').trigger('play');
     });
-    $( "#waitingModal" ).on('shown.bs.modal', (e) => {
+    $('#waitingModal').on('shown.bs.modal', () => {
       $('#pleaseWaitVideo').trigger('play');
     });
-    $( "#noAgentsModal" ).on('shown.bs.modal', (e) => {
+    $('#noAgentsModal').on('shown.bs.modal', () => {
       $('#noAgentsVideo').trigger('play');
     });
   }
@@ -89,7 +89,7 @@ $(document).ready(() => {
   }
 
   // Extend dayjs with utc plugin
-  //dayjs.extend(window.dayjs_plugin_utc);
+  dayjs.extend(window.dayjs_plugin_utc);
 
   // update the page height when the accelerated hardware banner appears/disappears
   var observer = new MutationObserver(function(mutations) {
@@ -541,11 +541,11 @@ function connect_socket() {
             console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
             updateCaptions(transcripts);
           }).on('multiparty-caption', (data) => {
-            updateCaptions(data)
+            updateCaptions(data);
           }).on('consumer-caption', function (transcripts) {
             // receiving own captions
-            updateCaptions(transcripts)
-         });
+            updateCaptions(transcripts);
+          });
       } else {
         // need to handle bad connections?
       }
@@ -560,7 +560,7 @@ function connect_socket() {
 const setColumnSize = function () {
   let acceleratedBannerHeight = 0;
   if ($('#hardware-acc-warning').is(':visible')) {
-    acceleratedBannerHeight = $('#hardware-acc-warning').height()
+    acceleratedBannerHeight = $('#hardware-acc-warning').height();
   }
 
   // sidebar tabs
@@ -587,13 +587,13 @@ const setColumnSize = function () {
   let videoButtonsRow = document.getElementById('callButtonsRow');
   let videoTop = buttonFeedback.getBoundingClientRect().bottom || speakingToRow.getBoundingClientRect().bottom || videoButtonsRow.getBoundingClientRect().bottom;
   let captionAreaHeight = 0;
-  
+
   if (captionsEnabled && captionsOn) {
     captionAreaHeight = 300;
   }
 
   let videoHeight = footer.getBoundingClientRect().top - videoTop - captionAreaHeight;
-  
+
 
   $('#remoteViewCol').height(videoHeight + 'px');
   $('#remoteView').height(videoHeight + 'px');
@@ -603,7 +603,6 @@ const setColumnSize = function () {
 };
 setColumnSize();
 window.addEventListener('resize', setColumnSize);
-
 
 // Updates the unordered lists in the caption area with the contents of the caption arrays
 function refreshCaptions() {
@@ -633,14 +632,14 @@ function refreshCaptions() {
 
 // Updates the caption arrays and calls refreshCaptions()
 function updateCaptions(caption) {
-  console.log(caption)
+  console.log(caption);
   if (caption.final) {
     console.log('final!');
     // Remove caption from current captions
     currentCaptions.forEach((element, index) => {
-      if(element.extension === caption.extension) { 
-        currentCaptions.splice(index, 1);  
-      };
+      if (element.extension === caption.extension) {
+        currentCaptions.splice(index, 1);
+      }
     });
 
     // Add to historical
@@ -678,7 +677,6 @@ function toggleCaptions() {
 
   setColumnSize();
 }
-
 
 // Function to change the text of the feedback for the buttons.
 function setFeedbackText(text) {
@@ -827,7 +825,7 @@ function registerJssip(myExtension, myPassword) {
         if (captionsEnabled) {
           e.participants.forEach((part) => {
             if (part.isAgent) {
-              socket.emit('consumer-captions-enabled', {agentExt: part.ext});
+              socket.emit('consumer-captions-enabled', { agentExt: part.ext });
             }
           });
         }
@@ -839,10 +837,10 @@ function registerJssip(myExtension, myPassword) {
         console.log('--- WV: CONNECTED');
 
         $('#queueModal').modal('hide');
-        //closeDialog($('#videomail-btn')[0]);
+        // closeDialog($('#videomail-btn')[0]);
 
         $('#waitingModal').modal('hide');
-        //closeDialog($('#waitingHangUpButton')[0]);
+        // closeDialog($('#waitingHangUpButton')[0]);
 
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
@@ -874,7 +872,7 @@ function unregisterJssip() {
 // CALL FLOW FUNCTIONS
 
 function enterQueue() {
-  //closeDialog($('#callQueueButton')[0]);
+  // closeDialog($('#callQueueButton')[0]);
   callAlreadyTerminated = false;
 
   const language = 'en';
@@ -883,28 +881,21 @@ function enterQueue() {
     vrs
   }, (isOpen) => {
     console.log('isOpen:', isOpen);
+    // closeDialog($('#callQueueButton')[0]);
+
     if (isOpen) {
       // wait for the options modal to fully close before opening another modal
-      let openWaitingModal = true;
-      $('#optionsModal').on('hidden.bs.modal', function (e) {
-        if (openWaitingModal) {
-          $('#waitingModal').modal('show');
-          $('#waitingModal').css('overflow-y', 'auto');
-          openDialog('waitingModal', window);
-          openWaitingModal = false;
-        }
+      $('#optionsModal').one('hidden.bs.modal', () => {
+        $('#waitingModal').modal('show');
+        $('#waitingModal').css('overflow-y', 'auto');
+        openDialog('waitingModal', window);
       });
-
     } else {
       // wait for the options modal to fully close before opening another modal
-      let openNoAgentsModal = true;
-      $('#optionsModal').on('hidden.bs.modal', function (e) {
-        if (openNoAgentsModal) {
-          $('#noAgentsModal').modal('show');
-          $('#noAgentsModal').css('overflow-y', 'auto');
-          openDialog('noAgentsModal', window);
-          openNoAgentsModal = false;
-        }
+      $('#optionsModal').one('hidden.bs.modal', () => {
+        $('#noAgentsModal').modal('show');
+        $('#noAgentsModal').css('overflow-y', 'auto');
+        openDialog('noAgentsModal', window);
       });
     }
   });
@@ -915,46 +906,45 @@ function enterQueue() {
  * @param {*Determines if the user hang up while waiting in queue or ended an active call} inCall
  */
 function endCall(userInitiated = false) {
-  if(callAlreadyTerminated && !userInitiated){
-    return; //Prevents a doubel call from someone leaving the queue from occurring.
+  if (callAlreadyTerminated && !userInitiated) {
+    return; // Prevents a double call from someone leaving the queue from occurring.
   }
-  console.log('CALLING ENDCALL COMPARING' + userInitiated);
+  console.log(`CALLING ENDCALL COMPARING ${userInitiated}`);
   clearInterval(callTimer);
+
   // if(callAnswered || forceHangup){
   // Catches if the user clicks the hangup on the noagents modal
   if (($('#noAgentsModal').hasClass('in') || $('#optionsModal').hasClass('in')) && !userInitiated) {
-    let openOptionsModal = true;
-    $('#noAgentsModal').modal('hide');
-    $('#noAgentsModal').on('hidden.bs.modal', function (e) {
-      if (openOptionsModal) {
-        $('#optionsModal').modal('show');
-        $('#optionsModal').css('overflow-y', 'auto');
-        openDialog('optionsModal', window);
-        openOptionsModal = false;
-      }
+    $('#noAgentsModal').one('hidden.bs.modal', () => {
+      // closeDialog($('#noAgentsHangUpButton')[0]);
+      $('#optionsModal').modal('show');
+      $('#optionsModal').css('overflow-y', 'auto');
+      openDialog('optionsModal', window);
     });
 
+    $('#noAgentsModal').modal('hide');
+    closeDialog($('#noAgentsHangUpButton')[0]);
   } else if (callAnswered) {
+    // Arrives here when a consumer ends a call that was connected with agent
     if (complaintRedirectActive) {
       $('#redirectURL').text(complaintRedirectUrl);
       $('#redirectUrlDesc').text(complaintRedirectDesc);
       $('#redirectUrlDesc').attr('href', complaintRedirectUrl);
-      $('#waitingModal').modal('hide');
-      //closeDialog($('#waitingHangUpButton')[0]);
+
       // wait for the modal to fully close before opening another modal
-      let openCallEndedModal = true;
-      $('#waitingModal').on('hidden.bs.modal', function (e) {
-        if (openCallEndedModal) {
-          $('#callEndedModal').modal('show');
-          $('#callEndedModal').css('overflow-y', 'auto');
-          openDialog('callEndedModal', window);
-          openCallEndedModal = false;
-        }
+      $('#waitingModal').one('hidden.bs.modal', () => {
+        // closeDialog($('#waitingHangUpButton')[0]);
+        $('#callEndedModal').modal('show');
+        $('#callEndedModal').css('overflow-y', 'auto');
+        openDialog('callEndedModal', window);
       });
+
+      $('#waitingModal').modal('hide');
+      closeDialog($('#waitingHangUpButton')[0]);
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
-      
+
       setTimeout(() => {
         location = complaintRedirectUrl;
       }, 10000);
@@ -963,51 +953,62 @@ function endCall(userInitiated = false) {
       // reset the page
       window.location = `${window.location.origin}/${nginxPath}${consumerPath}`;
     }
-  } else if(userInitiated) {
-    // Called when a user ends the call while waiting in queue
-    let openOptionsModal = true;
-    $('#waitingModal').modal('hide');
-    $('#noAgentsModal').modal('hide');
-    $('#waitingModal').on('hidden.bs.modal', function (e) {
-      if (openOptionsModal) {
+  } else if (userInitiated) {
+    // Called when a user ends the call with the "Hang Up" button while waiting in queue
+
+    if ($('#waitingModal').is(':visible')) {
+      $('#waitingModal').one('hidden.bs.modal', () => {
+        // closeDialog($('#waitingHangUpButton')[0]);
         $('#optionsModal').modal('show');
         $('#optionsModal').css('overflow-y', 'auto');
         openDialog('optionsModal', window);
-        openOptionsModal = false;
-      }
-    });
-    $('#noAgentsModal').on('hidden.bs.modal', function (e) {
-      if (openOptionsModal) {
+      });
+
+      // closeDialog($('#waitingHangUpButton')[0]);
+      $('#waitingModal').modal('hide');
+    }
+
+    if ($('#noAgentsModal').is(':visible')) {
+      $('#noAgentsModal').one('hidden.bs.modal', () => {
+        // closeDialog($('#noAgentsHangUpButton')[0]);
         $('#optionsModal').modal('show');
         $('#optionsModal').css('overflow-y', 'auto');
         openDialog('optionsModal', window);
-        openOptionsModal = false;
-      }
-    });
+      });
+
+      // closeDialog($('#noAgentsHangUpButton')[0]);
+      $('#noAgentsModal').modal('hide');
+    }
   } else {
     // Called when a user ends the call while waiting in queue
-    let openNoAgentsModal = true;
-    //closeDialog($('#waitingHangUpButton')[0]);
-    $('#waitingModal').modal('hide');
-    $('#optionsModal').modal('hide');
-    // wait for the modal to fully close before opening another modal
-    $('#waitingModal').on('hidden.bs.modal', function (e) {
-      if (openNoAgentsModal) {
+
+    if ($('#waitingModal').is(':visible')) {
+      // wait for the modal to fully close before opening another modal
+      $('#waitingModal').one('hidden.bs.modal', () => {
+        // closeDialog($('#waitingHangUpButton')[0]);
+
         $('#noAgentsModal').modal('show');
         $('#noAgentsModal').css('overflow-y', 'auto');
         openDialog('noAgentsModal', window);
-        openNoAgentsModal = false;
-      }
-    });
-    // wait for the modal to fully close before opening another modal
-    $('#optionsModal').on('hidden.bs.modal', function (e) {
-      if (openNoAgentsModal) {
+      });
+
+      $('#waitingModal').modal('hide');
+      // closeDialog($('#waitingHangUpButton')[0]);
+    }
+
+    if ($('#optionsModal').is(':visible')) {
+      // wait for the modal to fully close before opening another modal
+      $('#optionsModal').one('hidden.bs.modal', () => {
+        // closeDialog($('#callQueueButton')[0]);
+
         $('#noAgentsModal').modal('show');
         $('#noAgentsModal').css('overflow-y', 'auto');
         openDialog('noAgentsModal', window);
-        openNoAgentsModal = false;
-      }
-    });
+      });
+
+      $('#optionsModal').modal('hide');
+      // closeDialog($('#callQueueButton')[0]);
+    }
   }
 
   callAlreadyTerminated = true;
@@ -1119,7 +1120,7 @@ function enableVideoPrivacy() {
       setTimeout(() => {
         selfStream.classList.remove('mirror-mode');
         acekurento.enableDisableTrack(false, false); // mute video
-        muteAudio(); // 
+        muteAudio(); //
         captionsEnd();
         hideVideoButton.setAttribute('onclick', 'javascript: disableVideoPrivacy();');
         hideVideoIcon.style.display = 'block';
@@ -1433,9 +1434,14 @@ function newChatMessage(data) {
   }
 
   if (data.isConsumerMessage) {
-    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html('You').css('font-weight','700 !important').css('font-size', body2globalFontSize).appendTo(msginfo);
+    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html('You')
+      .css('font-weight', '700 !important')
+      .css('font-size', body2globalFontSize)
+      .appendTo(msginfo);
   } else {
-    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html(displayname).css('font-weight','700 !important').appendTo(msginfo);
+    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html(displayname)
+      .css('font-weight', '700 !important')
+      .appendTo(msginfo);
   }
 
   $(msgtime).addClass('direct-chat-timestamp chat-body2').html(` ${timestamp}`).appendTo(msginfo);
@@ -1685,7 +1691,7 @@ $('#collapseButton').on('keydown', (e) => {
   }
 });
 
-function collapseSidebar(tab) {  
+function collapseSidebar(tab) {
   if (isSidebarCollapsed) {
     // open the sidebar
     isSidebarCollapsed = false;
@@ -1694,7 +1700,7 @@ function collapseSidebar(tab) {
     $('#collapseButton').attr('aria-expanded', 'true');
     $('.tab-content').attr('hidden', false);
     $('#tab-pane').attr('hidden', false);
-   // $('#tab-options').css('padding-left', '');
+    // $('#tab-options').css('padding-left', '');
 
     $('#fileShareTab').attr('aria-label', 'File share tab');
     $('#chatTab').attr('aria-label', 'Chat tab');
@@ -1749,7 +1755,6 @@ function collapseSidebar(tab) {
     $('#callVideoColumn').addClass('col-xs-8');
     $('#tab-options').removeClass('collapsedTabWidth');
 
-
     $('#callFeaturesColumn').css('border-left', '1px solid #ddd');
     $('#callFeaturesColumn').css('padding-left', '');
     $('#callFeaturesColumn').css('padding-right', '');
@@ -1766,9 +1771,9 @@ function collapseSidebar(tab) {
     $('#remoteViewCol').css('height', '');
     $('#remoteView').css('height', '');
     $('#remoteView').css('width', '');
-    $('#tabRightGroup').addClass('tabsWidthClass')
+    $('#tabRightGroup').addClass('tabsWidthClass');
     setColumnSize();
-  } else {    
+  } else {
     // close the sidebar
     isSidebarCollapsed = true;
     openTab = '';
@@ -1793,7 +1798,7 @@ function collapseSidebar(tab) {
     $('#callVideoColumn').removeClass('col-xs-8');
     $('#callVideoColumn').addClass('col-xs-11');
     $('#tab-options').addClass('collapsedTabWidth');
-    $('#tabRightGroup').removeClass('tabsWidthClass')
+    $('#tabRightGroup').removeClass('tabsWidthClass');
 
     $('#callFeaturesColumn').css('border-left', '');
     $('#callFeaturesColumn').css('padding-left', '0px');
