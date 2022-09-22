@@ -542,8 +542,27 @@ class WebRTCMediaSession extends Events {
           const comp = await this._composite.createHubPort();
           await comp.connect(recorder);
         } else {
+          // Check if our _composite variable is instantiated.
+          if (!this._composite) {
+            this._composite = this._pipeline.create('Composite');
+          }
+
+          // Setting up a HubPort through our composite for the Agent to connect to.
+          const currentPeerEP = participant.endpoint;
+          const currentPeerHub = this._composite.createHubPort();
+          await currentPeerEP.connect(currentPeerHub);
+
+          // Setting up a HubPort through our composite for the Consumer to connect to.
           const otherPeer = this.oneToOnePeer(ext);
-          await otherPeer.endpoint.connect(recorder);
+          const otherPeerEP = otherPeer.endpoint;
+          const otherPeerHub = this._composite.createHubPort();
+          await otherPeerEP.connect(otherPeerHub);
+
+          // Connecting the previously constructed recorder endpoint to one of the HubPorts.
+          currentPeerHub.connect(recorder);
+
+          // The line below is what made the video only connect to the consumer.
+          // await otherPeer.endpoint.connect(recorder);
         }
 
         let timeoutRecording;
