@@ -287,7 +287,6 @@ function connect_socket() {
             filter: 'ALL'
           });
           setInterval(function () {
-            console.log('Interval recording sort');
             socket.emit('get-recordings', {
               extension: extensionMe,
               sortBy: recordSortFlag,
