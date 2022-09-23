@@ -34,6 +34,7 @@ var reinviteMonitorMultipartyTransition = false;
 var monitorCaptions = false;
 var consumerCaptionsEnabled = false;
 var multipartyCaptionsStarted = false;
+var recognitionStarted = false;
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
 function register_jssip() {
@@ -950,6 +951,9 @@ function mute_audio() {
       mute_audio_icon.classList.add('fa-microphone-slash');
       mute_audio_icon.classList.remove('fa-microphone');
       isMuted = true;
+      if (recognitionStarted && consumerCaptionsEnabled && recognition) {
+        recognition.stop();
+      }
     } catch {
       console.log('Mute broken trying again');
       setTimeout(function() {mute_audio();},1000);
@@ -966,6 +970,9 @@ function unmute_audio() {
     mute_audio_icon.classList.add('fa-microphone');
     mute_audio_icon.classList.remove('fa-microphone-slash');
     isMuted = false;
+    if (consumerCaptionsEnabled &&  !multipartyCaptionsStarted && !recognitionStarted) {
+      multipartyCaptionsStart();
+    }
   }
 }
 
@@ -1624,22 +1631,61 @@ function multipartyCaptionsStart() {
         hasMonitor: beingMonitored,
         monitorExt: monitorExt
       });
+    } else if(isMuted && event?.results && recognitionStarted) {
+      // Resend any partial captions as Final
+      var transcript = '';
+      for (let i = 0; i < event.results.length; i++) {
+        if (!event.results[i].isFinal) {
+        transcript += (event.results[i][0].transcript)
+        }
+      }
+
+      if (transcript === '') {
+        // If speaking slowly, the caption will be set to final. Make sure it still gets sent
+        var lastResult = event.results.length - 1;
+        transcript = event.results[lastResult][0].transcript;
+      }
+
+      socket.emit('multiparty-caption-agent', {
+        transcript: transcript,
+        final: true, 
+        language: language,
+        displayname: $('#agentname-sidebar').html().trim(),
+        extension: extensionMe,
+        agent: true,
+        participants: callParticipantsExt,
+        hasMonitor: beingMonitored,
+        monitorExt: monitorExt
+      });
+      multipartyCaptionsEnd();
     }
   };
 
   recognition.onend = function (event) {
-    if((acekurento.isMultiparty && (activeParticipantCount > 2)) || (beingMonitored && isMonitorInSession) || consumerCaptionsEnabled)
+    if((acekurento.isMultiparty && (activeParticipantCount > 2)) || (beingMonitored && isMonitorInSession) || consumerCaptionsEnabled && !isMuted) {
       multipartyCaptionsStart();	
+    } else if(consumerCaptionsEnabled && isMuted) {
+      multipartyCaptionsEnd()
+    }
   }
+  recognitionStarted = true;
   recognition.start();
 }
 
 function multipartyCaptionsEnd() {
-  if(recognition)
+  if(recognition) {
     recognition.abort();
-  recognition = null;
-  callParticipantsExt = [];
-  monitorCaptions = false;
-  consumerCaptionsEnabled = false;
+    recognition = null;
+  }
+
   multipartyCaptionsStarted = false;
+  recognitionStarted = false;
+
+  if (!isMuted || activeParticipantCount < 2) {
+    recognition = null;
+    callParticipantsExt = [];
+    monitorCaptions = false;
+    consumerCaptionsEnabled = false;
+    multipartyCaptionsStarted = false;
+  }
 }
