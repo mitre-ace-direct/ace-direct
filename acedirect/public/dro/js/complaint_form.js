@@ -31,6 +31,7 @@ let captionsEnabled = false;
 let captionsOn = true; // irrelevant if captionsEnabled is false, represents whether user has captions turn on or off via the cc button when enabled
 let currentCaptions = [];
 let historicalCaptions = [];
+let recognitionStarted = false;
 
 let exten;
 //This variable is for catching the double end call that occurs when a user clicks the button
@@ -1072,6 +1073,9 @@ function muteAudio() {
     acekurento.enableDisableTrack(false, true); // mute audio
   }
   $('#mute-audio').blur();
+  if (recognitionStarted && recognition) {
+    recognition.stop();
+  }
 }
 
 // unmutes self audio so remote can hear you
@@ -1085,6 +1089,9 @@ function unmuteAudio() {
     acekurento.enableDisableTrack(true, true); // unmute audio
   }
   $('#mute-audio').blur();
+  if (captionsEnabled && !recognitionStarted) {
+    captionsStart();
+  }
 }
 
 function enableVideoPrivacy() {
@@ -1893,13 +1900,39 @@ function captionsStart() {
         language: language,
         extension: exten
       });
+    } else if(isMuted && event?.results && recognitionStarted) {
+      // Resend any partial captions as Final
+      let transcript = '';
+      for (let i = 0; i < event.results.length; i++) {
+        if (!event.results[i].isFinal) {
+        transcript += (event.results[i][0].transcript)
+        }
+      }
+
+      if (transcript === '') {
+        // If speaking slowly, the caption will be set to final. Make sure it still gets sent
+        var lastResult = event.results.length - 1;
+        transcript = event.results[lastResult][0].transcript;
+      }
+
+      socket.emit('caption-consumer', {
+        transcript: transcript,
+        final: true, 
+        language: language,
+        extension: exten,
+      });
+      captionsEnd();
     }
   };
 
   recognition.onend = function (_event) {
-    if (true)
+    if (!isMuted) {
       captionsStart();
+    } else {
+      captionsEnd();
+    }
   };
+  recognitionStarted = true;
   recognition.start();
 }
 
@@ -1908,4 +1941,5 @@ function captionsEnd() {
   if (recognition)
     recognition.abort();
   recognition = null;
+  recognitionStarted = false
 }
