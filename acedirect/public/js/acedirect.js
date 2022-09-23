@@ -99,8 +99,6 @@ var monitorTransition = false;
 let asteriskPingError = false;
 let asteriskAmiError = false;
 
-let answerTimer = null;
-
 setInterval(function () {
   busylight.light(this.agentStatus);
 }, 2000);
@@ -572,18 +570,6 @@ function connect_socket() {
           }
         }).on('new-caller-ringing', function (data) {
           debugtxt('new-caller-ringing', data);
-
-          // temp fix for Asterisk hangup timing issue - AUTO DECLINE incoming call if user
-          // (or auto-click) doesn't accept/decline by 8 seconds
-          answerTimer = setTimeout(() => {
-            $("#accept-btn").addClass('disabled');
-            $("#decline-btn").addClass('disabled');
-            console.log('\n*** auto decline');
-            $('#decline-btn').trigger('click');
-            $("#accept-btn").removeClass('disabled');
-            $("#decline-btn").removeClass('disabled');
-          }, 8000);
-
           $('#myRingingModal').addClass('fade');
 
           if (isTransfer) {
@@ -665,6 +651,7 @@ function connect_socket() {
             totalMissedCalls = 0;
           } else {
             unpauseQueues();
+            toggle_incall_buttons(false);
           }
           debugtxt('new-missed-call', data);
           $('#myRingingModal').modal('hide');
@@ -3121,7 +3108,6 @@ function transferResponse(isAccepted) {
 
 // Check if status needs to be changed
 $('#accept-btn').click(function () {
-  clearTimeout(answerTimer);
   if($('#videomail-tab').hasClass('active') || $('#agents-tab').hasClass('active') || $('#shortcuts-tab').hasClass('active')) {
     $('#mail-btn').trigger('click');
   }
@@ -3154,13 +3140,15 @@ $('#accept-btn').click(function () {
 });
 
 $('#decline-btn').click(function () {
-  clearTimeout(answerTimer);
+  declineCall();
+});
+
+function declineCall() {
   $('#myRingingModalPhoneNumber').html('');
   $('#myRingingModal').modal('hide');
   unpauseQueues();
   $('#callerPhone').val('');
-});
-
+}
 // Dialpad functionality
 $('.keypad-button').click(function (e) {
   var etemp = $(e.currentTarget);
