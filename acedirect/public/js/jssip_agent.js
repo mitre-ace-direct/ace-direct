@@ -1516,7 +1516,7 @@ function testCaptions() {
 
 
 function createCaptionHtml(displayName, transcripts) {
-  console.log(displayName, transcripts)
+  console.log(displayName, transcripts);
   let caption = transcripts.transcript;
   if (!transcripts.final) {
     caption += '...';
