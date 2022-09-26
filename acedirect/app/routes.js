@@ -12,7 +12,20 @@ var config = require('./../../dat/config.json');
 const path = require('path');
 const formidable = require('formidable');
 
-const fileSharingEnabled = (utils.getConfigVal(config.filesharing.enabled) === 'true') ? true : false;
+let fileSharingEnabled = false;
+if (config.filesharing && config.filesharing.enabled) {
+  fileSharingEnabled = (utils.getConfigVal(config.filesharing.enabled) === 'true') ? true : false;
+}
+
+let autoplayVideos = '';
+if (config.autoplay_videos && config.autoplay_videos.enabled) {
+  autoplayVideos = (utils.getConfigVal(config.autoplay_videos.enabled) === 'true') ? 'autoplay' : '';
+}
+
+let screenSharingVisibility = 'invisible';
+if (config.screensharing && config.screensharing.enabled) {
+  screenSharingVisibility = (utils.getConfigVal(config.screensharing.enabled) === 'true') ? 'visible' : 'invisible';
+}
 
 AWS.config.update({
     region: utils.getConfigVal(config.s3.region),
@@ -102,7 +115,7 @@ router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => 
                 no_agents_video = config.complaint_videos.no_agents_video;
             }
         }
-        res.render('dro/pages/complaint_form', {please_wait_video: please_wait_video, instructions_video: instructions_video, no_agents_video : no_agents_video});
+        res.render('dro/pages/complaint_form', {please_wait_video: please_wait_video, instructions_video: instructions_video, no_agents_video : no_agents_video, screenSharingVisibility});
     } else {
         //TODO This is the old path to the previous consumer portal
         //res.render('pages/complaint_login');
@@ -339,7 +352,7 @@ router.get(utils.getConfigVal(config.nginx.agent_route), agentRestrict, (req, re
 * @param {function} function(req, res)
 */
 router.get(utils.getConfigVal(config.nginx.agent_route), agentRestrict, (req, res) => {
-    res.render('pages/agent_home');
+    res.render('pages/agent_home', {screenSharingVisibility});
 });
 
 /**
@@ -714,7 +727,7 @@ router.get('/videomail', consumerRestrict, (req, res) => {
         introVideo = 'videomailGreeting.mp4';
       }
     }
-    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), redirectDesc: utils.getConfigVal(config.complaint_redirect.desc), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs), introVideo });
+    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), redirectDesc: utils.getConfigVal(config.complaint_redirect.desc), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs), introVideo, autoplayVideos });
 });
 
 router.post('/videomailupload', consumerRestrict,  (req, res) => { //add restrict. this is for testing only

@@ -32,6 +32,9 @@ var isMonitorInSession = false;
 var reinviteMonitorMultipartyInvite = false;
 var reinviteMonitorMultipartyTransition = false;
 var monitorCaptions = false;
+var consumerCaptionsEnabled = false;
+var multipartyCaptionsStarted = false;
+var recognitionStarted = false;
 
 //setup for the call. creates and starts the User Agent (UA) and registers event handlers
 function register_jssip() {
@@ -177,7 +180,7 @@ function register_jssip() {
         document.getElementById('screenShareButton').removeAttribute('style');
         $('#end-call').attr('onclick', 'stopMonitoringCall(' + extensionBeingMonitored + ')');
       } else if(activeParticipantCount > 2) {
-        if (!isMultipartyCall && !monitorCaptions) {
+        if (!isMultipartyCall && !monitorCaptions && !multipartyCaptionsStarted) {
           // new multiparty call
           multipartyCaptionsStart();
           monitorCaptions = true;
@@ -208,7 +211,9 @@ function register_jssip() {
         }
       } else if (activeParticipantCount === 2) {
         isMultipartyCall = false;
-        multipartyCaptionsEnd();
+        if (multipartyCaptionsStarted && !consumerCaptionsEnabled) {
+          multipartyCaptionsEnd();
+        }
 
         if (allAgentCall) {
           $('#end-call').attr('onclick', 'terminate_call()');
@@ -946,6 +951,9 @@ function mute_audio() {
       mute_audio_icon.classList.add('fa-microphone-slash');
       mute_audio_icon.classList.remove('fa-microphone');
       isMuted = true;
+      if (recognitionStarted && consumerCaptionsEnabled && recognition) {
+        recognition.stop();
+      }
     } catch {
       console.log('Mute broken trying again');
       setTimeout(function() {mute_audio();},1000);
@@ -962,6 +970,9 @@ function unmute_audio() {
     mute_audio_icon.classList.add('fa-microphone');
     mute_audio_icon.classList.remove('fa-microphone-slash');
     isMuted = false;
+    if (consumerCaptionsEnabled &&  !multipartyCaptionsStarted && !recognitionStarted) {
+      multipartyCaptionsStart();
+    }
   }
 }
 
@@ -1505,7 +1516,7 @@ function testCaptions() {
 
 
 function createCaptionHtml(displayName, transcripts) {
-  console.log(displayName, transcripts)
+  console.log(displayName, transcripts);
   let caption = transcripts.transcript;
   if (!transcripts.final) {
     caption += '...';
@@ -1517,21 +1528,23 @@ function createCaptionHtml(displayName, transcripts) {
 function updateCaptions(transcripts) {
   
   console.log('transcripts in UC are ', transcripts)
-  var tDiv = document.getElementById(transcripts.msgid);
-  
-  if (!tDiv) {
-    var temp = document.createElement('div');
-    temp.id = transcripts.msgid;
-    temp.innerHTML = createCaptionHtml('Consumer', transcripts); 
+  if (transcripts.final) { // For now, only show final captions on agent side
+    var tDiv = document.getElementById(transcripts.msgid);
     
-    temp.classList.add('transcripttext');
-    document.getElementById('transcriptoverlay').prepend(temp);
-  } else {
-    tDiv.innerHTML = createCaptionHtml('Consumer', transcripts); 
-    if (transcripts.final) {
-      $('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
-      $('#caption-messages').scrollTop($('#caption-messages')[0].scrollHeight);
+    if (!tDiv) {
+      var temp = document.createElement('div');
+      temp.id = transcripts.msgid;
+      temp.innerHTML = createCaptionHtml(transcripts.displayname, transcripts); 
+      
+      temp.classList.add('transcripttext');
+      document.getElementById('transcriptoverlay').prepend(temp);
+    } else {
+      tDiv.innerHTML = createCaptionHtml(transcripts.displayname, transcripts); 
+      if (transcripts.final) {
+        $('#caption-messages').append("<div class='agent-scripts'><div class='direct-chat-text'>" + transcripts.transcript + "</div></div>");
+        $('#caption-messages').scrollTop($('#caption-messages')[0].scrollHeight);
 
+      }
     }
   }
 }
@@ -1559,6 +1572,7 @@ $('#language-select').on('change', function () {
 
 var recognition = null;
 function multipartyCaptionsStart() {
+  multipartyCaptionsStarted = true;
   var language = $('#language-select').val();
   switch (language) {
     case 'en': // English US
@@ -1600,7 +1614,7 @@ function multipartyCaptionsStart() {
   recognition = new webkitSpeechRecognition();
   recognition.continuous = true;
   recognition.lang = language;
-  recognition.interimResults = false;
+  recognition.interimResults = true;
   recognition.maxAlternatives = 1;
   recognition.onresult = function (event) {
     if (!isMuted && event && event.results && (event.results.length > 0)) {
@@ -1617,20 +1631,61 @@ function multipartyCaptionsStart() {
         hasMonitor: beingMonitored,
         monitorExt: monitorExt
       });
+    } else if(isMuted && event?.results && recognitionStarted) {
+      // Resend any partial captions as Final
+      var transcript = '';
+      for (let i = 0; i < event.results.length; i++) {
+        if (!event.results[i].isFinal) {
+        transcript += (event.results[i][0].transcript)
+        }
+      }
+
+      if (transcript === '') {
+        // If speaking slowly, the caption will be set to final. Make sure it still gets sent
+        var lastResult = event.results.length - 1;
+        transcript = event.results[lastResult][0].transcript;
+      }
+
+      socket.emit('multiparty-caption-agent', {
+        transcript: transcript,
+        final: true, 
+        language: language,
+        displayname: $('#agentname-sidebar').html().trim(),
+        extension: extensionMe,
+        agent: true,
+        participants: callParticipantsExt,
+        hasMonitor: beingMonitored,
+        monitorExt: monitorExt
+      });
+      multipartyCaptionsEnd();
     }
   };
 
   recognition.onend = function (event) {
-    if((acekurento.isMultiparty && (activeParticipantCount > 2)) || (beingMonitored && isMonitorInSession))
+    if((acekurento.isMultiparty && (activeParticipantCount > 2)) || (beingMonitored && isMonitorInSession) || consumerCaptionsEnabled && !isMuted) {
       multipartyCaptionsStart();	
+    } else if(consumerCaptionsEnabled && isMuted) {
+      multipartyCaptionsEnd()
+    }
   }
+  recognitionStarted = true;
   recognition.start();
 }
 
 function multipartyCaptionsEnd() {
-  if(recognition)
+  if(recognition) {
     recognition.abort();
-  recognition = null;
-  callParticipantsExt = [];
-  monitorCaptions = false;
+    recognition = null;
+  }
+
+  multipartyCaptionsStarted = false;
+  recognitionStarted = false;
+
+  if (!isMuted || activeParticipantCount < 2) {
+    recognition = null;
+    callParticipantsExt = [];
+    monitorCaptions = false;
+    consumerCaptionsEnabled = false;
+    multipartyCaptionsStarted = false;
+  }
 }

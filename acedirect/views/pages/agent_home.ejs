@@ -24,12 +24,16 @@
 </head>
 
 <body class="hold-transition skin-purple sidebar-mini">
-    <div id="hardware-acc-warning" class="alert alert-info hidden" style="margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; display: flex; align-items: center;">
-        <p style="padding-bottom: 0px;flex:1;">We noticed you have hardware acceleration turned on! For better performance, 
-          consider turning hardware acceleration off in your Google Chrome Settings.
-        </p>
-        <button type="button" id="gpu-close" class="fa fa-times" data-dismiss="alert" style="margin:1rem;background:none;border:none;"></button>
+  <section role="complementary" aria-labelledby="gpu-warning">
+    <div id="hardware-acc-warning" class="alert alert-info hidden"
+      style="margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; display: flex; align-items: center;">
+      <p id="gpu-warning" style="padding-bottom: 0px;flex:1;">We noticed you have hardware acceleration turned on! For
+        better performance, consider turning hardware acceleration off in your Google Chrome Settings.
+      </p>
+      <button type="button" id="gpu-close" class="fa fa-times" data-dismiss="alert" tabindex="0"
+        aria-label="close chrome hardware acceleration message" style="margin:1rem;background:none;border:none;"></button>
     </div>
+  </section>
     <div class="wrapper">
         <header class="main-header">
             <%- include("../partials/agent_page_header") %>
@@ -59,7 +63,7 @@
                 <!--Alert ERROR message 2-->
                 <div id="errorAlert2" class="alert alert-danger alert-dismissible" role="alert" hidden>
                   <div id="errorAlertText2"></div>
-              </div>                
+              </div>
 
                 <div class="grid-stack agent-grid">
                     <!-- VideoBox -->
@@ -283,7 +287,7 @@
                                           <i id="recording-id-sort" class="fa fa-sort"> </i>
                                         </th>
                                         <th id="recording-caller">Caller
-                                          
+
                                         </th>
                                         <th id="recording-date">Date
                                           <i id="recording-id-sort" class="fa fa-sort"> </i>
@@ -821,7 +825,7 @@
                         <img src="/images/phoneRinging.gif" alt="Phone Ringing" height="100">
                         <h2 id='incomingTransferExtension' class="modal-title text-center"></h2>
                     </div>
-                    
+
                     <div class="modal-footer">
                         <div class="btn-group" style="width: 100%;">
                             <button id="accept-transfer" type="button" onclick="transferResponse(true)" data-dismiss="modal" class="btn btn-success btn-style" style="width: 50%; height: 50px;">

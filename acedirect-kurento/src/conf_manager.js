@@ -4,7 +4,6 @@ const NodeWS = require('jssip-node-websocket');
 const SIP = require('jssip');
 const param = require('param');
 const RTCCall = require('./webrtc_media_session');
-// const VideoMail = require('./video_mail');
 const models = require('./dal/models');
 
 class ConfManager extends Events {
