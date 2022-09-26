@@ -631,6 +631,8 @@ body {
 }
 
 .tooltip.top .tooltip-inner {
-  line-break: anywhere;
+  line-break:auto;
   white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

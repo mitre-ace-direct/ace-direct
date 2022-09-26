@@ -61,7 +61,12 @@ $(document).ready(() => {
   openDialog('optionsModal', window);
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
-  $('[data-toggle="tooltip"]').tooltip({
+  $('#shareFileConsumer').tooltip({
+    trigger: 'hover',
+    viewport:$('#shareFileConsumer')
+  });
+
+  $('#collapseButton').tooltip({
     trigger: 'hover',
     viewport: $('#collapseTab')
   });
@@ -1400,8 +1405,8 @@ function addFileToDownloadList(data) {
         <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${filename}">${filename}</span>
         <span class="fileShareFiller"></span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton downloadFilesDownloadBtn" data-toggle="tooltip" data-container="body" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton downloadFilesViewBtn" data-toggle="tooltip" data-container="body" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
         </span>`)
       );
@@ -1412,8 +1417,8 @@ function addFileToDownloadList(data) {
         <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${filename}">${filename}</span>
         <span class="fileShareFiller"></span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton downloadFilesDownloadBtn" data-toggle="tooltip" data-container="body" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton downloadFilesViewBtn" data-toggle="tooltip" data-container="body" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
         </span>`)
       );
@@ -1425,17 +1430,28 @@ function addFileToDownloadList(data) {
       <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${filename}">${filename}</span>
       <span class="fileShareFiller"></span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton downloadFilesDownloadBtn" data-toggle="tooltip" data-container="body" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton downloadFilesViewBtn" data-toggle="tooltip" data-container="body" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
       </span>
       </span>`)
     );
   }
 
   // need to call this every time we add a new tooltip
-  $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover'
-  });
+    // need to call this every time we add a new tooltip
+    $('.downloadFilesDownloadBtn').tooltip({
+      trigger: 'hover',
+      viewport: $('.downloadFilesDownloadBtn')
+    });
+    $('.downloadFilesViewBtn').tooltip({
+      trigger: 'hover',
+      viewport: $('.downloadFilesViewBtn')
+    });
+  
+    $('.fileShareCellFilename').tooltip({
+      trigger: 'hover',
+      viewport: $('.fileShareCellFilename')
+    });
 }
 
 function addFileToSentList(data) {
@@ -1460,11 +1476,11 @@ function addFileToSentList(data) {
       // add to sent files list
       $('#sentFilesList').append(
         (`<span class="fileShareRow">
-        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip"title="${filename}">${filename}</span>
+        <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${filename}">${filename}</span>
         <span class="fileShareFiller"></span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton sentFilesDownloadBtn" data-toggle="tooltip" data-container="body" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton sentFilesViewBtn" data-toggle="tooltip" data-container="body" title="View file in new tab" target="_blank" href="./viewFile?id=${data.id}" role="button" aria-label="View ${data.original_filename} in new tab"><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
         </span>`)
       );
@@ -1476,8 +1492,8 @@ function addFileToSentList(data) {
         <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${filename}">${filename}</span>
         <span class="fileShareFiller"></span>
         <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
-          <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton sentFilesDownloadBtn" data-toggle="tooltip" data-container="body" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+          <a class="btn pull-right fileshareButton sentFilesViewBtn" data-toggle="tooltip" data-container="body" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
         </span>
         </span>`)
       );
@@ -1490,16 +1506,26 @@ function addFileToSentList(data) {
       <span class="fileShareCellFilename chat-body1" data-toggle="tooltip" title="${filename}">${filename}</span>
       <span class="fileShareFiller"></span>
       <span class="btn-toolbar pull-right fileShareCellBtn" role="toolbar">
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
-        <a class="btn pull-right fileshareButton" data-toggle="tooltip" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton sentFilesDownloadBtn" data-toggle="tooltip" data-container="body" title="Download" target="_blank" href="./downloadFile?id=${data.id}" role="button" aria-label="Download ${data.original_filename}"><i class="fa fa-download fileShareIcon"></i></a>
+        <a class="btn pull-right fileshareButton sentFilesViewBtn" data-toggle="tooltip" data-container="body" title="Download this file to view it" aria-label="Download ${data.original_filename} to view it" disabled><i class="fa fa-eye fileShareIcon"></i></a>
       </span>
       </span>`)
     );
   }
 
   // need to call this every time we add a new tooltip
-  $('[data-toggle="tooltip"]').tooltip({
-    trigger: 'hover'
+  $('.sentFilesDownloadBtn').tooltip({
+    trigger: 'hover',
+    viewport: $('.sentFilesDownloadBtn')
+  });
+  $('.sentFilesViewBtn').tooltip({
+    trigger: 'hover',
+    viewport: $('.sentFilesViewBtn')
+  });
+
+  $('.fileShareCellFilename').tooltip({
+    trigger: 'hover',
+    viewport: $('.fileShareCellFilename')
   });
 }
 
