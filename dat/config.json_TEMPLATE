@@ -265,17 +265,13 @@
     "conference_max_participants": 4,
     "mediapath": "/home/ubuntu/kms-share/media/"
   },
-  "videomailss": {
-    "directory": "/tmp/videomail/",
-    "instructions_media": [
-      "/tmp/videomail/instructions/video.mp4",
-      "/tmp/videomail/instructions/final.jpg"
-    ]
-  },
   "filesharing": {
     "enabled": "false",
     "virus_scan_enabled": "false"
   },
+  "screensharing": {
+    "enabled": "false"
+  },  
   "goodbye_video": {
     "enabled": "false"
   },  
@@ -283,5 +279,8 @@
     "instructions_video": "sample.mp4",
     "please_wait_video": "sample.mp4",
     "no_agents_video": "sample.mp4"
+  },
+  "autoplay_videos": {
+    "enabled": "false"
   }
 }

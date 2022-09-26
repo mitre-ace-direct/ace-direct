@@ -18,13 +18,17 @@
 </head>
 
 <body style="font-family: 'Roboto', sans-serif;">
-  <div id="hardware-acc-warning" class="alert alert-info hidden" style="display: none;margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; display: flex; align-items: center;">
-    <p style="padding-bottom: 0px;flex:1;">We noticed you have hardware acceleration turned on! For better performance, 
-      consider turning hardware acceleration off in your Google Chrome Settings.
-    </p>
-    <button type="button" id="gpu-close" class="fa fa-times" data-dismiss="alert" style="margin:1rem;background:none;border:none;"></button>
-  </div>
-  
+  <section role="complementary" aria-labelledby="gpu-warning">
+    <div id="hardware-acc-warning" class="alert alert-info hidden"
+      style="display: none;margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; display: flex; align-items: center;">
+      <p id="gpu-warning" style="padding-bottom: 0px;flex:1;">We noticed you have hardware acceleration turned on! For
+        better performance, consider turning hardware acceleration off in your Google Chrome Settings.
+      </p>
+      <button type="button" id="gpu-close" class="fa fa-times" data-dismiss="alert" tabindex="0"
+        aria-label="close chrome hardware acceleration message" style="margin:1rem;background:none;border:none;"></button>
+    </div>
+  </section>
+
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
@@ -57,7 +61,14 @@
                 <button type="button" class="btn btn-gray circleButton" onclick="enterFullscreen()" aria-label="Enter Fullscreen">
                   <i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
                 </button>
-                <button type="button" class="btn btn-gray button" id="startScreenshare" onclick="toggleScreenShare(true)"
+                <button id="mute-captions" type="button" class="btn btn-gray circleButton" onclick="toggleCaptions()" style="display:none" aria-label="Toggle Captions">
+                  <i class="call-btn-icon fa-stack">
+                    <i id="mute-captions-icon" class="fa fa-cc fa-stack-1x"></i>
+                    <i id="mute-captions-off-icon" class="fa fa-ban fa-stack-2x text-danger mute-ban" style="display:none;"></i>
+                  </i>
+                </button>
+
+                <button type="button" class="btn btn-gray button <%= screenSharingVisibility %>" id="startScreenshare" onclick="toggleScreenShare(true)"
                   aria-label="Toggle Screenshare">
                   <i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare
                 </button>
@@ -85,6 +96,11 @@
                 <div class="col-xs-9 pull-right" id="remoteViewCol">
                   <video id="remoteView" autoplay aria-label="Remote Video"></video>
                 </div>
+              </div>
+              <div id="captions-area" class="row" style="display:none">
+                <ul id="currentCaptions"> ...no one is speaking, no captions to display</ul>
+                <hr id="captionHr" />
+                <ul id="historicalCaptions"></ul>
               </div>
             </div>
           </div>
@@ -213,8 +229,8 @@
                               </div>
                             </span>
                           </span>
-                          <textarea id="newchatmessage" placeholder="Type a message" aria-label="Type a message"
-                            class="form-control col-xs-1 buttonFontSize chat-body1" maxlength="500" autocomplete="off" required></textarea>
+                          <input type="text" id="newchatmessage" placeholder="Type a message" aria-label="Type a message"
+                            class="form-control col-xs-1 buttonFontSize chat-body1" maxlength="500" autocomplete="off" required></input>
 
                           <span class="input-group-btn" style="vertical-align: bottom;">
                             <button id="chat-send" class="btn btn-primary btn-flat buttonFontSize" aria-label="Send message"
@@ -318,7 +334,7 @@
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <video controls class="video-element" id="instructionsVideo" title="Play Video" tabindex="0">
+        <video muted controls class="video-element" id="instructionsVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= instructions_video %>" type="video/mp4">
           <source src="/media/<%= instructions_video %>" type="video/webm">
         </video>
@@ -374,7 +390,7 @@
         <p id="callingBanner"><b>Calling...</b></p>
         <p class="waiting-header body1" role="heading" aria-level="3" aria-live="assertive" style="padding-bottom:0px"><b>Waiting for the next available agent</b></p>
         <hr />
-        <video controls class="video-element" id="pleaseWaitVideo" title="Play Video" tabindex="0">
+        <video muted controls class="video-element" id="pleaseWaitVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= please_wait_video %>" type="video/mp4">
           <source src="/media/<%= please_wait_video %>" type="video/webm">
         </video>
@@ -416,7 +432,7 @@
       <div class="modal-header text-center">
         <div class="no-agents-header" aria-live="assertive" style="font-size:26px !important">No agents are available to take your call at this time.</div>
         <hr/>
-        <video controls class="video-element" id="noAgentsVideo" title="Play Video" tabindex="0">
+        <video muted controls class="video-element" id="noAgentsVideo" title="Play Video" tabindex="0">
           <source src="/media/<%= no_agents_video %>" type="video/mp4">
           <source src="/media/<%= no_agents_video %>" type="video/webm">
         </video>
@@ -510,6 +526,8 @@
   let turnUser = '<%= turnUser %>';
   let turnCred = '<%= turnCred %>';
   let fileSharingEnabled = '<%= fileSharingEnabled %>';
+  let screenSharingEnabled = '<%= screenSharingEnabled %>';
+  let autoplayEnabled = '<%= autoplayEnabled %>';
 
   //not instrumenting complaint web page right now
   let logWebRTCStats = false;

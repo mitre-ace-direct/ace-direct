@@ -39,7 +39,7 @@
             onkeypress="goToCallPage()"
             aria-label="Cancel">Cancel</a>
         </div>
-        <video class="fill-height video-element" id="greetingVideo" title="Play Video" aria-label="videomail greeting video">
+        <video <%= autoplayVideos %> class="fill-height video-element" id="greetingVideo" title="Play Video" aria-label="videomail greeting video">
           <source src="/media/<%= introVideo %>" type="video/mp4">
           <source src="/media/<%= introVideo %>" type="video/webm">
         </video>

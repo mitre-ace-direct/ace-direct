@@ -528,7 +528,7 @@ body {
 }
 
 #callVideosRow {
-  height: 100%;
+  /* height: 100%; */
 }
 
 #mute-camera-off-icon {
@@ -635,4 +635,42 @@ body {
   white-space: normal;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+#captions-area {
+  background-color: white;
+  border: 2px solid gray;
+  height: 300px;
+  text-align: left;
+  font-size: 16px;
+  overflow: scroll;
+}
+
+
+#captions-area ul {
+  list-style-type: none;
+}
+
+#captionHr {
+  border: 1px solid lightgray;
+}
+
+#currentCaptions {
+  margin-top: 20px;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.speaker {
+  font-weight: 700;
+}
+
+.fa-cc {
+  left: -9px !important;
+  top: -3px;
+}
+
+.mute-ban {
+  left: -9px !important;
+  top: -3px;
 }

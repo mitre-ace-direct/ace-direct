@@ -255,17 +255,12 @@
     "mediapath": "location of the kms-share media folder. default: /home/ubuntu/kms-share/media/"
 
   },
-  "videomailss": {
-    "comment1": "this is part of the signaling server configuration",
-    "directory": "/tmp/videomail/",
-    "instructions_media": [
-      "/tmp/videomail/instructions/video.mp4",
-      "/tmp/videomail/instructions/final.jpg"
-    ]
-  },
   "filesharing": {
     "enabled": "Enable/disable filesharing in ACE Direct; this also hides all filesharing components; the default is 'false' ",
     "virus_scan_enabled": "Virus scan will be enabled if set to 'true' but clamdscan must be set up on the machine for it to work. The default is false"
+  },
+  "screensharing": {
+    "enabled": "Enable/disable screensharing in ACE Direct; this also hides all screensharing components; the default is 'false' "
   },
   "goodbye_video": {
     "enabled": "some installations have good-bye video processing at the end of VRS calls; default is 'false' "
@@ -274,5 +269,8 @@
     "instructions_video": "video filename for instructions to the complaint user; MP4/webm format; defaults to sample.mp4; customize with your own instructions file in /acedirect/public/media/",
     "please_wait_video": "video filename for letting the complaint user know to wait; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/",
     "no_agents_video": "video filename for the modal that appears when a user tries to call while all agents are away or offline; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/"
-  }
+  },
+  "autoplay_videos": {
+    "enabled": "enable or disable autoplay of ASL videos; default is 'false' "
+  }  
 }

@@ -285,7 +285,6 @@ function connect_socket() {
             filter: 'ALL'
           });
           setInterval(function () {
-            console.log('Interval recording sort');
             socket.emit('get-recordings', {
               extension: extensionMe,
               sortBy: recordSortFlag,
@@ -652,6 +651,7 @@ function connect_socket() {
             totalMissedCalls = 0;
           } else {
             unpauseQueues();
+            toggle_incall_buttons(false);
           }
           debugtxt('new-missed-call', data);
           $('#myRingingModal').modal('hide');
@@ -785,7 +785,9 @@ function connect_socket() {
           if (acekurento.isMultiparty || isMonitoring) {
             updateCaptionsMultiparty(transcripts);
           } else {
-            updateCaptions(transcripts); // in jssip_agent.js
+            // if (transcripts.displayname !== $('#agentname-sidebar').html()) {
+              updateCaptions(transcripts); // in jssip_agent.js
+            // }
           }
         }).on('multiparty-caption', function (transcripts) {
           // console.log(JSON.stringify(transcripts))
@@ -799,7 +801,8 @@ function connect_socket() {
           socket.emit('translate-caption', {
             transcripts: transcripts,
             callerNumber: extensionMe,
-            displayname: transcripts.displayname
+            displayname: transcripts.displayname,
+            speakerExt: transcripts.extension
           });
         }).on('new-agent-chat', function(data) {
           var count = 0;
@@ -1118,7 +1121,7 @@ function connect_socket() {
           }
           beingMonitored = true;
           monitorExt = data.monitorExt;
-          if (!isMultipartyCall && !monitorCaptions) {
+          if (!isMultipartyCall && !monitorCaptions && !multipartyCaptionsStarted) {
             multipartyCaptionsStart();
             monitorCaptions = true;
           }
@@ -1169,6 +1172,9 @@ function connect_socket() {
           }
         }).on('monitor-rejoin-session', function() {
           startMonitoringCall(extensionBeingMonitored);
+        }).on('begin-captioning', function() {
+          consumerCaptionsEnabled = true;
+          multipartyCaptionsStart();
         });
 
       } else {
@@ -3134,12 +3140,15 @@ $('#accept-btn').click(function () {
 });
 
 $('#decline-btn').click(function () {
+  declineCall();
+});
+
+function declineCall() {
   $('#myRingingModalPhoneNumber').html('');
   $('#myRingingModal').modal('hide');
   unpauseQueues();
   $('#callerPhone').val('');
-});
-
+}
 // Dialpad functionality
 $('.keypad-button').click(function (e) {
   var etemp = $(e.currentTarget);
