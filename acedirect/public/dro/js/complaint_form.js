@@ -1592,20 +1592,19 @@ function addFileToDownloadList(data) {
   }
 
   // need to call this every time we add a new tooltip
-    // need to call this every time we add a new tooltip
-    $('.downloadFilesDownloadBtn').tooltip({
-      trigger: 'hover',
-      viewport: $('.downloadFilesDownloadBtn')
-    });
-    $('.downloadFilesViewBtn').tooltip({
-      trigger: 'hover',
-      viewport: $('.downloadFilesViewBtn')
-    });
-  
-    $('.fileShareCellFilename').tooltip({
-      trigger: 'hover',
-      viewport: $('.fileShareCellFilename')
-    });
+  $('.downloadFilesDownloadBtn').tooltip({
+    trigger: 'hover',
+    viewport: $('.downloadFilesDownloadBtn')
+  });
+  $('.downloadFilesViewBtn').tooltip({
+    trigger: 'hover',
+    viewport: $('.downloadFilesViewBtn')
+  });
+
+  $('.fileShareCellFilename').tooltip({
+    trigger: 'hover',
+    viewport: $('.fileShareCellFilename')
+  });
 }
 
 function addFileToSentList(data) {
