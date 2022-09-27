@@ -402,7 +402,7 @@ body {
   /* position: absolute;*/
   bottom: 0;
   min-height: 38px !important;
-  max-height: 75px;
+  /* max-height: 75px; */
 }
 
 .emojiButtons {
