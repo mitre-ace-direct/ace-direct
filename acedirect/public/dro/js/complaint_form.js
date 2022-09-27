@@ -1314,7 +1314,7 @@ $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
     });
   }
 
-  this.style.height = `${this.scrollHeight}px`;  
+  this.style.height = `${this.scrollHeight}px`;
   if ($('#newchatmessage').val() === '') {
     this.style.height = $('#chat-send').css('height');
   }
@@ -1390,7 +1390,9 @@ $('#chatsend').submit((evt) => {
   const language = 'en';
 
   $('#newchatmessage').val('');
+  $('#newchatmessage').height(0);
   $('#chatcounter').text('500');
+  setColumnSize();
   console.log('sent message with language', language);
   isTyping = false;
   socket.emit('chat-message', {
