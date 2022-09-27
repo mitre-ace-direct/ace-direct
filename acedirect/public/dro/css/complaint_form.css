@@ -630,6 +630,13 @@ body {
   }
 }
 
+.tooltip.top .tooltip-inner {
+  line-break:auto;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 #captions-area {
   background-color: white;
   border: 2px solid gray;
