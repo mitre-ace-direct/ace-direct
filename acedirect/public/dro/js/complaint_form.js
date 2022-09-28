@@ -882,6 +882,24 @@ function unregisterJssip() {
   sessionStorage.clear();
 }
 
+// Modal Transcripts
+function showTranscripts(video) {
+  const transcriptButton = `#${video}TranscriptBtn`;
+  const transcript = `#${video}Transcript`;
+
+  if ($(transcript).is(':hidden')) {
+    $(transcript).attr('hidden', false);
+    $(transcript).attr('aria-hidden', 'false');
+    $(transcriptButton).html('Hide Transcript');
+    $(transcriptButton).blur();
+    $(transcript).focus();
+  } else {
+    $(transcript).attr('hidden', true);
+    $(transcript).attr('aria-hidden', 'true');
+    $(transcriptButton).html('Show Transcript');
+  }
+}
+
 // CALL FLOW FUNCTIONS
 
 function enterQueue() {
