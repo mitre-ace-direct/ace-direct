@@ -338,6 +338,14 @@
           <source src="/media/<%= instructions_video %>" type="video/mp4">
           <source src="/media/<%= instructions_video %>" type="video/webm">
         </video>
+        <button type="button" id="instructionsVideoTranscriptBtn" class="btn btn-secondary btn-style btn-block button" onclick="showTranscripts('instructionsVideo')">
+          Show Transcript
+        </button>
+        <div id="instructionsVideoTranscript" class="panel panel-default button-panel" tabindex="0" aria-hidden="true" hidden>
+          <section class="transcript" role="transcript">
+            <p>Thank you for calling FCC’s ASL Support Line. Press the “call” button to make a video call with an Agent. You may also press the “Leave Videomail” button to record a message and an Agent will return your call.</p>
+          </section>
+        </div>
       </div>
       <div class="modal-body text-center">
 
@@ -394,6 +402,14 @@
           <source src="/media/<%= please_wait_video %>" type="video/mp4">
           <source src="/media/<%= please_wait_video %>" type="video/webm">
         </video>
+        <button type="button" id="pleaseWaitTranscriptBtn" class="btn btn-secondary btn-style btn-block button" onclick="showTranscripts('pleaseWait')">
+          Show Transcript
+        </button>
+        <div id="pleaseWaitTranscript" tabindex="0" aria-hidden="true" hidden>
+          <section class="transcript" role="transcript">
+            <p>Please wait for the next available Agent to assist you. If you do not wish to wait, you may leave a video message or hang up the call.</p>
+          </section>
+        </div>
       </div>
       <div class="modal-body text-center my-body">
         <div class="row">
@@ -436,6 +452,14 @@
           <source src="/media/<%= no_agents_video %>" type="video/mp4">
           <source src="/media/<%= no_agents_video %>" type="video/webm">
         </video>
+        <button type="button" id="noAgentsTranscriptBtn" class="btn btn-secondary btn-style btn-block button" onclick="showTranscripts('noAgents')">
+          Show Transcript
+        </button>
+        <div id="noAgentsTranscript" tabindex="0" aria-hidden="true" aria-label="Video Transcript" hidden>
+          <section class="transcript" role="transcript">
+            <p>No agents are currently available to accept your call. Please leave a video message or call back at a later time.</p>
+          </section>
+        </div>
       </div>
       <div class="modal-body text-center my-body">
         <div class="row button-row">
