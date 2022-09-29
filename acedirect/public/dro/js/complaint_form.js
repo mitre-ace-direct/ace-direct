@@ -600,7 +600,7 @@ const setColumnSize = function () {
   const tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
   const chatHeight = footer.getBoundingClientRect().top - tabsTop;
   const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
-  const newChatMessageHeight = parseInt((document.getElementById('newchatmessage').style.height).slice(0, -2));
+  const newChatMessageHeight = parseInt((document.getElementById('newchatmessage').style.height).slice(0, -2), 10);
 
   $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
   if ($('#chat-messages').hasClass('emptyMessages')) {
