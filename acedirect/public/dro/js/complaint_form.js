@@ -600,9 +600,15 @@ const setColumnSize = function () {
   const tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
   const chatHeight = footer.getBoundingClientRect().top - tabsTop;
   const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
+  const newChatMessageHeight = parseInt((document.getElementById('newchatmessage').style.height).slice(0, -2));
 
   $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
-  $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
+  if ($('#chat-messages').hasClass('emptyMessages')) {
+    $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
+  }
+  else {
+    $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight + newChatMessageHeight));
+  }
 
   $('#fileshare-box-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
   $('#fileshare-body').height(fileshareHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
@@ -1332,6 +1338,9 @@ $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
   if ($('#newchatmessage').val() === '') {
     this.style.height = $('#chat-send').css('height');
   }
+
+  // readjust the chat window as the consumer is typing
+  setColumnSize();
 });
 
 $('#fileInput').on('change', () => {
@@ -1404,7 +1413,9 @@ $('#chatsend').submit((evt) => {
   const language = 'en';
 
   $('#newchatmessage').val('');
+  $('#newchatmessage').height(0);
   $('#chatcounter').text('500');
+  setColumnSize();
   console.log('sent message with language', language);
   isTyping = false;
   socket.emit('chat-message', {
