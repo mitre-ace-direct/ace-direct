@@ -28,7 +28,9 @@ let openTab = 'chat';
 let exitingQueue = false;
 let isCaptioning = false;
 let captionsEnabled = false;
-let captionsOn = true; // irrelevant if captionsEnabled is false, represents whether user has captions turn on or off via the cc button when enabled
+// captionsOn irrelevant if captionsEnabled is false, represents whether user has
+// captions turn on or off via the cc button when enabled
+let captionsOn = true;
 let currentCaptions = [];
 let historicalCaptions = [];
 let recognitionStarted = false;
@@ -53,11 +55,11 @@ const viewableFileTypes = [
   'html'
 ];
 const syntaxCharacters = [
-  {symbol: '&', replacement: '&amp;'},
-  {symbol: '>', replacement: '&gt;'},
-  {symbol: '<', replacement: '&lt;'},
-  {symbol: '"', replacement: '&quot;'},
-  {symbol: '\'', replacement: '&apos'},
+  { symbol: '&', replacement: '&amp;' },
+  { symbol: '>', replacement: '&gt;' },
+  { symbol: '<', replacement: '&lt;' },
+  { symbol: '"', replacement: '&quot;' },
+  { symbol: '\'', replacement: '&apos' }
 ];
 
 $(document).ready(() => {
@@ -65,12 +67,15 @@ $(document).ready(() => {
   if (autoplayEnabled === 'true') {
     console.log(`autoplayEnabled: ${autoplayEnabled}`);
     $('#optionsModal').on('shown.bs.modal', () => {
+      openDialog('optionsModal', window);
       $('#instructionsVideo').trigger('play');
     });
     $('#waitingModal').on('shown.bs.modal', () => {
+      openDialog('waitingModal', window);
       $('#pleaseWaitVideo').trigger('play');
     });
     $('#noAgentsModal').on('shown.bs.modal', () => {
+      openDialog('noAgentsModal', window);
       $('#noAgentsVideo').trigger('play');
     });
   }
@@ -82,12 +87,12 @@ $(document).ready(() => {
 
   $('#optionsModal').modal('show');
   $('#optionsModal').css('overflow-y', 'auto');
-  openDialog('optionsModal', window);
+
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
   $('#shareFileConsumer').tooltip({
     trigger: 'hover',
-    viewport:$('#shareFileConsumer')
+    viewport: $('#shareFileConsumer')
   });
 
   $('#collapseButton').tooltip({
@@ -105,11 +110,11 @@ $(document).ready(() => {
   dayjs.extend(window.dayjs_plugin_utc);
 
   // update the page height when the accelerated hardware banner appears/disappears
-  var observer = new MutationObserver(function(mutations) {
-    console.log('setting setColumnSize()')
+  const observer = new MutationObserver(function (mutations) {
+    console.log('setting setColumnSize()');
     setColumnSize();
   });
-  var target = document.querySelector('#hardware-acc-warning');
+  const target = document.querySelector('#hardware-acc-warning');
   observer.observe(target, {
     attributes: true
   });
@@ -169,7 +174,8 @@ function connect_socket() {
             // console.log(`after hours modal suppressed. isOpen: ${isOpen}`);
           }
 
-          // startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8); // start time in UTC
+          // start time is in UTC
+          // startTimeUTC = convertUTCtoLocal(payload.startTimeUTC).substring(0, 8);
           // endTimeUTC = convertUTCtoLocal(payload.endTimeUTC).substring(0, 8); // end time in UTC
           // $('#ah-start-time').text(startTimeUTC);
           // $('#ah-end-time').text(`${endTimeUTC} ${tz}`);
@@ -233,7 +239,8 @@ function connect_socket() {
               // Original
               // startCall(asteriskSipUri); //calling asterisk to get into the queue
 
-              // add ace kurento signal handling so we can get params, then call once we have a wv connection
+              // add ace kurento signal handling so we can get params,
+              // then call once we have a wv connection
               if (acekurento === null) {
                 let signalingUrl = globalData.signaling_server_url;
                 signalingUrl = signalingUrl.trim();
@@ -246,7 +253,8 @@ function connect_socket() {
                 const eventHandlers = {
                   connected: (_e) => {
                     console.log('--- WV: Connected ---\n');
-                    registerJssip(data.extension, data.password); // register with the given extension
+                    // register with the given extension
+                    registerJssip(data.extension, data.password);
                     startCall(asteriskSipUri); // calling asterisk to get into the queue
                   },
                   registerResponse: (error) => {
@@ -386,14 +394,16 @@ function connect_socket() {
           })
           .on('queue-caller-join', (data) => {
             if (data.extension === exten && data.queue === 'ComplaintsQueue') {
-              // setQueueText(data.position -= 1); // subtract because asterisk wording is off by one
+              // subtract because asterisk wording is off by one
+              // setQueueText(data.position -= 1);
             }
           })
           .on('queue-caller-leave', (data) => {
             const currentPosition = $('#pos-in-queue').text();
             if (data.queue === 'ComplaintsQueue') {
               /* if (!abandonedCaller) {
-                // abandoned caller triggers both leave and abandon event. this prevents duplicate removes.
+                // abandoned caller triggers both leave and abandon event.
+                // this prevents duplicate removes.
                     setQueueText(currentPosition -= 1);
                 } */
               abandonedCaller = false;
@@ -403,10 +413,13 @@ function connect_socket() {
             if (data.queue === 'ComplaintsQueue') {
               let currentPosition = $('#pos-in-queue').text();
               currentPosition += 1;
-              if (currentPosition > data.position) { // checks if the abandoned caller was ahead of you
+
+              // checks if the abandoned caller was ahead of you
+              if (currentPosition > data.position) {
                 currentPosition = $('#pos-in-queue').text();
                 // setQueueText(currentPosition -= 1);
               }
+
               abandonedCaller = true;
             }
           })
@@ -448,7 +461,6 @@ function connect_socket() {
               $('#redirectUrlDesc').attr('href', complaintRedirectUrl);
               $('#callEndedModal').modal('show');
               $('#callEndedModal').css('overflow-y', 'auto');
-              openDialog('callEndedModal', window);
 
               setTimeout(() => {
                 location = complaintRedirectUrl;
@@ -538,10 +550,12 @@ function connect_socket() {
               $('#closed-message').css('display', 'none');
               $('#callbutton').prop('disabled', false);
             }
-          }).on('agentScreenshare', () => {
+          })
+          .on('agentScreenshare', () => {
             // agent is stopping/starting screenshare
             isScreenshareRestart = true;
-          }).on('caption-config', (data) => {
+          })
+          .on('caption-config', (data) => {
             if (data && data !== 'false') {
               console.log(data, typeof data);
               captionsEnabled = data;
@@ -550,12 +564,15 @@ function connect_socket() {
                 $('#captions-area').show();
               }
             }
-          }).on('caption-translated', (transcripts) => {
+          })
+          .on('caption-translated', (transcripts) => {
             console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
             updateCaptions(transcripts);
-          }).on('multiparty-caption', (data) => {
+          })
+          .on('multiparty-caption', (data) => {
             updateCaptions(data);
-          }).on('consumer-caption', function (transcripts) {
+          })
+          .on('consumer-caption', function (transcripts) {
             // receiving own captions
             updateCaptions(transcripts);
           });
@@ -595,24 +612,25 @@ const setColumnSize = function () {
   // video section
   $('#callVideoColumn').height(footer.getBoundingClientRect().top - 200);
 
-  let buttonFeedback = document.getElementById('button-feedback');
-  let speakingToRow = document.getElementById('speakingToRow');
-  let videoButtonsRow = document.getElementById('callButtonsRow');
-  let videoTop = buttonFeedback.getBoundingClientRect().bottom || speakingToRow.getBoundingClientRect().bottom || videoButtonsRow.getBoundingClientRect().bottom;
+  const buttonFeedback = document.getElementById('button-feedback');
+  const speakingToRow = document.getElementById('speakingToRow');
+  const videoButtonsRow = document.getElementById('callButtonsRow');
+  const videoTop = buttonFeedback.getBoundingClientRect().bottom
+    || speakingToRow.getBoundingClientRect().bottom
+    || videoButtonsRow.getBoundingClientRect().bottom;
   let captionAreaHeight = 0;
 
   if (captionsEnabled && captionsOn) {
     captionAreaHeight = 300;
   }
 
-  let videoHeight = footer.getBoundingClientRect().top - videoTop - captionAreaHeight;
-
+  const videoHeight = footer.getBoundingClientRect().top - videoTop - captionAreaHeight;
 
   $('#remoteViewCol').height(videoHeight + 'px');
   $('#remoteView').height(videoHeight + 'px');
 
   // set remote video column width
-  $('#remoteViewCol').width(`${ ($('#callVideosRow').width() - $('#selfViewCol').width()) - 19 }px`);
+  $('#remoteViewCol').width(`${($('#callVideosRow').width() - $('#selfViewCol').width()) - 19}px`);
 };
 setColumnSize();
 window.addEventListener('resize', setColumnSize);
@@ -626,9 +644,8 @@ function refreshCaptions() {
   // Populate current captions
   if (currentCaptions.length < 1) {
     $('#currentCaptions').prepend('<li>...no one is speaking, no captions to display</li>');
-  }
-  else {
-    currentCaptions.forEach((caption, index) => {
+  } else {
+    currentCaptions.forEach((caption, _index) => {
       const date = dayjs(caption.timestamp);
       const timestamp = date.format('h:mm a');
       $('#currentCaptions').prepend('<li><span class="timestamp">' + timestamp + '</span> <span class="speaker">' + caption.displayname + '</span> <span class="caption">' + caption.transcript + '</span></li>');
@@ -636,7 +653,7 @@ function refreshCaptions() {
   }
 
   // Populate historical captions
-  historicalCaptions.forEach((caption, index) => {
+  historicalCaptions.forEach((caption, _index) => {
     const date = dayjs(caption.timestamp);
     const timestamp = date.format('h:mm a');
     $('#historicalCaptions').append('<li><span class="timestamp">' + timestamp + '</span> <span class="speaker">' + caption.displayname + '</span> <span class="caption">' + caption.transcript + '</span></li>');
@@ -657,11 +674,10 @@ function updateCaptions(caption) {
 
     // Add to historical
     historicalCaptions.unshift(caption);
-  }
-  else {
+  } else {
     let found = false;
     currentCaptions.forEach((element, index) => {
-      if(element.extension === caption.extension) {
+      if (element.extension === caption.extension) {
         found = true;
         currentCaptions[index] = caption;
       }
@@ -808,7 +824,7 @@ function registerJssip(myExtension, myPassword) {
       console.log(`--- WV: Call ended ---\n${e}`);
 
       $('#startScreenshare').hide();
-      //console.log('RECEIVED ENDCALL');
+      // console.log('RECEIVED ENDCALL');
       endCall(false);
       // terminateCall();
       // clearScreen();
@@ -901,14 +917,12 @@ function enterQueue() {
       $('#optionsModal').one('hidden.bs.modal', () => {
         $('#waitingModal').modal('show');
         $('#waitingModal').css('overflow-y', 'auto');
-        openDialog('waitingModal', window);
       });
     } else {
       // wait for the options modal to fully close before opening another modal
       $('#optionsModal').one('hidden.bs.modal', () => {
         $('#noAgentsModal').modal('show');
         $('#noAgentsModal').css('overflow-y', 'auto');
-        openDialog('noAgentsModal', window);
       });
     }
   });
@@ -932,7 +946,6 @@ function endCall(userInitiated = false) {
       // closeDialog($('#noAgentsHangUpButton')[0]);
       $('#optionsModal').modal('show');
       $('#optionsModal').css('overflow-y', 'auto');
-      openDialog('optionsModal', window);
     });
 
     $('#noAgentsModal').modal('hide');
@@ -949,7 +962,6 @@ function endCall(userInitiated = false) {
         // closeDialog($('#waitingHangUpButton')[0]);
         $('#callEndedModal').modal('show');
         $('#callEndedModal').css('overflow-y', 'auto');
-        openDialog('callEndedModal', window);
       });
 
       $('#waitingModal').modal('hide');
@@ -974,7 +986,6 @@ function endCall(userInitiated = false) {
         // closeDialog($('#waitingHangUpButton')[0]);
         $('#optionsModal').modal('show');
         $('#optionsModal').css('overflow-y', 'auto');
-        openDialog('optionsModal', window);
       });
 
       // closeDialog($('#waitingHangUpButton')[0]);
@@ -986,7 +997,6 @@ function endCall(userInitiated = false) {
         // closeDialog($('#noAgentsHangUpButton')[0]);
         $('#optionsModal').modal('show');
         $('#optionsModal').css('overflow-y', 'auto');
-        openDialog('optionsModal', window);
       });
 
       // closeDialog($('#noAgentsHangUpButton')[0]);
@@ -1002,7 +1012,6 @@ function endCall(userInitiated = false) {
 
         $('#noAgentsModal').modal('show');
         $('#noAgentsModal').css('overflow-y', 'auto');
-        openDialog('noAgentsModal', window);
       });
 
       $('#waitingModal').modal('hide');
@@ -1016,7 +1025,6 @@ function endCall(userInitiated = false) {
 
         $('#noAgentsModal').modal('show');
         $('#noAgentsModal').css('overflow-y', 'auto');
-        openDialog('noAgentsModal', window);
       });
 
       $('#optionsModal').modal('hide');
@@ -1332,13 +1340,15 @@ $('#fileInput').on('change', () => {
     $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');
     $('#removeFileBtn').css('display', 'none');
     // add tooltip to send button
-    $('#shareFileConsumer').attr('data-original-title', 'Choose a file to send').parent().find('.tooltip-inner').html('Choose a file to send');
+    $('#shareFileConsumer').attr('data-original-title', 'Choose a file to send').parent().find('.tooltip-inner')
+      .html('Choose a file to send');
   } else {
     console.log('file chosen!');
     $('#shareFileConsumer').attr('disabled', false).css('background-color', '#073863');
     $('#removeFileBtn').css('display', 'block');
     // remove tooltip on send button
-    $('#shareFileConsumer').attr('data-original-title', '').parent().find('.tooltip-inner').html('');
+    $('#shareFileConsumer').attr('data-original-title', '').parent().find('.tooltip-inner')
+      .html('');
   }
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
@@ -1349,7 +1359,8 @@ function removeFile() {
   $('#fileInput')[0].value = '';
   $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');
   $('#removeFileBtn').css('display', 'none');
-  $('#shareFileConsumer').attr('data-original-title', 'Choose a file to send').parent().find('.tooltip-inner').html('Choose a file to send');
+  $('#shareFileConsumer').attr('data-original-title', 'Choose a file to send').parent().find('.tooltip-inner')
+    .html('Choose a file to send');
   $('[data-toggle="tooltip"]').tooltip({
     trigger: 'hover'
   });
@@ -1520,7 +1531,8 @@ function shareFileConsumer() {
         console.log('file successfully sent');
         $('#fileSent').show();
         $('#removeFileBtn').hide();
-        $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner').html('You must choose a file');
+        $('#shareFileConsumer').attr('data-original-title', 'You must choose a file').parent().find('.tooltip-inner')
+          .html('You must choose a file');
         $('#button-feedback').hide();
 
         setTimeout(() => {
@@ -1541,7 +1553,7 @@ function addFileToDownloadList(data) {
     $('#receivedFilesDivider').addClass('populatedFilesDivider');
   }
   setFeedbackText('File received from agent!');
-  let tempFilename = data.original_filename
+  const tempFilename = data.original_filename;
   let filename = tempFilename;
 
   syntaxCharacters.forEach((e) => {
@@ -1550,7 +1562,7 @@ function addFileToDownloadList(data) {
     }
   });
 
-  let fileType = filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
+  const fileType = filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
   if (fileType) {
     if (viewableFileTypes.includes(fileType.toLowerCase())) {
       // we can open this file in a new tab without downloading it
@@ -1613,7 +1625,7 @@ function addFileToSentList(data) {
     $('#sentFilesDivider').addClass('populatedFilesDivider');
   }
 
-  let tempFilename = data.original_filename
+  const tempFilename = data.original_filename;
   let filename = tempFilename;
 
   syntaxCharacters.forEach((e) => {
@@ -1621,7 +1633,7 @@ function addFileToSentList(data) {
       filename = tempFilename.replaceAll(e.symbol, e.replacement);
     }
   });
-  let fileType = filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
+  const fileType = filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
 
   if (fileType) {
     if (viewableFileTypes.includes(fileType.toLowerCase())) {
@@ -1802,7 +1814,7 @@ function collapseSidebar(tab) {
       $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
     }
 
-    //$('.sidebarTab').css('width', '8vw');
+    // $('.sidebarTab').css('width', '8vw');
 
     $('#callFeaturesColumn').removeClass('col-xs-1');
     $('#callFeaturesColumn').addClass('col-xs-4');
@@ -1818,7 +1830,8 @@ function collapseSidebar(tab) {
     $('#collapseButtonIcon').addClass('fa fa-angle-double-right');
 
     // update the collapse button tooltip
-    $('#collapseButton').attr('data-original-title', 'Collapse').parent().find('.tooltip-inner').html('Collapse');
+    $('#collapseButton').attr('data-original-title', 'Collapse').parent().find('.tooltip-inner')
+      .html('Collapse');
     if (tab === '') {
       $('#collapseButton').tooltip('show');
     }
@@ -1840,7 +1853,7 @@ function collapseSidebar(tab) {
     $('#tab-options').css('padding-left', '0px');
     $('li').removeClass('active');
     $('.tab-pane').removeClass('active');
-    //$('.sidebarTab').css('width', '8.48vw');
+    // $('.sidebarTab').css('width', '8.48vw');
 
     $('#chatTab').attr('aria-selected', 'false');
     $('#fileShareTab').attr('aria-selected', 'false');
@@ -1860,7 +1873,8 @@ function collapseSidebar(tab) {
     $('#callFeaturesColumn').css('padding-right', '0px');
 
     // update the collapse button tooltip
-    $('#collapseButton').attr('data-original-title', 'Expand').parent().find('.tooltip-inner').html('Expand');
+    $('#collapseButton').attr('data-original-title', 'Expand').parent().find('.tooltip-inner')
+      .html('Expand');
     if (tab === '') {
       $('#collapseButton').tooltip('show');
     }
@@ -1980,12 +1994,12 @@ function captionsStart() {
         language: language,
         extension: exten
       });
-    } else if(isMuted && event?.results && recognitionStarted) {
+    } else if (isMuted && event?.results && recognitionStarted) {
       // Resend any partial captions as Final
       let transcript = '';
       for (let i = 0; i < event.results.length; i++) {
         if (!event.results[i].isFinal) {
-        transcript += (event.results[i][0].transcript)
+          transcript += (event.results[i][0].transcript);
         }
       }
 
@@ -1997,9 +2011,9 @@ function captionsStart() {
 
       socket.emit('caption-consumer', {
         transcript: transcript,
-        final: true, 
+        final: true,
         language: language,
-        extension: exten,
+        extension: exten
       });
       captionsEnd();
     }
@@ -2018,8 +2032,9 @@ function captionsStart() {
 
 function captionsEnd() {
   isCaptioning = false;
-  if (recognition)
+  if (recognition) {
     recognition.abort();
+  }
   recognition = null;
-  recognitionStarted = false
+  recognitionStarted = false;
 }
