@@ -13,7 +13,7 @@
     "config": "npm run sequelize db:migrate",
     "sequelize": "sequelize",
     "test": "echo \"No tests available\" && exit 0",
-    "lint": "echo 'linting not yet available'",
+    "lint": "echo 'acedirect-kurento linting disabled for now'",
     "bower": "cd static && bower install"
   },
   "dependencies": {

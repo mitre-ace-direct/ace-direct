@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 /**
  * Define the different AGENT REST service routes in this file.
  *
@@ -393,7 +394,7 @@ const appRouter = (connection, asterisk) => {
     const { extension } = req.body;
     const queueId = req.body.queue_id;
     const queue2Id = req.body.queue2_id;
-    const profile_picture = req.body.profile_picture;
+    const { profile_picture } = req.body;
 
     if (!agentId || !firstName || !lastName || !role || !phone || !email || !organization
         || Number.isNaN(isApproved) || Number.isNaN(isActive) || Number.isNaN(extension)) {
@@ -438,11 +439,12 @@ const appRouter = (connection, asterisk) => {
       + ' WHERE agent_id = ?';
       // Query for all records sorted by the id
       connection.query(query, [firstName, lastName, role, phone, email, organization,
-        isApproved, isActive, extensionIdParam, queueId, queue2Id, profile_picture, agentId], (err, results) => {
+        isApproved, isActive, extensionIdParam, queueId, queue2Id, profile_picture, agentId],
+      (err, results) => {
         if (err) {
           console.log(err);
-          console.log("QUERY DATA:", firstName, lastName, role, phone, email, organization,
-          isApproved, isActive, extensionIdParam, queueId, queue2Id, profile_picture, agentId)
+          console.log('QUERY DATA:', firstName, lastName, role, phone, email, organization,
+            isApproved, isActive, extensionIdParam, queueId, queue2Id, profile_picture, agentId);
           return res.status(500).send({
             message: 'MySQL error'
           });
