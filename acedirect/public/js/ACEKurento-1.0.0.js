@@ -14,17 +14,6 @@
       var recursive = require('merge').recursive.bind(undefined, true);
       var sdpTranslator = require('sdp-translator');
       var logger = window.Logger || console;
-      // Do not use plugin for screenshare
-      // try {
-      //   require('kurento-browser-extensions');
-      // } catch (error) {
-      //   if (typeof getScreenConstraints === 'undefined') {
-      //     logger.warn('screen sharing is not available');
-      //     getScreenConstraints = function getScreenConstraints(sendSource, callback) {
-      //       callback(new Error('This library is not enabled for screen sharing'));
-      //     };
-      //   }
-      // }
 
       var webcam_media = {
         audio: true,
@@ -452,8 +441,14 @@
             videoStream.getTracks().forEach(track => pc.addTrack(track, videoStream))
           }
           if (audioStream) {
-            // pc.addStream(audioStream); // mic still works on chrome with either this or below .. 
-            audioStream.getTracks().forEach(track => pc.addTrack(track, audioStream))
+            //pc.addStream(audioStream); // mic still works on chrome with either this or below .. 
+            let a = 0;
+            audioStream.getTracks().forEach(track => { 
+              console.log("ADD TRACK "+ a)
+              a += 1
+              pc.addTrack(track, audioStream);
+              //localVideo.addAudioTrack(track, audioStream);
+            })
           }
           var browser = parser.getBrowser();
           if (mode === 'sendonly' && (browser.name === 'Chrome' || browser.name === 'Chromium') && browser.major === 39) {
@@ -476,25 +471,25 @@
             logger.debug('Media Constraints for source:  WEBCAM', webcam_media);
           } else {
             if (navigator.getDisplayMedia) {
-              navigator.getDisplayMedia({ video: true, audio: true }).then(function (stream) {
+              navigator.getDisplayMedia({ video: true, audio: false }).then(function (stream) {
                 videoStream = stream;
-                navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (aStream) {
-                  audioStream = aStream;
-                  start();
+               navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (aStream) {
+                 aStream.getTracks().forEach(track => videoStream.addTrack(track));
+                 start();
                 }), failcase => {
-                  //console.log("FIRST MEDIA DIDNT WORK", failcase);
+                  console.log("FIRST MEDIA DIDNT WORK", failcase);
                 };
               }).catch(function(err){
-                //console.log("THIS WENT WRONG " + err);
+                console.log("THIS WENT WRONG " + err);
               })
             } else if (navigator.mediaDevices.getDisplayMedia) {
               navigator.mediaDevices.getDisplayMedia({ video: true, audio: true }).then(function (stream) {
-                videoStream = stream;
-                navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then(function (aStream) {
-                  audioStream = aStream;
+                videoStream = stream; 
+                navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (aStream) {
+                  aStream.getTracks().forEach(track => videoStream.addTrack(track));
                   start();
                 }), failcase => {
-                  //console.log("SECOND MEDIA DIDNT WORK", failcase);
+                  console.log("SECOND MEDIA DIDNT WORK", failcase);
                 };
               }).catch(function(err){
                 //console.log("THIS WENT WRONG " + err);
@@ -513,39 +508,6 @@
               mediaConstraints.video = { mediaSource: 'screen' };
               getMedia(mediaConstraints);
             }
-            /*      if (sendSource === 'webcam') {
-                    getMedia(mediaConstraints);
-                  } else {
-                    if (navigator.getDisplayMedia) {
-                      navigator.getDisplayMedia({video: true, audio: true}).then(function (stream) {
-                        videoStream = stream;
-                        navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (aStream) {
-                          audioStream = aStream;
-                          start();
-                        }).catch(callback);
-                      }).catch(callback);
-                    } else if (navigator.mediaDevices.getDisplayMedia) {
-                      navigator.mediaDevices.getDisplayMedia({video: true, audio: true}).then(function (stream) {
-                        videoStream = stream;
-                        navigator.mediaDevices.getUserMedia({ video: false, audio: true }).then(function (aStream) {
-                          audioStream = aStream;
-                          start();
-                        }).catch(callback);
-                      }).catch(callback);
-                    } else {
-                      logger.warn('This browser does not support getDisplayMedia, screen share might fail');
-                      mediaConstraints.video = {mediaSource: 'screen'};
-                      getMedia(mediaConstraints);
-                    }
-              */
-            // No plugin
-            // getScreenConstraints(sendSource, function (error, constraints_) {
-            //   if (error)
-            //     return callback(error);
-            //   constraints = [mediaConstraints];
-            //   constraints.unshift(constraints_);
-            //   getMedia(recursive.apply(undefined, constraints));
-            // }, guid);
           }
         } else {
           setTimeout(start, 0);
@@ -4614,6 +4576,9 @@ function ACEKurento(config) {
     mediaStream: function () {
       return webRtcPeer.localVideo.srcObject
     },
+    isMuted: function () {
+      return !this.mediaStream().getAudioTracks()[0].enabled;
+    },
     /**
      * Call id for current session
      */
@@ -5260,11 +5225,15 @@ function ACEKurento(config) {
      * @param {Boolean} enable - If "true" will enable screenshare. Otherwise will stop and use camera.
      */
     screenshare: function (enable) {
+      var wasMuted = false;
       if (webRtcPeer) {
+
+        wasMuted = this.isMuted()
         // dispose current webrtcPeer before making a new one
         webRtcPeer.dispose();
         webRtcPeer = null;
       }
+      
       var options = {
         localVideo: this.selfStream,
         remoteVideo: this.remoteStream,
@@ -5286,6 +5255,8 @@ function ACEKurento(config) {
         }
         console.log('created webRtcPeer');
         acekurento.isScreensharing = enable;
+        if(wasMuted)
+          acekurento.enableDisableTrack(false, true);
         this.generateOffer(function (error, offerSdp) {
           if (error) {
             console.error(error);
