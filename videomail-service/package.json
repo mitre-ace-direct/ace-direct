@@ -10,7 +10,7 @@
     "start": "node ./src/server.js",
     "clean": "rm -rf node_modules >/dev/null 2>&1 || true",
     "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
-    "lint": "echo 'linting disabled for now'",
+    "lint": "echo 'videomail-service linting disabled for now'",
     "build": "npm run clean && npm install"
   },
   "dependencies": {
