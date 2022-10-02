@@ -131,12 +131,57 @@ body{
 .control-sidebar.control-sidebar-open + .control-sidebar-bg {
     right: 0 !important;
 }
+
+/* New Agent Styling */
+
+.emptyMessages {
+  text-align: center;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.populatedMessages {
+  overflow-y: auto;
+  position: relative;
+  height: fit-content;
+  max-height: 70vh;
+  margin-top: auto;
+  margin-bottom: 5vh;
+  padding-right: 2rem;
+}
+
+.sentChat {
+  border-radius: 25px !important;
+  color: black !important;
+  overflow-wrap: break-word;
+}
+
+.receivedChat {
+  border-radius: 25px !important;
+  color: black !important;
+  background-color: lightgray !important;
+  overflow-wrap: break-word;
+}
+
+.rttChatBubble {
+  border-radius: 25px !important;
+  color: #737373 !important;
+  background-color: #f9f9f9 !important;
+  overflow-wrap: break-word;
+}
+
+.direct-chat-name {
+  font-weight: bold;
+  margin-right: 1rem;
+}
+/* 
 .direct-chat-text {
     margin: 5px 0 0 5px;
 }
 .right .direct-chat-text {
     margin-right: 5px !important;
-}
+} */
 
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {

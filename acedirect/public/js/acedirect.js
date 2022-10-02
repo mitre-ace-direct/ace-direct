@@ -886,7 +886,7 @@ function connect_socket() {
           }
         }).on('agent-typing', function (data) {
           if ($('#chatHeader').html() == data.displayname && $('#chatHeader').html() != $('#agentname-sidebar').html()) {
-            $('#agent-rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+            $('#agent-rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('rttChatBubble');
             $('#agent-rtt-typing').appendTo($('#agent-chat-messages'));
             $('#agent-chat-messages').scrollTop($('#agent-chat-messages')[0].scrollHeight);
           }
@@ -1345,6 +1345,10 @@ $('#agent-chat-send').on('click',function (evt) {
   if ($('#agentnewchatmessage').val() === '') {
     // do nothing
   } else {
+    if($('#agent-chat-messages').hasClass('emptyMessages')) {
+      $('#agent-chat-messages').removeClass('emptyMessages');
+      $('#agent-chat-messages').addClass('populatedMessages');
+    }
     var msg = $('#agentnewchatmessage').val();
     var displayname = $('#agentname-sidebar').html();
     var ext = $('#agent-ext').html();
@@ -1363,10 +1367,10 @@ $('#agent-chat-send').on('click',function (evt) {
     msg = msg.replace(/:\)/, '<i class="fa fa-smile-o fa-2x"></i>');
     msg = msg.replace(/:\(/, '<i class="fa fa-frown-o fa-2x"></i>');
 
-    $(msgsender).addClass('direct-chat-name pull-right').html(displayname).appendTo(msginfo);
+    $(msgsender).addClass('direct-chat-name').html(displayname).appendTo(msginfo);
     $(msgtime).addClass('direct-chat-timestamp pull-left').html(timestamp).appendTo(msginfo);
     $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-    $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
+    $(msgtext).addClass('sentChat').html(msg).appendTo(msgblock);
     $(msgblock).addClass('direct-chat-msg right').appendTo($('#agent-chat-messages'));
 
     $('#agent-chat-messages').scrollTop($('#agent-chat-messages')[0].scrollHeight);
