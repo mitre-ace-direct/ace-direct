@@ -338,8 +338,9 @@
           <source src="/media/<%= instructions_video %>" type="video/mp4">
           <source src="/media/<%= instructions_video %>" type="video/webm">
         </video>
-        <button type="button" id="instructionsVideoTranscriptBtn" class="btn btn-secondary btn-style btn-block button" onclick="showTranscripts('instructionsVideo')">
-          Show Transcript
+        <button type="button" id="instructionsVideoTranscriptBtn" class="btn btn-style btn-block button btn-tertiary" onclick="toggleTranscripts('instructionsVideo')">
+          Show Video Transcript
+          <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>
         </button>
         <div id="instructionsVideoTranscript" tabindex="0" aria-hidden="true" hidden>
           <section class="transcript" role="transcript">
@@ -402,8 +403,9 @@
           <source src="/media/<%= please_wait_video %>" type="video/mp4">
           <source src="/media/<%= please_wait_video %>" type="video/webm">
         </video>
-        <button type="button" id="pleaseWaitTranscriptBtn" class="btn btn-secondary btn-style btn-block button" onclick="showTranscripts('pleaseWait')">
-          Show Transcript
+        <button type="button" id="pleaseWaitTranscriptBtn" class="btn btn-style btn-block button btn-tertiary" onclick="toggleTranscripts('pleaseWait')">
+          Show Video Transcript
+          <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>
         </button>
         <div id="pleaseWaitTranscript" tabindex="0" aria-hidden="true" hidden>
           <section class="transcript" role="transcript">
@@ -452,8 +454,9 @@
           <source src="/media/<%= no_agents_video %>" type="video/mp4">
           <source src="/media/<%= no_agents_video %>" type="video/webm">
         </video>
-        <button type="button" id="noAgentsTranscriptBtn" class="btn btn-secondary btn-style btn-block button" onclick="showTranscripts('noAgents')">
-          Show Transcript
+        <button type="button" id="noAgentsTranscriptBtn" class="btn btn-style btn-block button btn-tertiary" onclick="toggleTranscripts('noAgents')">
+          Show Video Transcript
+          <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>
         </button>
         <div id="noAgentsTranscript" tabindex="0" aria-hidden="true" aria-label="Video Transcript" hidden>
           <section class="transcript" role="transcript">
