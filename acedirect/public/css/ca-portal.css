@@ -155,6 +155,8 @@ body{
   border-radius: 25px !important;
   color: black !important;
   overflow-wrap: break-word;
+  background-color: #d9edf7 !important;
+  border-color: #bce8f1 !important;
 }
 
 .receivedChat {
@@ -174,6 +176,14 @@ body{
 .direct-chat-name {
   font-weight: bold;
   margin-right: 1rem;
+}
+
+.chat-body1 {
+  font-size: 16px;
+}
+
+.chat-body2 {
+  font-size: 14px;
 }
 /* 
 .direct-chat-text {
