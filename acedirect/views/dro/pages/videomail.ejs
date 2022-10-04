@@ -21,28 +21,48 @@
   <main>
     <div class="container ad-container">
       <div class="row" id="greetingDiv">
-        <div class="row  text-center greeting-controls" id="greeting-controls">
-          <div>
-            <button class="circleButton" id="greetingPlayPauseBtn" tabindex="0" aria-label="Play Greeting">
-              <i id="greetingPlayPauseBtnIcon" class="fa fa-play" aria-hidden="true"></i>
-            </button>
+        <div id="greetingCol">
+          <div class="row  text-center greeting-controls" id="greeting-controls">
+            <div style="display: flex;">
+              <button class="circleButton" id="greetingPlayPauseBtn" tabindex="0" aria-label="Play Greeting">
+                <i id="greetingPlayPauseBtnIcon" class="fa fa-play" aria-hidden="true"></i>
+              </button>
+              <button class="circleButton" id="showIntroVideoTranscript" onclick="toggleTranscript()" tabindex="0"
+              data-toggle="tooltip" title="Show video transcript" aria-label="Show Video Transcript">
+                <i id="showIntroVideoTranscriptIcon" class="fa fa-file-text" aria-hidden="true"></i>
+              </button>
+            </div>
+  
+            <div class="body1"><span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
+            <div id="custom-seekbar" role="progressbar" aria-label="progress bar"><span></span></div>
+  
+            <button class="btn btn-secondary modal-outline-btn button" id="skipGreetingButton" tabindex="0"
+              aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
+                class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
+  
+            <a class="btn-tertiary button" id="cancelButton" tabindex="0" style="cursor:pointer;color:#073863;" onclick="goToCallPage()"
+              onkeypress="goToCallPage()"
+              aria-label="Cancel">Cancel</a>
           </div>
-
-          <div class="body1"><span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
-          <div id="custom-seekbar" role="progressbar" aria-label="progress bar"><span></span></div>
-
-          <button class="btn btn-secondary modal-outline-btn button" id="skipGreetingButton" tabindex="0"
-            aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
-              class="fa fa-angle-double-right" aria-hidden="true"></i> </button>
-
-          <a class="btn-tertiary button" id="cancelButton" tabindex="0" style="cursor:pointer;color:#073863;" onclick="goToCallPage()"
-            onkeypress="goToCallPage()"
-            aria-label="Cancel">Cancel</a>
+          <video <%= autoplayVideos %> class="fill-height video-element" id="greetingVideo" title="Play Video" aria-label="videomail greeting video">
+            <source src="/media/<%= introVideo %>" type="video/mp4">
+            <source src="/media/<%= introVideo %>" type="video/webm">
+          </video>
         </div>
-        <video <%= autoplayVideos %> class="fill-height video-element" id="greetingVideo" title="Play Video" aria-label="videomail greeting video">
-          <source src="/media/<%= introVideo %>" type="video/mp4">
-          <source src="/media/<%= introVideo %>" type="video/webm">
-        </video>
+        <div id="introVideoTranscriptCol" hidden>
+          <div id="introVideoTranscriptTab">
+            <section class="transcriptHeader" role="transcript" style="padding-top: 20px;">
+              <span class="h5">Video Transcript</span>
+              <button class="button pull-right" onclick="toggleTranscript()" style="background-color: transparent; border: none;">
+                X
+              </button>
+            </section>
+            <hr class="dark-hr">
+            <section class="transcript" role="transcript">
+              <p class="body1"><%= introVideoTranscript %></p>
+            </section>
+          </div>
+        </div>
       </div>
 
       <div class="row text-center" style="display:none; vertical-align: -webkit-baseline-middle;" id="countDownDiv">
