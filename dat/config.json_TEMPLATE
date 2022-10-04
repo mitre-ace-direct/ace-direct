@@ -128,7 +128,8 @@
     ]
   },
   "web_videomail": {
-    "introVideo": "videomailGreeting.mp4"
+    "introVideo": "videomailGreeting.mp4",
+    "introVideoTranscript": ""
   },
   "s3": {
     "region": "aws-region",
@@ -277,8 +278,11 @@
   },  
   "complaint_videos": {
     "instructions_video": "sample.mp4",
+    "instructions_video_transcript": "",
     "please_wait_video": "sample.mp4",
-    "no_agents_video": "sample.mp4"
+    "please_wait_video_transcript": "",
+    "no_agents_video": "sample.mp4",
+    "no_agents_video_transcript": ""
   },
   "autoplay_videos": {
     "enabled": "false"
