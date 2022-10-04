@@ -1,6 +1,13 @@
 let recordingPaused = false;
 let isFirstPlay = true;
 
+// Initialize tooltip
+$('#showIntroVideoTranscript').tooltip({
+  toggle: 'hover',
+  placement: 'bottom',
+  container: 'body'
+});
+
 function setVideoSize() {
   const a1 = document.getElementById('greeting-controls');
   const a2 = document.getElementById('recording-timer-bar');
@@ -90,6 +97,27 @@ $('#greetingPlayPauseBtn').on('click', () => {
     document.getElementById('greetingVideo').pause();
   }
 });
+
+function toggleTranscript() {
+  if ($('#introVideoTranscriptCol').hasClass('col-xs-3')) {
+    // close the transcript
+    $('#introVideoTranscriptCol').removeClass('col-xs-3');
+    $('#introVideoTranscriptCol').attr('hidden', true);
+    $('#greetingCol').removeClass('col-xs-9 greetingCol');
+
+    // TODO edit the transcript button icons, edit tooltip title
+    $('#showIntroVideoTranscript').blur();
+
+  } else {
+    // open the transcript
+    $('#introVideoTranscriptCol').addClass('col-xs-3');
+    $('#introVideoTranscriptCol').attr('hidden', false);
+    $('#greetingCol').addClass('col-xs-9 greetingCol');
+
+    // TODO edit the transcript button icon, edit tooltip title
+    $('#showIntroVideoTranscript').blur();
+  }
+}
 
 $('#greetingVideo')
   .on('play', (_evt) => {

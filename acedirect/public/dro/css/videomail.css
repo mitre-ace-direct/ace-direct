@@ -255,6 +255,7 @@
   margin-right: 5px;
   margin-top: 11px;
   margin-bottom: 11px;
+  flex: 1;
 }
 
 .circleButton:hover {
@@ -293,4 +294,8 @@
 
 #goodbyeModal {
   overflow-x: auto;
+}
+
+.greetingCol {
+  padding: 0px;
 }
