@@ -52,7 +52,7 @@ URL_MANAGER="https://${NGINX_PRIVATE_IP}${MP_PATH}"
 NUM_PM2_SVCS=7
 for ((i = 0; i < ${NUM_PM2_SVCS} ; ++i)); do
   printf "${IND}pm2 ${i} ${PM2_NAMES[i]} " 
-  PM2_STATUS=`pm2 show ${i} | grep status | awk '{ print $4 }' | sed 's/ //g'`
+  PM2_STATUS=`pm2 show ${i} | grep status | head -1 | awk '{ print $4 }' | sed 's/ //g'`
   if [[ "$PM2_STATUS" != "online" ]]
   then
     printf " ${FG_RED}${PM2_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
@@ -213,9 +213,9 @@ else
 fi
 
 # Check kms-share
-printf "${IND}kms share ${KURENTO_FQDN}"
-KMSS_STATUS=`pm2 show 0 | grep status | awk '{ print $4 }' | sed 's/ //g'`
-if [[ "$KMSS_STATUS" != "online" ]]
+printf "${IND}kms-share ${KURENTO_FQDN}"
+KMSS_STATUS=`ssh ${USER}@${KURENTO_FQDN} ps -aef | grep -i kms-share | grep ubuntu | wc -l`
+if [[ "$KMSS_STATUS" != "1" ]]
 then
   printf " ${FG_RED}${KMSS_STATUS}${RS}${FR} ${NOTOK_ICON}\n" 
   PASSED=false
