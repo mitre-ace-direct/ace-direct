@@ -27,8 +27,8 @@ let unreadFiles = 0;
 let openTab = 'chat';
 let exitingQueue = false;
 let isCaptioning = false;
-let captionsEnabled = false;
-// captionsOn irrelevant if captionsEnabled is false, represents whether user has
+let consumerCaptionsEnabled = false;
+// captionsOn irrelevant if consumerCaptionsEnabled is false, represents whether user has
 // captions turn on or off via the cc button when enabled
 let captionsOn = true;
 let currentCaptions = [];
@@ -558,8 +558,8 @@ function connect_socket() {
           .on('caption-config', (data) => {
             if (data && data !== 'false') {
               console.log(data, typeof data);
-              captionsEnabled = data;
-              if (captionsEnabled) {
+              consumerCaptionsEnabled = data;
+              if (consumerCaptionsEnabled) {
                 $('#mute-captions').show();
                 $('#captions-area').show();
               }
@@ -626,7 +626,7 @@ const setColumnSize = function () {
     || videoButtonsRow.getBoundingClientRect().bottom;
   let captionAreaHeight = 0;
 
-  if (captionsEnabled && captionsOn) {
+  if (consumerCaptionsEnabled && captionsOn) {
     captionAreaHeight = 300;
   }
 
@@ -857,7 +857,7 @@ function registerJssip(myExtension, myPassword) {
 
       if (partCount === 2 && !isScreenshareRestart) {
         startCallTimer();
-        if (captionsEnabled) {
+        if (consumerCaptionsEnabled) {
           e.participants.forEach((part) => {
             if (part.isAgent) {
               socket.emit('consumer-captions-enabled', { agentExt: part.ext });
@@ -1132,7 +1132,7 @@ function unmuteAudio() {
     acekurento.enableDisableTrack(true, true); // unmute audio
   }
   $('#mute-audio').blur();
-  if (captionsEnabled && !recognitionStarted) {
+  if (!recognitionStarted) {
     captionsStart();
   }
 }
