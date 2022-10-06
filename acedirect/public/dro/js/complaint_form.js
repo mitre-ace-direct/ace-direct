@@ -829,7 +829,6 @@ function registerJssip(myExtension, myPassword) {
     ended: (e) => {
       console.log(`--- WV: Call ended ---\n${e}`);
 
-      $('#startScreenshare').hide();
       // console.log('RECEIVED ENDCALL');
       endCall(false);
       // terminateCall();
