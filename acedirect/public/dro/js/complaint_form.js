@@ -1,5 +1,5 @@
 let socket;
-let proof = "THIS FILE IS MODIFIED FROM DEVELOP BRANCH"
+
 const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` ? `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` : '';
 const remoteStream = document.getElementById('remoteView');
 const selfStream = document.getElementById('selfView');
