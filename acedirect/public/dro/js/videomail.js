@@ -1,6 +1,16 @@
 let recordingPaused = false;
 let isFirstPlay = true;
 
+$(document).ready(() => {
+  $('#pauseModal').on('shown.bs.modal', () => {
+    openDialog('pauseModal', window);
+  });
+
+  $('#pauseModal').on('hidden.bs.modal', () => {
+    removeFocus();
+  });
+});
+
 function setVideoSize() {
   const a1 = document.getElementById('greeting-controls');
   const a2 = document.getElementById('recording-timer-bar');
@@ -11,10 +21,10 @@ function setVideoSize() {
   $('.video-element').height(videoHeight);
 
   // transition countdown page
-    const navbar = document.getElementById('consumerNavbar');
-    const countdownTop = navbar.getBoundingClientRect().bottom;
-    const countdownHeight = b.getBoundingClientRect().top - countdownTop
-    $('#countDownDiv').height(countdownHeight)
+  const navbar = document.getElementById('consumerNavbar');
+  const countdownTop = navbar.getBoundingClientRect().bottom;
+  const countdownHeight = b.getBoundingClientRect().top - countdownTop;
+  $('#countDownDiv').height(countdownHeight);
 }
 
 const selfVideo = document.querySelector('#selfVideo');
@@ -172,7 +182,6 @@ async function pauseAndShowModal() {
   recordingPaused = true;
   $('#recordingTime').html((_index, html) => html.replace('Recording', 'Paused').replace('circle', 'pause'));
   $('#pauseModal').modal();
-  openDialog('pauseModal', window);
 }
 
 $('#pauseAndShowModal').on('click', () => {
@@ -267,7 +276,7 @@ $('#selfVideo').on('play', (_evt) => {
     startVideomailTimer();
     isFirstPlay = false;
   }
-  
+
   startRecording();
 });
 
