@@ -62,11 +62,6 @@ const syntaxCharacters = [
   { symbol: '\'', replacement: '&apos' }
 ];
 
-function mike(){
-  //closeDialog()
-  //$("#optionsModal").modal('hide')
-}
-
 $(document).ready(() => {
   // autoplay videos (configurable)
   if (autoplayEnabled === 'true') {
