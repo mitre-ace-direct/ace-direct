@@ -10,19 +10,21 @@ function checkProfilePic(username) {
     type: 'GET',
     dataType: 'json',
     success: (data) => {
-      console.log("Profile Picture Poll:", JSON.stringify(data))
-      var response = data.profilePicExists // Parsing the value of response for checking Profile Pic
+      console.log('Profile Picture Poll:', JSON.stringify(data));
 
-      if(response) {
-        $('#deleteProfilePic').show()
+      // Parsing the value of response for checking Profile Pic
+      const response = data.profilePicExists;
+
+      if (response) {
+        $('#deleteProfilePic').show();
       } else {
-        $('#deleteProfilePic').hide()
+        $('#deleteProfilePic').hide();
       }
     },
     error: (error) => {
-      console.log("Error checking profile pic!", error);
+      console.log('Error checking profile pic!', error);
     }
-  })
+  });
 }
 
 $(document).ready(() => {
@@ -122,14 +124,14 @@ $(document).ready(() => {
   $('#usertable tbody').on('click', 'td', function ClickOnRow() {
     const data = table.row($(this).parents('tr')).data();
     const col = table.cell(this).index().column;
-    console.log("cell clicked with col: " + col + " data: " + JSON.stringify(data));
+    console.log(`cell clicked with col: ${col} data: ${JSON.stringify(data)}`);
 
     if (col !== 6) { // do not load agent info if the clicked cell is the checkbox
-      const url = `./GetAgent/${data["username"]}`;
+      const url = `./GetAgent/${data.username}`;
       console.log(`GetAgent url: ${url}`);
       selectedUser = data.userId;
       $.get('./GetAgent', {
-        username: data["username"]
+        username: data.username
       },
       (result, _status) => {
         console.log(`GetAgent returned: ${JSON.stringify(result)}`);
@@ -374,63 +376,65 @@ $('.glyphicon-eye-open').on('mouseover mouseout', function MouseOnEyeOpen(_e) {
   }
 });
 
+// eslint-disable-next-line no-unused-vars
 function setProfilePic() {
-  if(document.getElementById('profile-pic-file-upload').files && document.getElementById('profile-pic-file-upload').files[0]) {
-    var fileReader = new FileReader();
-    var file = document.getElementById('profile-pic-file-upload').files[0]
+  if (document.getElementById('profile-pic-file-upload').files && document.getElementById('profile-pic-file-upload').files[0]) {
+    const fileReader = new FileReader();
+    const file = document.getElementById('profile-pic-file-upload').files[0];
 
-    var fileExt = file.name.split('.')[1].toLowerCase()
-    console.log('You have uploaded a picture! File name:', file.name.split('.')[1])
+    const fileExt = file.name.split('.')[1].toLowerCase();
+    console.log('You have uploaded a picture! File name:', file.name.split('.')[1]);
 
-    fileReader.readAsDataURL(file)
+    fileReader.readAsDataURL(file);
 
     fileReader.onload = (e) => {
-      $('#inputProfilePic').attr('src', e.target.result)
+      $('#inputProfilePic').attr('src', e.target.result);
 
       $('#deleteProfilePic').show();
 
-      console.log('Emitting profile-pic-set event now...')
+      console.log('Emitting profile-pic-set event now...');
 
       socket.emit('profile-pic-set', {
-        picture : file,
-        agentExtension : agentExt,
+        picture: file,
+        agentExtension: agentExt,
         agentUsername,
         fileExt
       }, (res) => {
-        console.log(res)
-      })
-    }
+        console.log(res);
+      });
+    };
   }
 }
 
 // Event emitting for deleting a profile pic.
+// eslint-disable-next-line no-unused-vars
 function deleteProfilePicture() {
-  console.log("Deleting profile pic!");
+  console.log('Deleting profile pic!');
 
   $('#deleteProfilePic').hide();
 
   socket.emit('delete-profile-pic', {
     agentUsername
   }, (res, error) => {
-    if(error) {
-      console.log("Could not read file!")
+    if (error) {
+      console.log('Could not read file!');
     } else {
-      var fileReader = new FileReader();
+      const fileReader = new FileReader();
 
-      console.log("Delete image response:", res)
+      console.log('Delete image response:', res);
 
-      var fileBlob = new Blob([res], { type: 'image/*' })
+      const fileBlob = new Blob([res], { type: 'image/*' });
 
-      console.log("Response Blob:", fileBlob)
+      console.log('Response Blob:', fileBlob);
 
-      console.log('Profile Picture is being deleted!')
+      console.log('Profile Picture is being deleted!');
 
-      fileReader.readAsDataURL(fileBlob)
+      fileReader.readAsDataURL(fileBlob);
 
       fileReader.onload = (e) => {
-        console.log("File reader onload event:", e)
-        $('#inputProfilePic').attr('src', e.target.result)
-      }
+        console.log('File reader onload event:', e);
+        $('#inputProfilePic').attr('src', e.target.result);
+      };
     }
-  })
+  });
 }

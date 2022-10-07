@@ -11,10 +11,10 @@ function setVideoSize() {
   $('.video-element').height(videoHeight);
 
   // transition countdown page
-    const navbar = document.getElementById('consumerNavbar');
-    const countdownTop = navbar.getBoundingClientRect().bottom;
-    const countdownHeight = b.getBoundingClientRect().top - countdownTop
-    $('#countDownDiv').height(countdownHeight)
+  const navbar = document.getElementById('consumerNavbar');
+  const countdownTop = navbar.getBoundingClientRect().bottom;
+  const countdownHeight = b.getBoundingClientRect().top - countdownTop;
+  $('#countDownDiv').height(countdownHeight);
 }
 
 const selfVideo = document.querySelector('#selfVideo');
@@ -66,6 +66,7 @@ function skipGreeting() {
   gotoCountDown();
 }
 
+// eslint-disable-next-line no-unused-vars
 function goToCallPage() {
   window.location.href = './call';
 }
@@ -172,6 +173,7 @@ async function pauseAndShowModal() {
   recordingPaused = true;
   $('#recordingTime').html((_index, html) => html.replace('Recording', 'Paused').replace('circle', 'pause'));
   $('#pauseModal').modal();
+  // eslint-disable-next-line no-undef
   openDialog('pauseModal', window);
 }
 
@@ -267,7 +269,7 @@ $('#selfVideo').on('play', (_evt) => {
     startVideomailTimer();
     isFirstPlay = false;
   }
-  
+
   startRecording();
 });
 
