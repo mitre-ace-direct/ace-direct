@@ -1,5 +1,5 @@
 let socket;
-
+let proof = "THIS FILE IS MODIFIED FROM DEVELOP BRANCH"
 const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` ? `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` : '';
 const remoteStream = document.getElementById('remoteView');
 const selfStream = document.getElementById('selfView');
@@ -27,8 +27,8 @@ let unreadFiles = 0;
 let openTab = 'chat';
 let exitingQueue = false;
 let isCaptioning = false;
-let consumerCaptionsEnabled = false;
-// captionsOn irrelevant if consumerCaptionsEnabled is false, represents whether user has
+let captionsEnabled = false;
+// captionsOn irrelevant if captionsEnabled is false, represents whether user has
 // captions turn on or off via the cc button when enabled
 let captionsOn = true;
 let currentCaptions = [];
@@ -62,31 +62,63 @@ const syntaxCharacters = [
   { symbol: '\'', replacement: '&apos' }
 ];
 
+function mike(){
+  //closeDialog()
+  //$("#optionsModal").modal('hide')
+}
+
 $(document).ready(() => {
   // autoplay videos (configurable)
   if (autoplayEnabled === 'true') {
     console.log(`autoplayEnabled: ${autoplayEnabled}`);
     $('#optionsModal').on('shown.bs.modal', () => {
-      openDialog('optionsModal', window);
       $('#instructionsVideo').trigger('play');
     });
     $('#waitingModal').on('shown.bs.modal', () => {
-      openDialog('waitingModal', window);
       $('#pleaseWaitVideo').trigger('play');
     });
     $('#noAgentsModal').on('shown.bs.modal', () => {
-      openDialog('noAgentsModal', window);
       $('#noAgentsVideo').trigger('play');
     });
-  }
+  } 
 
+  $('#optionsModal').on('shown.bs.modal', () => {
+    $('#optionsModal').css('overflow-y', 'auto');
+    openDialog('optionsModal', window);
+  });
+  $('#noAgentsModal').on('shown.bs.modal', () => {
+    $('#noAgentsModal').css('overflow-y', 'auto');
+    openDialog('noAgentsModal', window);
+  });
+  $('#waitingModal').on('shown.bs.modal', () => {
+    $('#waitingModal').css('overflow-y', 'auto');
+    openDialog('waitingModal', window);
+  });
+  $('#callEndedModal').on('shown.bs.modal', () => {
+    $('#callEndedModal').css('overflow-y', 'auto');
+    openDialog('callEndedModal', window);
+  });
+  
+
+  $('#optionsModal').on('hidden.bs.modal', () => {
+    removeFocus()
+  });
+  $('#noAgentsModal').on('hidden.bs.modal', () => {
+    removeFocus()
+  });
+  $('#waitingModal').on('hide.bs.modal', () => {
+    removeFocus()
+  });
+  $('#callEndedModal').on('hide.bs.modal', () => {
+    removeFocus()
+  });
+  
   if (fileSharingEnabled === 'false') {
     // remove filesharing tab
     $('#tab2').remove();
   }
 
   $('#optionsModal').modal('show');
-  $('#optionsModal').css('overflow-y', 'auto');
 
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
@@ -460,7 +492,6 @@ function connect_socket() {
               $('#redirectUrlDesc').text(complaintRedirectDesc);
               $('#redirectUrlDesc').attr('href', complaintRedirectUrl);
               $('#callEndedModal').modal('show');
-              $('#callEndedModal').css('overflow-y', 'auto');
 
               setTimeout(() => {
                 location = complaintRedirectUrl;
@@ -558,8 +589,8 @@ function connect_socket() {
           .on('caption-config', (data) => {
             if (data && data !== 'false') {
               console.log(data, typeof data);
-              consumerCaptionsEnabled = data;
-              if (consumerCaptionsEnabled) {
+              captionsEnabled = data;
+              if (captionsEnabled) {
                 $('#mute-captions').show();
                 $('#captions-area').show();
               }
@@ -626,7 +657,7 @@ const setColumnSize = function () {
     || videoButtonsRow.getBoundingClientRect().bottom;
   let captionAreaHeight = 0;
 
-  if (consumerCaptionsEnabled && captionsOn) {
+  if (captionsEnabled && captionsOn) {
     captionAreaHeight = 300;
   }
 
@@ -817,7 +848,7 @@ function registerJssip(myExtension, myPassword) {
         remoteStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended remote');
           isScreenshareRestart = true;
-          acekurento.screenshare(false);
+          //acekurento.screenshare(false);
         };
       }
 
@@ -829,6 +860,7 @@ function registerJssip(myExtension, myPassword) {
     ended: (e) => {
       console.log(`--- WV: Call ended ---\n${e}`);
 
+      $('#startScreenshare').hide();
       // console.log('RECEIVED ENDCALL');
       endCall(false);
       // terminateCall();
@@ -856,7 +888,7 @@ function registerJssip(myExtension, myPassword) {
 
       if (partCount === 2 && !isScreenshareRestart) {
         startCallTimer();
-        if (consumerCaptionsEnabled) {
+        if (captionsEnabled) {
           e.participants.forEach((part) => {
             if (part.isAgent) {
               socket.emit('consumer-captions-enabled', { agentExt: part.ext });
@@ -921,13 +953,11 @@ function enterQueue() {
       // wait for the options modal to fully close before opening another modal
       $('#optionsModal').one('hidden.bs.modal', () => {
         $('#waitingModal').modal('show');
-        $('#waitingModal').css('overflow-y', 'auto');
       });
     } else {
       // wait for the options modal to fully close before opening another modal
       $('#optionsModal').one('hidden.bs.modal', () => {
         $('#noAgentsModal').modal('show');
-        $('#noAgentsModal').css('overflow-y', 'auto');
       });
     }
   });
@@ -950,11 +980,10 @@ function endCall(userInitiated = false) {
     $('#noAgentsModal').one('hidden.bs.modal', () => {
       // closeDialog($('#noAgentsHangUpButton')[0]);
       $('#optionsModal').modal('show');
-      $('#optionsModal').css('overflow-y', 'auto');
     });
 
     $('#noAgentsModal').modal('hide');
-    closeDialog($('#noAgentsHangUpButton')[0]);
+    //closeDialog($('#noAgentsHangUpButton')[0]);
   } else if (callAnswered) {
     // Arrives here when a consumer ends a call that was connected with agent
     if (complaintRedirectActive) {
@@ -966,11 +995,10 @@ function endCall(userInitiated = false) {
       $('#waitingModal').one('hidden.bs.modal', () => {
         // closeDialog($('#waitingHangUpButton')[0]);
         $('#callEndedModal').modal('show');
-        $('#callEndedModal').css('overflow-y', 'auto');
       });
 
       $('#waitingModal').modal('hide');
-      closeDialog($('#waitingHangUpButton')[0]);
+      //closeDialog($('#waitingHangUpButton')[0]);
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
@@ -990,7 +1018,6 @@ function endCall(userInitiated = false) {
       $('#waitingModal').one('hidden.bs.modal', () => {
         // closeDialog($('#waitingHangUpButton')[0]);
         $('#optionsModal').modal('show');
-        $('#optionsModal').css('overflow-y', 'auto');
       });
 
       // closeDialog($('#waitingHangUpButton')[0]);
@@ -1000,8 +1027,8 @@ function endCall(userInitiated = false) {
     if ($('#noAgentsModal').is(':visible')) {
       $('#noAgentsModal').one('hidden.bs.modal', () => {
         // closeDialog($('#noAgentsHangUpButton')[0]);
+        
         $('#optionsModal').modal('show');
-        $('#optionsModal').css('overflow-y', 'auto');
       });
 
       // closeDialog($('#noAgentsHangUpButton')[0]);
@@ -1016,7 +1043,6 @@ function endCall(userInitiated = false) {
         // closeDialog($('#waitingHangUpButton')[0]);
 
         $('#noAgentsModal').modal('show');
-        $('#noAgentsModal').css('overflow-y', 'auto');
       });
 
       $('#waitingModal').modal('hide');
@@ -1029,7 +1055,6 @@ function endCall(userInitiated = false) {
         // closeDialog($('#callQueueButton')[0]);
 
         $('#noAgentsModal').modal('show');
-        $('#noAgentsModal').css('overflow-y', 'auto');
       });
 
       $('#optionsModal').modal('hide');
@@ -1131,7 +1156,7 @@ function unmuteAudio() {
     acekurento.enableDisableTrack(true, true); // unmute audio
   }
   $('#mute-audio').blur();
-  if (!recognitionStarted) {
+  if (captionsEnabled && !recognitionStarted) {
     captionsStart();
   }
 }

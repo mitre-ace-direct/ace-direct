@@ -239,8 +239,8 @@ aria.Utils = aria.Utils || {};
     this.removeListeners();
     aria.Utils.remove(this.preNode);
     aria.Utils.remove(this.postNode);
-    this.dialogNode.className = 'hidden';
-    this.backdropNode.classList.remove('active');
+    //this.dialogNode.className = 'hidden';
+    //this.backdropNode.classList.remove('active');
     this.focusAfterClosed.focus();
 
     // If a dialog was open underneath this one, restore its listeners.
@@ -250,6 +250,20 @@ aria.Utils = aria.Utils || {};
       document.body.classList.remove(aria.Utils.dialogOpenClass);
     }
   }; // end close
+
+  aria.Dialog.prototype.removeFocus = function removeFocus() {
+    aria.OpenDialogList.pop();
+    this.removeListeners();
+    aria.Utils.remove(this.preNode);
+    aria.Utils.remove(this.postNode);
+    this.focusAfterClosed.focus();
+    // If a dialog was open underneath this one, restore its listeners.
+    if (aria.OpenDialogList.length > 0) {
+      aria.getCurrentDialog().addListeners();
+    } else {
+      document.body.classList.remove(aria.Utils.dialogOpenClass);
+    }
+  }; 
 
   /**
    * @description
@@ -330,6 +344,11 @@ aria.Utils = aria.Utils || {};
       topDialog.close();
     }
   }; // end closeDialog
+
+  window.removeFocus = function removeFocus() {
+    const topDialog = aria.getCurrentDialog();
+    topDialog.close();
+  }; 
 
   window.replaceDialog = function replaceDialog(
     newDialogId,
@@ -425,7 +444,7 @@ aria.Utils.isFocusable = function isFocusable(element) {
     case 'BUTTON':
     case 'SELECT':
     case 'TEXTAREA':
-      // case 'VIDEO':
+    case 'VIDEO':
       return true;
     default:
       return false;
