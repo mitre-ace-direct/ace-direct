@@ -2,12 +2,12 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const request = require('request');
 const fs = require('fs');
+const AWS = require('aws-sdk');
+const proxy = require('proxy-agent');
 const logger = require('../helpers/logger');
 const { getConfigVal } = require('../helpers/utility');
 const validator = require('../utils/validator');
-const config = require('./../../dat/config.json');
-const AWS = require('aws-sdk');
-const proxy = require('proxy-agent');
+const config = require('../../dat/config.json');
 
 AWS.config.update({
   region: config.s3.region,
@@ -49,7 +49,7 @@ if (nginxPath.length === 0) {
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/', restrict, (req, res) => {
+router.get('/', restrict, (_req, res) => {
   res.redirect('./dashboard');
 });
 
@@ -61,7 +61,7 @@ router.get('/', restrict, (req, res) => {
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/dashboard', restrict, (req, res) => {
+router.get('/dashboard', restrict, (_req, res) => {
   res.render('pages/dashboard');
 });
 
@@ -73,7 +73,7 @@ router.get('/dashboard', restrict, (req, res) => {
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/cdr', restrict, (req, res) => {
+router.get('/cdr', restrict, (_req, res) => {
   res.render('pages/cdr');
 });
 
@@ -85,7 +85,7 @@ router.get('/cdr', restrict, (req, res) => {
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/report', restrict, (req, res) => {
+router.get('/report', restrict, (_req, res) => {
   res.render('pages/report');
 });
 
@@ -97,7 +97,7 @@ router.get('/report', restrict, (req, res) => {
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/webrtcstats', restrict, (req, res) => {
+router.get('/webrtcstats', restrict, (_req, res) => {
   res.render('pages/webrtcstats');
 });
 
@@ -109,7 +109,7 @@ router.get('/webrtcstats', restrict, (req, res) => {
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/videomail', restrict, (req, res) => {
+router.get('/videomail', restrict, (_req, res) => {
   res.render('pages/videomail');
 });
 
@@ -153,7 +153,7 @@ router.get('/getVideomail', restrict, (req, res) => {
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/light', restrict, (req, res) => {
+router.get('/light', restrict, (_req, res) => {
   res.render('pages/light');
 });
 
@@ -165,7 +165,7 @@ router.get('/light', restrict, (req, res) => {
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/hours', restrict, (req, res) => {
+router.get('/hours', restrict, (_req, res) => {
   res.render('pages/hours');
 });
 
@@ -177,7 +177,7 @@ router.get('/hours', restrict, (req, res) => {
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/callblocking', restrict, (req, res) => {
+router.get('/callblocking', restrict, (_req, res) => {
   res.render('pages/callblocking', {
     callblocks: []
   });
@@ -203,7 +203,7 @@ function getAgentInfo(username, callback) {
   request({
     url,
     json: true
-  }, (error, response, dataIn) => {
+  }, (error, _response, dataIn) => {
     let data = dataIn;
     if (error) {
       logger.error(`login ERROR: ${error}`);
@@ -226,7 +226,7 @@ function getAgentInfo(username, callback) {
  * @param {function} function(req, res)
  *
  */
-router.get('/users', restrict, (req, res) => {
+router.get('/users', restrict, (_req, res) => {
   /* TODO: retrieve the current agent list from mserver and populate 'users' */
   getAgentInfo(null, (info) => {
     if (info.message === 'success') {
@@ -249,7 +249,7 @@ router.get('/users', restrict, (req, res) => {
  * @param {function} 'restrict'
  * @param {function} function(req, res)
  */
-router.get('/admin', restrict, (req, res) => {
+router.get('/admin', restrict, (_req, res) => {
   getAgentInfo(null, (info) => {
     if (info.message === 'success') {
       logger.info(`Returned agent data[0]${info.data[0].username}`);
@@ -284,8 +284,8 @@ router.get('/token', restrict, (req, res) => {
  */
 router.get('/logout', (req, res) => {
   req.session.user = null;
-  req.session.save(function (err1) {
-    req.session.regenerate(function (err2) {
+  req.session.save((_err1) => {
+    req.session.regenerate((_err2) => {
       res.redirect(req.get('referer'));
     });
   });
@@ -602,104 +602,100 @@ router.get('/GetAgent', restrict, (req, res) => {
  * Handler function for getting an agent from the database.
  */
 
- const getAgent = (usnm) => {
-  return new Promise((resolve, reject) => {
-    console.log('Getting agent! Username: ', usnm)
-    console.log('get agent link', `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`)
-    request({
-      method: 'GET',
-      headers : {'Accept': 'application/json'},
-      url: `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`,
-    }, function (error, response, data) {
-      if (error) {
-        console.log("Error! Could not get agent:", error);
-        reject(error)
-      } else {
-        console.log("Success! Agent found!");
-        console.log('Data: ', typeof data)
-        console.log("TEXT " + JSON.parse(data));
-        if(data.length > 0) {
-          var jsonData = JSON.parse(data)
-          resolve(jsonData)
-        }
-        else reject("Agent cannot be found!")
-      }
-    });
+const getAgent = (usnm) => new Promise((resolve, reject) => {
+  console.log('Getting agent! Username: ', usnm);
+  console.log('get agent link', `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`);
+  request({
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+    url: `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`
+  }, (error, _response, data) => {
+    if (error) {
+      console.log('Error! Could not get agent:', error);
+      reject(error);
+    } else {
+      console.log('Success! Agent found!');
+      console.log('Data: ', typeof data);
+      console.log(`TEXT ${JSON.parse(data)}`);
+      if (data.length > 0) {
+        const jsonData = JSON.parse(data);
+        resolve(jsonData);
+      // eslint-disable-next-line prefer-promise-reject-errors
+      } else reject('Agent cannot be found!');
+    }
   });
-}
-
+});
 
 /**
  * Handles populating all profile picture image tags seen throughout the management portal.
- * 
+ *
  * @param {string} '/profilePic/:username
- * 
+ *
  */
 
 router.get('/ProfilePic/:username', (req, res) => {
-  console.log(`/ProfilePic/${req.params.username} endpoint called!`)
+  console.log(`/ProfilePic/${req.params.username} endpoint called!`);
   let key = '';
 
   let image;
 
   res.set({
     'Content-Type': 'image/*'
-  })
+  });
 
   getAgent(req.params.username).then((data) => {
-    if(data.data[0].profile_picture && data.data[0].profile_picture !== '') {
+    if (data.data[0].profile_picture && data.data[0].profile_picture !== '') {
       key = data.data[0].profile_picture;
 
-      console.log("TYPEOF DATA:", typeof data)
-      console.log("data.data[0].profile_picture:", data.data[0].profile_picture)
-      console.log("typeof data.data[0].profile_picture", typeof data.data[0].profile_picture)
-      let options = {
-          Bucket : config.s3.bucketname,
-          Key : key
-      };            
-      s3.getObject(options, (err, data) => {
-          if(err) { 
-            throw new Error(err)
-          }
-          else {
-            console.log("success! Data retrieved:", data.Body)
-            image = data.Body
-            res.send(image)
-          }
+      console.log('TYPEOF DATA:', typeof data);
+      console.log('data.data[0].profile_picture:', data.data[0].profile_picture);
+      console.log('typeof data.data[0].profile_picture', typeof data.data[0].profile_picture);
+      const options = {
+        Bucket: config.s3.bucketname,
+        Key: key
+      };
+      s3.getObject(options, (err, data1) => {
+        if (err) {
+          throw new Error(err);
+        } else {
+          console.log('success! Data retrieved:', data1.Body);
+          image = data1.Body;
+          res.send(image);
+        }
       });
     } else {
-      fs.readFile('./public/images/anon.png', (err, data) => {
-        if(err) {
-          console.log("Could not read image!", err)
+      fs.readFile('./public/images/anon.png', (err, data2) => {
+        if (err) {
+          console.log('Could not read image!', err);
         } else {
-          console.log(data)
-          res.send(data)
+          console.log(data2);
+          res.send(data2);
         }
-      })
+      });
     }
-  }).catch(err => {
-    console.log("Error finding agent!", err);
-    fs.readFile('./public/images/anon.png', (err, data) => {
-      if(err) {
-        console.log("Could not read image!", err)
+  }).catch((err) => {
+    console.log('Error finding agent!', err);
+    fs.readFile('./public/images/anon.png', (err1, data) => {
+      if (err1) {
+        console.log('Could not read image!', err1);
       } else {
-        console.log(data)
-        res.send(data)
+        console.log(data);
+        res.send(data);
       }
-    })
-  })
-})
+    });
+  });
+});
 
 router.get('/profilePicPoll/:username', (req, res) => {
-  var profilePicFlag = { profilePicExists : false };
-  
+  const profilePicFlag = { profilePicExists: false };
+
   getAgent(req.params.username).then((data) => {
-      if(data.data[0].profile_picture && data.data[0].profile_picture.length > 1) {
-          console.log('User has a profile pic saved!')
-          profilePicFlag.profilePicExists = true
-      }
-      res.send(profilePicFlag)
+    if (data.data[0].profile_picture && data.data[0].profile_picture.length > 1) {
+      console.log('User has a profile pic saved!');
+      profilePicFlag.profilePicExists = true;
+    }
+    res.send(profilePicFlag);
   });
-})
+});
 
 module.exports = router;
