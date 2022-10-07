@@ -75,7 +75,7 @@ $(document).ready(() => {
     $('#noAgentsModal').on('shown.bs.modal', () => {
       $('#noAgentsVideo').trigger('play');
     });
-  } 
+  }
 
   $('#optionsModal').on('shown.bs.modal', () => {
     $('#optionsModal').css('overflow-y', 'auto');
@@ -93,21 +93,20 @@ $(document).ready(() => {
     $('#callEndedModal').css('overflow-y', 'auto');
     openDialog('callEndedModal', window);
   });
-  
 
   $('#optionsModal').on('hidden.bs.modal', () => {
-    removeFocus()
+    removeFocus();
   });
   $('#noAgentsModal').on('hidden.bs.modal', () => {
-    removeFocus()
+    removeFocus();
   });
   $('#waitingModal').on('hide.bs.modal', () => {
-    removeFocus()
+    removeFocus();
   });
   $('#callEndedModal').on('hide.bs.modal', () => {
-    removeFocus()
+    removeFocus();
   });
-  
+
   if (fileSharingEnabled === 'false') {
     // remove filesharing tab
     $('#tab2').remove();
@@ -898,10 +897,8 @@ function registerJssip(myExtension, myPassword) {
         console.log('--- WV: CONNECTED');
 
         $('#queueModal').modal('hide');
-        // closeDialog($('#videomail-btn')[0]);
 
         $('#waitingModal').modal('hide');
-        // closeDialog($('#waitingHangUpButton')[0]);
 
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
@@ -931,9 +928,7 @@ function unregisterJssip() {
 }
 
 // CALL FLOW FUNCTIONS
-
 function enterQueue() {
-  // closeDialog($('#callQueueButton')[0]);
   callAlreadyTerminated = false;
 
   const language = 'en';
@@ -942,7 +937,6 @@ function enterQueue() {
     vrs
   }, (isOpen) => {
     console.log('isOpen:', isOpen);
-    // closeDialog($('#callQueueButton')[0]);
 
     if (isOpen) {
       // wait for the options modal to fully close before opening another modal
@@ -973,12 +967,10 @@ function endCall(userInitiated = false) {
   // Catches if the user clicks the hangup on the noagents modal
   if (($('#noAgentsModal').hasClass('in') || $('#optionsModal').hasClass('in')) && !userInitiated) {
     $('#noAgentsModal').one('hidden.bs.modal', () => {
-      // closeDialog($('#noAgentsHangUpButton')[0]);
       $('#optionsModal').modal('show');
     });
 
     $('#noAgentsModal').modal('hide');
-    //closeDialog($('#noAgentsHangUpButton')[0]);
   } else if (callAnswered) {
     // Arrives here when a consumer ends a call that was connected with agent
     if (complaintRedirectActive) {
@@ -988,12 +980,10 @@ function endCall(userInitiated = false) {
 
       // wait for the modal to fully close before opening another modal
       $('#waitingModal').one('hidden.bs.modal', () => {
-        // closeDialog($('#waitingHangUpButton')[0]);
         $('#callEndedModal').modal('show');
       });
 
       $('#waitingModal').modal('hide');
-      //closeDialog($('#waitingHangUpButton')[0]);
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
@@ -1011,22 +1001,17 @@ function endCall(userInitiated = false) {
 
     if ($('#waitingModal').is(':visible')) {
       $('#waitingModal').one('hidden.bs.modal', () => {
-        // closeDialog($('#waitingHangUpButton')[0]);
         $('#optionsModal').modal('show');
       });
 
-      // closeDialog($('#waitingHangUpButton')[0]);
       $('#waitingModal').modal('hide');
     }
 
     if ($('#noAgentsModal').is(':visible')) {
       $('#noAgentsModal').one('hidden.bs.modal', () => {
-        // closeDialog($('#noAgentsHangUpButton')[0]);
-        
         $('#optionsModal').modal('show');
       });
 
-      // closeDialog($('#noAgentsHangUpButton')[0]);
       $('#noAgentsModal').modal('hide');
     }
   } else {
@@ -1035,25 +1020,19 @@ function endCall(userInitiated = false) {
     if ($('#waitingModal').is(':visible')) {
       // wait for the modal to fully close before opening another modal
       $('#waitingModal').one('hidden.bs.modal', () => {
-        // closeDialog($('#waitingHangUpButton')[0]);
-
         $('#noAgentsModal').modal('show');
       });
 
       $('#waitingModal').modal('hide');
-      // closeDialog($('#waitingHangUpButton')[0]);
     }
 
     if ($('#optionsModal').is(':visible')) {
       // wait for the modal to fully close before opening another modal
       $('#optionsModal').one('hidden.bs.modal', () => {
-        // closeDialog($('#callQueueButton')[0]);
-
         $('#noAgentsModal').modal('show');
       });
 
       $('#optionsModal').modal('hide');
-      // closeDialog($('#callQueueButton')[0]);
     }
   }
 

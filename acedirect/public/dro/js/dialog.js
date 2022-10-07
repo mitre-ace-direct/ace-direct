@@ -239,8 +239,8 @@ aria.Utils = aria.Utils || {};
     this.removeListeners();
     aria.Utils.remove(this.preNode);
     aria.Utils.remove(this.postNode);
-    //this.dialogNode.className = 'hidden';
-    //this.backdropNode.classList.remove('active');
+    // this.dialogNode.className = 'hidden';
+    // this.backdropNode.classList.remove('active');
     this.focusAfterClosed.focus();
 
     // If a dialog was open underneath this one, restore its listeners.
@@ -263,7 +263,7 @@ aria.Utils = aria.Utils || {};
     } else {
       document.body.classList.remove(aria.Utils.dialogOpenClass);
     }
-  }; 
+  };
 
   /**
    * @description
@@ -348,7 +348,7 @@ aria.Utils = aria.Utils || {};
   window.removeFocus = function removeFocus() {
     const topDialog = aria.getCurrentDialog();
     topDialog.close();
-  }; 
+  };
 
   window.replaceDialog = function replaceDialog(
     newDialogId,
