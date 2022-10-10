@@ -81,7 +81,7 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginxParams
         req.session.user.lastname = result[0].last_name;
         req.session.user.phone = result[0].phone;
         req.session.user.email = result[0].email;
-        req.session.user.profile_picture = result[0].profile_picture
+        req.session.user.profile_picture = result[0].profile_picture;
 
         const redirect = req.body.redirect !== 'on'; // default redirect
         if (redirect && result[0].role) {
@@ -129,8 +129,8 @@ const appRouter = function myFunc(app, passport, User, dbConnection, nginxParams
 
   app.get('/logout', (req, res) => {
     req.session.user = null;
-    req.session.save(function (err1) {
-      req.session.regenerate(function (err2) {
+    req.session.save((_err1) => {
+      req.session.regenerate((_err2) => {
         res.redirect('./login');
       });
     });
