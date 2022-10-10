@@ -79,32 +79,32 @@ $(document).ready(() => {
 
   $('#optionsModal').on('shown.bs.modal', () => {
     $('#optionsModal').css('overflow-y', 'auto');
-    openDialog('optionsModal', window);
+    window.openDialog('optionsModal', window);
   });
   $('#noAgentsModal').on('shown.bs.modal', () => {
     $('#noAgentsModal').css('overflow-y', 'auto');
-    openDialog('noAgentsModal', window);
+    window.openDialog('noAgentsModal', window);
   });
   $('#waitingModal').on('shown.bs.modal', () => {
     $('#waitingModal').css('overflow-y', 'auto');
-    openDialog('waitingModal', window);
+    window.openDialog('waitingModal', window);
   });
   $('#callEndedModal').on('shown.bs.modal', () => {
     $('#callEndedModal').css('overflow-y', 'auto');
-    openDialog('callEndedModal', window);
+    window.openDialog('callEndedModal', window);
   });
 
   $('#optionsModal').on('hidden.bs.modal', () => {
-    removeFocus();
+    window.removeFocus();
   });
   $('#noAgentsModal').on('hidden.bs.modal', () => {
-    removeFocus();
+    window.removeFocus();
   });
   $('#waitingModal').on('hide.bs.modal', () => {
-    removeFocus();
+    window.removeFocus();
   });
   $('#callEndedModal').on('hide.bs.modal', () => {
-    removeFocus();
+    window.removeFocus();
   });
 
   if (fileSharingEnabled === 'false') {

@@ -1,6 +1,16 @@
 let recordingPaused = false;
 let isFirstPlay = true;
 
+$(document).ready(() => {
+  $('#pauseModal').on('shown.bs.modal', () => {
+    window.openDialog('pauseModal', window);
+  });
+
+  $('#pauseModal').on('hidden.bs.modal', () => {
+    window.removeFocus();
+  });
+});
+
 function setVideoSize() {
   const a1 = document.getElementById('greeting-controls');
   const a2 = document.getElementById('recording-timer-bar');
@@ -173,8 +183,6 @@ async function pauseAndShowModal() {
   recordingPaused = true;
   $('#recordingTime').html((_index, html) => html.replace('Recording', 'Paused').replace('circle', 'pause'));
   $('#pauseModal').modal();
-  // eslint-disable-next-line no-undef
-  openDialog('pauseModal', window);
 }
 
 $('#pauseAndShowModal').on('click', () => {
