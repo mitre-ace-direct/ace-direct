@@ -8,11 +8,25 @@
 echo ""
 echo "pre-push hook: ${PWD}/$0..."
 echo "we have lift-off..."
-echo '   /\'
-echo '  (  )'
-echo '  (  )'
-echo ' /|/\|\'
-echo '/_||||_\'
-echo '   ** '
+echo ' '
+echo '                /|  /|  '
+echo '                ||__|| '
+echo '               /   O O\__  '
+echo '              /          \   '
+echo '             /      \     \ '
+echo '            /   _    \     \ '
+echo '           /    |\____\     \      '
+echo '          /     | | | |\____/      '
+echo '         /       \| | | |/ |'
+echo '        /  /  \   -------  |'
+echo '       /   |   |           |'
+echo '       |   |   |           |'
+echo '       |  |_|_|_|          |'
+echo '       /\                  |'
+echo '      / /\        |        /'
+echo '     / /  |       |       |'
+echo ' ___/ /   |       |       |'
+echo '|____/    c_c_c_C/ \C_c_c_c'
+echo ' '
 echo ""
 
