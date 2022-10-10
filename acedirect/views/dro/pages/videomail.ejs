@@ -11,10 +11,13 @@
   <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
   <link rel="stylesheet" href="/dro/css/videomail.css">
   <link rel="stylesheet" href="/dro/css/type_scale.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap">
   <!-- <link rel="stylesheet" href="/css/ca-portal.css"> -->
 </head>
 
-<body class="full-height">
+<body class="full-height" style="font-family: 'Roboto', sans-serif;">
   <header>
     <%- include("../partials/agent_page_header") %>
   </header>
@@ -26,9 +29,9 @@
             <button class="circleButton" id="greetingPlayPauseBtn" tabindex="0" aria-label="Play Greeting">
               <i id="greetingPlayPauseBtnIcon" class="fa fa-play" aria-hidden="true"></i>
             </button>
-            <button class="circleButton" id="showIntroVideoTranscript" onclick="toggleTranscript()" tabindex="0"
+            <button class="transcriptButton" id="showIntroVideoTranscript" onclick="toggleTranscript(true)" tabindex="0"
             data-toggle="tooltip" title="Show video transcript" aria-label="Show Video Transcript">
-              <i id="showIntroVideoTranscriptIcon" class="fa fa-file-text" aria-hidden="true"></i>
+              <i id="showIntroVideoTranscriptIcon" class="fa fa-file-text fa-2x" aria-hidden="true"></i>
             </button>
           </div>
 
@@ -53,7 +56,7 @@
           <div id="introVideoTranscriptTab">
             <section class="transcriptHeader" role="transcript" style="padding-top: 20px;">
               <span class="h5">Video Transcript</span>
-              <button class="button pull-right" onclick="toggleTranscript()" style="background-color: transparent; border: none;">
+              <button class="button pull-right" onclick="toggleTranscript(false)" style="background-color: transparent; border: none;">
                 X
               </button>
             </section>
