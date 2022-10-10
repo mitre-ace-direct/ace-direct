@@ -20,10 +20,10 @@ function setVideoSize() {
   $('.video-element').height(videoHeight);
 
   // transition countdown page
-    const navbar = document.getElementById('consumerNavbar');
-    const countdownTop = navbar.getBoundingClientRect().bottom;
-    const countdownHeight = b.getBoundingClientRect().top - countdownTop
-    $('#countDownDiv').height(countdownHeight)
+  const navbar = document.getElementById('consumerNavbar');
+  const countdownTop = navbar.getBoundingClientRect().bottom;
+  const countdownHeight = b.getBoundingClientRect().top - countdownTop;
+  $('#countDownDiv').height(countdownHeight);
 }
 
 const selfVideo = document.querySelector('#selfVideo');
@@ -101,7 +101,8 @@ $('#greetingPlayPauseBtn').on('click', () => {
 });
 
 /**
- * @param {boolean} transcriptButtonClicked used to determine if the tooltip automatically appears after changing title
+ * @param {boolean} transcriptButtonClicked
+ * used to determine if the tooltip automatically appears after changing title
  */
 function toggleTranscript(transcriptButtonClicked) {
   if ($('#introVideoTranscriptCol').hasClass('col-xs-3')) {
@@ -112,14 +113,14 @@ function toggleTranscript(transcriptButtonClicked) {
 
     // TODO edit the transcript button icons, edit tooltip title
     $('#showIntroVideoTranscript').blur();
-    $('#showIntroVideoTranscript').attr('data-original-title', 'Show video transcript').parent().find('.tooltip-inner').html('Show video transcript');
+    $('#showIntroVideoTranscript').attr('data-original-title', 'Show video transcript').parent().find('.tooltip-inner')
+      .html('Show video transcript');
 
     if (transcriptButtonClicked) {
       $('#showIntroVideoTranscript').tooltip('show');
     }
 
     $('.transcriptButton').css('border-bottom', 'none');
-
   } else {
     // open the transcript
     $('#introVideoTranscriptCol').addClass('col-xs-3');
@@ -129,7 +130,8 @@ function toggleTranscript(transcriptButtonClicked) {
     // TODO edit the transcript button icon, edit tooltip title
     $('#showIntroVideoTranscript').blur();
     $('#introVideoTranscriptTab').focus();
-    $('#showIntroVideoTranscript').attr('data-original-title', 'Close video transcript').parent().find('.tooltip-inner').html('Close video transcript');
+    $('#showIntroVideoTranscript').attr('data-original-title', 'Close video transcript').parent().find('.tooltip-inner')
+      .html('Close video transcript');
 
     if (transcriptButtonClicked) {
       $('#showIntroVideoTranscript').tooltip('show');
@@ -314,7 +316,7 @@ $('#selfVideo').on('play', (_evt) => {
     startVideomailTimer();
     isFirstPlay = false;
   }
-  
+
   startRecording();
 });
 
