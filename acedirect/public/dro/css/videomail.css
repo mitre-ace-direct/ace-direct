@@ -243,6 +243,20 @@
   border-top: 1px solid black;
 }
 
+.transcriptButton {
+  border: none;
+  height: 45px;
+  width: 45px !important;
+  margin-left: 15px;
+  background-color: transparent !important;
+  color: #073863;
+  vertical-align: initial !important;
+  margin-right: 5px;
+  margin-top: 11px;
+  margin-bottom: 11px;
+  flex: 1;
+}
+
 .circleButton {
   border-radius: 50% !important;
   border: none;
