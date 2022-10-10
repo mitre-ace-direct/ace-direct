@@ -14,9 +14,9 @@ const videomailflag = false;
 const muteCaptionsOffIcon = document.getElementById('mute-captions-off-icon');
 let hasMessages = false;
 let isAgentTyping = false;
-let sharingScreen = false;
+const sharingScreen = false;
 let isSidebarCollapsed = false;
-let index = 0;
+const index = 0;
 let monitorExt = '';
 let isScreenshareRestart = false;
 let callAnswered = false;
@@ -31,8 +31,8 @@ let captionsEnabled = false;
 // captionsOn irrelevant if captionsEnabled is false, represents whether user has
 // captions turn on or off via the cc button when enabled
 let captionsOn = true;
-let currentCaptions = [];
-let historicalCaptions = [];
+const currentCaptions = [];
+const historicalCaptions = [];
 let recognitionStarted = false;
 let body1globalFontSize;
 let body2globalFontSize;
@@ -128,7 +128,7 @@ $(document).ready(() => {
 
   // Use arrow keys to navigate tabs
   const tablists = document.querySelectorAll('[role=tablist].tabs-right');
-  for (let i = 0; i < tablists.length; i++) {
+  for (let i = 0; i < tablists.length; i += 1) {
     new TabsManual(tablists[i]);
   }
 
@@ -149,7 +149,8 @@ $(document).ready(() => {
 $(window).bind('fullscreenchange', function (_e) {
   // check to see if your browser has exited fullscreen
   if (!document.fullscreenElement && !document.mozFullScreenElement
-    && !document.webkitFullscreenElement && !document.msFullscreenElement) { // video fullscreen mode has changed
+    // video fullscreen mode has changed
+    && !document.webkitFullscreenElement && !document.msFullscreenElement) {
     if (document.fullscreenElement) {
       // you have just ENTERED full screen video
     } else {
@@ -191,7 +192,7 @@ function connect_socket() {
           vrs = payload.vrs;
           // $('#callerEmail').val(payload.email);
           $('#displayname').val(`${payload.first_name} ${payload.last_name}`);
-          const isOpen = payload.isOpen;
+          const { isOpen } = payload;
           if (!isOpen) { // after hours processing; if after hours, then show this modal
             // TODO Review potentially having config variable to determine if enabled per user
             // DO NOT enable for dro
@@ -622,16 +623,28 @@ const setColumnSize = function () {
   const chatSeparator = document.getElementById('chat-separator');
   const fileShareSeparator = document.getElementById('fileshare-separator');
   const footer = document.getElementById('footer-container-consumer');
-  const tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
+  const tabsTop = chatSeparator.getBoundingClientRect().bottom
+    || fileShareSeparator.getBoundingClientRect().bottom;
   const chatHeight = footer.getBoundingClientRect().top - tabsTop;
   const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
-  const newChatMessageHeight = parseInt((document.getElementById('newchatmessage').style.height).slice(0, -2), 10);
+  let newChatMessageHeight = parseInt((document.getElementById('newchatmessage').style.height).slice(0, -2), 10); // height of chat textarea
+  const getDefaultBrowserFontSize = parseInt((window.getComputedStyle(document.body).getPropertyValue('font-size')), 10); // default browser font size
+  const newChatTextSize = parseInt((document.getElementById('newchatmessage').style.fontSize).slice(0, -2), 10); // font size when increased/decreased by consumer
+  // if newchatsize is a number, user zoomed in/out
+  if (!Number.isNaN(newChatTextSize)) {
+    if (newChatTextSize * 6 > newChatMessageHeight) {
+      $('#newchatmessage').css('max-height', `${newChatTextSize * 6}px`);
+    } else {
+      newChatMessageHeight = newChatTextSize * 6; // increase textarea height as zoom increases
+    }
+  } else { // limit the textarea height to 6x default browser font height
+    $('#newchatmessage').css('max-height', `${getDefaultBrowserFontSize * 6}px`);
+  }
 
   $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
   if ($('#chat-messages').hasClass('emptyMessages')) {
     $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
-  }
-  else {
+  } else {
     $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight + newChatMessageHeight));
   }
 
@@ -657,8 +670,8 @@ const setColumnSize = function () {
 
   const videoHeight = footer.getBoundingClientRect().top - videoTop - captionAreaHeight;
 
-  $('#remoteViewCol').height(videoHeight + 'px');
-  $('#remoteView').height(videoHeight + 'px');
+  $('#remoteViewCol').height(`${videoHeight}px`);
+  $('#remoteView').height(`${videoHeight}px`);
 
   // set remote video column width
   $('#remoteViewCol').width(`${($('#callVideosRow').width() - $('#selfViewCol').width()) - 19}px`);
@@ -697,9 +710,9 @@ function updateCaptions(caption) {
   if (caption.final) {
     console.log('final!');
     // Remove caption from current captions
-    currentCaptions.forEach((element, index) => {
+    currentCaptions.forEach((element, captionIndex) => {
       if (element.extension === caption.extension) {
-        currentCaptions.splice(index, 1);
+        currentCaptions.splice(captionIndex, 1);
       }
     });
 
@@ -707,10 +720,10 @@ function updateCaptions(caption) {
     historicalCaptions.unshift(caption);
   } else {
     let found = false;
-    currentCaptions.forEach((element, index) => {
+    currentCaptions.forEach((element, captionIndex) => {
       if (element.extension === caption.extension) {
         found = true;
-        currentCaptions[index] = caption;
+        currentCaptions[captionIndex] = caption;
       }
     });
     if (!found) {
@@ -842,7 +855,7 @@ function registerJssip(myExtension, myPassword) {
         remoteStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended remote');
           isScreenshareRestart = true;
-          //acekurento.screenshare(false);
+          // acekurento.screenshare(false);
         };
       }
 
@@ -1137,7 +1150,8 @@ function unmuteAudio() {
 
 function enableVideoPrivacy() {
   $('#hide-video').blur();
-  // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa-stack');
+  // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera')
+  // .addClass('call-btn-icon fa-stack');
   $('#mute-camera-off-icon').children().remove();
   $('#mute-camera-off-icon').append(
     '<i class="fa fa-video-camera fa-stack-1x"></i><i class="fa fa-ban fa-stack-2x text-danger"></i>'
@@ -1703,28 +1717,6 @@ function addFileToSentList(data) {
   });
 }
 
-function setFontSize(size) {
-  $('.fontSizeButtons').blur();
-  const currentFontSize = $('.currentFontSize').text().split('%')[0];
-  const newFontSize = Number(currentFontSize) + size;
-  const body1FontSizeInPx = (16 * newFontSize) / 100; // 16px is the default font size for body1
-  const body2FontSizeInPx = (14 * newFontSize) / 100; // 14px is the default font size for body2
-  body1globalFontSize = body1FontSizeInPx;
-  body2globalFontSize = body2FontSizeInPx;
-
-  if (newFontSize >= 50 && size === -10 || newFontSize <= 200 && size === 10) {
-    if (newFontSize >= 80 && newFontSize <= 150) {
-      setOtherFontSize(size);
-    }
-
-    $('.tabFontSize').css('font-size', `${body1FontSizeInPx.toString()}px`);
-    $('.chat-body1').css('font-size', `${body1FontSizeInPx.toString()}px`);
-    $('.chat-body2').css('font-size', `${body2FontSizeInPx.toString()}px`);
-
-    $('.currentFontSize').text(`${newFontSize.toString()}%`);
-  }
-}
-
 function setOtherFontSize(size) {
   // sets font sizes for buttons/text input
   console.log(`size: ${size}`);
@@ -1754,6 +1746,28 @@ function setOtherFontSize(size) {
       $('#newchatmessage').css('height', '0px');
       $('#newchatmessage').css('height', `${$('#newchatmessage')[0].scrollHeight}px`);
     }
+  }
+}
+
+function setFontSize(size) {
+  $('.fontSizeButtons').blur();
+  const currentFontSize = $('.currentFontSize').text().split('%')[0];
+  const newFontSize = Number(currentFontSize) + size;
+  const body1FontSizeInPx = (16 * newFontSize) / 100; // 16px is the default font size for body1
+  const body2FontSizeInPx = (14 * newFontSize) / 100; // 14px is the default font size for body2
+  body1globalFontSize = body1FontSizeInPx;
+  body2globalFontSize = body2FontSizeInPx;
+
+  if ((newFontSize >= 50 && size === -10) || (newFontSize <= 200 && size === 10)) {
+    if (newFontSize >= 80 && newFontSize <= 150) {
+      setOtherFontSize(size);
+    }
+
+    $('.tabFontSize').css('font-size', `${body1FontSizeInPx.toString()}px`);
+    $('.chat-body1').css('font-size', `${body1FontSizeInPx.toString()}px`);
+    $('.chat-body2').css('font-size', `${body2FontSizeInPx.toString()}px`);
+
+    $('.currentFontSize').text(`${newFontSize.toString()}%`);
   }
 }
 
@@ -1947,7 +1961,7 @@ function redirectToVideomail() {
   }
 }
 
-var recognition = null;
+let recognition = null;
 function captionsStart() {
   isCaptioning = true;
   let language = $('#language-select').val();
