@@ -2,6 +2,14 @@ let recordingPaused = false;
 let isFirstPlay = true;
 
 $(document).ready(() => {
+  $('#pauseModal').on('shown.bs.modal', () => {
+    window.openDialog('pauseModal', window);
+  });
+
+  $('#pauseModal').on('hidden.bs.modal', () => {
+    window.removeFocus();
+  });
+
   // Initialize tooltip
   $('#showIntroVideoTranscript').tooltip({
     toggle: 'hover',
@@ -75,6 +83,7 @@ function skipGreeting() {
   gotoCountDown();
 }
 
+// eslint-disable-next-line no-unused-vars
 function goToCallPage() {
   window.location.href = './call';
 }
@@ -221,7 +230,6 @@ async function pauseAndShowModal() {
   recordingPaused = true;
   $('#recordingTime').html((_index, html) => html.replace('Recording', 'Paused').replace('circle', 'pause'));
   $('#pauseModal').modal();
-  openDialog('pauseModal', window);
 }
 
 $('#pauseAndShowModal').on('click', () => {
