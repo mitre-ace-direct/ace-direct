@@ -150,7 +150,7 @@ $(window).bind('fullscreenchange', function (_e) {
   // check to see if your browser has exited fullscreen
   if (!document.fullscreenElement && !document.mozFullScreenElement
     // video fullscreen mode has changed
-    && !document.webkitFullscreenElement && !document.msFullscreenElement) { 
+    && !document.webkitFullscreenElement && !document.msFullscreenElement) {
     if (document.fullscreenElement) {
       // you have just ENTERED full screen video
     } else {
@@ -192,7 +192,7 @@ function connect_socket() {
           vrs = payload.vrs;
           // $('#callerEmail').val(payload.email);
           $('#displayname').val(`${payload.first_name} ${payload.last_name}`);
-          const isOpen = payload.isOpen;
+          const { isOpen } = payload;
           if (!isOpen) { // after hours processing; if after hours, then show this modal
             // TODO Review potentially having config variable to determine if enabled per user
             // DO NOT enable for dro
@@ -710,9 +710,9 @@ function updateCaptions(caption) {
   if (caption.final) {
     console.log('final!');
     // Remove caption from current captions
-    currentCaptions.forEach((element, index) => {
+    currentCaptions.forEach((element, captionIndex) => {
       if (element.extension === caption.extension) {
-        currentCaptions.splice(index, 1);
+        currentCaptions.splice(captionIndex, 1);
       }
     });
 
@@ -720,10 +720,10 @@ function updateCaptions(caption) {
     historicalCaptions.unshift(caption);
   } else {
     let found = false;
-    currentCaptions.forEach((element, index) => {
+    currentCaptions.forEach((element, captionIndex) => {
       if (element.extension === caption.extension) {
         found = true;
-        currentCaptions[index] = caption;
+        currentCaptions[captionIndex] = caption;
       }
     });
     if (!found) {
