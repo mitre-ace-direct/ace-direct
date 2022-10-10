@@ -908,9 +908,13 @@ function registerJssip(myExtension, myPassword) {
       if (partCount >= 2 || videomailflag) {
         console.log('--- WV: CONNECTED');
 
-        $('#queueModal').modal('hide');
+        if ($('#queueModal').is(':visible')) {
+          $('#queueModal').modal('hide');
+        }
 
-        $('#waitingModal').modal('hide');
+        if ($('#waitingModal').is(':visible')) {
+          $('#waitingModal').modal('hide');
+        }
 
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
