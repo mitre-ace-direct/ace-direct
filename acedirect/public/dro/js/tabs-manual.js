@@ -7,6 +7,7 @@
  *   Desc:   Tablist widget that implements ARIA Authoring Practices
  */
 
+// eslint-disable-next-line no-unused-vars
 class TabsManual {
   constructor(groupNode) {
     this.tablistNode = groupNode;
