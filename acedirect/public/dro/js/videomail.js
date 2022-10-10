@@ -3,13 +3,11 @@ let isFirstPlay = true;
 
 $(document).ready(() => {
   $('#pauseModal').on('shown.bs.modal', () => {
-    // eslint-disable-next-line no-undef
-    openDialog('pauseModal', window);
+    window.openDialog('pauseModal', window);
   });
 
   $('#pauseModal').on('hidden.bs.modal', () => {
-    // eslint-disable-next-line no-undef
-    removeFocus();
+    window.removeFocus();
   });
 });
 
