@@ -3,10 +3,12 @@ let isFirstPlay = true;
 
 $(document).ready(() => {
   $('#pauseModal').on('shown.bs.modal', () => {
+    // eslint-disable-next-line no-undef
     openDialog('pauseModal', window);
   });
 
   $('#pauseModal').on('hidden.bs.modal', () => {
+    // eslint-disable-next-line no-undef
     removeFocus();
   });
 });
@@ -76,6 +78,7 @@ function skipGreeting() {
   gotoCountDown();
 }
 
+// eslint-disable-next-line no-unused-vars
 function goToCallPage() {
   window.location.href = './call';
 }
