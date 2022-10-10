@@ -22,7 +22,6 @@ function fnBrowserDetect() {
     // show modal
     $('#browserType').text(browserName);
     $('#notChromeModal').modal('show');
-    openDialog('notChromeModal', window);
   }
 }
 
@@ -73,6 +72,20 @@ $(window).on('load', () => {
   });
 });
 
+$(document).ready(() => {
+  $('#notChromeModal').on('shown.bs.modal', () => {
+    window.openDialog('notChromeModal', window);
+  });
+
+  $('#notChromeModal').on('hidden.bs.modal', () => {
+    window.removeFocus();
+  });
+});
+
+function hideMessage() {
+  $('#message').hide();
+}
+
 function login() {
   $('#message').hide();
   $('#message').text('');
@@ -115,10 +128,6 @@ function login() {
     $('#message').css({ color: 'red' });
     $('#message').show();
   }
-}
-
-function hideMessage() {
-  $('#message').hide();
 }
 
 function copyURL() {
