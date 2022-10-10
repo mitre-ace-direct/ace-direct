@@ -817,7 +817,6 @@ function registerJssip(myExtension, myPassword) {
         remoteStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended remote');
           isScreenshareRestart = true;
-          acekurento.screenshare(false);
         };
       }
 
