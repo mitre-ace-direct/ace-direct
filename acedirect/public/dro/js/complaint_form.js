@@ -855,7 +855,6 @@ function registerJssip(myExtension, myPassword) {
         remoteStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended remote');
           isScreenshareRestart = true;
-          // acekurento.screenshare(false);
         };
       }
 
@@ -909,9 +908,13 @@ function registerJssip(myExtension, myPassword) {
       if (partCount >= 2 || videomailflag) {
         console.log('--- WV: CONNECTED');
 
-        $('#queueModal').modal('hide');
+        if ($('#queueModal').is(':visible')) {
+          $('#queueModal').modal('hide');
+        }
 
-        $('#waitingModal').modal('hide');
+        if ($('#waitingModal').is(':visible')) {
+          $('#waitingModal').modal('hide');
+        }
 
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
