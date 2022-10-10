@@ -149,7 +149,8 @@ $(document).ready(() => {
 $(window).bind('fullscreenchange', function (_e) {
   // check to see if your browser has exited fullscreen
   if (!document.fullscreenElement && !document.mozFullScreenElement
-    && !document.webkitFullscreenElement && !document.msFullscreenElement) { // video fullscreen mode has changed
+    // video fullscreen mode has changed
+    && !document.webkitFullscreenElement && !document.msFullscreenElement) { 
     if (document.fullscreenElement) {
       // you have just ENTERED full screen video
     } else {
