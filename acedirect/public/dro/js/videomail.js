@@ -11,7 +11,7 @@ $(document).ready(() => {
   });
 
   // Initialize tooltip
-  $('#showIntroVideoTranscript').tooltip({
+  $('[data-toggle="tooltip"]').tooltip({
     toggle: 'hover',
     placement: 'bottom',
     container: 'body'
@@ -25,7 +25,8 @@ function setVideoSize() {
   const top = a1.getBoundingClientRect().bottom || a2.getBoundingClientRect().bottom;
   const videoHeight = b.getBoundingClientRect().top - top;
   console.log(videoHeight);
-  $('.video-element').height(videoHeight);
+  $('.video-element').height(videoHeight - ($('#greeting-controls-footer').height() + $('#footer-container-consumer').height()));
+  $('#introVideoTranscriptCol').height(videoHeight - ($('#greeting-controls-footer').height() + $('#footer-container-consumer').height()));
 
   // transition countdown page
   const navbar = document.getElementById('consumerNavbar');
@@ -129,7 +130,7 @@ function toggleTranscript(transcriptButtonClicked) {
       $('#showIntroVideoTranscript').tooltip('show');
     }
 
-    $('.transcriptButton').css('border-bottom', 'none');
+    $('#showIntroVideoTranscript').css('border-bottom', 'none');
   } else {
     // open the transcript
     $('#introVideoTranscriptCol').addClass('col-xs-3');
@@ -145,7 +146,7 @@ function toggleTranscript(transcriptButtonClicked) {
     if (transcriptButtonClicked) {
       $('#showIntroVideoTranscript').tooltip('show');
     }
-    $('.transcriptButton').css('border-bottom', '2px solid #073863');
+    $('#showIntroVideoTranscript').css('border-bottom', '2px solid #073863');
   }
 }
 
