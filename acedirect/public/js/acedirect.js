@@ -1835,7 +1835,7 @@ function newChatMessage(data) {
     $('#emptyChat').css('margin-top', '0px');
   }
 
-  if (data.isConsumerMessage) {
+  if (!data.isConsumerMessage) {
     $(msgsender).addClass('direct-chat-name pull-left chat-body2').html('You')
       .css('font-weight', '700 !important')
       .appendTo(msginfo);
