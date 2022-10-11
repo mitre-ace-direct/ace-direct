@@ -14,9 +14,9 @@ const videomailflag = false;
 const muteCaptionsOffIcon = document.getElementById('mute-captions-off-icon');
 let hasMessages = false;
 let isAgentTyping = false;
-let sharingScreen = false;
+const sharingScreen = false;
 let isSidebarCollapsed = false;
-let index = 0;
+const index = 0;
 let monitorExt = '';
 let isScreenshareRestart = false;
 let callAnswered = false;
@@ -31,8 +31,8 @@ let captionsEnabled = false;
 // captionsOn irrelevant if captionsEnabled is false, represents whether user has
 // captions turn on or off via the cc button when enabled
 let captionsOn = true;
-let currentCaptions = [];
-let historicalCaptions = [];
+const currentCaptions = [];
+const historicalCaptions = [];
 let recognitionStarted = false;
 let body1globalFontSize;
 let body2globalFontSize;
@@ -67,18 +67,45 @@ $(document).ready(() => {
   if (autoplayEnabled === 'true') {
     console.log(`autoplayEnabled: ${autoplayEnabled}`);
     $('#optionsModal').on('shown.bs.modal', () => {
-      openDialog('optionsModal', window);
       $('#instructionsVideo').trigger('play');
     });
     $('#waitingModal').on('shown.bs.modal', () => {
-      openDialog('waitingModal', window);
       $('#pleaseWaitVideo').trigger('play');
     });
     $('#noAgentsModal').on('shown.bs.modal', () => {
-      openDialog('noAgentsModal', window);
       $('#noAgentsVideo').trigger('play');
     });
   }
+
+  $('#optionsModal').on('shown.bs.modal', () => {
+    $('#optionsModal').css('overflow-y', 'auto');
+    window.openDialog('optionsModal', window);
+  });
+  $('#noAgentsModal').on('shown.bs.modal', () => {
+    $('#noAgentsModal').css('overflow-y', 'auto');
+    window.openDialog('noAgentsModal', window);
+  });
+  $('#waitingModal').on('shown.bs.modal', () => {
+    $('#waitingModal').css('overflow-y', 'auto');
+    window.openDialog('waitingModal', window);
+  });
+  $('#callEndedModal').on('shown.bs.modal', () => {
+    $('#callEndedModal').css('overflow-y', 'auto');
+    window.openDialog('callEndedModal', window);
+  });
+
+  $('#optionsModal').on('hidden.bs.modal', () => {
+    window.removeFocus();
+  });
+  $('#noAgentsModal').on('hidden.bs.modal', () => {
+    window.removeFocus();
+  });
+  $('#waitingModal').on('hide.bs.modal', () => {
+    window.removeFocus();
+  });
+  $('#callEndedModal').on('hide.bs.modal', () => {
+    window.removeFocus();
+  });
 
   if (fileSharingEnabled === 'false') {
     // remove filesharing tab
@@ -86,7 +113,6 @@ $(document).ready(() => {
   }
 
   $('#optionsModal').modal('show');
-  $('#optionsModal').css('overflow-y', 'auto');
 
   document.getElementById('exitFullscreen').style.display = 'none';
   connect_socket();
@@ -102,7 +128,7 @@ $(document).ready(() => {
 
   // Use arrow keys to navigate tabs
   const tablists = document.querySelectorAll('[role=tablist].tabs-right');
-  for (let i = 0; i < tablists.length; i++) {
+  for (let i = 0; i < tablists.length; i += 1) {
     new TabsManual(tablists[i]);
   }
 
@@ -123,7 +149,8 @@ $(document).ready(() => {
 $(window).bind('fullscreenchange', function (_e) {
   // check to see if your browser has exited fullscreen
   if (!document.fullscreenElement && !document.mozFullScreenElement
-    && !document.webkitFullscreenElement && !document.msFullscreenElement) { // video fullscreen mode has changed
+    // video fullscreen mode has changed
+    && !document.webkitFullscreenElement && !document.msFullscreenElement) {
     if (document.fullscreenElement) {
       // you have just ENTERED full screen video
     } else {
@@ -165,7 +192,7 @@ function connect_socket() {
           vrs = payload.vrs;
           // $('#callerEmail').val(payload.email);
           $('#displayname').val(`${payload.first_name} ${payload.last_name}`);
-          const isOpen = payload.isOpen;
+          const { isOpen } = payload;
           if (!isOpen) { // after hours processing; if after hours, then show this modal
             // TODO Review potentially having config variable to determine if enabled per user
             // DO NOT enable for dro
@@ -460,7 +487,6 @@ function connect_socket() {
               $('#redirectUrlDesc').text(complaintRedirectDesc);
               $('#redirectUrlDesc').attr('href', complaintRedirectUrl);
               $('#callEndedModal').modal('show');
-              $('#callEndedModal').css('overflow-y', 'auto');
 
               setTimeout(() => {
                 location = complaintRedirectUrl;
@@ -597,16 +623,28 @@ const setColumnSize = function () {
   const chatSeparator = document.getElementById('chat-separator');
   const fileShareSeparator = document.getElementById('fileshare-separator');
   const footer = document.getElementById('footer-container-consumer');
-  const tabsTop = chatSeparator.getBoundingClientRect().bottom || fileShareSeparator.getBoundingClientRect().bottom;
+  const tabsTop = chatSeparator.getBoundingClientRect().bottom
+    || fileShareSeparator.getBoundingClientRect().bottom;
   const chatHeight = footer.getBoundingClientRect().top - tabsTop;
   const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
-  const newChatMessageHeight = parseInt((document.getElementById('newchatmessage').style.height).slice(0, -2), 10);
+  let newChatMessageHeight = parseInt((document.getElementById('newchatmessage').style.height).slice(0, -2), 10); // height of chat textarea
+  const getDefaultBrowserFontSize = parseInt((window.getComputedStyle(document.body).getPropertyValue('font-size')), 10); // default browser font size
+  const newChatTextSize = parseInt((document.getElementById('newchatmessage').style.fontSize).slice(0, -2), 10); // font size when increased/decreased by consumer
+  // if newchatsize is a number, user zoomed in/out
+  if (!Number.isNaN(newChatTextSize)) {
+    if (newChatTextSize * 6 > newChatMessageHeight) {
+      $('#newchatmessage').css('max-height', `${newChatTextSize * 6}px`);
+    } else {
+      newChatMessageHeight = newChatTextSize * 6; // increase textarea height as zoom increases
+    }
+  } else { // limit the textarea height to 6x default browser font height
+    $('#newchatmessage').css('max-height', `${getDefaultBrowserFontSize * 6}px`);
+  }
 
   $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
   if ($('#chat-messages').hasClass('emptyMessages')) {
     $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
-  }
-  else {
+  } else {
     $('#chat-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight + newChatMessageHeight));
   }
 
@@ -632,8 +670,8 @@ const setColumnSize = function () {
 
   const videoHeight = footer.getBoundingClientRect().top - videoTop - captionAreaHeight;
 
-  $('#remoteViewCol').height(videoHeight + 'px');
-  $('#remoteView').height(videoHeight + 'px');
+  $('#remoteViewCol').height(`${videoHeight}px`);
+  $('#remoteView').height(`${videoHeight}px`);
 
   // set remote video column width
   $('#remoteViewCol').width(`${($('#callVideosRow').width() - $('#selfViewCol').width()) - 19}px`);
@@ -672,9 +710,9 @@ function updateCaptions(caption) {
   if (caption.final) {
     console.log('final!');
     // Remove caption from current captions
-    currentCaptions.forEach((element, index) => {
+    currentCaptions.forEach((element, captionIndex) => {
       if (element.extension === caption.extension) {
-        currentCaptions.splice(index, 1);
+        currentCaptions.splice(captionIndex, 1);
       }
     });
 
@@ -682,10 +720,10 @@ function updateCaptions(caption) {
     historicalCaptions.unshift(caption);
   } else {
     let found = false;
-    currentCaptions.forEach((element, index) => {
+    currentCaptions.forEach((element, captionIndex) => {
       if (element.extension === caption.extension) {
         found = true;
-        currentCaptions[index] = caption;
+        currentCaptions[captionIndex] = caption;
       }
     });
     if (!found) {
@@ -817,7 +855,6 @@ function registerJssip(myExtension, myPassword) {
         remoteStream.srcObject.getVideoTracks()[0].onended = () => {
           console.log('screensharing ended remote');
           isScreenshareRestart = true;
-          acekurento.screenshare(false);
         };
       }
 
@@ -871,11 +908,13 @@ function registerJssip(myExtension, myPassword) {
       if (partCount >= 2 || videomailflag) {
         console.log('--- WV: CONNECTED');
 
-        $('#queueModal').modal('hide');
-        // closeDialog($('#videomail-btn')[0]);
+        if ($('#queueModal').is(':visible')) {
+          $('#queueModal').modal('hide');
+        }
 
-        $('#waitingModal').modal('hide');
-        // closeDialog($('#waitingHangUpButton')[0]);
+        if ($('#waitingModal').is(':visible')) {
+          $('#waitingModal').modal('hide');
+        }
 
         document.getElementById('noCallPoster').style.display = 'none';
         document.getElementById('inCallSection').style.display = 'block';
@@ -905,9 +944,7 @@ function unregisterJssip() {
 }
 
 // CALL FLOW FUNCTIONS
-
 function enterQueue() {
-  // closeDialog($('#callQueueButton')[0]);
   callAlreadyTerminated = false;
 
   const language = 'en';
@@ -916,19 +953,16 @@ function enterQueue() {
     vrs
   }, (isOpen) => {
     console.log('isOpen:', isOpen);
-    // closeDialog($('#callQueueButton')[0]);
 
     if (isOpen) {
       // wait for the options modal to fully close before opening another modal
       $('#optionsModal').one('hidden.bs.modal', () => {
         $('#waitingModal').modal('show');
-        $('#waitingModal').css('overflow-y', 'auto');
       });
     } else {
       // wait for the options modal to fully close before opening another modal
       $('#optionsModal').one('hidden.bs.modal', () => {
         $('#noAgentsModal').modal('show');
-        $('#noAgentsModal').css('overflow-y', 'auto');
       });
     }
   });
@@ -949,13 +983,10 @@ function endCall(userInitiated = false) {
   // Catches if the user clicks the hangup on the noagents modal
   if (($('#noAgentsModal').hasClass('in') || $('#optionsModal').hasClass('in')) && !userInitiated) {
     $('#noAgentsModal').one('hidden.bs.modal', () => {
-      // closeDialog($('#noAgentsHangUpButton')[0]);
       $('#optionsModal').modal('show');
-      $('#optionsModal').css('overflow-y', 'auto');
     });
 
     $('#noAgentsModal').modal('hide');
-    closeDialog($('#noAgentsHangUpButton')[0]);
   } else if (callAnswered) {
     // Arrives here when a consumer ends a call that was connected with agent
     if (complaintRedirectActive) {
@@ -965,13 +996,10 @@ function endCall(userInitiated = false) {
 
       // wait for the modal to fully close before opening another modal
       $('#waitingModal').one('hidden.bs.modal', () => {
-        // closeDialog($('#waitingHangUpButton')[0]);
         $('#callEndedModal').modal('show');
-        $('#callEndedModal').css('overflow-y', 'auto');
       });
 
       $('#waitingModal').modal('hide');
-      closeDialog($('#waitingHangUpButton')[0]);
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
@@ -989,23 +1017,17 @@ function endCall(userInitiated = false) {
 
     if ($('#waitingModal').is(':visible')) {
       $('#waitingModal').one('hidden.bs.modal', () => {
-        // closeDialog($('#waitingHangUpButton')[0]);
         $('#optionsModal').modal('show');
-        $('#optionsModal').css('overflow-y', 'auto');
       });
 
-      // closeDialog($('#waitingHangUpButton')[0]);
       $('#waitingModal').modal('hide');
     }
 
     if ($('#noAgentsModal').is(':visible')) {
       $('#noAgentsModal').one('hidden.bs.modal', () => {
-        // closeDialog($('#noAgentsHangUpButton')[0]);
         $('#optionsModal').modal('show');
-        $('#optionsModal').css('overflow-y', 'auto');
       });
 
-      // closeDialog($('#noAgentsHangUpButton')[0]);
       $('#noAgentsModal').modal('hide');
     }
   } else {
@@ -1014,27 +1036,19 @@ function endCall(userInitiated = false) {
     if ($('#waitingModal').is(':visible')) {
       // wait for the modal to fully close before opening another modal
       $('#waitingModal').one('hidden.bs.modal', () => {
-        // closeDialog($('#waitingHangUpButton')[0]);
-
         $('#noAgentsModal').modal('show');
-        $('#noAgentsModal').css('overflow-y', 'auto');
       });
 
       $('#waitingModal').modal('hide');
-      // closeDialog($('#waitingHangUpButton')[0]);
     }
 
     if ($('#optionsModal').is(':visible')) {
       // wait for the modal to fully close before opening another modal
       $('#optionsModal').one('hidden.bs.modal', () => {
-        // closeDialog($('#callQueueButton')[0]);
-
         $('#noAgentsModal').modal('show');
-        $('#noAgentsModal').css('overflow-y', 'auto');
       });
 
       $('#optionsModal').modal('hide');
-      // closeDialog($('#callQueueButton')[0]);
     }
   }
 
@@ -1139,7 +1153,8 @@ function unmuteAudio() {
 
 function enableVideoPrivacy() {
   $('#hide-video').blur();
-  // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera').addClass('call-btn-icon fa-stack');
+  // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera')
+  // .addClass('call-btn-icon fa-stack');
   $('#mute-camera-off-icon').children().remove();
   $('#mute-camera-off-icon').append(
     '<i class="fa fa-video-camera fa-stack-1x"></i><i class="fa fa-ban fa-stack-2x text-danger"></i>'
@@ -1705,28 +1720,6 @@ function addFileToSentList(data) {
   });
 }
 
-function setFontSize(size) {
-  $('.fontSizeButtons').blur();
-  const currentFontSize = $('.currentFontSize').text().split('%')[0];
-  const newFontSize = Number(currentFontSize) + size;
-  const body1FontSizeInPx = (16 * newFontSize) / 100; // 16px is the default font size for body1
-  const body2FontSizeInPx = (14 * newFontSize) / 100; // 14px is the default font size for body2
-  body1globalFontSize = body1FontSizeInPx;
-  body2globalFontSize = body2FontSizeInPx;
-
-  if (newFontSize >= 50 && size === -10 || newFontSize <= 200 && size === 10) {
-    if (newFontSize >= 80 && newFontSize <= 150) {
-      setOtherFontSize(size);
-    }
-
-    $('.tabFontSize').css('font-size', `${body1FontSizeInPx.toString()}px`);
-    $('.chat-body1').css('font-size', `${body1FontSizeInPx.toString()}px`);
-    $('.chat-body2').css('font-size', `${body2FontSizeInPx.toString()}px`);
-
-    $('.currentFontSize').text(`${newFontSize.toString()}%`);
-  }
-}
-
 function setOtherFontSize(size) {
   // sets font sizes for buttons/text input
   console.log(`size: ${size}`);
@@ -1756,6 +1749,28 @@ function setOtherFontSize(size) {
       $('#newchatmessage').css('height', '0px');
       $('#newchatmessage').css('height', `${$('#newchatmessage')[0].scrollHeight}px`);
     }
+  }
+}
+
+function setFontSize(size) {
+  $('.fontSizeButtons').blur();
+  const currentFontSize = $('.currentFontSize').text().split('%')[0];
+  const newFontSize = Number(currentFontSize) + size;
+  const body1FontSizeInPx = (16 * newFontSize) / 100; // 16px is the default font size for body1
+  const body2FontSizeInPx = (14 * newFontSize) / 100; // 14px is the default font size for body2
+  body1globalFontSize = body1FontSizeInPx;
+  body2globalFontSize = body2FontSizeInPx;
+
+  if ((newFontSize >= 50 && size === -10) || (newFontSize <= 200 && size === 10)) {
+    if (newFontSize >= 80 && newFontSize <= 150) {
+      setOtherFontSize(size);
+    }
+
+    $('.tabFontSize').css('font-size', `${body1FontSizeInPx.toString()}px`);
+    $('.chat-body1').css('font-size', `${body1FontSizeInPx.toString()}px`);
+    $('.chat-body2').css('font-size', `${body2FontSizeInPx.toString()}px`);
+
+    $('.currentFontSize').text(`${newFontSize.toString()}%`);
   }
 }
 
@@ -1949,7 +1964,7 @@ function redirectToVideomail() {
   }
 }
 
-var recognition = null;
+let recognition = null;
 function captionsStart() {
   isCaptioning = true;
   let language = $('#language-select').val();
