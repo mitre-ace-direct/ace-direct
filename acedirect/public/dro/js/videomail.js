@@ -26,6 +26,7 @@ function setVideoSize() {
   const videoHeight = b.getBoundingClientRect().top - top;
   console.log(videoHeight);
   $('.video-element').height(videoHeight - ($('#greeting-controls-footer').height() + $('#footer-container-consumer').height()));
+  $('#greetingCol').height(videoHeight - ($('#greeting-controls-footer').height() + $('#footer-container-consumer').height()));
   $('#introVideoTranscriptCol').height(videoHeight - ($('#greeting-controls-footer').height() + $('#footer-container-consumer').height()));
 
   // transition countdown page
