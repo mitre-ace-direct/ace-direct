@@ -99,6 +99,8 @@ var monitorTransition = false;
 let asteriskPingError = false;
 let asteriskAmiError = false;
 
+let emojiToggle = false;
+
 setInterval(function () {
   busylight.light(this.agentStatus);
 }, 2000);
@@ -337,6 +339,7 @@ function connect_socket() {
         }).on('typing-clear', function (data) {
           debugtxt('typing-clear', data);
           if ($('#displayname').val() !== data.displayname) {
+            console.log('typing clear event', data);
             $('#chat-messages').remove($('#rtt-typing'));
             $('#rtt-typing').html('').removeClass('direct-chat-text');
           }
@@ -1279,7 +1282,20 @@ function stopMonitoringCall(ext) {
   socket.emit('stopMonitoringCall', { originalExt: ext, vrs: $('#callerPhone').val() });
 }
 
-$('#newchatmessage').on('change keydown paste input', function () {
+$('#dropup-menu').on('shown.bs.dropdown', () => {
+  emojiToggle = true;
+});
+
+$('#newchatmessage').on('keyup change keydown paste input', function (evt) {
+  if (evt.keyCode === 13) {
+    evt.preventDefault();
+    if ($('#newchatmessage').val() !== '' && !emojiToggle) {
+      $('#chatsend').submit();
+    } else if (emojiToggle) {
+      emojiToggle = false;
+    }
+  }
+
   var value = $('#newchatmessage').val();
   var displayname = $('#displayname').val();
   var vrs = $('#callerPhone').val();
@@ -1853,40 +1869,36 @@ function newChatMessage(data) {
     .html(msg)
     .appendTo(msgblock);
 
-  if ($('#displayname').val() === displayname) {
-    $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
-    if (isAgentTyping) {
-      // keep the rtt at the bottom of the the chat pane
-      $('#rtt-typing').appendTo($('#chat-messages'));
-    }
-  } else {
-    isAgentTyping = false;
-    $('#rtt-typing').css('display', 'none');
-    $('#chat-messages').remove($('#rtt-typing'));
-    $('#rtt-typing').html('').removeClass('direct-chat-text chat-body1');
-    $(msgblock).addClass('alert alert-secondary receivedChat')
-      .attr('aria-live', 'assertive')
-      .appendTo($('#chat-messages'));
-  }
+  // if ($('#displayname').val() === displayname) {
+  //   $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
+  //   if (isAgentTyping) {
+  //     // keep the rtt at the bottom of the the chat pane
+  //     $('#rtt-typing').appendTo($('#chat-messages'));
+  //   }
+  // } else {
+  //   isAgentTyping = false;
+  //   $('#rtt-typing').css('display', 'none');
+  //   $('#chat-messages').remove($('#rtt-typing'));
+  //   $('#rtt-typing').html('').removeClass('direct-chat-text chat-body1');
+  //   $(msgblock).addClass('alert alert-secondary receivedChat')
+  //     .attr('aria-live', 'assertive')
+  //     .appendTo($('#chat-messages'));
+  // }
   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 
-  // if ($('#displayname').val() === displayname) {
-  //   $(msgsender).addClass('direct-chat-name pull-right').html(displayname).appendTo(msginfo);
-  //   $(msgtime).addClass('direct-chat-timestamp pull-left').html(timestamp).appendTo(msginfo);
-  //   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-  //   $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
-  //   $(msgblock).addClass('direct-chat-msg right').appendTo($('#chat-messages'));
-  // } else {
-  //   $('#chat-messages').remove($('#rtt-typing'));
-  //   $('#rtt-typing').html('').removeClass('direct-chat-text');
+  if ($('#displayname').val() === displayname) {
+    $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
+  } else {
+    $('#chat-messages').remove($('#rtt-typing'));
+    $('#rtt-typing').html('').removeClass('direct-chat-text');
 
-  //   $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
-  //   $(msgtime).addClass('direct-chat-timestamp pull-right').html(timestamp).appendTo(msginfo);
-  //   $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-  //   $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
-  //   $(msgblock).addClass('direct-chat-msg').appendTo($('#chat-messages'));
+    $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
+    $(msgtime).addClass('direct-chat-timestamp pull-right').html(timestamp).appendTo(msginfo);
+    $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
+    $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
+    $(msgblock).addClass('direct-chat-msg').appendTo($('#chat-messages'));
 
-  // }
+  }
   // $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 }
 
