@@ -114,6 +114,7 @@ $('#greetingPlayPauseBtn').on('click', () => {
  * @param {boolean} transcriptButtonClicked
  * used to determine if the tooltip automatically appears after changing title
  */
+// eslint-disable-next-line no-unused-vars
 function toggleTranscript(transcriptButtonClicked) {
   if ($('#introVideoTranscriptCol').hasClass('col-xs-3')) {
     // close the transcript

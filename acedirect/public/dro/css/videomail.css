@@ -36,7 +36,7 @@
 }
 
 .greeting-controls {
-  background-color: #DDDDDD;
+  background-color: #F9F9F9;
   height: 100%;
   color: #000000;
   padding: 0.6em 2.6em 0.6em 2.6em;
@@ -80,6 +80,7 @@
 
 .modal-outline-btn {
   color: #073863 !important;
+  background-color: white;
   border-color: #073863 !important;
   border-width: 2px !important;
   font-weight: bold !important;
@@ -246,8 +247,6 @@
 .transcriptButton {
   border: none;
   height: 45px;
-  width: 45px !important;
-  margin-left: 15px;
   background-color: transparent !important;
   color: #073863;
   vertical-align: initial !important;

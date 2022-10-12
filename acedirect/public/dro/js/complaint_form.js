@@ -949,7 +949,6 @@ function toggleTranscripts(video) {
     $(transcript).attr('hidden', true);
     $(transcript).attr('aria-hidden', 'true');
     $(transcriptButton).html('Show Video Transcript <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>');
-    $(transcriptButton).blur();
   }
 }
 
