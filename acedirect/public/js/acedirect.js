@@ -333,6 +333,7 @@ function connect_socket() {
         }).on('typing', function (data) {
           debugtxt('typing', data);
           if ($('#displayname').val() !== data.displayname) {
+            console.log('typing event', data);
             $('#rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('alert alert-secondary rttChatBubble chat-body1').addClass('text-bold body2');
             $('#rtt-typing').appendTo($('#chat-messages'));
           }
@@ -341,7 +342,7 @@ function connect_socket() {
           if ($('#displayname').val() !== data.displayname) {
             console.log('typing clear event', data);
             $('#chat-messages').remove($('#rtt-typing'));
-            $('#rtt-typing').html('').removeClass('direct-chat-text');
+            $('#rtt-typing').html('').removeClass('alert alert-secondary rttChatBubble chat-body1 text-bold body2');
           }
         }).on('new-caller-general', function (endpoint_type) { // a new general caller has connected
           debugtxt('new-caller-general', data);
@@ -1290,7 +1291,7 @@ $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
   if (evt.keyCode === 13) {
     evt.preventDefault();
     if ($('#newchatmessage').val() !== '' && !emojiToggle) {
-      $('#chatsend').submit();
+      $('#chatsend').trigger('submit');
     } else if (emojiToggle) {
       emojiToggle = false;
     }
