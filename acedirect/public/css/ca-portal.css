@@ -133,7 +133,13 @@ body{
 }
 
 /* New Agent Styling */
-
+#newchatmessage {
+  height: 38px;
+  resize: none;
+  /* position: absolute;*/
+  bottom: 0;
+  min-height: 38px !important;
+}
 .emptyMessages {
   text-align: center;
   position: relative;
