@@ -13,8 +13,8 @@ $(document).ready(() => {
   // Initialize tooltip
   $('[data-toggle="tooltip"]').tooltip({
     toggle: 'hover',
-    placement: 'bottom',
-    container: 'body'
+    container: 'body',
+    viewport: $('#transcriptButtonDiv')
   });
 });
 
