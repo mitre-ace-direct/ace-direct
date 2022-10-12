@@ -97,9 +97,9 @@ router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => 
         let instructions_video = 'sample.mp4'; // TODO: Update with real default video
         let no_agents_video = 'sample.mp4'; // TODO: Update with the real default video
 
-        let please_wait_video_transcript = '';
-        let instructions_video_transcript = '';
-        let no_agents_video_transcript = '';
+        let please_wait_video_transcript = 'No transcripts available.';
+        let instructions_video_transcript = 'No transcripts available.';
+        let no_agents_video_transcript = 'No transcripts available.';
         
         if (config.complaint_videos && config.complaint_videos.please_wait_video) {
             please_wait_video = utils.getConfigVal(config.complaint_videos.please_wait_video);
@@ -754,7 +754,7 @@ router.get('/profilePicPoll', (req, res) => {
 
 router.get('/videomail', consumerRestrict, (req, res) => {  
     let introVideo = 'videomailGreeting.mp4';
-    let introVideoTranscript = '';
+    let introVideoTranscript = 'No transcripts available.';
 
     if (config.web_videomail && config.web_videomail.introVideo) {
       introVideo = utils.getConfigVal(config.web_videomail.introVideo);
@@ -765,7 +765,7 @@ router.get('/videomail', consumerRestrict, (req, res) => {
     if (config.web_videomail && config.web_videomail.introVideoTranscript) {
         introVideoTranscript = utils.getConfigVal(config.web_videomail.introVideoTranscript);
         if (!introVideoTranscript || introVideoTranscript.length === 0) {
-            introVideoTranscript = '';
+            introVideoTranscript = 'No transcripts available.';
         }
     }
     res.render('dro/pages/videomail', {
