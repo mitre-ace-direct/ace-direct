@@ -1325,7 +1325,7 @@ $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
   if (evt.keyCode === 13) {
     evt.preventDefault();
     if ($('#newchatmessage').val() !== '' && !emojiToggle) {
-      $('#chatsend').submit();
+      $('#chatsend').trigger('submit');
     } else if (emojiToggle) {
       emojiToggle = false;
     }
