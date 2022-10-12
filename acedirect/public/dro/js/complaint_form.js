@@ -21,9 +21,9 @@ const videomailflag = false;
 const muteCaptionsOffIcon = document.getElementById('mute-captions-off-icon');
 let hasMessages = false;
 let isAgentTyping = false;
-const sharingScreen = false;
+// const sharingScreen = false;
 let isSidebarCollapsed = false;
-const index = 0;
+// const index = 0;
 let monitorExt = '';
 let isScreenshareRestart = false;
 let callAnswered = false;
@@ -32,7 +32,7 @@ let feedbackTimeoutID;
 let unreadMessages = 0;
 let unreadFiles = 0;
 let openTab = 'chat';
-let exitingQueue = false;
+// let exitingQueue = false;
 let isCaptioning = false;
 let captionsEnabled = false;
 // captionsOn irrelevant if captionsEnabled is false, represents whether user has
@@ -143,17 +143,21 @@ $(document).ready(() => {
   dayjs.extend(window.dayjs_plugin_utc);
 
   // update the page height when the accelerated hardware banner appears/disappears
-  const observer = new MutationObserver(function (_mutations) {
+  const observer = new MutationObserver((_mutations) => {
     console.log('setting setColumnSize()');
     setColumnSize();
   });
+  // const observer = new MutationObserver(function (_mutations) {
+  //   console.log('setting setColumnSize()');
+  //   setColumnSize();
+  // });
   const target = document.querySelector('#hardware-acc-warning');
   observer.observe(target, {
     attributes: true
   });
 });
 
-$(window).bind('fullscreenchange', function (_e) {
+$(window).bind('fullscreenchange', (_e) => {
   // check to see if your browser has exited fullscreen
   if (!document.fullscreenElement && !document.mozFullScreenElement
     // video fullscreen mode has changed
@@ -165,7 +169,20 @@ $(window).bind('fullscreenchange', function (_e) {
     }
   }
 });
+// $(window).bind('fullscreenchange', function (_e) {
+//   // check to see if your browser has exited fullscreen
+//   if (!document.fullscreenElement && !document.mozFullScreenElement
+//     // video fullscreen mode has changed
+//     && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+//     if (document.fullscreenElement) {
+//       // you have just ENTERED full screen video
+//     } else {
+//       document.getElementById('exitFullscreen').style.display = 'none';
+//     }
+//   }
+// });
 
+// eslint-disable-next-line camelcase
 function connect_socket() {
   $.ajax({
     url: './token',
@@ -1064,11 +1081,11 @@ function endCall(userInitiated = false) {
   terminateCall();
 }
 
-function exitQueue() {
-  console.log('EXITING QUEUE');
-  exitingQueue = true;
-  endCall();
-}
+// function exitQueue() {
+//   console.log('EXITING QUEUE');
+//   exitingQueue = true;
+//   endCall();
+// }
 
 // makes a call
 /*
