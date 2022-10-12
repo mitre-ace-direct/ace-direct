@@ -1,12 +1,19 @@
+/* global
+  nginxPath
+  consumerPath
+  fileSharingEnabled
+  autoplayEnabled
+*/
+
 let socket;
 
 const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` ? `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` : '';
 const remoteStream = document.getElementById('remoteView');
 const selfStream = document.getElementById('selfView');
-const muteAudioButton = document.getElementById('mute-audio');
+// const muteAudioButton = document.getElementById('mute-audio');
 const hideVideoButton = document.getElementById('hide-video');
 let callTimer = 0;
-const inCall = false;
+// const inCall = false;
 let vrs;
 let acekurento = null;
 const ua = null;
@@ -136,7 +143,7 @@ $(document).ready(() => {
   dayjs.extend(window.dayjs_plugin_utc);
 
   // update the page height when the accelerated hardware banner appears/disappears
-  const observer = new MutationObserver(function (mutations) {
+  const observer = new MutationObserver(function (_mutations) {
     console.log('setting setColumnSize()');
     setColumnSize();
   });
@@ -624,6 +631,7 @@ const setColumnSize = function () {
   const fileShareSeparator = document.getElementById('fileshare-separator');
   const footer = document.getElementById('footer-container-consumer');
   const tabsTop = chatSeparator.getBoundingClientRect().bottom
+ 
     || fileShareSeparator.getBoundingClientRect().bottom;
   const chatHeight = footer.getBoundingClientRect().top - tabsTop;
   const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
