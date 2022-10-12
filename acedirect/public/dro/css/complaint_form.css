@@ -689,4 +689,10 @@ body {
 .btn-tertiary:focus {
   background-color: white !important;
   color: #073863 !important;
+  outline: none !important;
+}
+.btn-tertiary:focus-visible {
+  background-color: white !important;
+  color: #073863 !important;
+  outline: -webkit-focus-ring-color auto 1px !important;
 }
