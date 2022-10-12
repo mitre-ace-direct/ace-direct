@@ -347,7 +347,9 @@ aria.Utils = aria.Utils || {};
 
   window.removeFocus = function removeFocus() {
     const topDialog = aria.getCurrentDialog();
-    topDialog.removeFocus();
+    if (topDialog) {
+      topDialog.removeFocus();
+    }
   };
 
   window.replaceDialog = function replaceDialog(
