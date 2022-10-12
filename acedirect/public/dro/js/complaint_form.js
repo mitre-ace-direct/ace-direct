@@ -254,7 +254,6 @@ function connect_socket() {
           })
           .on('extension-created', (data) => {
             if (data.message === 'success') {
-              globalData = data;
               // $('#outOfExtensionsModal').modal('hide');
               exten = data.extension;
               // $('#display_name').val(data.extension);
@@ -293,7 +292,7 @@ function connect_socket() {
               // add ace kurento signal handling so we can get params,
               // then call once we have a wv connection
               if (acekurento === null) {
-                let signalingUrl = globalData.signaling_server_url;
+                let signalingUrl = data.signaling_server_url;
                 signalingUrl = signalingUrl.trim();
 
                 acekurento = new ACEKurento({ acekurentoSignalingUrl: signalingUrl });
@@ -1097,7 +1096,6 @@ function startCall(otherSipUri) {
 
   $('#screenshareButton').removeAttr('disabled');
   $('#fileInput').removeAttr('disabled');
-  // acekurento.call(globalData.queues_complaint_number, false);
   acekurento.call(otherSipUri, false);
 }
 
