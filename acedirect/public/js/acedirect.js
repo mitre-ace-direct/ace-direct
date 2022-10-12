@@ -1881,9 +1881,9 @@ function newChatMessage(data) {
   //   $('#rtt-typing').css('display', 'none');
   //   $('#chat-messages').remove($('#rtt-typing'));
   //   $('#rtt-typing').html('').removeClass('direct-chat-text chat-body1');
-  //   $(msgblock).addClass('alert alert-secondary receivedChat')
-  //     .attr('aria-live', 'assertive')
-  //     .appendTo($('#chat-messages'));
+    // $(msgblock).addClass('alert alert-secondary receivedChat')
+    //   .attr('aria-live', 'assertive')
+    //   .appendTo($('#chat-messages'));
   // }
   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 
@@ -1891,14 +1891,15 @@ function newChatMessage(data) {
     $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
   } else {
     $('#chat-messages').remove($('#rtt-typing'));
-    $('#rtt-typing').html('').removeClass('direct-chat-text');
+    $('#rtt-typing').html('').removeClass('direct-chat-text chat-body1');
 
-    $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
-    $(msgtime).addClass('direct-chat-timestamp pull-right').html(timestamp).appendTo(msginfo);
-    $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-    $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
-    $(msgblock).addClass('direct-chat-msg').appendTo($('#chat-messages'));
-
+    // $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
+    // $(msgtime).addClass('direct-chat-timestamp pull-right').html(timestamp).appendTo(msginfo);
+    // $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
+    // $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
+    $(msgblock).addClass('alert alert-secondary receivedChat')
+      .attr('aria-live', 'assertive')
+      .appendTo($('#chat-messages'));
   }
   // $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 }
