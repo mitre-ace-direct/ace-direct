@@ -36,7 +36,7 @@
 }
 
 .greeting-controls {
-  background-color: #DDDDDD;
+  background-color: #F9F9F9;
   height: 100%;
   color: #000000;
   padding: 0.6em 2.6em 0.6em 2.6em;
@@ -80,6 +80,7 @@
 
 .modal-outline-btn {
   color: #073863 !important;
+  background-color: white;
   border-color: #073863 !important;
   border-width: 2px !important;
   font-weight: bold !important;
@@ -243,6 +244,18 @@
   border-top: 1px solid black;
 }
 
+.transcriptButton {
+  border: none;
+  height: 45px;
+  background-color: transparent !important;
+  color: #073863;
+  vertical-align: initial !important;
+  margin-right: 5px;
+  margin-top: 11px;
+  margin-bottom: 11px;
+  flex: 1;
+}
+
 .circleButton {
   border-radius: 50% !important;
   border: none;
@@ -255,6 +268,7 @@
   margin-right: 5px;
   margin-top: 11px;
   margin-bottom: 11px;
+  flex: 1;
 }
 
 .circleButton:hover {
@@ -293,4 +307,8 @@
 
 #goodbyeModal {
   overflow-x: auto;
+}
+
+.greetingCol {
+  padding: 0px;
 }

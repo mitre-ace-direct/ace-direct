@@ -96,6 +96,10 @@ router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => 
         let please_wait_video = 'sample.mp4'; // TODO: Update with real default video
         let instructions_video = 'sample.mp4'; // TODO: Update with real default video
         let no_agents_video = 'sample.mp4'; // TODO: Update with the real default video
+
+        let please_wait_video_transcript = 'No transcripts available.';
+        let instructions_video_transcript = 'No transcripts available.';
+        let no_agents_video_transcript = 'No transcripts available.';
         
         if (config.complaint_videos && config.complaint_videos.please_wait_video) {
             please_wait_video = utils.getConfigVal(config.complaint_videos.please_wait_video);
@@ -103,19 +107,48 @@ router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, next) => 
                 please_wait_video = config.complaint_videos.please_wait_video;
             }
         }
+        if (config.complaint_videos && config.complaint_videos.please_wait_video_transcript) {
+            please_wait_video_transcript = utils.getConfigVal(config.complaint_videos.please_wait_video_transcript);
+            if (!please_wait_video_transcript || please_wait_video_transcript.length === 0) {
+                please_wait_video_transcript = config.complaint_videos.please_wait_video_transcript;
+            }
+        }
+
         if (config.complaint_videos && config.complaint_videos.instructions_video) {
             instructions_video = utils.getConfigVal(config.complaint_videos.instructions_video);
             if (!instructions_video || instructions_video.length === 0) {
                 instructions_video = config.complaint_videos.instructions_video;
             }
         }
+        if (config.complaint_videos && config.complaint_videos.instructions_video_transcript) {
+            instructions_video_transcript = utils.getConfigVal(config.complaint_videos.instructions_video_transcript);
+            if (!instructions_video_transcript || instructions_video_transcript.length === 0) {
+                instructions_video_transcript = config.complaint_videos.instructions_video_transcript;
+            }
+        }
+
         if (config.complaint_videos && config.complaint_videos.no_agents_video) {
             no_agents_video = utils.getConfigVal(config.complaint_videos.no_agents_video);
             if (!no_agents_video || no_agents_video.length === 0) {
                 no_agents_video = config.complaint_videos.no_agents_video;
             }
         }
-        res.render('dro/pages/complaint_form', {please_wait_video: please_wait_video, instructions_video: instructions_video, no_agents_video : no_agents_video, screenSharingVisibility});
+        if (config.complaint_videos && config.complaint_videos.no_agents_video_transcript) {
+            no_agents_video_transcript = utils.getConfigVal(config.complaint_videos.no_agents_video_transcript);
+            if (!no_agents_video_transcript || no_agents_video_transcript.length === 0) {
+                no_agents_video_transcript = config.complaint_videos.no_agents_video_transcript;
+            }
+        }
+
+        res.render('dro/pages/complaint_form', {
+            please_wait_video: please_wait_video,
+            please_wait_video_transcript : please_wait_video_transcript,
+            instructions_video: instructions_video,
+            instructions_video_transcript : instructions_video_transcript,
+            no_agents_video : no_agents_video,
+            no_agents_video_transcript : no_agents_video_transcript,
+            screenSharingVisibility
+        });
     } else {
         //TODO This is the old path to the previous consumer portal
         //res.render('pages/complaint_login');
@@ -721,13 +754,28 @@ router.get('/profilePicPoll', (req, res) => {
 
 router.get('/videomail', consumerRestrict, (req, res) => {  
     let introVideo = 'videomailGreeting.mp4';
+    let introVideoTranscript = 'No transcripts available.';
+
     if (config.web_videomail && config.web_videomail.introVideo) {
       introVideo = utils.getConfigVal(config.web_videomail.introVideo);
       if (!introVideo || introVideo.length === 0) {
         introVideo = 'videomailGreeting.mp4';
       }
     }
-    res.render('dro/pages/videomail', {redirectURL: utils.getConfigVal(config.complaint_redirect.url), redirectDesc: utils.getConfigVal(config.complaint_redirect.desc), maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs), introVideo, autoplayVideos });
+    if (config.web_videomail && config.web_videomail.introVideoTranscript) {
+        introVideoTranscript = utils.getConfigVal(config.web_videomail.introVideoTranscript);
+        if (!introVideoTranscript || introVideoTranscript.length === 0) {
+            introVideoTranscript = 'No transcripts available.';
+        }
+    }
+    res.render('dro/pages/videomail', {
+        redirectURL: utils.getConfigVal(config.complaint_redirect.url),
+        redirectDesc: utils.getConfigVal(config.complaint_redirect.desc),
+        maxRecordSeconds: utils.getConfigVal(config.videomail.max_record_secs),
+        introVideo,
+        introVideoTranscript,
+        autoplayVideos
+    });
 });
 
 router.post('/videomailupload', consumerRestrict,  (req, res) => { //add restrict. this is for testing only
