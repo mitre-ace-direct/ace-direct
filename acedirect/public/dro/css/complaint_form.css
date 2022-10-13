@@ -674,3 +674,25 @@ body {
   left: -9px !important;
   top: -3px;
 }
+
+.btn-tertiary {
+  background-color: white !important;
+  color: #073863;
+}
+
+.btn-tertiary:hover {
+  background-color: white !important;
+  color: #073863 !important;
+  text-decoration: underline !important;
+}
+
+.btn-tertiary:focus {
+  background-color: white !important;
+  color: #073863 !important;
+  outline: none !important;
+}
+.btn-tertiary:focus-visible {
+  background-color: white !important;
+  color: #073863 !important;
+  outline: -webkit-focus-ring-color auto 1px !important;
+}
