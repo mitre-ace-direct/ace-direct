@@ -914,6 +914,10 @@ function registerJssip(myExtension, myPassword) {
 
         if ($('#waitingModal').is(':visible')) {
           $('#waitingModal').modal('hide');
+          if ($('#pleaseWaitTranscript').is(':visible')) {
+            // close the transcript when closing the modal
+            toggleTranscripts('pleaseWait');
+          }
         }
 
         document.getElementById('noCallPoster').style.display = 'none';
@@ -943,9 +947,33 @@ function unregisterJssip() {
   sessionStorage.clear();
 }
 
+// Modal Video Transcripts
+function toggleTranscripts(video) {
+  const transcriptButton = `#${video}TranscriptBtn`;
+  const transcript = `#${video}Transcript`;
+
+  if ($(transcript).is(':hidden')) {
+    // open the transcript
+    $(transcript).attr('hidden', false);
+    $(transcript).attr('aria-hidden', 'false');
+    $(transcriptButton).html('Hide Video Transcript <i class="fa fa-chevron-up" alt="" aria-hidden="true"></i>');
+    $(transcriptButton).blur();
+    $(transcript).focus();
+  } else {
+    // close the transcript
+    $(transcript).attr('hidden', true);
+    $(transcript).attr('aria-hidden', 'true');
+    $(transcriptButton).html('Show Video Transcript <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>');
+  }
+}
+
 // CALL FLOW FUNCTIONS
 function enterQueue() {
   callAlreadyTerminated = false;
+  if ($('#instructionsVideoTranscript').is(':visible')) {
+    // close the transcript when closing the modal
+    toggleTranscripts('instructionsVideo');
+  }
 
   const language = 'en';
   socket.emit('call-initiated', {
@@ -987,6 +1015,11 @@ function endCall(userInitiated = false) {
     });
 
     $('#noAgentsModal').modal('hide');
+    if ($('#noAgentsTranscript').is(':visible')) {
+      // close the transcript when closing the modal
+      toggleTranscripts('noAgents');
+    }
+    closeDialog($('#noAgentsHangUpButton')[0]);
   } else if (callAnswered) {
     // Arrives here when a consumer ends a call that was connected with agent
     if (complaintRedirectActive) {
@@ -1000,6 +1033,11 @@ function endCall(userInitiated = false) {
       });
 
       $('#waitingModal').modal('hide');
+      if ($('#pleaseWaitTranscript').is(':visible')) {
+        // close the transcript when closing the modal
+        toggleTranscripts('pleaseWait');
+      }
+      closeDialog($('#waitingHangUpButton')[0]);
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
@@ -1021,6 +1059,10 @@ function endCall(userInitiated = false) {
       });
 
       $('#waitingModal').modal('hide');
+      if ($('#pleaseWaitTranscript').is(':visible')) {
+        // close the transcript when closing the modal
+        toggleTranscripts('pleaseWait');
+      }
     }
 
     if ($('#noAgentsModal').is(':visible')) {
@@ -1029,6 +1071,10 @@ function endCall(userInitiated = false) {
       });
 
       $('#noAgentsModal').modal('hide');
+      if ($('#noAgentsTranscript').is(':visible')) {
+        // close the transcript when closing the modal
+        toggleTranscripts('noAgents');
+      }
     }
   } else {
     // Called when a user ends the call while waiting in queue
@@ -1040,6 +1086,11 @@ function endCall(userInitiated = false) {
       });
 
       $('#waitingModal').modal('hide');
+      if ($('#pleaseWaitTranscript').is(':visible')) {
+        // close the transcript when closing the modal
+        toggleTranscripts('pleaseWait');
+      }
+      // closeDialog($('#waitingHangUpButton')[0]);
     }
 
     if ($('#optionsModal').is(':visible')) {
@@ -1049,6 +1100,11 @@ function endCall(userInitiated = false) {
       });
 
       $('#optionsModal').modal('hide');
+      if ($('#instructionsVideoTranscript').is(':visible')) {
+        // close the transcript when closing the modal
+        toggleTranscripts('instructionsVideo');
+      }
+      // closeDialog($('#callQueueButton')[0]);
     }
   }
 

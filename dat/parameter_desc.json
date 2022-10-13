@@ -98,7 +98,8 @@
     }
   },
   "web_videomail": {
-    "introVideo": "intro video filename for web-based videomail; MP4 format; defaults to videomailGreeting.mp4; customize with your own videomail intro file in /acedirect/public/media/"
+    "introVideo": "intro video filename for web-based videomail; MP4 format; defaults to videomailGreeting.mp4; customize with your own videomail intro file in /acedirect/public/media/",
+    "introVideoTranscript": "transcript for no_agents_video. Defaults to 'No transcripts available.'"
   },
   "videomail": {
     "max_record_secs": "Maximum time (seconds) for a video mail",
@@ -267,8 +268,12 @@
   }, 
   "complaint_videos": {
     "instructions_video": "video filename for instructions to the complaint user; MP4/webm format; defaults to sample.mp4; customize with your own instructions file in /acedirect/public/media/",
+    "instructions_video_transcript": "transcript for instructions_video. Defaults to 'No transcripts available.'",
     "please_wait_video": "video filename for letting the complaint user know to wait; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/",
-    "no_agents_video": "video filename for the modal that appears when a user tries to call while all agents are away or offline; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/"
+    "please_wait_video_transcript": "transcript for please_wait_video. Defaults to 'No transcripts available.'",
+    "no_agents_video": "video filename for the modal that appears when a user tries to call while all agents are away or offline; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/",
+    "no_agents_video_transcript": "transcript for no_agents_video. Defaults to 'No transcripts available.'"
+
   },
   "autoplay_videos": {
     "enabled": "enable or disable autoplay of ASL videos; default is 'false' "
