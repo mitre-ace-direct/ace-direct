@@ -628,7 +628,7 @@ const setColumnSize = function () {
   const chatHeight = footer.getBoundingClientRect().top - tabsTop;
   const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
   let newChatMessageHeight = parseInt((document.getElementById('newchatmessage').style.height).slice(0, -2), 10); // height of chat textarea
-  const getDefaultBrowserFontSize = parseInt((window.getComputedStyle(document.body).getPropertyValue('font-size')), 10); // default browser font size
+  const defaultBrowserFontSize = parseInt((window.getComputedStyle(document.body).getPropertyValue('font-size')), 10); // default browser font size
   const newChatTextSize = parseInt((document.getElementById('newchatmessage').style.fontSize).slice(0, -2), 10); // font size when increased/decreased by consumer
   // if newchatsize is a number, user zoomed in/out
   if (!Number.isNaN(newChatTextSize)) {
@@ -638,7 +638,11 @@ const setColumnSize = function () {
       newChatMessageHeight = newChatTextSize * 6; // increase textarea height as zoom increases
     }
   } else { // limit the textarea height to 6x default browser font height
-    $('#newchatmessage').css('max-height', `${getDefaultBrowserFontSize * 6}px`);
+    if(defaultBrowserFontSize * 6 > newChatMessageHeight){
+      $('#newchatmessage').css('max-height', `${defaultBrowserFontSize * 6}px`);
+    } else {
+      newChatMessageHeight = defaultBrowserFontSize * 6;
+    }
   }
 
   $('#chat-box-body').height(chatHeight - ($('#footer-container-consumer').height() + 20 + acceleratedBannerHeight));
