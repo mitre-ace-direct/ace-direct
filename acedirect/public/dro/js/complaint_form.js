@@ -3,10 +3,16 @@
   consumerPath
   fileSharingEnabled
   autoplayEnabled
+  asteriskSipUri: writable
+  complaintRedirectActive: writable
+  complaintRedirectDesc: writable
+  complaintRedirectUrl: writable
+  ACEKurento
 */
 
 let socket;
 
+// eslint-disable-next-line no-constant-condition
 const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` ? `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm` : '';
 const remoteStream = document.getElementById('remoteView');
 const selfStream = document.getElementById('selfView');
@@ -43,6 +49,7 @@ const historicalCaptions = [];
 let recognitionStarted = false;
 let body1globalFontSize;
 let body2globalFontSize;
+let currentPosition;
 
 let exten;
 // This variable is for catching the double end call that occurs when a user clicks the button
@@ -122,7 +129,6 @@ $(document).ready(() => {
   $('#optionsModal').modal('show');
 
   document.getElementById('exitFullscreen').style.display = 'none';
-  connect_socket();
   $('#shareFileConsumer').tooltip({
     trigger: 'hover',
     viewport: $('#shareFileConsumer')
@@ -136,16 +142,17 @@ $(document).ready(() => {
   // Use arrow keys to navigate tabs
   const tablists = document.querySelectorAll('[role=tablist].tabs-right');
   for (let i = 0; i < tablists.length; i += 1) {
-    new TabsManual(tablists[i]);
+    // eslint-disable-next-line no-undef -- defined in tabs-manual.js
+    tablists[i] = new TabsManual(tablists[i]);
   }
 
   // Extend dayjs with utc plugin
-  dayjs.extend(window.dayjs_plugin_utc);
+  window.dayjs.extend(window.dayjs_plugin_utc);
 
   // update the page height when the accelerated hardware banner appears/disappears
   const observer = new MutationObserver((_mutations) => {
     console.log('setting setColumnSize()');
-    setColumnSize();
+    this.setColumnSize();
   });
   // const observer = new MutationObserver(function (_mutations) {
   //   console.log('setting setColumnSize()');
@@ -183,7 +190,7 @@ $(window).bind('fullscreenchange', (_e) => {
 // });
 
 // eslint-disable-next-line camelcase
-function connect_socket() {
+function ConnectSocket() {
   $.ajax({
     url: './token',
     type: 'GET',
@@ -203,6 +210,7 @@ function connect_socket() {
         });
 
         socket.on('connect', () => {
+          // eslint-disable-next-line no-undef -- imported /assets/js/jwt-decode.js
           const payload = jwt_decode(successData.token);
           // get the start/end time strings for the after hours dialog
           // const tz = convertUTCtoLocal(payload.startTimeUTC).split(' ')[2];
@@ -268,7 +276,7 @@ function connect_socket() {
               }
 
               // get the max videomail recording seconds
-              maxRecordingSeconds = data.queues_videomail_maxrecordsecs;
+              // maxRecordingSeconds = data.queues_videomail_maxrecordsecs; // unused
 
               // get complaint redirect options
               complaintRedirectActive = data.complaint_redirect_active;
@@ -304,8 +312,8 @@ function connect_socket() {
                   connected: (_e) => {
                     console.log('--- WV: Connected ---\n');
                     // register with the given extension
-                    registerJssip(data.extension, data.password);
-                    startCall(asteriskSipUri); // calling asterisk to get into the queue
+                    this.registerJssip(data.extension, data.password);
+                    this.startCall(asteriskSipUri); // calling asterisk to get into the queue
                   },
                   registerResponse: (error) => {
                     console.log('--- WV: Register response:', error || 'Success ---');
@@ -373,7 +381,7 @@ function connect_socket() {
             }
           })
           .on('chat-message-new', (data) => {
-            newChatMessage(data);
+            this.newChatMessage(data);
             /*
                 // debugtxt('chat-message-new', data);
 
@@ -390,7 +398,7 @@ function connect_socket() {
                 */
           })
           .on('chat-message-new-translated', (data) => {
-            newChatMessage(data);
+            this.newChatMessage(data);
           })
           .on('translate-language-error', (error) => {
             console.error('Translation error:', error);
@@ -404,13 +412,13 @@ function connect_socket() {
                 $('#rtt-typing').css('display', 'block');
                 setTimeout(() => {
                   $('#rtt-typing').css('display', 'block');
-                  $('#rtt-typing').html(`<b>${data.displayname}</b>` + `<br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
+                  $('#rtt-typing').html(`<b>${data.displayname}</b>`, `<br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
                   $('#rtt-typing').appendTo($('#chat-messages'));
                   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
                 }, 100);
               } else {
                 $('#rtt-typing').css('display', 'block');
-                $('#rtt-typing').html(`<b>${data.displayname}</b>` + `<br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
+                $('#rtt-typing').html(`<b>${data.displayname}</b>`, `<br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
                 $('#rtt-typing').appendTo($('#chat-messages'));
                 $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
               }
@@ -435,11 +443,11 @@ function connect_socket() {
             }
           })
           .on('disconnect', () => {
-            unregisterJssip();
+            this.unregisterJssip();
           })
           .on('unauthorized', (error) => {
             if (error.data.type === 'UnauthorizedError' || error.data.code === 'invalid_token') {
-              logout('Session has expired');
+              this.logout('Session has expired');
             }
           })
           .on('queue-caller-join', (data) => {
@@ -449,19 +457,19 @@ function connect_socket() {
             }
           })
           .on('queue-caller-leave', (data) => {
-            const currentPosition = $('#pos-in-queue').text();
+            currentPosition = $('#pos-in-queue').text();
             if (data.queue === 'ComplaintsQueue') {
               /* if (!abandonedCaller) {
                 // abandoned caller triggers both leave and abandon event.
                 // this prevents duplicate removes.
                     setQueueText(currentPosition -= 1);
                 } */
-              abandonedCaller = false;
+              // abandonedCaller = false;
             }
           })
           .on('queue-caller-abandon', (data) => {
             if (data.queue === 'ComplaintsQueue') {
-              let currentPosition = $('#pos-in-queue').text();
+              currentPosition = $('#pos-in-queue').text();
               currentPosition += 1;
 
               // checks if the abandoned caller was ahead of you
@@ -470,7 +478,7 @@ function connect_socket() {
                 // setQueueText(currentPosition -= 1);
               }
 
-              abandonedCaller = true;
+              // abandonedCaller = true;
             }
           })
           .on('agent-name', (data) => {
@@ -518,9 +526,9 @@ function connect_socket() {
           })
           .on('error', (reason) => {
             if (reason.code === 'invalid_token') {
-              logout('Session has expired');
+              this.logout('Session has expired');
             } else {
-              logout(`An Error Occurred: ${JSON.stringify(reason)}`);
+              this.logout(`An Error Occurred: ${JSON.stringify(reason)}`);
             }
           })
           .on('fileListConsumer', (data) => {
@@ -635,6 +643,7 @@ function connect_socket() {
     }
   });
 }
+ConnectSocket();
 
 const setColumnSize = function () {
   let acceleratedBannerHeight = 0;
