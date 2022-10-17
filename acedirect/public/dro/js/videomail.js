@@ -25,9 +25,9 @@ function setVideoSize() {
   const top = a1.getBoundingClientRect().bottom || a2.getBoundingClientRect().bottom;
   const videoHeight = b.getBoundingClientRect().top - top;
   console.log(videoHeight);
-  $('.video-element').height(videoHeight - ($('#greeting-controls-footer').height() + $('#footer-container-consumer').height()));
-  $('#greetingCol').height(videoHeight - ($('#greeting-controls-footer').height() + $('#footer-container-consumer').height()));
-  $('#introVideoTranscriptCol').height(videoHeight - ($('#greeting-controls-footer').height() + $('#footer-container-consumer').height()));
+  $('.video-element').height(videoHeight - (($('#greeting-controls-footer').height() + 17) + $('#footer-container-consumer').height()));
+  $('#greetingCol').height(videoHeight - (($('#greeting-controls-footer').height() + 17) + $('#footer-container-consumer').height()));
+  $('#introVideoTranscriptCol').height(videoHeight - (($('#greeting-controls-footer').height() + 17) + $('#footer-container-consumer').height()));
 
   // transition countdown page
   const navbar = document.getElementById('consumerNavbar');
