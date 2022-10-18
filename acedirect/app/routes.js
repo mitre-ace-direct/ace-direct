@@ -95,63 +95,63 @@ router.get('/', (req, res, _next) => {
 
 router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, _next) => {
   if (req.session.user && req.session.user.role === 'VRS') {
-    let please_wait_video = 'sample.mp4'; // TODO: Update with real default video
-    let instructions_video = 'sample.mp4'; // TODO: Update with real default video
-    let no_agents_video = 'sample.mp4'; // TODO: Update with the real default video
+    let pleaseWaitVideo = 'sample.mp4'; // TODO: Update with real default video
+    let instructionsVideo = 'sample.mp4'; // TODO: Update with real default video
+    let noAgentsVideo = 'sample.mp4'; // TODO: Update with the real default video
 
-    let please_wait_video_transcript = 'No transcripts available.';
-    let instructions_video_transcript = 'No transcripts available.';
-    let no_agents_video_transcript = 'No transcripts available.';
+    let pleaseWaitVideoTranscript = 'No transcripts available.';
+    let instructionsVideoTranscript = 'No transcripts available.';
+    let noAgentsVideoTranscript = 'No transcripts available.';
 
     if (config.complaint_videos && config.complaint_videos.please_wait_video) {
-      please_wait_video = utils.getConfigVal(config.complaint_videos.please_wait_video);
-      if (!please_wait_video || please_wait_video.length === 0) {
-        please_wait_video = config.complaint_videos.please_wait_video;
+      pleaseWaitVideo = utils.getConfigVal(config.complaint_videos.please_wait_video);
+      if (!pleaseWaitVideo || pleaseWaitVideo.length === 0) {
+        pleaseWaitVideo = config.complaint_videos.please_wait_video;
       }
     }
     if (config.complaint_videos && config.complaint_videos.please_wait_video_transcript) {
-      please_wait_video_transcript = utils
+      pleaseWaitVideoTranscript = utils
         .getConfigVal(config.complaint_videos.please_wait_video_transcript);
-      if (!please_wait_video_transcript || please_wait_video_transcript.length === 0) {
-        please_wait_video_transcript = config.complaint_videos.please_wait_video_transcript;
+      if (!pleaseWaitVideoTranscript || pleaseWaitVideoTranscript.length === 0) {
+        pleaseWaitVideoTranscript = config.complaint_videos.please_wait_video_transcript;
       }
     }
 
     if (config.complaint_videos && config.complaint_videos.instructions_video) {
-      instructions_video = utils.getConfigVal(config.complaint_videos.instructions_video);
-      if (!instructions_video || instructions_video.length === 0) {
-        instructions_video = config.complaint_videos.instructions_video;
+      instructionsVideo = utils.getConfigVal(config.complaint_videos.instructions_video);
+      if (!instructionsVideo || instructionsVideo.length === 0) {
+        instructionsVideo = config.complaint_videos.instructions_video;
       }
     }
     if (config.complaint_videos && config.complaint_videos.instructions_video_transcript) {
-      instructions_video_transcript = utils
+      instructionsVideoTranscript = utils
         .getConfigVal(config.complaint_videos.instructions_video_transcript);
-      if (!instructions_video_transcript || instructions_video_transcript.length === 0) {
-        instructions_video_transcript = config.complaint_videos.instructions_video_transcript;
+      if (!instructionsVideoTranscript || instructionsVideoTranscript.length === 0) {
+        instructionsVideoTranscript = config.complaint_videos.instructions_video_transcript;
       }
     }
 
     if (config.complaint_videos && config.complaint_videos.no_agents_video) {
-      no_agents_video = utils.getConfigVal(config.complaint_videos.no_agents_video);
-      if (!no_agents_video || no_agents_video.length === 0) {
-        no_agents_video = config.complaint_videos.no_agents_video;
+      noAgentsVideo = utils.getConfigVal(config.complaint_videos.no_agents_video);
+      if (!noAgentsVideo || noAgentsVideo.length === 0) {
+        noAgentsVideo = config.complaint_videos.no_agents_video;
       }
     }
     if (config.complaint_videos && config.complaint_videos.no_agents_video_transcript) {
-      no_agents_video_transcript = utils
+      noAgentsVideoTranscript = utils
         .getConfigVal(config.complaint_videos.no_agents_video_transcript);
-      if (!no_agents_video_transcript || no_agents_video_transcript.length === 0) {
-        no_agents_video_transcript = config.complaint_videos.no_agents_video_transcript;
+      if (!noAgentsVideoTranscript || noAgentsVideoTranscript.length === 0) {
+        noAgentsVideoTranscript = config.complaint_videos.no_agents_video_transcript;
       }
     }
 
     res.render('dro/pages/complaint_form', {
-      please_wait_video,
-      please_wait_video_transcript,
-      instructions_video,
-      instructions_video_transcript,
-      no_agents_video,
-      no_agents_video_transcript,
+      pleaseWaitVideo,
+      pleaseWaitVideoTranscript,
+      instructionsVideo,
+      instructionsVideoTranscript,
+      noAgentsVideo,
+      noAgentsVideoTranscript,
       screenSharingVisibility
     });
   } else {
