@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 /* global
   nginxPath
   consumerPath
@@ -9,6 +10,7 @@
   complaintRedirectUrl: writable
   ACEKurento
   dayjs
+  io
 */
 
 let socket;
@@ -314,7 +316,7 @@ function ConnectSocket() {
                     console.log('--- WV: Connected ---\n');
                     // register with the given extension
                     this.registerJssip(data.extension, data.password);
-                    this.startCall(asteriskSipUri); // calling asterisk to get into the queue
+                    startCall(asteriskSipUri); // calling asterisk to get into the queue
                   },
                   registerResponse: (error) => {
                     console.log('--- WV: Register response:', error || 'Success ---');
@@ -382,7 +384,7 @@ function ConnectSocket() {
             }
           })
           .on('chat-message-new', (data) => {
-            this.newChatMessage(data);
+            newChatMessage(data);
             /*
                 // debugtxt('chat-message-new', data);
 
@@ -444,11 +446,11 @@ function ConnectSocket() {
             }
           })
           .on('disconnect', () => {
-            this.unregisterJssip();
+            unregisterJssip();
           })
           .on('unauthorized', (error) => {
             if (error.data.type === 'UnauthorizedError' || error.data.code === 'invalid_token') {
-              this.logout('Session has expired');
+              logout('Session has expired');
             }
           })
           .on('queue-caller-join', (data) => {
@@ -552,7 +554,7 @@ function ConnectSocket() {
           .on('fileListConsumer', (data) => {
             $('#fileSent').hide();
             $('#fileSentError').hide();
-            this.addFileToDownloadList(data);
+            addFileToDownloadList(data);
 
             if (isSidebarCollapsed || openTab !== 'fileShare') {
               unreadFiles += 1;
@@ -561,7 +563,7 @@ function ConnectSocket() {
           })
           .on('fileListAgent', (data) => {
             // file sent confirmation
-            this.addFileToSentList(data);
+            addFileToSentList(data);
             $('#fileInput').val('');
             $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');
           })
@@ -642,14 +644,17 @@ function ConnectSocket() {
           })
           .on('caption-translated', (transcripts) => {
             console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
-            this.updateCaptions(transcripts);
+            // eslint-disable-next-line no-use-before-define
+            updateCaptions(transcripts);
           })
           .on('multiparty-caption', (data) => {
-            this.updateCaptions(data);
+            // eslint-disable-next-line no-use-before-define
+            updateCaptions(data);
           })
           .on('consumer-caption', (transcripts) => {
             // receiving own captions
-            this.updateCaptions(transcripts);
+            // eslint-disable-next-line no-use-before-define
+            updateCaptions(transcripts);
           });
       } else {
         // need to handle bad connections?
@@ -792,6 +797,7 @@ function captionsMuted() {
   return muteCaptionsOffIcon.style.display === 'block';
 }
 
+// eslint-disable-next-line no-unused-vars -- used in complaint_form.ejs
 function toggleCaptions() {
   if (!captionsMuted()) {
     captionsOn = false;
@@ -839,11 +845,12 @@ function setFeedbackText(text) {
 
 // setup for the call. creates and starts the User Agent (UA) and registers event handlers
 // This uses the new ACE Kurento object rather than JsSIP
+// eslint-disable-next-line no-unused-vars
 function registerJssip(myExtension, myPassword) {
   const eventHandlers = {
     connected: (e) => {
       console.log(`--- WV: Connected ---\n${e}`);
-      callTerminated = false;
+      // callTerminated = false;
     },
     accepted: (e) => {
       console.log(`--- WV: UA accepted ---\n${e}`);
@@ -898,7 +905,7 @@ function registerJssip(myExtension, myPassword) {
             socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
 
             setTimeout(() => {
-              screenShareEnabled = false;
+              // screenShareEnabled = false;
               if (acekurento) acekurento.screenshare(false);
             }, 500);
           } else if (acekurento) {
@@ -1023,6 +1030,7 @@ function toggleTranscripts(video) {
 }
 
 // CALL FLOW FUNCTIONS
+// eslint-disable-next-line no-unused-vars -- used in complaint_form.ejs
 function enterQueue() {
   callAlreadyTerminated = false;
   if ($('#instructionsVideoTranscript').is(':visible')) {
@@ -1074,6 +1082,7 @@ function endCall(userInitiated = false) {
       // close the transcript when closing the modal
       toggleTranscripts('noAgents');
     }
+    // eslint-disable-next-line no-undef -- defined in ./dialog.js
     closeDialog($('#noAgentsHangUpButton')[0]);
   } else if (callAnswered) {
     // Arrives here when a consumer ends a call that was connected with agent
@@ -1092,13 +1101,14 @@ function endCall(userInitiated = false) {
         // close the transcript when closing the modal
         toggleTranscripts('pleaseWait');
       }
+      // eslint-disable-next-line no-undef -- defined in ./dialog.js
       closeDialog($('#waitingHangUpButton')[0]);
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
 
       setTimeout(() => {
-        location = complaintRedirectUrl;
+        window.location = complaintRedirectUrl;
       }, 10000);
       captionsEnd();
     } else {
@@ -1191,7 +1201,7 @@ function startCallTimer() {
   let seconds = 0;
   const start = new Date();
 
-  callTimer = setInterval(function () {
+  callTimer = setInterval(() => {
     const temp = Math.round(new Date() - start) / 1000;
     minutes = Math.floor(temp / 60) > 0 ? Math.floor(temp / 60) : 0;
     seconds = Math.floor((temp - (minutes * 60)));
@@ -1208,7 +1218,7 @@ function terminateCall() {
     acekurento.stop(false);
     acekurento = null;
   }
-  callTerminated = true;
+  // callTerminated = true;
   // monitorExt = null;
 
   //  $('#fileInput').prop('disabled', true);
@@ -1261,6 +1271,7 @@ function unmuteAudio() {
   }
 }
 
+// eslint-disable-next-line no-unused-vars -- used in complaint_form.ejs
 function enableVideoPrivacy() {
   $('#hide-video').blur();
   // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera')
@@ -1280,8 +1291,8 @@ function enableVideoPrivacy() {
         acekurento.enableDisableTrack(false, false); // mute video
         muteAudio(); //
         captionsEnd();
-        hideVideoButton.setAttribute('onclick', 'javascript: disableVideoPrivacy();');
-        hideVideoIcon.style.display = 'block';
+        hideVideoButton.setAttribute('onclick', 'disableVideoPrivacy();');
+        // hideVideoIcon.style.display = 'block';
         acekurento.privateMode(true, privacyVideoUrl);
         socket.emit('reinvite-monitor', { monitorExt });
       }, 500);
@@ -1295,6 +1306,7 @@ function enableVideoPrivacy() {
   }
 }
 
+// eslint-disable-next-line no-unused-vars
 function disableVideoPrivacy() {
   $('#hide-video').blur();
   // $('#mute-camera-off-icon').removeClass('call-btn-icon fa fa-video-camera')
@@ -1314,10 +1326,10 @@ function disableVideoPrivacy() {
         acekurento.enableDisableTrack(true, false); // unmute video
         unmuteAudio(); //
         captionsStart();
-        hideVideoButton.setAttribute('onclick', 'javascript: enableVideoPrivacy();');
-        hideVideoIcon.style.display = 'none';
+        hideVideoButton.setAttribute('onclick', 'enableVideoPrivacy();');
+        // hideVideoIcon.style.display = 'none';
         acekurento.privateMode(false);
-        hideVideoIcon.style.display = 'none';
+        // hideVideoIcon.style.display = 'none';
         socket.emit('reinvite-monitor', { monitorExt });
       }, 500);
     } else {
@@ -1342,6 +1354,7 @@ function logout() {
   window.location.href = './logout';
 }
 
+// eslint-disable-next-line no-unused-vars -- used in complaint_form.ejs
 function toggleScreenShare(toggle) {
   $('#startScreenshare').blur();
   isScreenshareRestart = true;
@@ -1374,6 +1387,7 @@ function toggleScreenShare(toggle) {
   }
 }
 
+// eslint-disable-next-line no-unused-vars -- used in complaint_form.ejs
 function enterFullscreen() {
   const webcamContainer = document.getElementById('fullscreen-element');
 
@@ -1422,10 +1436,10 @@ function exitFullscreen() {
   }
 }
 
-function showFileShareConfirmation() {
-  // just showing a confirmation to demo UI
-  $('#fileSent').show();
-}
+// function showFileShareConfirmation() {
+//   // just showing a confirmation to demo UI
+//   $('#fileSent').show();
+// }
 
 $('#dropup-menu').on('shown.bs.dropdown', () => {
   emojiToggle = true;
@@ -1435,7 +1449,7 @@ $('#dropup-menu').on('shown.bs.dropdown', () => {
 //   emojiToggle = false;
 // });
 
-$('#newchatmessage').on('keyup change keydown paste input', function (evt) {
+$('#newchatmessage').on('keyup change keydown paste input', (evt) => {
   if (evt.keyCode === 13) {
     evt.preventDefault();
     if ($('#newchatmessage').val() !== '' && !emojiToggle) {
@@ -1489,6 +1503,7 @@ $('#fileInput').on('change', () => {
   });
 });
 
+// eslint-disable-next-line no-unused-vars -- used in copmlaint_form.ejs
 function removeFile() {
   $('#fileInput')[0].value = '';
   $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');
@@ -1542,7 +1557,7 @@ $('#chatsend').submit((evt) => {
   $('#chatcounter').text('500');
   setColumnSize();
   console.log('sent message with language', language);
-  isTyping = false;
+  // isTyping = false;
   socket.emit('chat-message', {
     message: msg,
     timestamp,
@@ -1552,6 +1567,7 @@ $('#chatsend').submit((evt) => {
   });
 });
 
+// eslint-disable-next-line no-unused-vars -- used in complaint_form.ejs
 function addEmoji(emoji) {
   let value = $('#newchatmessage').val();
   const displayname = $('#displayname').val();
@@ -1645,6 +1661,7 @@ function newChatMessage(data) {
 
 // file share logic
 // Fileshare for consumer portal
+// eslint-disable-next-line no-unused-vars -- used in complaint_form.ejs
 function shareFileConsumer() {
   $('#fileSent').hide();
   $('#fileSentError').hide();
@@ -1850,7 +1867,7 @@ function setOtherFontSize(size) {
       $('#newchatmessage').css('height', `${$('#newchatmessage')[0].scrollHeight}px`);
     }
     $('#chatBody').removeClass('active');
-  } else {
+  } else if (!$('#fileBody').hasClass('active')) {
     // the chat tab is open
     if ($('#newchatmessage').val() === '') {
       $('#newchatmessage').css('height', $('#chat-send').css('height'));
@@ -1862,6 +1879,7 @@ function setOtherFontSize(size) {
   }
 }
 
+// eslint-disable-next-line no-unused-vars -- used in complaint_form.ejs
 function setFontSize(size) {
   $('.fontSizeButtons').blur();
   const currentFontSize = $('.currentFontSize').text().split('%')[0];
@@ -1910,7 +1928,7 @@ function collapseSidebar(tab) {
 
     if (tab !== '') {
       // open the selected tab
-      $('#' + tab).addClass('active');
+      $(`#${tab}`).addClass('active');
       if (tab === 'fileShareTab') {
         $('#fileBody').addClass('active');
         $('#fileShareTab').addClass('active');
@@ -2022,11 +2040,12 @@ function collapseSidebar(tab) {
   }
 }
 
+// eslint-disable-next-line no-unused-vars -- used in complaint_form.ejs
 function toggleTab(tab) {
   if (isSidebarCollapsed) {
     // open sidebar
     collapseSidebar(tab);
-  } else {
+  } else if (!isSidebarCollapsed) {
     if (tab === 'chatTab') {
       $('#chatTab').addClass('active');
       $('#chatTab').attr('aria-selected', 'true');
@@ -2060,6 +2079,7 @@ function toggleTab(tab) {
   setColumnSize();
 }
 
+// eslint-disable-next-line no-unused-vars -- used in complaint_form.ejs
 function redirectToVideomail() {
   if (acekurento != null) {
     acekurento.eventHandlers = Object.assign(acekurento.eventHandlers, {
@@ -2075,6 +2095,7 @@ function redirectToVideomail() {
 }
 
 let recognition = null;
+let lastResult;
 function captionsStart() {
   isCaptioning = true;
   let language = $('#language-select').val();
@@ -2115,25 +2136,26 @@ function captionsStart() {
     default:
       language = 'en-US';
   }
+  // eslint-disable-next-line new-cap, no-undef
   recognition = new webkitSpeechRecognition();
   recognition.continuous = true;
   recognition.lang = language;
   recognition.interimResults = true;
   recognition.maxAlternatives = 1;
-  recognition.onresult = function (event) {
+  recognition.onresult = (event) => {
     if (!isMuted && event && event.results && (event.results.length > 0)) {
-      const lastResult = event.results.length - 1;
+      lastResult = event.results.length - 1;
 
       socket.emit('caption-consumer', {
         transcript: event.results[lastResult][0].transcript,
         final: event.results[lastResult].isFinal,
-        language: language,
+        language,
         extension: exten
       });
     } else if (isMuted && event?.results && recognitionStarted) {
       // Resend any partial captions as Final
       let transcript = '';
-      for (let i = 0; i < event.results.length; i++) {
+      for (let i = 0; i < event.results.length; i += 1) {
         if (!event.results[i].isFinal) {
           transcript += (event.results[i][0].transcript);
         }
@@ -2141,21 +2163,21 @@ function captionsStart() {
 
       if (transcript === '') {
         // If speaking slowly, the caption will be set to final. Make sure it still gets sent
-        var lastResult = event.results.length - 1;
+        lastResult = event.results.length - 1;
         transcript = event.results[lastResult][0].transcript;
       }
 
       socket.emit('caption-consumer', {
-        transcript: transcript,
+        transcript,
         final: true,
-        language: language,
+        language,
         extension: exten
       });
       captionsEnd();
     }
   };
 
-  recognition.onend = function (_event) {
+  recognition.onend = (_event) => {
     if (!isMuted) {
       captionsStart();
     } else {
