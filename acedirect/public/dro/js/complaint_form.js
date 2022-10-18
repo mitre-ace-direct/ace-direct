@@ -8,6 +8,7 @@
   complaintRedirectDesc: writable
   complaintRedirectUrl: writable
   ACEKurento
+  dayjs
 */
 
 let socket;
@@ -487,7 +488,7 @@ function ConnectSocket() {
               $('#agent-name').text(firstname[0]); // TODO add to communicating header
               $('#CommunicationText').text(`You are communicating with ${firstname[0]}`);
               // $('#agent-name-box').show();
-              agentExtension = data.vrs;
+              // agentExtension = data.vrs;
               $('.agentChatName').text(` with ${firstname[0]}`);
             }
           })
@@ -504,8 +505,25 @@ function ConnectSocket() {
             $('#newchatmessage').val('');
             $('#chat-messages').removeClass('populatedMessages');
             $('#chat-messages').addClass('emptyMessages');
-            $('#chat-messages').html('<div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble chat-body2" id="rtt-typing" style="min-height: 20px; display: none;"></div>\
-            <span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No messages yet to display</span>');
+
+            const chatContentsDiv = document.createElement('div');
+            chatContentsDiv.addClass('direct-chat-timestamp');
+            chatContentsDiv.addClass('text-bold');
+            chatContentsDiv.addClass('alert');
+            chatContentsDiv.addClass('alert-secondary');
+            chatContentsDiv.addClass('rttChatBubble');
+            chatContentsDiv.addClass('chat-body2');
+            chatContentsDiv.setAttribute('id', 'rtt-typing');
+            chatContentsDiv.style.minHeight('20px');
+            chatContentsDiv.style.display('none');
+            const chatContentsSpan = document.createElement('span');
+            chatContentsSpan.setAttribute('id', 'emptyChat');
+            chatContentsSpan.text('This is the start of your chat');
+            const innerChatContentsSpan = document.createElement('span');
+            innerChatContentsSpan.addClass('agentChatName');
+            chatContentsSpan.append(innerChatContentsSpan);
+            chatContentsDiv.append(chatContentsSpan);
+            $('#chat-messages').html(chatContentsDiv);
 
             // reset buttons and ticket form
             $('#ticketNumber').text('');
@@ -520,7 +538,7 @@ function ConnectSocket() {
               $('#callEndedModal').modal('show');
 
               setTimeout(() => {
-                location = complaintRedirectUrl;
+                window.location = complaintRedirectUrl;
               }, 10000);
             }
           })
@@ -534,7 +552,7 @@ function ConnectSocket() {
           .on('fileListConsumer', (data) => {
             $('#fileSent').hide();
             $('#fileSentError').hide();
-            addFileToDownloadList(data);
+            this.addFileToDownloadList(data);
 
             if (isSidebarCollapsed || openTab !== 'fileShare') {
               unreadFiles += 1;
@@ -543,7 +561,7 @@ function ConnectSocket() {
           })
           .on('fileListAgent', (data) => {
             // file sent confirmation
-            addFileToSentList(data);
+            this.addFileToSentList(data);
             $('#fileInput').val('');
             $('#shareFileConsumer').attr('disabled', true).css('background-color', 'rgb(15, 42, 66)');
           })
@@ -624,14 +642,14 @@ function ConnectSocket() {
           })
           .on('caption-translated', (transcripts) => {
             console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
-            updateCaptions(transcripts);
+            this.updateCaptions(transcripts);
           })
           .on('multiparty-caption', (data) => {
-            updateCaptions(data);
+            this.updateCaptions(data);
           })
-          .on('consumer-caption', function (transcripts) {
+          .on('consumer-caption', (transcripts) => {
             // receiving own captions
-            updateCaptions(transcripts);
+            this.updateCaptions(transcripts);
           });
       } else {
         // need to handle bad connections?
@@ -645,7 +663,7 @@ function ConnectSocket() {
 }
 ConnectSocket();
 
-const setColumnSize = function () {
+function setColumnSize() {
   let acceleratedBannerHeight = 0;
   if ($('#hardware-acc-warning').is(':visible')) {
     acceleratedBannerHeight = $('#hardware-acc-warning').height();
@@ -656,7 +674,6 @@ const setColumnSize = function () {
   const fileShareSeparator = document.getElementById('fileshare-separator');
   const footer = document.getElementById('footer-container-consumer');
   const tabsTop = chatSeparator.getBoundingClientRect().bottom
- 
     || fileShareSeparator.getBoundingClientRect().bottom;
   const chatHeight = footer.getBoundingClientRect().top - tabsTop;
   const fileshareHeight = footer.getBoundingClientRect().top - tabsTop;
@@ -670,8 +687,9 @@ const setColumnSize = function () {
     } else {
       newChatMessageHeight = newChatTextSize * 6; // increase textarea height as zoom increases
     }
-  } else { // limit the textarea height to 6x default browser font height
-    if(defaultBrowserFontSize * 6 > newChatMessageHeight){
+  // limit the textarea height to 6x default browser font height
+  } else if (Number.isNaN(newChatTextSize)) {
+    if (defaultBrowserFontSize * 6 > newChatMessageHeight) {
       $('#newchatmessage').css('max-height', `${defaultBrowserFontSize * 6}px`);
     } else {
       newChatMessageHeight = defaultBrowserFontSize * 6;
@@ -712,7 +730,7 @@ const setColumnSize = function () {
 
   // set remote video column width
   $('#remoteViewCol').width(`${($('#callVideosRow').width() - $('#selfViewCol').width()) - 19}px`);
-};
+}
 setColumnSize();
 window.addEventListener('resize', setColumnSize);
 
@@ -729,7 +747,7 @@ function refreshCaptions() {
     currentCaptions.forEach((caption, _index) => {
       const date = dayjs(caption.timestamp);
       const timestamp = date.format('h:mm a');
-      $('#currentCaptions').prepend('<li><span class="timestamp">' + timestamp + '</span> <span class="speaker">' + caption.displayname + '</span> <span class="caption">' + caption.transcript + '</span></li>');
+      $('#currentCaptions').prepend(`<li><span class="timestamp">${timestamp}</span> <span class="speaker">${caption.displayname}</span> <span class="caption">${caption.transcript}</span></li>`);
     });
   }
 
@@ -737,7 +755,7 @@ function refreshCaptions() {
   historicalCaptions.forEach((caption, _index) => {
     const date = dayjs(caption.timestamp);
     const timestamp = date.format('h:mm a');
-    $('#historicalCaptions').append('<li><span class="timestamp">' + timestamp + '</span> <span class="speaker">' + caption.displayname + '</span> <span class="caption">' + caption.transcript + '</span></li>');
+    $('#historicalCaptions').append(`<li><span class="timestamp">${timestamp}</span> <span class="speaker">${caption.displayname}</span> <span class="caption">${caption.transcript}</span></li>`);
   });
 }
 
