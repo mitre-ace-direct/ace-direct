@@ -52,6 +52,7 @@ const historicalCaptions = [];
 let recognitionStarted = false;
 let body1globalFontSize;
 let body2globalFontSize;
+let wasMutedBeforePrivacy = false;
 let currentPosition;
 
 let exten;
@@ -1240,6 +1241,7 @@ function terminateCall() {
 
 // mutes self audio so remote cannot hear you
 let isMuted = false;
+
 function muteAudio() {
   $('#mute-audio-icon').removeClass('call-btn-icon fa fa-microphone').addClass('call-btn-icon fa fa-microphone-slash');
   $('#mute-audio').attr('onclick', 'unmuteAudio()');
@@ -1282,14 +1284,24 @@ function enableVideoPrivacy() {
   );
   $('#hide-video').attr('onclick', 'disableVideoPrivacy()');
   $('#hide-video').attr('aria-label', 'Disable Video Privacy');
-  setFeedbackText('Video is off!');
   if (acekurento !== null) {
+    if (isMuted) {
+      wasMutedBeforePrivacy = true;
+    } else {
+      wasMutedBeforePrivacy = false;
+    }
+
     if (acekurento.isMonitoring) {
       socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
       setTimeout(() => {
         selfStream.classList.remove('mirror-mode');
         acekurento.enableDisableTrack(false, false); // mute video
-        muteAudio(); //
+        if (!isMuted) {
+          muteAudio();
+          setFeedbackText('Video is off and audio muted!');
+        } else {
+          setFeedbackText('Video is off!');
+        }
         captionsEnd();
         hideVideoButton.setAttribute('onclick', 'disableVideoPrivacy();');
         // hideVideoIcon.style.display = 'block';
@@ -1299,7 +1311,13 @@ function enableVideoPrivacy() {
     } else {
       selfStream.classList.remove('mirror-mode');
       acekurento.enableDisableTrack(false, false); // mute video
-      muteAudio(); //
+      if (!isMuted) {
+        muteAudio();
+        setFeedbackText('Video is off and audio muted!');
+      } else {
+        setFeedbackText('Video is off!');
+      }
+
       captionsEnd();
       acekurento.privateMode(true, privacyVideoUrl);
     }
@@ -1324,7 +1342,12 @@ function disableVideoPrivacy() {
       setTimeout(() => {
         selfStream.classList.add('mirror-mode');
         acekurento.enableDisableTrack(true, false); // unmute video
-        unmuteAudio(); //
+        if (!wasMutedBeforePrivacy) {
+          unmuteAudio(); //
+          setFeedbackText('Video is on and audio unmuted!');
+        } else {
+          setFeedbackText('Video is on!');
+        }
         captionsStart();
         hideVideoButton.setAttribute('onclick', 'enableVideoPrivacy();');
         // hideVideoIcon.style.display = 'none';
@@ -1335,7 +1358,12 @@ function disableVideoPrivacy() {
     } else {
       selfStream.classList.add('mirror-mode');
       acekurento.enableDisableTrack(true, false); // unmute video
-      unmuteAudio(); //
+      if (!wasMutedBeforePrivacy) {
+        unmuteAudio();
+        setFeedbackText('Video is on and audio unmuted!');
+      } else {
+        setFeedbackText('Video is on!');
+      }
       captionsStart();
       acekurento.privateMode(false);
     }
