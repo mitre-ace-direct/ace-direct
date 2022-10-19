@@ -156,7 +156,7 @@ $(document).ready(() => {
   // update the page height when the accelerated hardware banner appears/disappears
   const observer = new MutationObserver((_mutations) => {
     console.log('setting setColumnSize()');
-    this.setColumnSize();
+    setColumnSize();
   });
   // const observer = new MutationObserver(function (_mutations) {
   //   console.log('setting setColumnSize()');
@@ -316,7 +316,7 @@ function ConnectSocket() {
                   connected: (_e) => {
                     console.log('--- WV: Connected ---\n');
                     // register with the given extension
-                    this.registerJssip(data.extension, data.password);
+                    registerJssip(data.extension, data.password);
                     startCall(asteriskSipUri); // calling asterisk to get into the queue
                   },
                   registerResponse: (error) => {
@@ -402,7 +402,7 @@ function ConnectSocket() {
                 */
           })
           .on('chat-message-new-translated', (data) => {
-            this.newChatMessage(data);
+            newChatMessage(data);
           })
           .on('translate-language-error', (error) => {
             console.error('Translation error:', error);
@@ -547,9 +547,9 @@ function ConnectSocket() {
           })
           .on('error', (reason) => {
             if (reason.code === 'invalid_token') {
-              this.logout('Session has expired');
+              logout('Session has expired');
             } else {
-              this.logout(`An Error Occurred: ${JSON.stringify(reason)}`);
+              logout(`An Error Occurred: ${JSON.stringify(reason)}`);
             }
           })
           .on('fileListConsumer', (data) => {
@@ -1477,7 +1477,7 @@ $('#dropup-menu').on('shown.bs.dropdown', () => {
 //   emojiToggle = false;
 // });
 
-$('#newchatmessage').on('keyup change keydown paste input', (evt) => {
+$('#newchatmessage').on('keyup change keydown paste input', function (evt) {
   if (evt.keyCode === 13) {
     evt.preventDefault();
     if ($('#newchatmessage').val() !== '' && !emojiToggle) {
