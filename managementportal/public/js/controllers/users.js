@@ -3,6 +3,7 @@ let selectedUser = 0;
 let socket;
 let agentExt;
 let agentUsername;
+let agentProfilePicture;
 
 function checkProfilePic(username) {
   $.ajax({
@@ -136,6 +137,7 @@ $(document).ready(() => {
       (result, _status) => {
         console.log(`GetAgent returned: ${JSON.stringify(result)}`);
 
+        agentProfilePicture = result.profile_picture;
         checkProfilePic(result.username);
 
         agentExt = result.extension;
@@ -260,9 +262,11 @@ $(document).ready(() => {
       organization: $('#inputOrganization').val(),
       extension: $('#inputExtension').val(),
       queue_id: ($('#inputComplaintsQueue').prop('checked')) ? ($('#inputComplaintsQueue').val()) : 0,
-      queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0
+      queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0,
+      profile_picture: agentProfilePicture
     },
     (data, _status) => {
+      console.log(data, _status);
       if (data.result === 'success') {
         // console.log(`POST succ: ${JSON.stringify(data)}`);
         $('#actionError').attr('hidden', true);
@@ -278,15 +282,18 @@ $(document).ready(() => {
     });
 
     const file = document.getElementById('profile-pic-file-upload').files[0];
-    const fileExt = file.name.split('.')[1].toLowerCase();
-    socket.emit('profile-pic-set', {
-      picture: file,
-      agentExtension: agentExt,
-      agentUsername,
-      fileExt
-    }, (res) => {
-      console.log(res);
-    });
+    console.log(typeof file !== 'undefined');
+    if (typeof file !== 'undefined') {
+      const fileExt = file.name.split('.')[1].toLowerCase();
+      socket.emit('profile-pic-set', {
+        picture: file,
+        agentExtension: agentExt,
+        agentUsername,
+        fileExt
+      }, (res) => {
+        console.log(res);
+      });
+    }
   });
 
   function getBulkDeleteAgentList() {

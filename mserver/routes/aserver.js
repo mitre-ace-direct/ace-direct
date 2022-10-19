@@ -414,7 +414,7 @@ const appRouter = (connection, asterisk) => {
         } else if (rows.length > 0) {
           console.log(JSON.stringify(rows));
           extensionId = rows[0].id;
-          console.log(`extension_id after query is: ${extensionId}`);
+          // console.log(`extension_id after query is: ${extensionId}`);
           resolve(extensionId);
         } else {
           console.log('extension not found in asterisk_extensions table');
@@ -454,12 +454,16 @@ const appRouter = (connection, asterisk) => {
             message: 'Success!'
           });
         }
+        console.log('Failed, no affected rows for', extension);
         return res.status(200).send({
           message: 'Failed!'
         });
       });
     },
-    (error) => res.status(200).send({ message: error }));
+    (error) => {
+      console.log('Error looking up extension', extension, error);
+      res.status(200).send({ message: error });
+    });
   });
 
   /**
@@ -557,7 +561,7 @@ const appRouter = (connection, asterisk) => {
             } else if (rows.length > 0) {
               console.log(JSON.stringify(rows));
               extensionId = rows[0].id;
-              console.log(`extension_id after query is: ${extensionId}`);
+              // console.log(`extension_id after query is: ${extensionId}`);
               resolve(extensionId);
             } else {
               console.log('extension not found in asterisk_extensions table');
