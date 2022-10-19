@@ -46,20 +46,20 @@ const validator = require('./utils/validator');
 
 const getAgent = (usnm) => {
   return new Promise((resolve, reject) => {
-    console.log('Getting agent! Username: ', usnm)
-    console.log('get agent link', `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`)
+    // console.log('Getting agent! Username: ', usnm)
+    // console.log('get agent link', `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`)
     request({
       method: 'GET',
       headers : {'Accept': 'application/json'},
       url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`,
     }, function (error, response, data) {
       if (error) {
-        console.log("Error! Could not get agent:", error);
+        console.error("Error! Could not get agent:", error);
         reject(error)
       } else {
-        console.log("Success! Agent found!");
-        console.log('Data: ', typeof data)
-        console.log("TEXT " + JSON.parse(data));
+        // console.log("Success! Agent found!");
+        // console.log('Data: ', typeof data)
+        // console.log("TEXT " + JSON.parse(data));
         if(data.length > 0) {
           var jsonData = JSON.parse(data)
           resolve(jsonData)
