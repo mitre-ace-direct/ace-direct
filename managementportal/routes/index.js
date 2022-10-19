@@ -656,7 +656,7 @@ router.get('/ProfilePic/:username', (req, res) => {
       };
       s3.getObject(options, (err, data1) => {
         if (err) {
-          throw new Error(err);
+          console.error('Error retrieving s3 object', err);
         } else {
           console.log('success! Data retrieved:', data1.Body);
           image = data1.Body;

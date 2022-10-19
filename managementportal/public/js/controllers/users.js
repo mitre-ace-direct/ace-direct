@@ -246,6 +246,9 @@ $(document).ready(() => {
       return;
     }
 
+    /* This is a little kludgey.  The call to ./UpdateAgent nukes the profile pic and
+     then the emit to profile-pic-set below resets it correctly */
+
     $.post('./UpdateAgent', {
       agent_id: selectedUser,
       username: $('#inputUsername').val(),
@@ -272,6 +275,17 @@ $(document).ready(() => {
         $('#actionError').show();
         $('#btnUpdateAgent').prop('disabled', false);
       }
+    });
+
+    const file = document.getElementById('profile-pic-file-upload').files[0];
+    const fileExt = file.name.split('.')[1].toLowerCase();
+    socket.emit('profile-pic-set', {
+      picture: file,
+      agentExtension: agentExt,
+      agentUsername,
+      fileExt
+    }, (res) => {
+      console.log(res);
     });
   });
 
@@ -394,14 +408,14 @@ function setProfilePic() {
 
       console.log('Emitting profile-pic-set event now...');
 
-      socket.emit('profile-pic-set', {
-        picture: file,
-        agentExtension: agentExt,
-        agentUsername,
-        fileExt
-      }, (res) => {
-        console.log(res);
-      });
+      // socket.emit('profile-pic-set', {
+      //   picture: file,
+      //   agentExtension: agentExt,
+      //   agentUsername,
+      //   fileExt
+      // }, (res) => {
+      //   console.log(res);
+      // });
     };
   }
 }

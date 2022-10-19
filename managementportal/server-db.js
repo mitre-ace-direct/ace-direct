@@ -96,8 +96,8 @@ const updateAgent = (aId, first, last, role, phone, email, org, isApp, isAct, ex
         reject(error)
       } else {
         console.log("**Updating the agent was a success!**");
-        console.log('response:', response)
-        console.log('data:', data)
+        // console.log('response:', response)
+        // console.log('data:', data)
       }
     });
   });
@@ -1522,7 +1522,7 @@ io.sockets.on('connection', (socket) => {
     var getParams = { Bucket : datConfig.s3.bucketname, Key : agentExt+'.'+fileExt }
     var uploadParams = { ...getParams, Body : profilePic, ContentType : 'image/*' }
 
-    //console.log("Upload parameters: " + JSON.stringify(uploadParams))
+    // console.log("Upload parameters: " + JSON.stringify(uploadParams))
 
     s3.getObject(getParams, (err, data) => {
       if(err) {
