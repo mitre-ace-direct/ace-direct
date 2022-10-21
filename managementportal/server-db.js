@@ -1509,7 +1509,6 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('profile-pic-set', (data, callback) => {
-    console.log('Profile Picture Set!')
     callback("Emitter signal received!")
 
     var profilePic = data.picture
@@ -1545,11 +1544,11 @@ io.sockets.on('connection', (socket) => {
         })
       } else {
         s3.deleteObject(getParams, (err, data) => {
-          if(err) console.log(err)
-          else {
-            console.log(data)
+          if (err) {
+            console.log('Error deleting object', err)
+          } else {
             s3.upload(uploadParams, (err) => {
-              if(err) {
+              if (err) {
                 console.log("Error! Could not upload to S3 bucket: " + err)
               } else {
                 getAgent(agentUsnm).then(agentInfoArray => {
