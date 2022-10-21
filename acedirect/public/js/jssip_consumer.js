@@ -1,3 +1,19 @@
+/* global
+  acekurento:writable,
+  clearScreen,
+  complaintRedirectActive,
+  complaintRedirectUrl,
+  complaintRedirectDesc,
+  disableChatButtons,
+  enableInitialButtons,
+  isOpen,
+  maxRecordingSeconds:writable,
+  nginxPath,
+  remoteView,
+  selfView,
+  socket,
+  videomailflag:writable */
+
 let ua;
 let currentSession;
 let remoteStream = document.getElementById('remoteView');
@@ -10,10 +26,11 @@ const muteCaptionsOffIcon = document.getElementById('mute-captions-off-icon');
 const transcriptOverlay = document.getElementById('transcriptoverlay');
 const hideVideoIcon = document.getElementById('mute-camera-off-icon');
 const holdButton = document.getElementById('hold-call');
-// Eslint wants this to be a const but it is edited in complaint_form
-let maxRecordingSeconds = 90;
+
+maxRecordingSeconds = 90;
 let callTerminated = false;
 // const privacyVideoUrl = window.location.origin + '/' + nginxPath + '/media/videoPrivacy.webm';
+
 const privacyVideoUrl = `${window.location.origin}/${nginxPath}/media/videoPrivacy.webm`;
 let monitorExt;
 
@@ -48,7 +65,7 @@ function hideCaptions() {
   $('#consumer-divider').hide();
 }
 
-// toggles showing the call option buttons at the bottom of the video window (ie end call, mute, etc).
+// toggles showing call option buttons at the bottom of the video window (ie end call, mute, etc).
 // The buttons themselves are in acedirect and the complaint_form, this simply un-hides them
 // @param make_visible: boolean whether or not to show the call option buttons
 function toggleIncallButtons(makeVisible) {
@@ -103,7 +120,7 @@ function enableVideoPrivacy() {
       setTimeout(() => {
         selfStream.classList.remove('mirror-mode');
         acekurento.enableDisableTrack(false, false); // mute video
-        hideVideoButton.setAttribute('onclick', 'javascript: disableVideoPrivacy();');
+        hideVideoButton.setAttribute('onclick', 'disableVideoPrivacy();');
         hideVideoIcon.style.display = 'block';
         acekurento.privateMode(true, privacyVideoUrl);
         socket.emit('reinvite-monitor', { monitorExt });
@@ -111,7 +128,7 @@ function enableVideoPrivacy() {
     } else {
       selfStream.classList.remove('mirror-mode');
       acekurento.enableDisableTrack(false, false); // mute video
-      hideVideoButton.setAttribute('onclick', 'javascript: disableVideoPrivacy();');
+      hideVideoButton.setAttribute('onclick', 'disableVideoPrivacy();');
       hideVideoIcon.style.display = 'block';
       acekurento.privateMode(true, privacyVideoUrl);
     }
@@ -125,7 +142,7 @@ function disableVideoPrivacy() {
       setTimeout(() => {
         selfStream.classList.add('mirror-mode');
         acekurento.enableDisableTrack(true, false); // unmute video
-        hideVideoButton.setAttribute('onclick', 'javascript: enableVideoPrivacy();');
+        hideVideoButton.setAttribute('onclick', 'enableVideoPrivacy();');
         hideVideoIcon.style.display = 'none';
         acekurento.privateMode(false);
         hideVideoIcon.style.display = 'none';
@@ -134,7 +151,7 @@ function disableVideoPrivacy() {
     } else {
       selfStream.classList.add('mirror-mode');
       acekurento.enableDisableTrack(true, false); // unmute video
-      hideVideoButton.setAttribute('onclick', 'javascript: enableVideoPrivacy();');
+      hideVideoButton.setAttribute('onclick', 'enableVideoPrivacy();');
       hideVideoIcon.style.display = 'none';
       acekurento.privateMode(false);
       hideVideoIcon.style.display = 'none';
@@ -159,7 +176,7 @@ function removeVideo() {
   remoteView.src = '';
 
   console.log('Disabling video privacy button');
-  hideVideoButton.setAttribute('onclick', 'javascript: enableVideoPrivacy();');
+  hideVideoButton.setAttribute('onclick', 'enableVideoPrivacy();');
   hideVideoIcon.style.display = 'none';
 
   // stops remote track
@@ -232,7 +249,7 @@ function terminateCall() {
   hideCaptions();
 
   // reset the incall mute button
-  muteAudioButton.setAttribute('onclick', 'javascript: muteAudio();');
+  muteAudioButton.setAttribute('onclick', 'muteAudio();');
   muteAudioIcon.classList.add('fa-microphone');
   muteAudioIcon.classList.remove('fa-microphone-slash');
 
@@ -258,7 +275,6 @@ function startRecordProgress() {
   $('#callbutton').prop('disabled', true);
   $('#videomailbutton').prop('disabled', true);
   $('#userformbtn').prop('disabled', true);
-  recordId = setInterval(myFunc, 1000);
   seconds = 0;
 
   function myFunc() {
@@ -274,10 +290,12 @@ function startRecordProgress() {
       $('#recordicon').show();
     }
   }
+  recordId = setInterval(myFunc, 1000);
 }
 
 // setup for the call. creates and starts the User Agent (UA) and registers event handlers
 // This uses the new ACE Kurento object rather than JsSIP
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function registerJssip(myExtension, myPassword) {
   const eventHandlers = {
     connected: (e) => {
@@ -289,7 +307,7 @@ function registerJssip(myExtension, myPassword) {
     },
     newMessage: (e) => {
       console.log('--- WV: New Message ---\n');
-      const consumerLanguage = sessionStorage.consumerLanguage;
+      const { consumerLanguage } = sessionStorage;
 
       console.log(`Consumer's selected language is ${consumerLanguage}`);
 
@@ -365,13 +383,10 @@ function registerJssip(myExtension, myPassword) {
             socket.emit('force-monitor-leave', { monitorExt, reinvite: true });
 
             setTimeout(() => {
-              screenShareEnabled = false;
               if (acekurento) acekurento.screenshare(false);
             }, 500);
-          } else {
-            if (acekurento) {
-              acekurento.screenshare(false);
-            }
+          } else if (acekurento) {
+            acekurento.screenshare(false);
           }
         };
       }
@@ -434,9 +449,11 @@ function registerJssip(myExtension, myPassword) {
 /*
 * Use acekurento object to make the call. Not sure about the extension
 */
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function startCall(otherSipUri) {
   console.log(`startCall: ${otherSipUri}`);
   selfStream.removeAttribute('hidden');
+  // eslint-disable-next-line no-use-before-define -- defined in complaint_form.js
   if (!captionsMuted()) {
     showCaptions();
   }
@@ -446,40 +463,6 @@ function startCall(otherSipUri) {
   $('#shareFileConsumer').removeAttr('disabled');
   // acekurento.call(globalData.queues_complaint_number, false);
   acekurento.call(otherSipUri, false);
-}
-
-function transferToVideomail() {
-  if (currentSession) {
-    currentSession.sendDTMF(1);
-
-    $('#vmwait').show();
-    swapVideo();
-    $('#vmsent').hide();
-    videomailflag = true;
-    $('#record-progress-bar').show();
-    $('#callbutton').prop('disabled', true);
-    $('#userformbtn').prop('disabled', true);
-    $('#videomailbutton').prop('disabled', true);
-  }
-}
-
-function monitorHangup() {
-  socket.emit('force-monitor-leave', { monitorExt, reinvite: false });
-  setTimeout(() => {
-    terminateCall();
-  }, 500);
-}
-
-// terminates the call (if present) and unregisters the ua
-function unregisterJssip() {
-  terminateCall();
-  if (ua) {
-    ua.unregister();
-    ua.terminateSessions();
-    ua.stop();
-  }
-  localStorage.clear();
-  sessionStorage.clear();
 }
 
 // swaps remote and local videos for videomail recording
@@ -496,12 +479,50 @@ function swapVideo() {
   $('#selfView').attr('hidden', true);
 }
 
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
+function transferToVideomail() {
+  if (currentSession) {
+    currentSession.sendDTMF(1);
+
+    $('#vmwait').show();
+    swapVideo();
+    $('#vmsent').hide();
+    videomailflag = true;
+    $('#record-progress-bar').show();
+    $('#callbutton').prop('disabled', true);
+    $('#userformbtn').prop('disabled', true);
+    $('#videomailbutton').prop('disabled', true);
+  }
+}
+
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
+function monitorHangup() {
+  socket.emit('force-monitor-leave', { monitorExt, reinvite: false });
+  setTimeout(() => {
+    terminateCall();
+  }, 500);
+}
+
+// terminates the call (if present) and unregisters the ua
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
+function unregisterJssip() {
+  terminateCall();
+  if (ua) {
+    ua.unregister();
+    ua.terminateSessions();
+    ua.stop();
+  }
+  localStorage.clear();
+  sessionStorage.clear();
+}
+
 // mutes self audio so remote cannot hear you
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function muteAudio() {
   console.log('here mute');
   if (acekurento !== null) {
     acekurento.enableDisableTrack(false, true); // mute audio
-    muteAudioButton.setAttribute('onclick', 'javascript: unmuteAudio();');
+    muteAudioButton.setAttribute('onclick', 'unmuteAudio();');
     muteAudioIcon.classList.add('fa-microphone-slash');
     muteAudioIcon.classList.remove('fa-microphone');
     console.log('here mute2');
@@ -509,10 +530,11 @@ function muteAudio() {
 }
 
 // unmutes self audio so remote can hear you
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function unmuteAudio() {
   if (acekurento !== null) {
     acekurento.enableDisableTrack(true, true); // unmute audio
-    muteAudioButton.setAttribute('onclick', 'javascript: muteAudio();');
+    muteAudioButton.setAttribute('onclick', 'muteAudio();');
     muteAudioIcon.classList.add('fa-microphone');
     muteAudioIcon.classList.remove('fa-microphone-slash');
   }
@@ -523,6 +545,7 @@ function captionsMuted() {
 }
 
 // hide/unhide captions
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function toggleCaptions() {
   if (!captionsMuted()) {
     muteCaptionsOffIcon.style.display = 'block';
@@ -551,6 +574,7 @@ function unhideVideo() {
   }
 }
 
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function toggleSelfview() {
   setTimeout(() => {
     hideVideo();
@@ -563,27 +587,30 @@ function toggleSelfview() {
 // times out and ends call after 30 or so seconds.
 // agent gets event 'ended' with cause 'RTP Timeout'.
 // puts session on hold
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function hold() {
   if (currentSession) {
     const options = {
       useUpdate: true
     };
     currentSession.hold(options);
-    holdButton.setAttribute('onclick', 'javascript: unhold();');
+    holdButton.setAttribute('onclick', 'unhold();');
     holdButton.innerHTML = 'Unhold';
   }
 }
 
-// resumes session
+// resumes
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function unhold() {
   if (currentSession) {
     currentSession.unhold();
-    holdButton.setAttribute('onclick', 'javascript: hold();');
+    holdButton.setAttribute('onclick', 'hold();');
     holdButton.innerHTML = 'Hold';
   }
 }
 
 // Change the style of the video captions
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function changeCaption(id) {
   const value = id.split('-')[1];
   const target = id.split('-')[0];
@@ -606,6 +633,8 @@ function changeCaption(id) {
       case 'white':
         color = `rgba(255,255,255,${alpha})`;
         break;
+      default: // Shouldn't happen
+        color = `rgba(0,0,0,${alpha})`;
     }
     document.documentElement.style.setProperty('--caption-bg-color', color);
   } else if (target === 'font') {
@@ -640,10 +669,11 @@ function createCaptionHtml(displayName, transcripts) {
   return `<span class="timestamp">${timestamp}</span><strong>${displayName}:</strong> ${caption}`;
 }
 
+// eslint-disable-next-line no-use-before-define, no-unused-vars -- used by complaint_form.js
 function updateConsumerCaptions(transcripts) {
   const tDiv = document.getElementById(transcripts.msgid);
   const displayName = `CSR ${$('#agent-name').text()}`;
-  let caption = createCaptionHtml(displayName, transcripts);
+  const caption = createCaptionHtml(displayName, transcripts);
   console.log('--- WV: transcripts.transcript ---\n');
   console.log('consumer uc: ', transcripts);
 
@@ -658,10 +688,6 @@ function updateConsumerCaptions(transcripts) {
   } else {
     tDiv.innerHTML = caption;
     if (transcripts.final || callTerminated) {
-      // setTimeout(function(){tDiv.remove();},5000);
-
-      // var captionBubble = '<div><b>' +transcripts.timestamp + ':</b>&nbsp;'+transcripts.transcript+'<br/><div>';
-      // $(captionBubble).appendTo($('#caption-messages'));
       $('#caption-messages').append(`<div class='agent-scripts'><div class='direct-chat-text'>${transcripts.transcript}</div></div>`);
       $('#caption-messages').scrollTop($('#caption-messages')[0].scrollHeight);
     }
@@ -671,8 +697,8 @@ function updateConsumerCaptions(transcripts) {
 // Default to English
 sessionStorage.consumerLanguage = 'en';
 
-/* global setPreferredLanguage */
 /* eslint no-undef: "error" */
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function setPreferredLanguage() {
   sessionStorage.consumerLanguage = $('#language-select').val();
   let flag = 'us';
@@ -732,6 +758,7 @@ function setPreferredLanguage() {
 // return 'cyan'; // fixme
 // }
 
+// eslint-disable-next-line no-unused-vars -- used by complaint_form.js
 function updateCaptionsMultiparty(transcripts) {
   const temp = document.createElement('div');
   temp.id = transcripts.msgid;
