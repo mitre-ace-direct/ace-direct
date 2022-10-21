@@ -1,9 +1,14 @@
 <style>
+  #consumerNavbar {
+    width: 100vw;
+    display: flex;
+  }
+
   .display-flex-center {
     display: flex;
     align-items: center;
     width: 100%;
-    min-width: 992px;
+    /* min-width: 992px; */
     margin-left: 0px;
   }
 
@@ -20,7 +25,12 @@
     padding-right: 0px !important;
   }
 
-  @media only screen and (max-width: 500px) {
+  @media (max-width: 500px) {
+    #consumerNavbar {
+      justify-content: center;
+      text-align: center;
+    }
+
     .appTitle {
       font-size: 1.3em;
     }

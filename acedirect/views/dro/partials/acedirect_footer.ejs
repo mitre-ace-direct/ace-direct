@@ -6,8 +6,8 @@
     padding: .6em 30px .6em;
     bottom: 0;
     position: absolute;
-    width: 100%;
-    min-width: 1300px;
+    width: 100vw;
+    /* min-width: 1300px; */
     z-index: 9;
   }
 
@@ -19,11 +19,16 @@
     padding-left: .6em;
   }
   
-  @media only screen and (max-width: 500px) {
+  @media (max-width: 500px) {
+    #footer-container-consumer {
+      text-align: center;
+      position: relative;
+    }
+
     #footer-version, #footer-copyright {
       font-size: .8em !important;
+      text-align: center;
     }
-  
   }
 
 </style>
