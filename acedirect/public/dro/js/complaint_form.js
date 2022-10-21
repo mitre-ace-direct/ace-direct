@@ -508,26 +508,7 @@ function ConnectSocket() {
             $('#newchatmessage').val('');
             $('#chat-messages').removeClass('populatedMessages');
             $('#chat-messages').addClass('emptyMessages');
-
-            const chatContentsDiv = document.createElement('div');
-            chatContentsDiv.addClass('direct-chat-timestamp');
-            chatContentsDiv.addClass('text-bold');
-            chatContentsDiv.addClass('alert');
-            chatContentsDiv.addClass('alert-secondary');
-            chatContentsDiv.addClass('rttChatBubble');
-            chatContentsDiv.addClass('chat-body2');
-            chatContentsDiv.setAttribute('id', 'rtt-typing');
-            chatContentsDiv.style.minHeight('20px');
-            chatContentsDiv.style.display('none');
-            const chatContentsSpan = document.createElement('span');
-            chatContentsSpan.setAttribute('id', 'emptyChat');
-            chatContentsSpan.text('This is the start of your chat');
-            const innerChatContentsSpan = document.createElement('span');
-            innerChatContentsSpan.addClass('agentChatName');
-            chatContentsSpan.append(innerChatContentsSpan);
-            chatContentsDiv.append(chatContentsSpan);
-            $('#chat-messages').html(chatContentsDiv);
-
+            $('#chat-messages').html('<div class="direct-chat-timestamp text-bold alert alert-secondary rttChatBubble chat-body2" id="rtt-typing" style="min-height: 20px; display: none;"></div><span id="emptyChat">This is the start of your chat<span class="agentChatName"></span>. No messages yet to display</span>');
             // reset buttons and ticket form
             $('#ticketNumber').text('');
             $('#complaintcounter').text('2,000');
@@ -1083,8 +1064,6 @@ function endCall(userInitiated = false) {
       // close the transcript when closing the modal
       toggleTranscripts('noAgents');
     }
-    // eslint-disable-next-line no-undef -- defined in ./dialog.js
-    closeDialog($('#noAgentsHangUpButton')[0]);
   } else if (callAnswered) {
     // Arrives here when a consumer ends a call that was connected with agent
     if (complaintRedirectActive) {
@@ -1102,8 +1081,6 @@ function endCall(userInitiated = false) {
         // close the transcript when closing the modal
         toggleTranscripts('pleaseWait');
       }
-      // eslint-disable-next-line no-undef -- defined in ./dialog.js
-      closeDialog($('#waitingHangUpButton')[0]);
 
       document.getElementById('noCallPoster').style.display = 'block';
       document.getElementById('inCallSection').style.display = 'none';
@@ -1156,7 +1133,6 @@ function endCall(userInitiated = false) {
         // close the transcript when closing the modal
         toggleTranscripts('pleaseWait');
       }
-      // closeDialog($('#waitingHangUpButton')[0]);
     }
 
     if ($('#optionsModal').is(':visible')) {
@@ -1170,7 +1146,6 @@ function endCall(userInitiated = false) {
         // close the transcript when closing the modal
         toggleTranscripts('instructionsVideo');
       }
-      // closeDialog($('#callQueueButton')[0]);
     }
   }
 
@@ -1473,15 +1448,11 @@ $('#dropup-menu').on('shown.bs.dropdown', () => {
   emojiToggle = true;
 });
 
-// $('#dropup-menu').on('hidden.bs.dropdown', () => {
-//   emojiToggle = false;
-// });
-
 $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
   if (evt.keyCode === 13) {
     evt.preventDefault();
     if ($('#newchatmessage').val() !== '' && !emojiToggle) {
-      $('#chatsend').submit();
+      $('#chatsend').trigger('submit');
     } else if (emojiToggle) {
       emojiToggle = false;
     }
