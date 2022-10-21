@@ -426,7 +426,7 @@ router.post('/UpdateAgent', restrict, (req, res) => {
   const extension = parseInt(req.body.extension, 10);
   const queueId = parseInt(req.body.queue_id, 10);
   const queue2Id = parseInt(req.body.queue2_id, 10);
-  const { profilePicture } = req.body;
+  const profilePicture = req.body.profile_picture;
 
   if (validator.isNameValid(firstName) && validator.isNameValid(lastName)
     && validator.isPasswordComplex(password)
@@ -461,7 +461,6 @@ router.post('/UpdateAgent', restrict, (req, res) => {
         };
 
         logger.debug(`Agent data to be updated: ${JSON.stringify(newAgent)}`);
-
         request.post({
           url,
           json: true,
@@ -659,9 +658,8 @@ router.get('/ProfilePic/:username', (req, res) => {
       };
       s3.getObject(options, (err, data1) => {
         if (err) {
-          console.error('Error retrieving s3 object', err);
+          console.error('Error retrieving s3 object', key, err);
         } else {
-          // console.log('success! Data retrieved:', data1.Body);
           image = data1.Body;
           res.send(image);
         }

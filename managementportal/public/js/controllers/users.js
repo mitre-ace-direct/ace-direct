@@ -266,7 +266,6 @@ $(document).ready(() => {
       profile_picture: agentProfilePicture
     },
     (data, _status) => {
-      console.log(data, _status);
       if (data.result === 'success') {
         // console.log(`POST succ: ${JSON.stringify(data)}`);
         $('#actionError').attr('hidden', true);
