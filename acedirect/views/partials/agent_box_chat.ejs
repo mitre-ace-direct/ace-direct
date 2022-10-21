@@ -29,11 +29,11 @@
         <form name="chatsend" id="chatsend">
             <div class="input-group">
                 <input type="hidden" id="displayname">
-                <input type="text" id="newchatmessage" placeholder="Chat disabled" class="form-control" autocomplete="off" required disabled>
                 <span class="input-group-btn">
                     <div class="dropup">
-                        <button id="chat-emoji" class="btn btn-primary btn-flat" type="button" data-toggle="dropdown"
-                            animation="true" disabled>&#128512;</button>
+                        <button id="chat-emoji" class="btn btn-flat" type="button" data-toggle="dropdown"
+                            animation="true" style="border:2px solid lightgrey; margin-right: 10px; border-radius: 4px !important;" 
+                            aria-label="Select emoji" disabled>&#128512;</button>
                         <div class="dropdown-menu dropdown-multicol" id="emoji-selector"
                             aria-labelledby="dropdownMenuButton" style="height:150px; overflow-y: scroll;">
                             <li role="presentation" class="dropdown-header">Select an Emoji</li>
@@ -83,9 +83,12 @@
                                     value="&#128266;">&#128266;</button>
                             </div>
                         </div>
-                        
-                        <button class="btn btn-primary btn-flat" id="chat-send" type="submit" disabled>Send</button>
                     </div>
+                </span>
+                <textarea type="text" id="newchatmessage" placeholder="Chat disabled" class="form-control col-xs-1 chat-body1" 
+                style="resize: none;font-size: 14px;max-height: 84px;" maxlength="500" autocomplete="off" required disabled></textarea>
+                <span class="input-group-btn" style="vertical-align: bottom;">
+                    <button class="btn btn-primary btn-flat" id="chat-send" type="submit" style="background-color: #073863 !important; margin-left: 10px; border-radius: 6px; border: 2px solid #073863; font-weight:700; font-size: 14px;" disabled>Send</button>
                 </span>
             </div>
         </form>
