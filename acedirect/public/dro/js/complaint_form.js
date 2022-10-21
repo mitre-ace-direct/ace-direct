@@ -1448,15 +1448,11 @@ $('#dropup-menu').on('shown.bs.dropdown', () => {
   emojiToggle = true;
 });
 
-// $('#dropup-menu').on('hidden.bs.dropdown', () => {
-//   emojiToggle = false;
-// });
-
 $('#newchatmessage').on('keyup change keydown paste input', function (evt) {
   if (evt.keyCode === 13) {
     evt.preventDefault();
     if ($('#newchatmessage').val() !== '' && !emojiToggle) {
-      $('#chatsend').submit();
+      $('#chatsend').trigger('submit');
     } else if (emojiToggle) {
       emojiToggle = false;
     }
