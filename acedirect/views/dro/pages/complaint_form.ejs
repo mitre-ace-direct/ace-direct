@@ -333,11 +333,20 @@
 <div id="optionsModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
+      <div class="modal-header" style="padding-bottom: 5px !important;">
         <video muted controls class="video-element" id="instructionsVideo" title="Play Video" tabindex="0">
-          <source src="/media/<%= instructions_video %>" type="video/mp4">
-          <source src="/media/<%= instructions_video %>" type="video/webm">
+          <source src="/media/<%= instructionsVideo %>" type="video/mp4">
+          <source src="/media/<%= instructionsVideo %>" type="video/webm">
         </video>
+        <button type="button" id="instructionsVideoTranscriptBtn" class="btn btn-style btn-block button btn-tertiary" onclick="toggleTranscripts('instructionsVideo')">
+          Show Video Transcript
+          <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>
+        </button>
+        <div id="instructionsVideoTranscript" tabindex="0" aria-hidden="true" hidden>
+          <section class="transcript" role="transcript">
+            <p><%= instructionsVideoTranscript %></p>
+          </section>
+        </div>
       </div>
       <div class="modal-body text-center">
 
@@ -386,14 +395,23 @@
 <div id="waitingModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="waiting-header">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
-      <div class="modal-header text-center">
+      <div class="modal-header text-center" style="padding-bottom: 5px !important;">
         <p id="callingBanner"><b>Calling...</b></p>
         <p class="waiting-header body1" role="heading" aria-level="3" aria-live="assertive" style="padding-bottom:0px"><b>Waiting for the next available agent</b></p>
         <hr />
         <video muted controls class="video-element" id="pleaseWaitVideo" title="Play Video" tabindex="0">
-          <source src="/media/<%= please_wait_video %>" type="video/mp4">
-          <source src="/media/<%= please_wait_video %>" type="video/webm">
+          <source src="/media/<%= pleaseWaitVideo %>" type="video/mp4">
+          <source src="/media/<%= pleaseWaitVideo %>" type="video/webm">
         </video>
+        <button type="button" id="pleaseWaitTranscriptBtn" class="btn btn-style btn-block button btn-tertiary" onclick="toggleTranscripts('pleaseWait')">
+          Show Video Transcript
+          <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>
+        </button>
+        <div id="pleaseWaitTranscript" tabindex="0" aria-hidden="true" hidden>
+          <section class="transcript" role="transcript">
+            <p><%= pleaseWaitVideoTranscript %></p>
+          </section>
+        </div>
       </div>
       <div class="modal-body text-center my-body">
         <div class="row">
@@ -429,13 +447,22 @@
 <div id="noAgentsModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="no-agents-header">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
-      <div class="modal-header text-center">
+      <div class="modal-header text-center" style="padding-bottom: 5px !important;">
         <div class="no-agents-header" aria-live="assertive" style="font-size:26px !important">No agents are available to take your call at this time.</div>
         <hr/>
         <video muted controls class="video-element" id="noAgentsVideo" title="Play Video" tabindex="0">
-          <source src="/media/<%= no_agents_video %>" type="video/mp4">
-          <source src="/media/<%= no_agents_video %>" type="video/webm">
+          <source src="/media/<%= noAgentsVideo %>" type="video/mp4">
+          <source src="/media/<%= noAgentsVideo %>" type="video/webm">
         </video>
+        <button type="button" id="noAgentsTranscriptBtn" class="btn btn-style btn-block button btn-tertiary" onclick="toggleTranscripts('noAgents')">
+          Show Video Transcript
+          <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>
+        </button>
+        <div id="noAgentsTranscript" tabindex="0" aria-hidden="true" aria-label="Video Transcript" hidden>
+          <section class="transcript" role="transcript">
+            <p><%= noAgentsVideoTranscript %></p>
+          </section>
+        </div>
       </div>
       <div class="modal-body text-center my-body">
         <div class="row button-row">
@@ -545,13 +572,13 @@
 
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="./socket.io/socket.io.js"></script>
 <script type="text/javascript" src="/dro/js/complaint_form.js"></script>
 <script type="text/javascript" src="/dro/js/tabs-manual.js"></script>
 <script type="text/javascript" src="/dro/js/dialog.js"></script>
 <script type="text/javascript" src="/assets/js/jwt-decode.js"></script>
 <script type="text/javascript" src="/assets/js/dayjs.min.js"></script>
 <script type="text/javascript" src='/assets/js/utc.js'></script>
-<script type="text/javascript" src="./socket.io/socket.io.js"></script>
 <script type="module" src="/dro/js/hardware_acc.js"></script>
 <script src="/js/ACEKurento-1.0.0.js"></script>
 

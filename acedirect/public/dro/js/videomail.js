@@ -9,6 +9,13 @@ $(document).ready(() => {
   $('#pauseModal').on('hidden.bs.modal', () => {
     window.removeFocus();
   });
+
+  // Initialize tooltip
+  $('[data-toggle="tooltip"]').tooltip({
+    toggle: 'hover',
+    container: 'body',
+    viewport: $('#transcriptButtonDiv')
+  });
 });
 
 function setVideoSize() {
@@ -18,7 +25,9 @@ function setVideoSize() {
   const top = a1.getBoundingClientRect().bottom || a2.getBoundingClientRect().bottom;
   const videoHeight = b.getBoundingClientRect().top - top;
   console.log(videoHeight);
-  $('.video-element').height(videoHeight);
+  $('.video-element').height(videoHeight - (($('#greeting-controls-footer').height() + 17) + $('#footer-container-consumer').height()));
+  $('#greetingCol').height(videoHeight - (($('#greeting-controls-footer').height() + 17) + $('#footer-container-consumer').height()));
+  $('#introVideoTranscriptCol').height(videoHeight - (($('#greeting-controls-footer').height() + 17) + $('#footer-container-consumer').height()));
 
   // transition countdown page
   const navbar = document.getElementById('consumerNavbar');
@@ -101,6 +110,47 @@ $('#greetingPlayPauseBtn').on('click', () => {
     document.getElementById('greetingVideo').pause();
   }
 });
+
+/**
+ * @param {boolean} transcriptButtonClicked
+ * used to determine if the tooltip automatically appears after changing title
+ */
+// eslint-disable-next-line no-unused-vars
+function toggleTranscript(transcriptButtonClicked) {
+  if ($('#introVideoTranscriptCol').hasClass('col-xs-3')) {
+    // close the transcript
+    $('#introVideoTranscriptCol').removeClass('col-xs-3');
+    $('#introVideoTranscriptCol').attr('hidden', true);
+    $('#greetingCol').removeClass('col-xs-9 greetingCol');
+
+    // TODO edit the transcript button icons, edit tooltip title
+    $('#showIntroVideoTranscript').blur();
+    $('#showIntroVideoTranscript').attr('data-original-title', 'Show video transcript').parent().find('.tooltip-inner')
+      .html('Show video transcript');
+
+    if (transcriptButtonClicked) {
+      $('#showIntroVideoTranscript').tooltip('show');
+    }
+
+    $('#showIntroVideoTranscript').css('border-bottom', 'none');
+  } else {
+    // open the transcript
+    $('#introVideoTranscriptCol').addClass('col-xs-3');
+    $('#introVideoTranscriptCol').attr('hidden', false);
+    $('#greetingCol').addClass('col-xs-9 greetingCol');
+
+    // TODO edit the transcript button icon, edit tooltip title
+    $('#showIntroVideoTranscript').blur();
+    $('#introVideoTranscriptTab').focus();
+    $('#showIntroVideoTranscript').attr('data-original-title', 'Close video transcript').parent().find('.tooltip-inner')
+      .html('Close video transcript');
+
+    if (transcriptButtonClicked) {
+      $('#showIntroVideoTranscript').tooltip('show');
+    }
+    $('#showIntroVideoTranscript').css('border-bottom', '2px solid #073863');
+  }
+}
 
 $('#greetingVideo')
   .on('play', (_evt) => {
