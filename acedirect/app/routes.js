@@ -34,6 +34,11 @@ if (config.screensharing && config.screensharing.enabled) {
   screenSharingVisibility = (utils.getConfigVal(config.screensharing.enabled) === 'true') ? 'visible' : 'invisible';
 }
 
+let languageTranslationEnabled = 'false';
+if (config.language_translation && config.language_translation.translation_enabled) {
+  languageTranslationEnabled = (utils.getConfigVal(config.language_translation.translation_enabled) === 'true') ? true : false;
+}
+
 AWS.config.update({
   region: utils.getConfigVal(config.s3.region),
   httpOptions: {
@@ -152,7 +157,8 @@ router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, _next) =>
       instructionsVideoTranscript,
       noAgentsVideo,
       noAgentsVideoTranscript,
-      screenSharingVisibility
+      screenSharingVisibility,
+      languageTranslationEnabled
     });
   } else {
     // TODO This is the old path to the previous consumer portal

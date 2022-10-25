@@ -1025,6 +1025,21 @@ io.sockets.on('connection', (socket) => {
     });
   });
 
+  // language translation
+  socket.on('send-agent-language', (data) => {
+    console.log('in send-agent-language')
+    console.log(data)
+    const vrs = data.vrs;
+    const agentLanguage = data.agentLanguage;
+    const agentExt = data.agentExt;
+    io.to(Number(vrs)).emit('receive-agent-language', { agentLanguage, agentExt });
+  });
+
+  socket.on('consumer-closed-translation-modal', (data) => {
+    const ext = data.agentExt;
+    io.to(Number(ext)).emit('consumer-translation-setup-finished');
+  });
+
   socket.on('transferCallInvite', (data) => {
     // send the original ext through so we know who should terminate the call
     io.to(Number(data.transferExt)).emit('receiveTransferInvite', { originalExt: data.originalExt, vrs: data.vrs, transferExt: data.transferExt });
@@ -1622,6 +1637,9 @@ io.sockets.on('connection', (socket) => {
 
   const saveChatHistory = getConfigVal('agent_chat:save_agent_chats');
   socket.emit('save-chat-value', { isSaved: saveChatHistory });
+
+  const languageTranslationEnabled = (getConfigVal('language_translation:translation_enabled') === 'true') ? true : false;
+  socket.emit('language-translation-enabled', { languageTranslationEnabled });
 
   // direct messaging between agents
   socket.on('check-agent-chat-status', (data) => {
@@ -2300,7 +2318,7 @@ io.sockets.on('connection', (socket) => {
                 'Content-Type': 'application/json'
               },
               json: true
-            }, (error, response, data) => {
+            }, (error, response, translationData) => {
               if (error) {
                 logger.error(`GET translation: ${error}`);
                 console.error(`GET translation error: ${error}`);
@@ -2310,15 +2328,15 @@ io.sockets.on('connection', (socket) => {
                 // 'msgid': msgid,
                 // 'final': final
                 // });
-              } else if (!data.translation) {
+              } else if (!translationData.translation) {
                 console.error('No translation was received from translation server');
               } else {
-                console.log('received translation', data);
+                console.log('received translation', translationData);
                 console.log(languageFrom, languageTo, translationUrl);
 
                 // fixme will this be wrong if multiple clients/agents?
                 socket.emit('caption-translated', {
-                  transcript: data.translation,
+                  transcript: translationData.translation,
                   displayname: data.transcripts.displayname,
                   agent: data.transcripts.agent,
                   msgid,
@@ -2467,7 +2485,7 @@ function insertCallDataRecord(eventType, vrs, uniqueId, origin) {
     if (vrs != null) {
       data.vrs = vrs;
 
-      console.log(`INSERTING CALL DATA ${JSON.stringify(data, null, 2)}`);
+      console.log(`INSERTING CALL DATA ${JSON.stringify(data, null, 2)}`); // here
       colCallData.insertOne(data, (err, _result) => {
         if (err) {
           console.log(`Insert a call data record into calldata collection of MongoDB, error: ${err}`);
