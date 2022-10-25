@@ -101,6 +101,8 @@ var monitorTransition = false;
 let asteriskPingError = false;
 let asteriskAmiError = false;
 
+let emojiToggle = false;
+
 setInterval(function () {
   busylight.light(this.agentStatus);
 }, 2000);
@@ -338,14 +340,16 @@ function connect_socket() {
         }).on('typing', function (data) {
           debugtxt('typing', data);
           if ($('#displayname').val() !== data.displayname) {
-            $('#rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+            console.log('typing event', data);
+            $('#rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('alert alert-secondary rttChatBubble chat-body1').addClass('text-bold body2');
             $('#rtt-typing').appendTo($('#chat-messages'));
           }
         }).on('typing-clear', function (data) {
           debugtxt('typing-clear', data);
           if ($('#displayname').val() !== data.displayname) {
+            console.log('typing clear event', data);
             $('#chat-messages').remove($('#rtt-typing'));
-            $('#rtt-typing').html('').removeClass('direct-chat-text');
+            $('#rtt-typing').html('').removeClass('alert alert-secondary rttChatBubble chat-body1 text-bold body2');
           }
         }).on('new-caller-general', function (endpoint_type) { // a new general caller has connected
           debugtxt('new-caller-general', data);
@@ -893,7 +897,7 @@ function connect_socket() {
           }
         }).on('agent-typing', function (data) {
           if ($('#chatHeader').html() == data.displayname && $('#chatHeader').html() != $('#agentname-sidebar').html()) {
-            $('#agent-rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('direct-chat-text').addClass('direct-chat-timestamp text-bold');
+            $('#agent-rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('rttChatBubble');
             $('#agent-rtt-typing').appendTo($('#agent-chat-messages'));
             $('#agent-chat-messages').scrollTop($('#agent-chat-messages')[0].scrollHeight);
           }
@@ -1297,7 +1301,20 @@ function stopMonitoringCall(ext) {
   socket.emit('stopMonitoringCall', { originalExt: ext, vrs: $('#callerPhone').val() });
 }
 
-$('#newchatmessage').on('change keydown paste input', function () {
+$('#dropup-menu').on('shown.bs.dropdown', () => {
+  emojiToggle = true;
+});
+
+$('#newchatmessage').on('keyup change keydown paste input', function (evt) {
+  if (evt.keyCode === 13) {
+    evt.preventDefault();
+    if ($('#newchatmessage').val() !== '' && !emojiToggle) {
+      $('#chatsend').trigger('submit');
+    } else if (emojiToggle) {
+      emojiToggle = false;
+    }
+  }
+
   var value = $('#newchatmessage').val();
   var displayname = $('#displayname').val();
   var vrs = $('#callerPhone').val();
@@ -1363,6 +1380,10 @@ $('#agent-chat-send').on('click',function (evt) {
   if ($('#agentnewchatmessage').val() === '') {
     // do nothing
   } else {
+    if($('#agent-chat-messages').hasClass('emptyMessages')) {
+      $('#agent-chat-messages').removeClass('emptyMessages');
+      $('#agent-chat-messages').addClass('populatedMessages');
+    }
     var msg = $('#agentnewchatmessage').val();
     var displayname = $('#agentname-sidebar').html();
     var ext = $('#agent-ext').html();
@@ -1381,10 +1402,10 @@ $('#agent-chat-send').on('click',function (evt) {
     msg = msg.replace(/:\)/, '<i class="fa fa-smile-o fa-2x"></i>');
     msg = msg.replace(/:\(/, '<i class="fa fa-frown-o fa-2x"></i>');
 
-    $(msgsender).addClass('direct-chat-name pull-right').html(displayname).appendTo(msginfo);
+    $(msgsender).addClass('direct-chat-name').html(displayname).appendTo(msginfo);
     $(msgtime).addClass('direct-chat-timestamp pull-left').html(timestamp).appendTo(msginfo);
     $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-    $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
+    $(msgtext).addClass('sentChat').html(msg).appendTo(msgblock);
     $(msgblock).addClass('direct-chat-msg right').appendTo($('#agent-chat-messages'));
 
     $('#agent-chat-messages').scrollTop($('#agent-chat-messages')[0].scrollHeight);
@@ -1838,24 +1859,67 @@ function newChatMessage(data) {
   var msgsender = document.createElement('span');
   var msgtime = document.createElement('span');
   var msgtext = document.createElement('div');
+
+  msg = msg.replace(/:\)/, '<i class="fa fa-smile-o fa-2x"></i>');
+  msg = msg.replace(/:\(/, '<i class="fa fa-frown-o fa-2x"></i>');
+
+  if ($('#chat-messages').hasClass('emptyMessages')) {
+    $('#emptyChat').text('');
+    $('#chat-messages').removeClass('emptyMessages');
+    $('#chat-messages').addClass('populatedMessages');
+    $('#emptyChat').css('margin-top', '0px');
+  }
+
+  if (!data.isConsumerMessage) {
+    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html('You')
+      .css('font-weight', '700 !important')
+      .appendTo(msginfo);
+  } else {
+    $(msgsender).addClass('direct-chat-name pull-left chat-body2').html(displayname)
+      .css('font-weight', '700 !important')
+      .appendTo(msginfo);
+  }
+
+  $(msgtime).addClass('chat-body2').html(` ${timestamp}`).appendTo(msginfo);
+  // $(msgtime).addClass('direct-chat-timestamp chat-body2')
+  //   .html(` ${dayjs(timestamp).local().format('h:mm a')}`).appendTo(msginfo);
+  $(msginfo).addClass('clearfix').appendTo(msgblock);
+  $(msgtext).addClass('chat-body1')
+    .html(msg)
+    .appendTo(msgblock);
+
+  // if ($('#displayname').val() === displayname) {
+  //   $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
+  //   if (isAgentTyping) {
+  //     // keep the rtt at the bottom of the the chat pane
+  //     $('#rtt-typing').appendTo($('#chat-messages'));
+  //   }
+  // } else {
+  //   isAgentTyping = false;
+  //   $('#rtt-typing').css('display', 'none');
+  //   $('#chat-messages').remove($('#rtt-typing'));
+  //   $('#rtt-typing').html('').removeClass('direct-chat-text chat-body1');
+    // $(msgblock).addClass('alert alert-secondary receivedChat')
+    //   .attr('aria-live', 'assertive')
+    //   .appendTo($('#chat-messages'));
+  // }
+  $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+
   if ($('#displayname').val() === displayname) {
-    $(msgsender).addClass('direct-chat-name pull-right').html(displayname).appendTo(msginfo);
-    $(msgtime).addClass('direct-chat-timestamp pull-left').html(timestamp).appendTo(msginfo);
-    $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-    $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
-    $(msgblock).addClass('direct-chat-msg right').appendTo($('#chat-messages'));
+    $(msgblock).addClass('alert alert-info sentChat').appendTo($('#chat-messages'));
   } else {
     $('#chat-messages').remove($('#rtt-typing'));
-    $('#rtt-typing').html('').removeClass('direct-chat-text');
+    $('#rtt-typing').html('').removeClass('direct-chat-text chat-body1');
 
-    $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
-    $(msgtime).addClass('direct-chat-timestamp pull-right').html(timestamp).appendTo(msginfo);
-    $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
-    $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
-    $(msgblock).addClass('direct-chat-msg').appendTo($('#chat-messages'));
-
+    // $(msgsender).addClass('direct-chat-name pull-left').html(displayname).appendTo(msginfo);
+    // $(msgtime).addClass('direct-chat-timestamp pull-right').html(timestamp).appendTo(msginfo);
+    // $(msginfo).addClass('direct-chat-info clearfix').appendTo(msgblock);
+    // $(msgtext).addClass('direct-chat-text').html(msg).appendTo(msgblock);
+    $(msgblock).addClass('alert alert-secondary receivedChat')
+      .attr('aria-live', 'assertive')
+      .appendTo($('#chat-messages'));
   }
-  $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+  // $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
 }
 
 
