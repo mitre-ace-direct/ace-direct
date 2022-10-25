@@ -46,20 +46,20 @@ const validator = require('./utils/validator');
 
 const getAgent = (usnm) => {
   return new Promise((resolve, reject) => {
-    console.log('Getting agent! Username: ', usnm)
-    console.log('get agent link', `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`)
+    // console.log('Getting agent! Username: ', usnm)
+    // console.log('get agent link', `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`)
     request({
       method: 'GET',
       headers : {'Accept': 'application/json'},
       url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`,
     }, function (error, response, data) {
       if (error) {
-        console.log("Error! Could not get agent:", error);
+        console.error("Error! Could not get agent:", error);
         reject(error)
       } else {
-        console.log("Success! Agent found!");
-        console.log('Data: ', typeof data)
-        console.log("TEXT " + JSON.parse(data));
+        // console.log("Success! Agent found!");
+        // console.log('Data: ', typeof data)
+        // console.log("TEXT " + JSON.parse(data));
         if(data.length > 0) {
           var jsonData = JSON.parse(data)
           resolve(jsonData)
@@ -96,8 +96,8 @@ const updateAgent = (aId, first, last, role, phone, email, org, isApp, isAct, ex
         reject(error)
       } else {
         console.log("**Updating the agent was a success!**");
-        console.log('response:', response)
-        console.log('data:', data)
+        // console.log('response:', response)
+        // console.log('data:', data)
       }
     });
   });
@@ -1508,7 +1508,6 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('profile-pic-set', (data, callback) => {
-    console.log('Profile Picture Set!')
     callback("Emitter signal received!")
 
     var profilePic = data.picture
@@ -1521,7 +1520,7 @@ io.sockets.on('connection', (socket) => {
     var getParams = { Bucket : datConfig.s3.bucketname, Key : agentExt+'.'+fileExt }
     var uploadParams = { ...getParams, Body : profilePic, ContentType : 'image/*' }
 
-    //console.log("Upload parameters: " + JSON.stringify(uploadParams))
+    // console.log("Upload parameters: " + JSON.stringify(uploadParams))
 
     s3.getObject(getParams, (err, data) => {
       if(err) {
@@ -1544,11 +1543,11 @@ io.sockets.on('connection', (socket) => {
         })
       } else {
         s3.deleteObject(getParams, (err, data) => {
-          if(err) console.log(err)
-          else {
-            console.log(data)
+          if (err) {
+            console.log('Error deleting object', err)
+          } else {
             s3.upload(uploadParams, (err) => {
-              if(err) {
+              if (err) {
                 console.log("Error! Could not upload to S3 bucket: " + err)
               } else {
                 getAgent(agentUsnm).then(agentInfoArray => {

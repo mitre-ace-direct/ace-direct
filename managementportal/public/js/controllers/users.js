@@ -3,6 +3,7 @@ let selectedUser = 0;
 let socket;
 let agentExt;
 let agentUsername;
+let agentProfilePicture;
 
 function checkProfilePic(username) {
   $.ajax({
@@ -136,6 +137,7 @@ $(document).ready(() => {
       (result, _status) => {
         console.log(`GetAgent returned: ${JSON.stringify(result)}`);
 
+        agentProfilePicture = result.profile_picture;
         checkProfilePic(result.username);
 
         agentExt = result.extension;
@@ -246,6 +248,9 @@ $(document).ready(() => {
       return;
     }
 
+    /* This is a little kludgey.  The call to ./UpdateAgent nukes the profile pic and
+     then the emit to profile-pic-set below resets it correctly */
+
     $.post('./UpdateAgent', {
       agent_id: selectedUser,
       username: $('#inputUsername').val(),
@@ -257,7 +262,8 @@ $(document).ready(() => {
       organization: $('#inputOrganization').val(),
       extension: $('#inputExtension').val(),
       queue_id: ($('#inputComplaintsQueue').prop('checked')) ? ($('#inputComplaintsQueue').val()) : 0,
-      queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0
+      queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0,
+      profile_picture: agentProfilePicture
     },
     (data, _status) => {
       if (data.result === 'success') {
@@ -273,6 +279,20 @@ $(document).ready(() => {
         $('#btnUpdateAgent').prop('disabled', false);
       }
     });
+
+    const file = document.getElementById('profile-pic-file-upload').files[0];
+    console.log(typeof file !== 'undefined');
+    if (typeof file !== 'undefined') {
+      const fileExt = file.name.split('.')[1].toLowerCase();
+      socket.emit('profile-pic-set', {
+        picture: file,
+        agentExtension: agentExt,
+        agentUsername,
+        fileExt
+      }, (res) => {
+        console.log(res);
+      });
+    }
   });
 
   function getBulkDeleteAgentList() {
@@ -394,14 +414,14 @@ function setProfilePic() {
 
       console.log('Emitting profile-pic-set event now...');
 
-      socket.emit('profile-pic-set', {
-        picture: file,
-        agentExtension: agentExt,
-        agentUsername,
-        fileExt
-      }, (res) => {
-        console.log(res);
-      });
+      // socket.emit('profile-pic-set', {
+      //   picture: file,
+      //   agentExtension: agentExt,
+      //   agentUsername,
+      //   fileExt
+      // }, (res) => {
+      //   console.log(res);
+      // });
     };
   }
 }
