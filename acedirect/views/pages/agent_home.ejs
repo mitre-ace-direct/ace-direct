@@ -719,7 +719,7 @@
                     </div>
                     <div class="modal-body" id="agent-modal-body">
                         <div id="agent-chat-body">
-                            <div class="direct-chat-messages" id="agent-chat-messages"></div>
+                            <div class="emptyMessages" id="agent-chat-messages"></div>
                             <div class="direct-chat-timestamp text-bold" id="agent-rtt-typing" style="margin-left: 10px; min-height: 20px"></div>
                         </div>
                     </div>
@@ -727,7 +727,6 @@
                         <form name="chatsend" id="agent-chatsend">
                             <div class="input-group">
                                 <input type="hidden" id="agentdisplayname">
-                                <input type="text" id="agentnewchatmessage" placeholder="Type Message..." class="form-control" autocomplete="off" required>
                                 <span class="input-group-btn">
                                     <div class="dropup">
                                         <div class="btn-group">
@@ -783,6 +782,10 @@
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </span>
+                                <input type="text" id="agentnewchatmessage" placeholder="Type Message..." class="form-control" autocomplete="off" required>
+                                <span class="input-group-btn">
                                     <button class="btn btn-primary btn-flat" id="agent-chat-send" type="submit">Send</button>
                                     <div class='btn-group'>
                                         <button class="btn btn-primary btn-flat" id="agent-chat-broadcast" data-toggle="dropdown"
@@ -800,9 +803,7 @@
                                                     style="text-align: center;">Cancel</button>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    </div>
+                                    </div>                
                                 </span>
                             </div>
                         </form>
