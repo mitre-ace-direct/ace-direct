@@ -88,6 +88,8 @@ var multipartyTransition = false;
 var isMultipartyTransfer = false;
 var allAgentCall = false;
 var consumerType;
+let languageTranslationEnabled = false;
+let agentLanguage = '';
 
 // call monitoring
 var isMonitoring = false;
@@ -108,6 +110,11 @@ $(document).ready(function () {
   if (fileSharingEnabled === 'false') {
     // hide filesharing dialog
     $("#filebox").hide();
+  }
+
+  if (languageTranslationEnabled) {
+    // Do we want to get the language from the browser or the dropdown menu?
+    // agentLanguage = window.navigator.language;
   }
 
   // connection elements
@@ -1175,6 +1182,17 @@ function connect_socket() {
         }).on('begin-captioning', function() {
           consumerCaptionsEnabled = true;
           multipartyCaptionsStart();
+        }).on('language-translation-enabled', function(data) {
+          languageTranslationEnabled = data.languageTranslationEnabled;
+          if (languageTranslationEnabled) {
+            // change the onclick event for the Accept Call button
+            // we want to set up language translation before setting up the call
+            //$("#accept-btn").attr("onclick","languageTranslationInit()");
+          }
+        }).on('consumer-translation-setup-finished', function() {
+          unmute_audio();
+          disable_video_privacy();
+          $('#consumerSettingUpTranslation').modal('hide');
         });
 
       } else {

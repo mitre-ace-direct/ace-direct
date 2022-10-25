@@ -543,6 +543,29 @@
 
 </div>
 
+<div id="beginCallLanguageTranslationModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog">
+  <div class="modal-dialog modal-dialog-csentered">
+    <div class="modal-content">
+        <div class="modal-body" style="position: relative;min-height:300px; padding: 0px;">
+          <div class="center text-center body1" style="width:100%; padding: 30px;"><!--style="width: 75%"-->
+            <br /><br />
+            <p>The agent you will be connected to is fluent in ASL, but they may speak or type in a different language than the language set as default in your browser. 
+              Do you want to turn on language translation for captions and chat for this call?
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="btn-group" style="width: 100%;">
+            <button id="enableTranslationBtn" type="button"  class="btn btn-secondary modal-outline-btn button" onclick="enableTranslation()" data-dismiss="modal">
+                Enable Translation </button>
+            <button id="declineTranslationBtn" type="button" class="btn btn-secondary modal-outline-btn button" data-dismiss="modal" onclick="disableTranslation()">
+                No Thanks </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   let nginxPath = '<%= nginxPath %>';
   let consumerPath = '<%= consumerPath %>';
@@ -555,6 +578,7 @@
   let fileSharingEnabled = '<%= fileSharingEnabled %>';
   let screenSharingEnabled = '<%= screenSharingEnabled %>';
   let autoplayEnabled = '<%= autoplayEnabled %>';
+  let languageTranslationEnabled = '<%= languageTranslationEnabled %>';
 
   //not instrumenting complaint web page right now
   let logWebRTCStats = false;
