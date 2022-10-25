@@ -562,7 +562,6 @@ if (mongodbUri) {
 // Validates the token, if valid go to connection.
 // If token is not valid, no connection will be established.
 const jwtKey = getConfigVal('web_security:json_web_token:secret_key');
-// const jwtEnc = getConfigVal('web_security:json_web_token:encoding');
 
 io.use(socketioJwt.authorize({
   // secret: ((jwtEnc == 'base64') ? Buffer.from(jwtKey , jwtEnc ): jwtKey),
