@@ -54,6 +54,13 @@ let body1globalFontSize;
 let body2globalFontSize;
 let wasMutedBeforePrivacy = false;
 let currentPosition;
+let userLanguage = '';
+let agentLanguage = '';
+let isTranslationEnabled = false;
+let tempConsumerLanguage = '';
+let tempAgentLanguage = '';
+let settingUpTranslation = false;
+let translationAgentExt = '';
 
 let exten;
 // This variable is for catching the double end call that occurs when a user clicks the button
@@ -111,6 +118,10 @@ $(document).ready(() => {
     $('#callEndedModal').css('overflow-y', 'auto');
     window.openDialog('callEndedModal', window);
   });
+  $('#beginCallLanguageTranslationModal').on('shown.bs.modal', () => {
+    $('#beginCallLanguageTranslationModal').css('overflow-y', 'auto');
+    window.openDialog('beginCallLanguageTranslationModal', window);
+  });
 
   $('#optionsModal').on('hidden.bs.modal', () => {
     window.removeFocus();
@@ -123,6 +134,14 @@ $(document).ready(() => {
   });
   $('#callEndedModal').on('hide.bs.modal', () => {
     window.removeFocus();
+  });
+  $('#beginCallLanguageTranslationModal').on('hide.bs.modal', () => {
+    window.removeFocus();
+    unmuteAudio();
+    disableVideoPrivacy();
+    socket.emit('consumer-closed-translation-modal', {
+      agentExt: translationAgentExt // TODO remove hardcoded value
+    })
   });
 
   if (fileSharingEnabled === 'false') {
@@ -166,6 +185,9 @@ $(document).ready(() => {
   observer.observe(target, {
     attributes: true
   });
+
+  // Get browser language
+  userLanguage = window.navigator.language;
 });
 
 $(window).bind('fullscreenchange', (_e) => {
@@ -385,21 +407,20 @@ function ConnectSocket() {
             }
           })
           .on('chat-message-new', (data) => {
-            newChatMessage(data);
-            /*
-                // debugtxt('chat-message-new', data);
-
-                // Translate incoming message
-                const localLanguage = sessionStorage.consumerLanguage;
-                console.log(`Selected language is ${localLanguage}`);
-                // var localLanguage = 'es';
-                data['toLanguage'] = localLanguage;
-                if (localLanguage === data.fromLanguage) {
+            if (isTranslationEnabled) {
+              // Translate incoming message
+              const localLanguage = userLanguage;
+              console.log(`Selected language is ${localLanguage}`);
+              // var localLanguage = 'es';
+              data['toLanguage'] = localLanguage;
+              if (localLanguage === data.fromLanguage) {
                 newChatMessage(data);
-                } else {
+              } else {
                 socket.emit('translate', data);
-                }
-                */
+              }
+            } else {
+              newChatMessage(data);
+            }
           })
           .on('chat-message-new-translated', (data) => {
             newChatMessage(data);
@@ -648,14 +669,33 @@ function ConnectSocket() {
             // eslint-disable-next-line no-use-before-define
             updateCaptions(transcripts);
           })
-          .on('multiparty-caption', (data) => {
+          .on('multiparty-caption', (transcripts) => {
             // eslint-disable-next-line no-use-before-define
-            updateCaptions(data);
+            if (isTranslationEnabled) {
+              socket.emit('translate-caption', {
+                transcripts,
+                callerNumber: exten,
+                displayname: transcripts.displayname || 'You',
+                speakerExt: exten
+              });
+            } else {
+              updateCaptions(data);
+            }
           })
           .on('consumer-caption', (transcripts) => {
             // receiving own captions
             // eslint-disable-next-line no-use-before-define
             updateCaptions(transcripts);
+          }).on('receive-agent-language', (data) => {
+            console.log('got agent language!')
+            agentLanguage = data.agentLanguage;
+            translationAgentExt = data.agentExt; // TODO find a better spot for this
+            if (agentLanguage !== userLanguage) {
+              // Ask user if they want to enable language translation
+              muteAudio();
+              enableVideoPrivacy();
+              setupLanguageTranslation();
+            }
           });
       } else {
         // need to handle bad connections?
@@ -811,6 +851,36 @@ function toggleCaptions() {
   }
 
   setColumnSize();
+}
+
+function setupLanguageTranslation() {
+  console.log('in setupLanguageTranslation')
+  settingUpTranslation = true;
+  $('#consumerDefaultLanguage').html(userLanguage);
+  $('#agentDefaultLanguage').html(agentLanguage)
+
+  if ($('#waitingModal').is(':visible')) {
+    $('#waitingModal').modal('hide');
+    if ($('#pleaseWaitTranscript').is(':visible')) {
+      // close the transcript when closing the modal
+      toggleTranscripts('pleaseWait');
+    }
+  }
+
+  $('#beginCallLanguageTranslationModal').modal('show');
+}
+
+function enableTranslation() {
+  isTranslationEnabled = true;
+  tempConsumerLanguage = userLanguage;
+  tempAgentLanguage = agentLanguage;
+
+}
+
+function disableTranslation() {
+  isTranslationEnabled = false;
+  tempConsumerLanguage = '';
+  tempAgentLanguage = '';
 }
 
 // Function to change the text of the feedback for the buttons.
@@ -990,6 +1060,12 @@ function registerJssip(myExtension, myPassword) {
         if (!isCaptioning) {
           captionsStart();
         }
+
+        if (languageTranslationEnabled && $('#beginCallLanguageTranslationModal').is(':visible')) {
+          console.log(`your language: ${userLanguage} agent language: ${agentLanguage}`)
+          muteAudio();
+          enableVideoPrivacy();
+        }
       }
     }
   };
@@ -1039,7 +1115,7 @@ function enterQueue() {
     toggleTranscripts('instructionsVideo');
   }
 
-  const language = 'en';
+  const language = userLanguage;
   socket.emit('call-initiated', {
     language,
     vrs
@@ -1577,8 +1653,7 @@ $('#chatsend').submit((evt) => {
   // console.log('utc time: ' + date.utc().format());
   // const timestamp = date.utc();
 
-  // const language = sessionStorage.consumerLanguage;
-  const language = 'en';
+  const language = userLanguage;
 
   $('#newchatmessage').val('');
   $('#newchatmessage').height(0);
@@ -2126,7 +2201,7 @@ let recognition = null;
 let lastResult;
 function captionsStart() {
   isCaptioning = true;
-  let language = $('#language-select').val();
+  let language = userLanguage;
   switch (language) {
     case 'en': // English US
       language = 'en-US';
@@ -2206,9 +2281,10 @@ function captionsStart() {
   };
 
   recognition.onend = (_event) => {
-    if (!isMuted) {
+    if (!isMuted && !settingUpTranslation) {
+      settingUpTranslation = false;
       captionsStart();
-    } else {
+    } else if (!settingUpTranslation) {
       captionsEnd();
     }
   };

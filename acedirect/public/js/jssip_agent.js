@@ -130,6 +130,7 @@ function register_jssip() {
           consumerType = 'webrtc';
           enable_chat_buttons();
           socket.emit('begin-file-share', { vrs: $('#callerPhone').val(), agentExt: extensionMe });
+          languageTranslationInit();
         }  else if (participants[i].type === 'participant:rtp') {
           // provider consumer. disable chat and file share
           isConsumerInSession = true;
@@ -540,6 +541,18 @@ function calibrateVideo(duration) {
   }
 }
 
+// set up language translation
+function languageTranslationInit() {
+  console.log($('#callerPhone').val())
+  let language = $('#language-select').val();
+  socket.emit('send-agent-language', {
+    agentLanguage : language,
+    vrs: $('#callerPhone').val(),
+    agentExt: extensionMe
+  });
+  //accept_call()
+}
+
 // answers an incoming call
 function accept_call() {
   if (!captionsMuted()) {
@@ -584,6 +597,14 @@ function accept_call() {
     setTimeout(() => {
       if (document.getElementById('muteAudio').checked === true) {
         mute_audio();
+      }
+
+      if (languageTranslationEnabled) {
+        console.log('in languageTranslationEnabled')
+        languageTranslationInit();
+        mute_audio();
+        enable_video_privacy();
+        $('#consumerSettingUpTranslation').modal('show');
       }
 
       if (transitionAgent && transitionAgent !== extensionMe) {
