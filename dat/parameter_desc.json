@@ -124,7 +124,6 @@
   },
   "web_security": {
     "json_web_token": {
-      "encoding": "Encoding scheme for the JSON web token",
       "secret_key": "CHANGE THIS to some unique UTF-8 string for your installation; string key for the JSON web token",
       "timeout": "timeout in ms: 15000",
       "handshake": "Handshake? true or false"

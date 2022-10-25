@@ -140,7 +140,6 @@
   },
   "web_security": {
     "json_web_token": {
-      "encoding": "utf8",
       "secret_key": "someGlobalKey",
       "timeout": "15000",
       "handshake": "true"
