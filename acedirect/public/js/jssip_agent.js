@@ -130,7 +130,9 @@ function register_jssip() {
           consumerType = 'webrtc';
           enable_chat_buttons();
           socket.emit('begin-file-share', { vrs: $('#callerPhone').val(), agentExt: extensionMe });
-          languageTranslationInit();
+          if (languageTranslationEnabled) {
+            languageTranslationInit();
+          }
         }  else if (participants[i].type === 'participant:rtp') {
           // provider consumer. disable chat and file share
           isConsumerInSession = true;
