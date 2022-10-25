@@ -22,43 +22,44 @@
 <body id="consumerBackground" style="font-family: 'Roboto', sans-serif;">
   <section role="complementary" aria-labelledby="gpu-warning">
     <div id="hardware-acc-warning" class="alert alert-info hidden"
-      style="margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; display: flex; align-items: center;">
-      <p id="gpu-warning" style="padding-bottom: 0px;flex:1;">We noticed you have hardware acceleration turned on! For
-        better performance, consider turning hardware acceleration off in your Google Chrome Settings.
-      </p>
-      <button type="button" id="gpu-close" class="fa fa-times" data-dismiss="alert" tabindex="0"
-        aria-label="close chrome hardware acceleration message" style="margin:1rem;background:none;border:none;"></button>
-    </div>
-  </section>
+    style="margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; display: flex; align-items: center;">
+    <p id="gpu-warning" style="padding-bottom: 0px;flex:1;">We noticed you have hardware acceleration turned on! For
+      better performance, consider turning hardware acceleration off in your Google Chrome Settings.
+    </p>
+    <button type="button" id="gpu-close" class="fa fa-times" data-dismiss="alert" tabindex="0"
+    aria-label="close chrome hardware acceleration message" style="margin:1rem;background:none;border:none;"></button>
+  </div>
+</section>
 
-  <header>
-    <%- include("../partials/agent_page_header") %>
-  </header>
+<header>
+  <%- include("../partials/agent_page_header") %>
+</header>
+
   <main>
-    <section aria-label="logos">
+    <section id="vrs-container" aria-label="logos">
       <div id="logoContainer">
         <img src="dro/images/DVC2.png" style="margin-right: 3%;" width="20%" alt="Direct Video Calling Logo">
         <img src="dro/images/fcc-logo.jpg" width="7%" alt="FCC Logo">
       </div>
-      <img id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100vw" aria-hidden="true" alt="">
+      <!-- <img id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100vw" aria-hidden="true" alt=""> -->
     </section>
+    <img id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100%" aria-hidden="true" alt="">
 
-    <div class="row">
-      <section aria-label="videophone number">
+    <div id="consumer-input-row" class="row">
+      <section id="consumer-input" aria-label="videophone number">
         <div id="VRSlogincontainer" class="col-lg-4 col-md-6 col-xs-10">
           <div id="VRScontent">
-            <h1 id="headerBox" class="h1" style="padding-bottom:15px">Welcome to ASL Consumer Support</h1>
+            <h1 id="headerBox" class="h1">Welcome to ASL Consumer Support</h1>
             <div>
-              <p class="body1">Enter your videophone number to get started</p>
+              <p id="headerText" class="body1">Enter your videophone number to get started</p>
             </div>
             <hr style="border: 1px solid black; width: 100px;" />
             <div id="input-group" class="input-group">
               <label for="vrs_number" style="float:left">Videophone Number</label>
-              <input type="text" class="form-control input-lg" id="vrs_number" data-inputmask="'mask': '(999) 999-9999'"
+              <input type="text" pattern="\d*" class="form-control input-lg" id="vrs_number" data-inputmask="'mask': '(999) 999-9999'"
                 data-mask required tabindex="0">
               <span class="input-group-btn" style="vertical-align:bottom">
                 <button id="continueButton" class="btn input-lg button"
-                  style="background-color: #073863; color: white !important; margin-left: 15px; border-top-left-radius:4px !important; border-bottom-left-radius:4px !important;"
                   tabindex="0">
                   Continue <span class="fa fa-angle-double-right" aria-hidden="true" />
                 </button>
@@ -79,8 +80,11 @@
     </div>
   </main>
 
-  <%- include("../partials/acedirect_footer") %>
 </body>
+<!-- may not be necessary -->
+<footer>
+  <%- include("../partials/acedirect_footer") %>
+</footer>
 
 <!--Incorrect Browser Modal-->
 <div id="notChromeModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog"

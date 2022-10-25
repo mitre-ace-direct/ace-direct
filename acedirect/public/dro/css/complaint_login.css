@@ -38,13 +38,17 @@
   background-color: white;
   text-align: center;
   padding: 1%;
-  min-width: 992px;
+  width: 100%;
+  /* min-width: 992px; */
 }
 
 #continueButton {
   background-color: #073863 !important;
   color: white !important;
   cursor: pointer;
+  margin-left: 15px; 
+  border-top-left-radius: 4px !important; 
+  border-bottom-left-radius: 4px !important;
 }
 
 #continueButton:hover {
@@ -59,9 +63,11 @@
 
 #headerBox {
   font-size: 20px;
+  padding-bottom: 15px;
 }
 
-#vrslogincontainer {
+/* ??? */
+/* #vrslogincontainer {
   z-index: 100;
   position: absolute;
   background-color: white;
@@ -70,7 +76,7 @@
   width: 50vw;
   padding-right: 0px !important;
   padding-left: 0px !important;
-}
+} */
 
 #heroLogo {
   min-width: 100%;
@@ -149,9 +155,21 @@
   transform: translateY(0);
 }
 
+@media (max-width: 500px){
+  /* undo min width and adjust logo image width */
+  #logoContainer {
+    min-width: 0;
+    height: 100%;
+    grid-area: logo;
+  }
 
-/* MEDIA QUERIES FOR MOBILE */
-@media only screen and (max-width: 500px) {
+  #logoContainer img:nth-child(1) {
+    width: 50%;
+  }
+
+  #logoContainer img:nth-child(2) {
+    width: 10%;
+  }
 
   /* entire grid */
   #consumerBackground {
@@ -159,86 +177,116 @@
     grid-template-rows: min-content 1fr;
     grid-template-areas:
       "header"
-      "main";
-    align-items: center;
-    height: 90vh;
+      "main"
+      "footer";
   }
 
   header {
-    grid-area: 'header';
+    grid-area: header;
   }
 
   main {
     grid-area: main;
-    position: relative;
-    height: 90vh;
-  }
-
-  main>section:first-child {
     display: grid;
-    grid-template-rows: min-content 1fr;
-    height: 90vh;
-    position: relative;
+    grid-template-areas:
+      "logo"
+      "image"
+      "input";
   }
 
   #heroLogo {
-    /* center the hero */
-    position: inherit;
-    object-fit: initial;
-    background-size: initial;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-
-    display: none;
-
+    grid-area: image;
+    position: relative;
   }
 
-  main .row {
-    position: absolute;
-    margin-right: 0;
-    margin-left: 0;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  #consumer-input-row {
+    grid-area: input;
+    display: flex;
+    margin: 0;
+    width: 100%;
+    /* padding: auto; */
   }
 
+  /* #consumer-input {
+    position: relative;
+    width: 100%;
+  } */
+  
   #VRSlogincontainer {
-    position: absolute;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    left: inherit;
-    right: inherit;
-    top: inherit;
-    margin: 0 10vw;
+    /* align-items: center; */
+    /* left: inherit; */
+    /* right: inherit; */
+    /* top: inherit; */
+    width: 100%;
+    /* height: 100%; */
+    float: none;
   }
 
   #VRScontent {
     margin-top: 0;
     padding: 20px;
+    width: 100%;
+    border: none;
   }
 
-  /* undo min width and adjust logo image width */
-  #logoContainer {
-    min-width: 0;
-    height: 100%;
-  }
-
-  #logoContainer img:nth-child(1) {
-    width: 30%;
-  }
-
-  #logoContainer img:nth-child(2) {
-    width: 10%;
-  }
-
-  /* font adjustments */
-  .appTitle,
   #headerBox {
-    font-size: 1.3em !important;
+    font-size: 1.2em !important;
+    padding-bottom: 0;
+    font-weight: initial !important;
+  }
+  
+  #headerText {
+    font-size: 1em !important;
+  }
+
+  #input-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  #input-group span {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  #continueButton {
+    margin-left: 0;
+    margin-top: 40px;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #continueButton span {
+    margin-left: 10px;
+  }
+
+  #infoBox {
+    margin-top: 0;
+    /* padding: 20px 40px; */
+    border: none;
+    width: 100%;
+  }
+
+  /* may not be necessary */
+  footer {
+    grid-area: footer;
+    width: 100%;
+  }
+
+}
+
+@media (max-width: 325px) {
+  #VRScontent {
+    padding: 20px 10px;
   }
 }

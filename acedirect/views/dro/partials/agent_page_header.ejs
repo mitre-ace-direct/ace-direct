@@ -1,9 +1,14 @@
 <style>
+  #consumerNavbar {
+    width: 100%;
+    display: flex;
+  }
+
   .display-flex-center {
     display: flex;
     align-items: center;
     width: 100%;
-    min-width: 992px;
+    /* min-width: 992px; */
     margin-left: 0px;
   }
 
@@ -20,18 +25,22 @@
     padding-right: 0px !important;
   }
 
-  @media only screen and (max-width: 500px) {
+  @media (max-width: 500px) {
+    #consumerNavbar {
+      justify-content: center;
+      text-align: center;
+    }
+
     .appTitle {
-      font-size: 1.3em;
+      font-size: 1.4em;
     }
   }
-
 
 </style>
 
 
   <div id="consumerNavbar" class="Navbar row display-flex-center">
-    <div class="appTitle col-xs-8 col-md-6">FCC ASL Consumer Support</div>
+    <div class="appTitle col-xs-12 col-md-6">FCC ASL Consumer Support</div>
   </div>
 
   <script>
