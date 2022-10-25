@@ -38,7 +38,7 @@ module.exports = {
       const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,15}$/;
       isFormatCorrect = re.test(password);
     }
-    console.log(`isPasswordComplex ${isFormatCorrect}`);
+    // console.log(`isPasswordComplex ${isFormatCorrect}`);
     return isFormatCorrect;
   },
   isUsernameValid(username) {
@@ -48,7 +48,7 @@ module.exports = {
       isFormatCorrect = ((username.length >= 4) && (username.length <= 10)
         && (legalChars.test(username)));
     }
-    console.log(`isUsernameValid ${isFormatCorrect}`);
+    // console.log(`isUsernameValid ${isFormatCorrect}`);
     return isFormatCorrect;
   },
   isEmailValid(email) {
@@ -57,7 +57,7 @@ module.exports = {
       const legalChars = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
       isFormatCorrect = ((email.length >= 1) && (email.length <= 40) && (legalChars.test(email)));
     }
-    console.log(`isEmailValid ${isFormatCorrect}`);
+    // console.log(`isEmailValid ${isFormatCorrect}`);
     return isFormatCorrect;
   },
   isVrsNumberValid(phone) {
@@ -74,7 +74,7 @@ module.exports = {
       const legalChars = /^[1-9]\d{2}-\d{3}-\d{4}/;
       isFormatCorrect = ((phone.length >= 1) && (phone.length <= 12) && (legalChars.test(phone)));
     }
-    console.log(`isPhoneValid ${isFormatCorrect} ${phone}`);
+    // console.log(`isPhoneValid ${isFormatCorrect} ${phone}`);
     return isFormatCorrect;
   },
   isNameValid(name) {
@@ -84,7 +84,7 @@ module.exports = {
       const legalChars = /^[A-Za-z/\s.'-]+$/;
       isFormatCorrect = ((name.length >= 1) && (name.length <= 20) && (legalChars.test(name)));
     }
-    console.log(`isNameValid ${isFormatCorrect} ${name}`);
+    // console.log(`isNameValid ${isFormatCorrect} ${name}`);
     return isFormatCorrect;
   }
 };

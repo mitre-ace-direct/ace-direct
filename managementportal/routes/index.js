@@ -426,6 +426,7 @@ router.post('/UpdateAgent', restrict, (req, res) => {
   const extension = parseInt(req.body.extension, 10);
   const queueId = parseInt(req.body.queue_id, 10);
   const queue2Id = parseInt(req.body.queue2_id, 10);
+  const profilePicture = req.body.profile_picture;
 
   if (validator.isNameValid(firstName) && validator.isNameValid(lastName)
     && validator.isPasswordComplex(password)
@@ -455,11 +456,11 @@ router.post('/UpdateAgent', restrict, (req, res) => {
           is_active: 1,
           extension,
           queue_id: queueId,
-          queue2_id: queue2Id
+          queue2_id: queue2Id,
+          profile_picture: profilePicture
         };
 
         logger.debug(`Agent data to be updated: ${JSON.stringify(newAgent)}`);
-
         request.post({
           url,
           json: true,
@@ -603,20 +604,21 @@ router.get('/GetAgent', restrict, (req, res) => {
  */
 
 const getAgent = (usnm) => new Promise((resolve, reject) => {
-  console.log('Getting agent! Username: ', usnm);
-  console.log('get agent link', `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`);
+  // console.log('Getting agent! Username: ', usnm);
+  // console.log('get agent link', `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`);
   request({
     method: 'GET',
     headers: { Accept: 'application/json' },
     url: `https://${config.servers.main_private_ip}:${config.app_ports.mserver}/getagentrec/${usnm}`
   }, (error, _response, data) => {
     if (error) {
-      console.log('Error! Could not get agent:', error);
+      console.error('Error! Could not get agent:', error);
       reject(error);
     } else {
-      console.log('Success! Agent found!');
-      console.log('Data: ', typeof data);
-      console.log(`TEXT ${JSON.parse(data)}`);
+      // console.log('Success! Agent found!');
+      // console.log('Data: ', typeof data);
+      // console.log(`TEXT ${JSON.parse(data)}`);
+      // eslint-disable-next-line no-lonely-if
       if (data.length > 0) {
         const jsonData = JSON.parse(data);
         resolve(jsonData);
@@ -634,7 +636,7 @@ const getAgent = (usnm) => new Promise((resolve, reject) => {
  */
 
 router.get('/ProfilePic/:username', (req, res) => {
-  console.log(`/ProfilePic/${req.params.username} endpoint called!`);
+  // console.log(`/ProfilePic/${req.params.username} endpoint called!`);
   let key = '';
 
   let image;
@@ -647,18 +649,17 @@ router.get('/ProfilePic/:username', (req, res) => {
     if (data.data[0].profile_picture && data.data[0].profile_picture !== '') {
       key = data.data[0].profile_picture;
 
-      console.log('TYPEOF DATA:', typeof data);
-      console.log('data.data[0].profile_picture:', data.data[0].profile_picture);
-      console.log('typeof data.data[0].profile_picture', typeof data.data[0].profile_picture);
+      // console.log('TYPEOF DATA:', typeof data);
+      // console.log('data.data[0].profile_picture:', data.data[0].profile_picture);
+      // console.log('typeof data.data[0].profile_picture', typeof data.data[0].profile_picture);
       const options = {
         Bucket: config.s3.bucketname,
         Key: key
       };
       s3.getObject(options, (err, data1) => {
         if (err) {
-          throw new Error(err);
+          console.error('Error retrieving s3 object', key, err);
         } else {
-          console.log('success! Data retrieved:', data1.Body);
           image = data1.Body;
           res.send(image);
         }
@@ -666,9 +667,9 @@ router.get('/ProfilePic/:username', (req, res) => {
     } else {
       fs.readFile('./public/images/anon.png', (err, data2) => {
         if (err) {
-          console.log('Could not read image!', err);
+          console.error('Could not read image!', err);
         } else {
-          console.log(data2);
+          // console.log(data2);
           res.send(data2);
         }
       });
