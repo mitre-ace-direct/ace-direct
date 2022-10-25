@@ -204,6 +204,9 @@
     "agent": "true",
     "consumer": "true"
   },
+  "language_translation": {
+    "translation_enabled": "false"
+  },
   "management_portal": {
     "poll_interval": "1000",
     "force_logout_password": "securexForcexLogoutxPassword"
