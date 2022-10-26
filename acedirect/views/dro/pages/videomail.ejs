@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-us" class="full-height">
+
+<head>
+  <title>ACE Direct - Videomail</title>
+
+  <meta name="description" content="ACE Direct - Videomail">
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/dro/css/videomail.css">
+  <link rel="stylesheet" href="/dro/css/type_scale.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap">
+  <!-- <link rel="stylesheet" href="/css/ca-portal.css"> -->
+</head>
+
+<body class="full-height" style="font-family: 'Roboto', sans-serif;">
+  <header>
+    <%- include("../partials/agent_page_header") %>
+  </header>
+  <main>
+    <div class="container ad-container">
+      <div class="row" id="greetingDiv">
+        <div class="row text-center greeting-controls" id="greeting-controls">
+          <div style="display: flex;">
+            <button class="circleButton" id="greetingPlayPauseBtn" tabindex="0" aria-label="Play Greeting">
+              <i id="greetingPlayPauseBtnIcon" class="fa fa-play" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="body1"><span id="greetingCurrentTime">0:00</span>/<span id="greetingDuration">0:00</span></div>
+          <div id="custom-seekbar" role="progressbar" aria-label="progress bar"><span></span></div>
+          <div style="display: flex" aria-hidden="true">
+            <button class="transcriptButton h3" style="pointer-events: none; color:grey; margin-right:0px !important" tabindex="-1">|</button>
+          </div>
+          <div id="transcriptButtonDiv" style="display: flex;">
+            <button class="transcriptButton" id="showIntroVideoTranscript" onclick="toggleTranscript(true)" tabindex="0"
+            data-toggle="tooltip" data-placement="bottom" title="Show video transcript" aria-label="Show Video Transcript">
+              <i id="showIntroVideoTranscriptIcon" class="fa fa-file-text fa-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <div class="row" style="margin-right: 0px !important;">
+          <div id="greetingCol" class="col">
+            <video <%= autoplayVideos %> class="fill-height video-element" id="greetingVideo" title="Play Video" aria-label="videomail greeting video">
+              <source src="/media/<%= introVideo %>" type="video/mp4">
+              <source src="/media/<%= introVideo %>" type="video/webm">
+            </video>
+          </div>
+          <div id="introVideoTranscriptCol" class="col" style="overflow: auto;" hidden>
+            <div id="introVideoTranscriptTab">
+              <section class="transcriptHeader" role="transcript" style="padding-top: 20px;">
+                <span class="h5">Video Transcript</span>
+                <button class="button pull-right" onclick="toggleTranscript(false)" style="background-color: transparent; border: none;" aria-label="Close video transcript">
+                  <i class="fa fa-times" aria-hidden="true"></i>
+                </button>
+              </section>
+              <hr class="dark-hr">
+              <section class="transcript" role="transcript">
+                <p class="body1"><%= introVideoTranscript %></p>
+              </section>
+            </div>
+          </div>
+        </div>
+        <div class="row text-center greeting-controls" id="greeting-controls-footer" style="padding: 20px 2.6em 20px 2.6em">
+          <button class="btn btn-secondary modal-outline-btn button" id="skipGreetingButton" tabindex="0"
+            aria-label="Skip Greeting. Recording will start in 5 seconds.">Skip Greeting&nbsp;<i
+            class="fa fa-angle-double-right" aria-hidden="true"></i>
+          </button>
+          <a class="btn-tertiary button" id="cancelButton" tabindex="0" style="cursor:pointer;color:#073863;" onclick="goToCallPage()"
+            onkeypress="goToCallPage()"
+            aria-label="Cancel">Cancel</a>
+        </div>
+      </div>
+
+      <div class="row text-center" style="display:none; vertical-align: -webkit-baseline-middle;" id="countDownDiv">
+        <div class="col-12 text-center align-self-center" style="height:100%; display: flex; align-items: center;">
+          <span style="font-size:26px; font-weight:400 !important; flex:4;">Recording will start in: <br/>
+            <span id="recordingCountdown" style="font-size: 54px; font-weight:700;">5</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="row" style="display:none" id="recordingDiv">
+        <div class="col-12 text-center">
+
+          <div class="row recording-controls body1" style="margin-right: 0 !important;">
+            <div class="col-md-12">
+              <span class="text-danger" id="recordingTime"><i class="fa fa-circle" aria-hidden="true"></i> Recording
+                &nbsp;&nbsp; 0:00 / 0:00</span>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i
+                  class="fa fa-microphone-slash" aria-hidden="true"></i>&nbsp;Microphone is muted
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-video-camera"
+                  aria-hidden="true"></i>&nbsp;Video is
+                ON</span>
+            </div>
+          </div>
+
+          <div class="row recording-timer-bar" id="recording-timer-bar" style="margin-right: 0 !important;">
+            <div class="col-12">
+              <div id="recordingTimer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                aria-live="polite"><span></span></div>
+            </div>
+          </div>
+
+          <div class="video-container">
+            <video autoplay="true" class="video-element self-view" id="selfVideo">
+            </video>
+            <div class="recordingInfoBanner body2">
+              <span role="alert" aria-live="assertive" style="font-weight: 700;">To send your Videomail before the 90 second time limit elapses,
+                click the 'Send Videomail' button.</span>
+              <div class="button-container">
+                <button class="btn btn-custom" id="sendVideomailButton" onclick="sendVideomail();"><i
+                  class="fa fa-paper-plane" aria-hidden="true" style="padding-right:8px;"></i> Send Videomail
+                </button>
+                <button id="pauseAndShowModal" class="btn btn-secondary modal-outline-btn vm-cancel-button button" onclick="pauseAndShowModal();">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <span id="maxTime" hidden>
+        <%= maxRecordSeconds %>
+      </span>
+    </div>
+  </main>
+  <%- include("../partials/acedirect_footer") %>
+
+    <!-- MODALS -->
+    <div id="goodbyeModal" class="modal fade" data-backdrop="static" role="dialog" aria-labelledby="goodbyeDescription">
+      <div class="modal-dialog modal-dialog-csentered">
+        <div class="modal-content">
+          <div class="modal-body" style="position: relative;min-height:300px; margin-top: 20px; margin-bottom: 20px; padding: 0px;">
+            <div class="center text-center body1" style="width: 100%; padding: 30px;">
+              <i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>
+              <br /><br />
+              <p id="goodbyeDescription" style="font-size: 26px; line-height:32.5px;">Thank you for leaving videomail. An agent will review
+                your videomail
+                message.</p>
+              <hr class="text-black"
+                style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
+                You are being redirected in <b>10</b> seconds to <a id="redirectUrlDesc" class="link" href="<%= redirectURL%>">
+                  <%= redirectDesc%>
+                </a>
+            </div>
+            <div id="redirectSiteURL" hidden><%= redirectURL%></div>
+          </div>
+          <div class="modal-footer">
+            <div class="text-center">
+              <a id="goodbyeExit" href="#" style="color:#073863;" role="button" tabindex="0" class="body2"><i
+                  class="fa fa-sign-out"></i> Exit Support
+                Portal</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="pauseModal" class="modal fade" data-backdrop="static" role="dialog" aria-labelledby="pauseDescription">
+      <div class="modal-dialog modal-dialog-csentered">
+        <div class="modal-content">
+          <div class="modal-body" style="position: relative;min-height:300px;">
+            <div id="pause-body-container">
+              <h1 class="h1">Cancel Recording Videomail?</h1>
+              <hr class="dark-hr">
+              <p id="pauseDescription" class="body1">Recording is temporarily paused.</p>
+              <p id="pauseDescription" class="body1">Are you sure you want to cancel and discard your videomail? Discarded videomails will not be sent.</p>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-custom button" id="sendVideomailButton" onclick="goToCallPage();">Yes, Cancel & Discard
+            </button>
+            <button id="continue-button" class="btn btn-secondary modal-outline-btn vm-cancel-button button" onclick="resumeAndCloseModal();">No, Continue Recording</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/assets/js/bootstrap.min.js" async></script>
+<script type="text/javascript" src="/dro/js/dialog.js"></script>
+<script type="text/javascript" src="/dro/js/videomail.js" async></script>
+<script type="text/javascript" src="/assets/js/RecordRTC.min.js" async></script>
+
+</html>

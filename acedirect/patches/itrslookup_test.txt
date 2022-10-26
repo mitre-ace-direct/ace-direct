@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# TESTING ONLY!
+# This test script is sanitized and it always returns true
+# Replace this file with the real itrslookup.sh script from the asterisk repo
+
+if [ "$#" -ne 2 ]; then
+  printf "\nusage:  $0  <vrsnum>  simple  \n"
+  printf "e.g.    $0  1112223333 siple \n\n"
+  exit 99
+fi
+
+echo ""
+echo "Calling"
+echo "Call Time:Tue Jul 20 13:58:49 UTC 2021"
+echo "${1}"
+echo "SIPURI1:"
+echo "SIPURI2:asterisk.domain.com"
+echo "SET VARIABLE sipuri asterisk.domain.com"

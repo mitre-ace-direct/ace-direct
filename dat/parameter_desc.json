@@ -1,0 +1,283 @@
+{
+  "common": {
+    "cleartext": "A non-empty string indicates that the file is in clear text (not encoded).",
+    "version": "ACE Direct Version number for display only.",
+    "year": "The Copyright year for display only.",
+    "debug_level": "Logging level: ALL TRACE DEBUG INFO WARN ERROR FATAL OFF",
+    "proxy" : "The proxy address that allows access to AWS S3, e.g. http://0.0.0.0:1234",
+    "https": {
+      "certificate": "Full path to the certificate file",
+      "private_key": "Full path to the private key file",
+      "csr": "full path to asterisk csr file for signaling server demo/test page; disabled by default"
+    }
+  },
+  "servers": {
+    "main_fqdn": "Fully qualified domain name of this primary Node application server",
+    "main_private_ip": "Private IP address of this primary Node application server",
+    "nginx_fqdn": "Fully qualified domain name of the NGINX server",
+    "nginx_private_ip": "Private IP address of the NGINX server",
+    "asterisk_fqdn": "Fully qualified domain name of the Asterisk server",
+    "asterisk_private_ip": "Private IP address of the Asterisk server",
+    "stun_fqdn": "Fully qualified domain name of the stun server",
+    "turn_fqdn": "Fully qualified domain name of turn server",
+    "kurento_fqdn": "fully-qualified domain name of internal kurento media server, must point to private IP address",
+    "kurento_private_ip": "Private IP address of the Kurento server",
+    "mysql_fqdn": "Private IP address of the local ACE Direct MySQL server OR localhost OR AWS RDS FQDN",
+    "redis_fqdn": "Local IP address of the Redis server on acenode.domain.com: 127.0.0.1",
+    "mongodb_fqdn": "Mongo DB host; leave blank to disable logging",
+    "zendesk_fqdn": "fully-qualified domain name of commercial Zendesk server or private IP address of local Fendesk server or localhost"
+  },
+  "app_ports": {
+    "acedirect": "local HTTPS listen port for ACE direct server; MUST MATCH value in /etc/nginx/nginx.conf on the NGINX server",
+    "managementportal": "local HTTPS listen port for management portal server; MUST MATCH value in /etc/nginx/nginx.conf on the NGINX server",
+    "zendesk": "local application port for fendesk (or use port from commercial Zendesk instance)",
+    "mserver": "local application port for mserver",
+    "videomail": "local application port for the videomail service",
+    "sswebserver": "local application port for signaling server acedirect-kurento webserver; MUST MATCH value in /etc/nginx/nginx.conf on the NGINX server",
+    "fognito": "local application port for fognito",
+    "nginx": "NGINX server port number",
+    "asterisk_ws": "Asterisk websocket port",
+    "asterisk_ami": "Asterisk AMI port",
+    "stun": "STUN server port",
+    "turn": "TURN server port; may be empty string",
+    "mysql": "Port number for the ACE Direct MySQL server",
+    "redis": "Redis server port",
+    "mongodb": "MongoDB port number, default is 27017",
+    "translation_server": "Port number of the translation server",
+    "kurento": "Kurento media server port",
+    "kmsshare": "kms-share application port, default is 3000"
+  },
+  "fognito": {
+    "session_secret": "secret session password for auth server",
+    "strategy": "authentication strategy; default is 'local' "    
+  },
+  "signaling_server": {
+      "protocol": "wss",
+      "path": "This is the acedirect-kurento route; MUST MATCH value in /etc/nginx/nginx.conf on the NGINX server"
+  },
+  "nginx": {
+    "ad_path": "customizable NGINX path for agent/consumer portals",
+    "mp_path": "customizable NGINX path for management portal",
+    "agent_route": "customizable route for agent portal url",
+    "consumer_route": "customizable route for consumer portal url",
+    "fognito_path": "NGINX route for the fognito authentication server"
+  },
+  "media_server": {
+    "privacy_video_url": "file location of privacy video file on the Kurento media server"
+  },
+  "asterisk": {
+    "sip": {
+      "protocol": "Asterisk protocol",
+      "stun_user": "stun server username",
+      "turn_user": "turn server username",
+      "turn_cred": "turn server password",
+      "channel": "default to SIP"
+    },
+    "ami": {
+      "id": "Asterisk AMI userid; retrieve from /etc/asterisk/manager.conf on acesip.domain.com",
+      "passwd": "Asterisk AMI password; retrieve from /etc/asterisk/manager.conf on acesip.domain.com"
+    },
+    "extensions": {
+      "start_number": "First consumer extension; see 'password=' in /etc/asterisk/pjsip.conf on acesip.domain.com",
+      "end_number": "Last consumer extension; see 'password=' in /etc/asterisk/pjsip.conf on acesip.domain.com",
+      "secret": "Consumer extension password; see 'password=' in /etc/asterisk/pjsip.conf on acesip.domain.com"
+    },
+    "queues": {
+      "complaint": {
+        "number": "Asterisk dial-in number for the complaint queue; from /etc/asterisk/extensions.conf on acesip.domain.com",
+        "name": "string; name of complaint queue"
+      },
+      "general": {
+        "number": "Asterisk dial-in number for the general queue; from /etc/asterisk/extensions.conf on acesip.domain.com",
+        "name": "string; name of general queue"
+      },
+      "videomail": {
+        "number": "Asterisk dial-in number for the videomail queue; from /etc/asterisk/extensions.conf on acesip.domain.com",
+        "name": "string; name of videomail queue"
+      }
+    }
+  },
+  "web_videomail": {
+    "introVideo": "intro video filename for web-based videomail; MP4 format; defaults to videomailGreeting.mp4; customize with your own videomail intro file in /acedirect/public/media/",
+    "introVideoTranscript": "transcript for no_agents_video. Defaults to 'No transcripts available.'"
+  },
+  "videomail": {
+    "max_record_secs": "Maximum time (seconds) for a video mail",
+    "outbound_timeout_secs": "Integer; maximum seconds to wait for outbound videomail server to respond",
+    "introfile1": "Intro 1 video filename",
+    "introfile2": "Intro 2 video filename",
+    "introfile3": "Intro 3 video filename",
+    "recordfile": "Recording video filename",
+    "agents": [
+      { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" },
+      { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" },
+      { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" },
+      { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" },
+      { "sipId": "Videomail Agent extension, check /etc/asterisk/pjsip.conf", "sipPass": "Videomail Agent password, check /etc/asterisk/pjsip.conf" }]
+  },
+  "s3": {
+    "region": "The AWS region for the s3, example: us-east-1",
+    "bucketname": "The s3 bucketname"
+  },
+  "missed_calls": {
+    "max_missed_calls": "Number of consecutive missed calls before forcing the agent to Away status"
+  },
+  "web_security": {
+    "json_web_token": {
+      "secret_key": "CHANGE THIS to some unique UTF-8 string for your installation; string key for the JSON web token",
+      "timeout": "timeout in ms: 15000",
+      "handshake": "Handshake? true or false"
+    },
+    "session": {
+      "secret_key": "CHANGE THIS to some unique UTF-8 string for your installation; string key for the session",
+      "resave": "Resave? true or false",
+      "save_uninitialized": "Save uninitialized? true or false",
+      "secure": "Secure? true or false",
+      "http_only": "HTTP only? true or false",
+      "rolling": "Rolling? true or false",
+      "max_age": "Max. age: 2400000"
+    }
+  },
+  "database_servers": {
+    "mysql": {
+      "user": "Username for the ACE Direct MySQL user",
+      "password": "Password for the ACE Direct MySQL user; same value as _ACEDIRECT_PASSWORD_ in MySQL installation",
+      "ad_database_name": "ACE Direct database name",
+      "cdr_database_name": "Asterisk database name",
+      "cdr_table_name": "Asterisk table name",
+      "ssdatabase": "Signaling server db name"
+    },
+    "redis": {
+      "auth": "Redis authentication string; CHANGE THIS TO MATCH your myRedisPassword value during Redis installation"
+    },
+    "mongodb": {
+      "database_name": "primary database",
+      "tlsCAFile": "The full path to the pem file (rds-combined-ca-bundle.pem) needed to connect to DocumentDB",
+      "cappedCollection": "MongoDB supports capped collectsions, set this to true. DocumentDB does not support capped collections, set this to false",
+      "caption_database_name": "database to log captions to",
+      "caption_collection_name": "collection to log captions to",
+      "logAMIevents": "true/false boolean - log AMI events",
+      "logCallData": "true/false boolean - log Call Data",
+      "logStats": "true/false boolean - log stats",
+      "logStatsFreq": "frequency(milliseconds) to log stats"
+    }
+  },
+  "webrtcstats": {
+    "logWebRTCStats": "true/false boolean; turn on webrtc in-call stats for the agent portal (FPS and dropped packets indicators)",
+    "logWebRTCStatsFreq": "string; webrtc stats polling frequency (milliseconds); set to >= 1000, since the call stats object is quite large",
+    "logWebRTCMongo": "mongodb connection URI; leave empty to disable MongoDB logging",
+    "fpsLow": "float; FPS meter low boundary",
+    "fpsHigh": "float; FPS meter high boundary",
+    "fpsMin": "float; FPS meter min value",
+    "fpsMax": "float; FPS meter max value",
+    "fpsOptimum": "float; FPS meter optimum value"
+  },
+  "complaint_redirect": {
+    "active": "Complaint portal redirect? true or false",
+    "desc": "Description of redirect website",
+    "url": "full HTTPS URL of website to redirect too at end of consumer web call"
+  },
+  "popticket": {
+    "url": "Optional. For FCC, URL of zendesk pop ticket; omit this field to skip zendesk pop; this if for automatically populating a Zendesk ticket, assuming a Zendesk integration server is available."
+  },
+  "skinny_mode" : {
+    "agent": "Enable skinny mode for agent portal: true or false; true shows all web page dialogs",
+    "consumer": "Enable skinny mode for consumer portal: true or false; true shows all web page dialogs"
+  },
+  "caption_mode" : {
+    "agent": "Enable captions for the agent portal",
+    "consumer" : "Enable captions for the consumer portal"
+  },
+  "language_translation": {
+    "translation_enabled": "enable language translation for the consumer and agent portal"
+  },
+  "management_portal": {
+    "poll_interval" : "Poll frequency (seconds) of the Management Portal statistics",
+    "force_logout_password": "CHANGE THIS to a really secure password for the remote force agent logout feature"
+  },
+  "zendesk": {
+    "protocol": "Use http for zendesk, https for fendesk",
+    "user_id": "email address of the zendesk user; this is a placeholder value for a real Zendesk account if available",
+    "token": "token of the zendesk user; this is a placeholder value for a real Zendesk account if available"
+  },
+  "user_service": {
+    "itrs_mode": "Use ITRS to verify numbers? true|false"
+  },
+  "agent_chat": {
+    "save_agent_chats":"boolean string (true/false) that enables or disables saving the agent chats to MongoDB"
+  },
+  "agent_incall_audio": {
+    "mute_all_audio": "boolean string (true/false) that enables or disables muting the agent audio at the beginning of a call"
+  },
+  "busylight": {
+    "enabled": "boolean string (true/false) that enables or disables the optional busylight in ACE Direct; disabled by default",
+    "awayBlink": "boolean string (true/false) that enables blinking while Away, if callers are in queue"
+  },
+  "translation_server": {
+    "protocol": "Protocol (http/https) of the translation server",
+    "enabled": "Boolean; enable/disable translation server"
+  },
+  "webserver": {
+    "comment1": "OPTIONAL signling server test/demo page configuration",
+    "static": "./static",
+    "token": "__DEV_TOKEN__"
+  },
+  "asteriskss": {
+    "comment1": "this is part of the signaling server configuration",
+    "sip_media_request_interval": 5000,
+    "ami": {
+      "enabled": true
+    }
+  },
+  "kurento": {
+    "comment1": "this is part of the signaling server configuration",
+    "protocol": "wss",
+    "path": "/kurento",
+    "stats_interval": 10000,
+    "sdes_crypto": "AES_128_CM_HMAC_SHA1_80",
+    "monitoring_enabled": false,
+    "recording_all_enabled": false,
+    "recording_limit_length_in_sec": 30,
+    "video_webrtc_max_bitrate": 8000,
+    "video_webrtc_min_bitrate": 100,
+    "video_rtp_max_bitrate": 8000,
+    "video_webrtc_codec": "H264",
+    "_comment2": "Dev Notes, unused: 42001F fixes some problems. 42E015 - try this too - RFC3984 - page 38",
+    "_comment3": "Dev Notes, unused: WV tried 42e01f - did not work",
+    "_comment4" : "Dev Notes, unused: profile-level-id=42001F;packetization-mode=0;level-asymmetry-allowed=1",
+    "h264_config": "profile-level-id=42E01F;packetization-mode=0;level-asymmetry-allowed=0",
+    "aws": {
+      "s3": {
+        "key": "{$AWS_KEY}",
+        "secret": "{$AWS_SECRET}",
+        "region": "{$AWS_BUCKET_REGION}",
+        "bucket": "{$AWS_BUCKET_NAME}"
+      }
+    },
+    "conference_max_participants": 4,
+    "mediapath": "location of the kms-share media folder. default: /home/ubuntu/kms-share/media/"
+
+  },
+  "filesharing": {
+    "enabled": "Enable/disable filesharing in ACE Direct; this also hides all filesharing components; the default is 'false' ",
+    "virus_scan_enabled": "Virus scan will be enabled if set to 'true' but clamdscan must be set up on the machine for it to work. The default is false"
+  },
+  "screensharing": {
+    "enabled": "Enable/disable screensharing in ACE Direct; this also hides all screensharing components; the default is 'false' "
+  },
+  "goodbye_video": {
+    "enabled": "some installations have good-bye video processing at the end of VRS calls; default is 'false' "
+  }, 
+  "complaint_videos": {
+    "instructions_video": "video filename for instructions to the complaint user; MP4/webm format; defaults to sample.mp4; customize with your own instructions file in /acedirect/public/media/",
+    "instructions_video_transcript": "transcript for instructions_video. Defaults to 'No transcripts available.'",
+    "please_wait_video": "video filename for letting the complaint user know to wait; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/",
+    "please_wait_video_transcript": "transcript for please_wait_video. Defaults to 'No transcripts available.'",
+    "no_agents_video": "video filename for the modal that appears when a user tries to call while all agents are away or offline; MP4/webm format; defaults to sample.mp4; customize with your own please wait file in /acedirect/public/media/",
+    "no_agents_video_transcript": "transcript for no_agents_video. Defaults to 'No transcripts available.'"
+
+  },
+  "autoplay_videos": {
+    "enabled": "enable or disable autoplay of ASL videos; default is 'false' "
+  }  
+}

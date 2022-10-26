@@ -1,0 +1,35 @@
+# Build and run the AceDirect NGINX proxy
+# 
+# NOTE: Critical environment variables are in the ./.env file.
+# 
+version: "2"
+services:
+    nginx:
+        env_file: .env
+        environment:
+        - HTTP_PROXY=${http_proxy}
+        - HTTPS_PROXY=${https_proxy}
+        - NO_PROXY=${no_proxy}
+        build: 
+            context: .
+            args:
+                - http_proxy=${http_proxy}
+                - https_proxy=${https_proxy}
+                # confd requires keys to be upper case and separated by "_"
+                - HTTP_PROXY=${http_proxy}
+                - HTTPS_PROXY=${https_proxy}
+                - NGINX_LISTEN_PORT_HTTP
+                - NGINX_LISTEN_PORT_HTTPS
+                - NGINX_HOST_NAME
+                - OPENAM_HOST_NAME
+                - OPENAM_HOST_PORT
+        ports: 
+        - 80:${NGINX_LISTEN_PORT_HTTP}
+        - 443:${NGINX_LISTEN_PORT_HTTPS}
+#        logging:
+#            driver: syslog
+        volumes:
+        - ${CERTS_VOLUME}:/etc/ssl:ro
+        - ../volumes/logs:/var/log/nginx
+        #restart: on-failure
+        restart: "no"

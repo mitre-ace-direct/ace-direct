@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# An example hook script to verify what is about to be pushed.  Called by "git
+# push" after it has checked the remote status, but before anything has been
+# pushed.  If this script exits with a non-zero status nothing will be pushed.
+#
+
+echo ""
+echo "pre-push hook: ${PWD}/$0..."
+echo "we have lift-off..."
+echo ' '
+echo '                /|  /|  '
+echo '                ||__|| '
+echo '               /   O O\__  '
+echo '              /          \   '
+echo '             /      \     \ '
+echo '            /   _    \     \ '
+echo '           /    |\____\     \      '
+echo '          /     | | | |\____/      '
+echo '         /       \| | | |/ |'
+echo '        /  /  \   -------  |'
+echo '       /   |   |           |'
+echo '       |   |   |           |'
+echo '       |  |_|_|_|          |'
+echo '       /\                  |'
+echo '      / /\        |        /'
+echo '     / /  |       |       |'
+echo ' ___/ /   |       |       |'
+echo '|____/    c_c_c_C/ \C_c_c_c'
+echo ' '
+echo ""
+

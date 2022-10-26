@@ -1,0 +1,14 @@
+[template]
+src = "nginx.conf.tmpl"
+dest = "/etc/nginx/nginx.conf"
+
+# these keys are in nginx.env used by docker-compose
+keys = [
+        "/nginx/listen/port/http",
+        "/nginx/listen/port/https",
+        "/nginx/host/name",    # /_
+        "/openam/host/name",  
+        "/openam/host/port", 
+        "/acedirect/host/name",  
+        "/acedirect/host/port", 
+       ]

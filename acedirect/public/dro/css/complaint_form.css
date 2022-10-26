@@ -1,0 +1,698 @@
+body {
+  min-width: 1300px !important;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+#selfView {
+  width: 200px;
+  padding-top: 10px;
+}
+
+#remoteView {
+  width: -webkit-fill-available;
+}
+
+#noCallPoster {
+  height: 100%;
+}
+
+#inCallSection {
+  height: 100%;
+}
+
+#DVC {
+  top: 40%;
+  position: relative;
+  width: 400px;
+}
+
+#pageContainer {
+  padding-left: 0px !important;
+  /*padding-right: 15px !important;*/
+  width: 100% !important;
+}
+
+.container {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+#callFeaturesColumn {
+  height: 86vh;
+}
+
+#callButtonsRow {
+  background-color: #dddddd;
+  height: "70px";
+}
+
+#speakingToRow {
+  background-color: #c8c8c8;
+  height: 28px;
+}
+
+#end-call {
+  float: right;
+  margin-top: 16px;
+  margin-right: 1%;
+}
+
+#end-call-icon {
+  margin-right: 5px;
+  padding-bottom: 2px;
+}
+
+#screenshare-icon {
+  margin-right: 5px;
+}
+
+.circleButton {
+  border-radius: 50% !important;
+  border: none;
+  height: 45px;
+  width: 45px !important;
+  margin-left: 15px;
+  background-color: #073863 !important;
+  color: white;
+  vertical-align: initial !important;
+  margin-right: 5px;
+  margin-top: 11px;
+  margin-bottom: 11px;
+}
+
+.circleButton:hover {
+  color: white;
+  background-color: #205493 !important;
+}
+
+.circleButton:focus {
+  color: white;
+  background-color: #396082 !important;
+}
+
+#startScreenshare {
+  background-color: #073863 !important;
+  color: white;
+  margin-left: 2%;
+  vertical-align: unset;
+}
+
+#startScreenshare:focus {
+  color: white;
+  background-color: #396082 !important;
+}
+
+#startScreenshare:hover {
+  color: white;
+  background-color: #205493 !important;
+}
+
+#chat-send:focus {
+  color: white;
+  background-color: #396082 !important;
+}
+
+#chat-send:hover {
+  color: white;
+  background-color: #205493 !important;
+}
+
+#callQueueButton:focus {
+  color: white;
+  background-color: #396082 !important;
+}
+
+#callQueueButton:hover {
+  color: white;
+  background-color: #205493 !important;
+}
+
+#leaveVideomailButton:focus {
+  color: white;
+  background-color: #396082 !important;
+}
+
+#leaveVideomailButton:hover {
+  color: white;
+  background-color: #205493 !important;
+}
+
+.big-icon {
+  font-size: 60px !important;
+  color: #8f8f8f;
+  margin-top: 20px;
+}
+
+.panel-header {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.button-area {
+  margin-top: 20px;
+}
+
+.button-area button {
+  width: 100%;
+  background-color: #073863 !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  font-weight: bold !important;
+}
+
+.button-area a {
+  width: 100%;
+  background-color: #073863 !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  font-weight: bold !important;
+}
+
+.or-column {
+  font-weight: bold;
+  font-size: 15px;
+  margin-top: 90px;
+  width: 9.666667% !important;
+}
+
+.modal-footer {
+  text-align: center !important;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+}
+
+.button-panel {
+  background-color: #f9f9f9 !important;
+  padding: 10px;
+  margin-bottom: 0px !important;
+}
+
+.panel-header {
+  color: black !important;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.panel-col {
+  width: 45% !important;
+}
+
+.tabs-right {
+  border-bottom: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+  padding-top: 2px;
+}
+
+.tabs-right>li {
+  float: none;
+  margin-bottom: 2px;
+  margin-left: -1px;
+}
+
+.tabs-right>li.active>a,
+.tabs-right>li.active>a:hover,
+.tabs-right>li.active>a:focus {
+  border-bottom: 1px solid #ddd !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+  outline: none !important;
+}
+
+.tabs-right>li.active>a:focus-visible {
+  outline: 2px solid black !important;
+  outline-offset: -15px;
+  background-color: white !important;
+  border-left-color: transparent !important;
+  border-right-color: transparent !important;
+}
+
+.tabs-right>li>a:focus-visible {
+  outline: 2px solid black !important;
+  outline-offset: -15px;
+  background-color: transparent !important;
+  border-left-color: transparent !important;
+
+}
+
+.tabs-right>li>a {
+  border-radius: 0 4px 4px 0;
+  margin-right: 0;
+}
+
+.tab:first-child {
+  border-right: transparent !important;
+}
+.tabsWidthClass {
+  width: 110%;
+}
+
+#collapseButton {
+  border-radius: 50%;
+  color: #073863;
+  border: 2px solid lightgrey
+}
+
+.fileshareButton {
+  border-radius: 50%;
+  color: black;
+  font-size: 15px;
+  background-color: lightgrey;
+}
+
+.fileShareIcon {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+.fontSizeButtons {
+  border: 1px solid grey !important;
+  height: 100%;
+}
+
+.chooseFileGroup input.fileInput::-webkit-file-upload-button {
+  border: none;
+  color: black;
+  font-weight: 500;
+  background: lightgrey;
+  padding: 9px 18px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.chooseFileGroup input.fileInput:active {
+  outline: none;
+  box-shadow: none;
+  background-color: white;
+}
+
+.collapseTab:hover {
+  background-color: transparent !important;
+}
+
+/* Center modals vertically */
+.modal-dialog {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: auto;
+  min-height: calc(100vh - 100px);
+  margin: 30px auto !important;
+
+  @media (max-width: 767px) {
+    min-height: calc(100vh - 20px);
+  }
+}
+
+.modal-open .modal {
+  overflow-x: auto !important;
+}
+
+.modal-outline-btn {
+  color: #073863 !important;
+  border-color: #073863 !important;
+  border-width: 2px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  width: 190px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+}
+
+.modal-outline-btn:hover {
+  color: #073863 !important;
+  border-color: #073863 !important;
+  border-width: 2px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  width: 190px !important;
+  background-color: #E6EBEF !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+}
+
+.modal-outline-btn:focus {
+  color: #073863 !important;
+  border-color: #073863 !important;
+  border-width: 2px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+  width: 190px !important;
+  background-color: #CDD7E0 !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+}
+
+.rotate-phone {
+  -webkit-transform: rotate(137deg);
+  -ms-transform: rotate(137deg);
+  transform: rotate(137deg);
+  font-size: 18px !important;
+  top: 2px !important;
+  position: relative;
+}
+
+.separator {
+  content: '';
+  display: inline-block;
+  background: #073863;
+  margin: 1px 12px;
+  height: 18px;
+  width: 1px;
+  vertical-align: top;
+}
+
+.second-or {
+  margin-top: 9px;
+}
+
+.my-body {
+  padding-bottom: 20px !important;
+}
+
+.button-row {
+  width: 90%;
+  margin-left: 5% !important;
+}
+
+.waiting-header {
+  font-size: 18px;
+}
+
+#placeholderImage {
+  margin-bottom: 8px;
+}
+
+
+#emptyChat {
+  color: #767676;
+  display: inline-block;
+}
+
+#newchatmessage {
+  height: 38px;
+  resize: none;
+  /* position: absolute;*/
+  bottom: 0;
+  min-height: 38px !important;
+}
+
+.emojiButtons {
+  background-color: transparent;
+  border: none;
+  font-size: large;
+}
+
+#hangupButton {
+  background-color: #c70000;
+}
+
+#callTime {
+  margin-top: 25px !important;
+  text-indent: 47px;
+}
+
+#CommunicationText {
+  vertical-align: sub;
+}
+
+.emptyMessages {
+  text-align: center;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.populatedMessages {
+  overflow-y: auto;
+  position: relative;
+  height: fit-content;
+  max-height: 70vh;
+  margin-top: auto;
+  margin-bottom: 5vh;
+  padding-right: 2rem;
+}
+
+.sentChat {
+  border-radius: 25px !important;
+  color: black !important;
+  overflow-wrap: break-word;
+}
+
+.receivedChat {
+  border-radius: 25px !important;
+  color: black !important;
+  background-color: lightgray !important;
+  overflow-wrap: break-word;
+}
+
+.rttChatBubble {
+  border-radius: 25px !important;
+  color: #737373 !important;
+  background-color: #f9f9f9 !important;
+  overflow-wrap: break-word;
+}
+
+.direct-chat-name {
+  font-weight: bold;
+  margin-right: 1rem;
+}
+
+.noFiles {
+  font-style: italic;
+  color: #767676 !important;
+}
+
+.filesList {
+  max-height: 20%;
+  overflow: scroll;
+}
+
+.tabFontSize {
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.buttonFontSize {
+  font-size: 14px;
+}
+
+.complaint-modal {
+  position: absolute;
+}
+
+
+.complaint-modal .modal-dialog {
+  width: 600px;
+}
+
+
+.sidebarTab {
+  /*width: 8vw;*/
+  text-align: center;
+}
+.collapsedTabWidth {
+  width: 100%;
+}
+
+#exitFullscreen {
+  margin: 0 auto;
+  background-color: #073863 !important;
+  color: white;
+}
+
+#remoteViewCol {
+  padding-right: 0px !important;
+  padding-left: 0px !important;
+  background-color: #333333;
+  height: 7%;
+}
+
+#selfViewCol {
+  min-width: 250px;
+  max-width: 250px;
+  width: 250px;
+  height : 100%;
+  padding-right: 0 !important;
+}
+
+#fullscreen-element {
+  height: 95%;
+}
+
+#callVideosRow {
+  /* height: 100%; */
+}
+
+#mute-camera-off-icon {
+  right: 9px;
+  bottom: 4px;
+}
+
+.video-element {
+  width: 100%;
+}
+
+#hide-video {
+  vertical-align: bottom !important;
+}
+
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+.tabNotificationBadge {
+  border-radius: 50% !important;
+  position: absolute;
+  background-color: #C70000;
+  top: 10px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.fileShareRow {
+  display: flex;
+  align-items: center;
+  min-height: 70px;
+  border-bottom: 1px solid lightgrey;
+}
+
+.fileShareCellFilename {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.fileShareCellBtn {
+  display: flex;
+  flex-direction: row;
+  flex: 2;
+}
+
+.fileShareFiller {
+  /* flex-grow is a large number to account for very wide monitors */
+  flex-grow: 80;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.populatedFilesDivider {
+  margin-bottom: 0 !important;
+}
+
+.currentFontSize {
+  width: 64px;
+  min-width: 64px;
+  background-color: white;
+  pointer-events: none;
+}
+
+#callingBanner {
+  border-radius: 25px;
+  background: #00860D;
+  padding: 20px;
+  color: white;
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.chat-body1 {
+  font-size: 16px;
+}
+
+.chat-body2 {
+  font-size: 14px;
+}
+
+.test-class {
+  border: 5px solid pink;
+}
+
+.tooltip.top .tooltip-inner {
+  font-weight: 400;
+  font-size: 12px;
+}
+
+@media only screen and (max-width: 500px) {
+  .body1 b {
+    font-size: .9em;
+  }
+
+  #callQueueButton,
+  #leaveVideomailButton {
+    font-size: .8em !important;
+  }
+}
+
+.tooltip.top .tooltip-inner {
+  line-break:auto;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#captions-area {
+  background-color: white;
+  border: 2px solid gray;
+  height: 300px;
+  text-align: left;
+  font-size: 16px;
+  overflow: scroll;
+}
+
+
+#captions-area ul {
+  list-style-type: none;
+}
+
+#captionHr {
+  border: 1px solid lightgray;
+}
+
+#currentCaptions {
+  margin-top: 20px;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.speaker {
+  font-weight: 700;
+}
+
+.fa-cc {
+  left: -9px !important;
+  top: -3px;
+}
+
+.mute-ban {
+  left: -9px !important;
+  top: -3px;
+}
+
+.btn-tertiary {
+  background-color: white !important;
+  color: #073863;
+}
+
+.btn-tertiary:hover {
+  background-color: white !important;
+  color: #073863 !important;
+  text-decoration: underline !important;
+}
+
+.btn-tertiary:focus {
+  background-color: white !important;
+  color: #073863 !important;
+  outline: none !important;
+}
+.btn-tertiary:focus-visible {
+  background-color: white !important;
+  color: #073863 !important;
+  outline: -webkit-focus-ring-color auto 1px !important;
+}

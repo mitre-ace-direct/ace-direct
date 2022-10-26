@@ -1,0 +1,58 @@
+<style>
+  #consumerNavbar {
+    width: 100%;
+    display: flex;
+  }
+
+  .display-flex-center {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    /* min-width: 992px; */
+    margin-left: 0px;
+  }
+
+  .Navbar {
+    background-color: #073863;
+    color: #FFFFFF;
+    padding: .6em 30px .6em 30px;
+  }
+
+  .appTitle {
+    font-size: 32px;
+    font-weight: bold;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+
+  @media (max-width: 500px) {
+    #consumerNavbar {
+      justify-content: center;
+      text-align: center;
+    }
+
+    .appTitle {
+      font-size: 1.4em;
+    }
+  }
+
+</style>
+
+
+  <div id="consumerNavbar" class="Navbar row display-flex-center">
+    <div class="appTitle col-xs-12 col-md-6">FCC ASL Consumer Support</div>
+  </div>
+
+  <script>
+    function logout() {
+    // clear the token from session storage
+    //console.log(`logout(): ${msg}`);
+    sessionStorage.clear();
+    // disconnect socket.io connection
+    //if (socket) {
+      //  socket.disconnect();
+    //}
+    // display the login screen to the user.
+    window.location.href = './logout';
+}
+  </script>

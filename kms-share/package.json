@@ -1,0 +1,26 @@
+{
+  "name": "kms-share",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "audit-fix": "npm audit fix",
+    "start": "node ./bin/www",
+    "test": "",
+    "clean": "rm -rf node_modules >/dev/null 2>&1 || true",
+    "clean:logs": "rm logs/*.log* > /dev/null 2>&1 || true",
+    "lint": "find . -name '*.js'  -not -path './node_modules/*' -not -path './public/assets/js/*' -not -path './.cache/*' -not -path './bower_components/*' -not -path './public/js/*' -print0 | xargs -0 eslint",
+    "build": "npm run clean && npm install"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.24.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0"
+  }
+}

@@ -1,0 +1,19 @@
+.DS_Store
+node_modules/
+nbproject/
+bower_components/
+/.vscode/
+*.swp
+.env
+~*
+itrs.log
+
+scripts/itrslookup.sh
+
+# config files
+acedirect-kurento/confs/kurento/WebRtcEndpoint.conf.ini
+acedirect-kurento/src/config/development.json
+dat/config.json
+
+# sensitive file
+managementportal/rds-combined-ca-bundle.pem

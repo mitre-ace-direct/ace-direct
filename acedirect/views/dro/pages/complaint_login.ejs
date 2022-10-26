@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <title>FCC ASL Consumer Support</title>
+
+  <meta name="description" content="FCC ASL Consumer Support">
+  <meta name="viewport" content="width=device-width">
+
+  <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/dro/css/complaint_login.css">
+  <link rel="stylesheet" href="/dro/css/type_scale.css">
+  <link rel="stylesheet" href="/assets/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/css/ca-portal.css">
+  <link rel="stylesheet" href="/assets/css/inputmask.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap">
+</head>
+
+<body id="consumerBackground" style="font-family: 'Roboto', sans-serif;">
+  <section role="complementary" aria-labelledby="gpu-warning">
+    <div id="hardware-acc-warning" class="alert alert-info hidden"
+    style="margin-bottom: 0px; padding-top: 0px; padding-bottom: 0px; display: flex; align-items: center;">
+    <p id="gpu-warning" style="padding-bottom: 0px;flex:1;">We noticed you have hardware acceleration turned on! For
+      better performance, consider turning hardware acceleration off in your Google Chrome Settings.
+    </p>
+    <button type="button" id="gpu-close" class="fa fa-times" data-dismiss="alert" tabindex="0"
+    aria-label="close chrome hardware acceleration message" style="margin:1rem;background:none;border:none;"></button>
+  </div>
+</section>
+
+<header>
+  <%- include("../partials/agent_page_header") %>
+</header>
+
+  <main>
+    <section id="vrs-container" aria-label="logos">
+      <div id="logoContainer">
+        <img src="dro/images/DVC2.png" style="margin-right: 3%;" width="20%" alt="Direct Video Calling Logo">
+        <img src="dro/images/fcc-logo.jpg" width="7%" alt="FCC Logo">
+      </div>
+      <!-- <img id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100vw" aria-hidden="true" alt=""> -->
+    </section>
+    <img id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100%" aria-hidden="true" alt="">
+
+    <div id="consumer-input-row" class="row">
+      <section id="consumer-input" aria-label="videophone number">
+        <div id="VRSlogincontainer" class="col-lg-4 col-md-6 col-xs-10">
+          <div id="VRScontent">
+            <h1 id="headerBox" class="h1">Welcome to ASL Consumer Support</h1>
+            <div>
+              <p id="headerText" class="body1">Enter your videophone number to get started</p>
+            </div>
+            <hr style="border: 1px solid black; width: 100px;" />
+            <div id="input-group" class="input-group">
+              <label for="vrs_number" style="float:left">Videophone Number</label>
+              <input type="text" pattern="\d*" class="form-control input-lg" id="vrs_number" data-inputmask="'mask': '(999) 999-9999'"
+                data-mask required tabindex="0">
+              <span class="input-group-btn" style="vertical-align:bottom">
+                <button id="continueButton" class="btn input-lg button"
+                  tabindex="0">
+                  Continue <span class="fa fa-angle-double-right" aria-hidden="true" />
+                </button>
+              </span>
+            </div>
+            <div id="message" hidden aria-live="assertive" style="text-align:left;"></div>
+          </div>
+
+          <div id="infoBox">
+            <p class="caption">You are entering an Official United States Government System, which may be used only for
+              authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby
+              notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized
+              attempts
+              to upload or change information on this web site is prohibited.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+</body>
+<!-- may not be necessary -->
+<footer>
+  <%- include("../partials/acedirect_footer") %>
+</footer>
+
+<!--Incorrect Browser Modal-->
+<div id="notChromeModal" class="modal fade" data-keyboard="false" data-backdrop="static" role="dialog"
+  aria-labelledby="recommendedBrowserTitle">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <div id="recommendedBrowserTitle" class="browsercheckheader">Recommended Browser</div>
+      </div>
+      <div class="modal-body">
+        <div class="row justify-content-md-center">
+          <div class="col-8 text-center align-self-center" id="browsercheckdescription">
+            <div class="browsercheckdescription">For the best experience, visit this site using Google Chrome.</div>
+            <div class="browsercheckdescription" style="padding-top: 15px">You are using <span id="browserType"></span>.
+            </div>
+            <div class="btn-group-lg" role="group">
+              <button id="continue-btn" type="button" class="btn btn-light btn-lg"
+                style="background-color: #073863; color: white;  margin-right: 15px;" data-dismiss="modal">Continue to
+                Support Portal</button>
+              <button id="copy-btn" type="button" class="btn btn-light btn-lg"
+                style="color:#073863; background-color: white; border:2px solid #073863;">Copy
+                Support Portal Link</button>
+            </div>
+            <div id="clipboardStatus" hidden></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="background-color: #F9F9F9; border-radius: 6px;">
+        <div class="row">
+          <div class="col-xs-12 text-center">
+            <a href="https://www.fcc.gov/accessibility" style="color:#073863"><i class="fa fa-sign-out"></i> Exit
+              Support Portal</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+  {
+      "imports": {
+          "detect-gpu": "https://unpkg.com/detect-gpu@4.0.35/dist/detect-gpu.esm.js"
+      }
+  }
+</script>
+
+<script type="text/javascript" src="/assets/js/jquery.min.js"></script>
+<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/dro/js/dialog.js"></script>
+<script type="text/javascript" src="/dro/js/complaint_login.js" async></script>
+<script type="text/javascript" src="/assets/js/inputmask.min.js"></script>
+<script type="text/javascript" src="/assets/js/jquery.inputmask.min.js" async></script>
+<script type="module" src="/dro/js/hardware_acc.js"></script>
+
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <%- include("../partials/head") %>
+
+  <style>
+    .legend {
+      display: block;
+      -webkit-padding-start: 2px;
+      -webkit-padding-end: 2px;
+      border-width: initial;
+      border-style: none;
+      border-color: initial;
+      border-image: initial;
+      padding-left: 10px;
+      padding-right: 10px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
+    .legendLayer .background {
+      fill: rgba(255, 255, 255, 0.85);
+      stroke: rgba(0, 0, 0, 0.85);
+      stroke-width: 1;
+    }
+
+    .legendContainer {
+      background-color: #fff;
+      padding: 2px;
+      margin-bottom: 8px;
+      border-radius: 3px 3px 3px 3px;
+      border: 1px solid #E6E6E6;
+      display: inline-block;
+      margin: 0 auto;
+    }
+
+    #agent_dropdown {
+      float:right;
+    }
+
+    .refresh-button {
+      position:absolute;
+      right:10px;
+      bottom:10px;
+      font-size:10px;
+      cursor:pointer;
+    }
+
+    .loading-indicator {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: fixed;
+      font-size: 300px;
+      z-index: 100;
+      height:100%;
+      width:100%;
+      opacity:50%;
+      background: gray;
+      top: 0;
+      left: 0;
+
+    }
+
+    .loading-spinner {
+      /* top: calc(50vh - 150px);
+      left: calc(50vw - 150px); */
+    }
+
+  </style>
+</head>
+
+<body class="hold-transition skin-purple sidebar-mini layout-fixed">
+  <div class="wrapper">
+    <!-- Main Header -->
+    <%- include("../partials/header") %>
+    <%- include("../partials/sidebar") %>
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-md-8">
+              <h1 class="m-0 text-dark">WebRTC Stats</h1>
+              <div id="reportrange">
+                <div data-toggle="tooltip" data-placement="left"
+                  title="Select Date Range – The user can select a date range for the report. Predefined values are Today, Yesterday, Last 7 days, Last 30 days, This Month, Last Month, All Time (March 1st 2020 to Today), and Custom Range. Default selection is 'Last 7 days'">
+                  <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+                  <span></span>
+                  <b class="caret"></b>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <!-- <label>Agent:</label> -->
+              <select
+                id="agent_dropdown"
+                class="form-control"
+                >
+                <!-- <option selected="selected" value="ALL">All Agents</option>
+                <option value="eric">Eric</option>
+                <option value="jackie">Jackie</option> -->
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Main content -->
+      <!-- <i class="fas fa-spinner fa-pulse loading-indicator"></i> -->
+      <div class="loading-indicator" role="alert" aria-label="Loading">
+        <i class="fas fa-circle-notch fa-spin loading-spinner"></i>
+      </div>
+      <div class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">Calls</h3>
+                </div>
+                <div id="callstablediv" class="card-body table-responsive" style="overflow-x: scroll">
+                  <table id="callstable" class="display table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                      <tr>
+                        <th class="text-center" data-toggle="tooltip" data-container="body" title="Start">Start</th>
+                        <th class="text-center" data-toggle="tooltip" data-container="body" title="End">End</th>
+                        <th class="text-center" data-toggle="tooltip" data-container="body" title="Call Time">Call Time</th>
+                        <th class="text-center" data-toggle="tooltip" data-container="body" title="Call ID">
+                          Call ID</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="container-fluid">
+          <div id="charts-row" class="row">
+          </div>
+        </div>
+      </div>
+      <!-- /.content -->
+    </div>
+    <!-- /.content - wrapper -->
+    <%- include("../partials/footer") %>
+  </div>
+  <!-- ./wrapper -->
+
+
+  <!-- REQUIRED JS SCRIPTS -->
+  <!-- flot -->
+  <script language="javascript" type="text/javascript" src="./assets/js/globalize.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.canvaswrapper.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.colorhelpers.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.resize.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.saturated.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.browser.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.drawSeries.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.uiConstants.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.time.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.legend.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.flot.selection.js"></script>
+  <script language="javascript" type="text/javascript" src="./assets/js/jquery.event.drag.js"></script>
+
+  <!-- DateRangePicker -->
+  <script type="text/javascript" src="./assets/js/daterangepicker.js"></script>
+  <script type="text/javascript" src="./js/controllers/webrtcstats.js"></script>
+</body>
+
+</html>

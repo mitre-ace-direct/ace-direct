@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+  <title>Login</title>
+  <%- include('partials/includes') %>
+</head>
+<style>
+  .vertical-center {
+  min-height: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+}
+.top-buffer { margin-top:20px; }
+</style>
+<body>
+  <!-- show any messages that come back with authentication -->
+  <% if (message.length > 0) { %>
+    <div class="alert alert-danger"><%= message %></div>
+  <% } %>
+
+  <div class="brand-background-img container-fluid">
+    <!-- rows are 12 columns -->
+
+    <div class="vertical-center">
+      <div class="container">
+        <div class="row justify-content-start">      
+          <div class="col-sm"></div>
+          <div class="shadow-lg jumbotron col-sm-5 text-center" style="background-color: white;">
+            <div class="row">
+              <div class="col-sm display-1 genericName"><img src="public/images/AD-logo-trim.png" class="img-fluid" alt="login image"></img></div>
+            </div>
+            <br>
+            <div class="row">
+              <div class="col-sm display-1 genericName"><h1 id="pageTitle"></h1></div>
+            </div>
+            <div class="row">
+              <div class="col-sm display-1 label label-default font-weight-light" style="font-size: larger;">SIGN IN</div>
+            </div>        
+            <hr>
+          <!-- LOGIN FORM -->
+          <form action="./login" method="post">
+          <div class="form-group top-buffer">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+            </div>
+            <input type="text" class="form-control" placeholder="Username" name="id">
+          </div>
+          </div>
+          <div class="form-group">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+            </div>
+            <input type="password" class="form-control" placeholder="Password" name="password">
+          </div>
+          </div>
+          <div class="row">
+            <div class="col-sm">
+              <!-- TODO
+              <label> <input type="checkbox"> Remember Me </label>
+              -->
+            </div>
+            <br>
+            <div class="col-sm">
+              <!-- TODO
+              <p class="font-weight-lighter" ><a href="#">Forgot Password?</a></p>
+              -->
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-info btn-block my-2 my-sm-0 action-btn-responsive"><i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Login</button>
+          </form>
+          </div>
+          <div class="col-sm"></div>
+        </div>
+        </div>
+      </div>
+  </div>
+  <%- include('partials/footer') %>  
+</body>
+</html>

@@ -1,0 +1,12 @@
+# Ignore these files and folders
+/config.json
+/config-aws.json
+/server-db.out
+/server-user.out
+/server.out
+node_modules
+nbproject
+config_.json_MIKE
+.DS_Store
+.env
+.vscode

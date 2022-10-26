@@ -1,0 +1,69 @@
+{
+  "apps": [
+    {
+      "name": "acedirect",
+      "script": "adserver.js",
+      "cwd": "./acedirect",
+      "restart_delay": 5000,
+      "autorestart": true,
+      "out_file": "./logs/pm2-adserver.log",
+      "error_file": "./logs/pm2-adserver-error.log"
+    },
+    {
+      "name": "managementportal",
+      "script": "server-db.js",
+      "cwd": "./managementportal",
+      "restart_delay": 5000,
+      "autorestart": true,
+      "out_file": "./logs/pm2-server-db.log",
+      "error_file": "./logs/pm2-server-db-error.log"
+    },
+    {
+      "name": "fendesk",
+      "script": "app.js",
+      "cwd": "./fendesk",
+      "restart_delay": 5000,
+      "autorestart": true,
+      "out_file": "./logs/pm2-fendesk.log",
+      "error_file": "./logs/pm2-fendesk-error.log"
+    },
+    {
+      "name": "fognito",
+      "script": "server.js",
+      "cwd": "./fognito",
+      "restart_delay": 5000,
+      "autorestart": true,
+      "out_file": "./logs/pm2-fognito.log",
+      "error_file": "./logs/pm2-fognito-error.log"
+    },    
+    {
+      "name": "acedirect-kurento",
+      "script": "src/index.js",
+      "cwd": "./acedirect-kurento",
+      "restart_delay": 5000,
+      "autorestart": true,
+      "out_file": "./logs/pm2-server-db.log",
+      "error_file": "./logs/pm2-server-db-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "name": "videomail-service",
+      "script": "src/server.js",
+      "cwd": "./videomail-service",
+      "restart_delay": 5000,
+      "autorestart": true,
+      "out_file": "./logs/pm2-server-db.log",
+      "error_file": "./logs/pm2-server-db-error.log",
+      "log_date_format": "YYYY-MM-DD HH:mm Z"
+    },
+    {
+      "name": "mserver",
+      "script": "app.js",
+      "cwd": "./mserver",
+      "restart_delay": 5000,
+      "autorestart": true,
+      "out_file": "./logs/pm2-app.log",
+      "error_file": "./logs/pm2-app-error.log"
+    }
+  ]
+}
