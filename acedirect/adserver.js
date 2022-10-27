@@ -2285,7 +2285,7 @@ io.sockets.on('connection', (socket) => {
               } else {
                 languageTo = language;
                 if (!languageTo) {
-                  languageTo = 'en'; // default English
+                  languageTo = 'en-US'; // default English
                 }
                 resolve();
               }
