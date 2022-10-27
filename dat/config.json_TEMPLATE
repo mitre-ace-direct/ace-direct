@@ -8,7 +8,7 @@
     "https": {
       "certificate": "/etc/ssl/cert.pem",
       "private_key": "/etc/ssl/key.pem",
-      "csr": "/tmp/asterisk.csr"
+      "csr": "../dat/asterisk.csr"
     }
   },
   "servers": {
