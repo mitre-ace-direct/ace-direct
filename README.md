@@ -618,6 +618,8 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 
 * When upgrading to MySQL8, make sure to disable strict mode, e.g.: `USE acedirect; SET GLOBAL sql_mode='';`. When strict mode is on, [fognito/db/create-user.sh](fognito/db/create-user.sh) may fail to add MySQL users.
 
+* When the agent logs in, an error appears in the agent portal browser console: `WebSocket connection to 'wss://...' failed:`. One possible solution is to make sure the `common.https.csr` file in `dat/config.json` exists on the Node server. It can be an empty file.
+
 ---
 
 _fin._
