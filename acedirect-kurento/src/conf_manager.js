@@ -266,10 +266,10 @@ class ConfManager extends Events {
         debug(rtpAnswer);
         const iceArr = [
           {
-            urls: `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('app_ports.stun')}`
+            urls: `stun:${param('servers.stun_fqdn')}:${param('app_ports.stun')}`
           },
           {
-            urls: `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('app_ports.turn')}`,
+            urls: `turn:${param('servers.turn_fqdn')}:${param('app_ports.turn')}`,
             username: `${param('asterisk.sip.turn_user')}`,
             credential: `${param('asterisk.sip.turn_cred')}`
           }
@@ -379,10 +379,10 @@ class ConfManager extends Events {
       let pfuInt;
       const iceArr = [
         {
-          urls: `${param('asterisk.sip.stun_user')}:${param('servers.stun_fqdn')}:${param('app_ports.stun')}`
+          urls: `stun:${param('servers.stun_fqdn')}:${param('app_ports.stun')}`
         },
         {
-          urls: `${param('asterisk.sip.turn_user')}:${param('servers.turn_fqdn')}:${param('app_ports.turn')}`,
+          urls: `turn:${param('servers.turn_fqdn')}:${param('app_ports.turn')}`,
           username: `${param('asterisk.sip.turn_user')}`,
           credential: `${param('asterisk.sip.turn_cred')}`
         }
