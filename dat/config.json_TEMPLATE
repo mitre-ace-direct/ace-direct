@@ -30,11 +30,11 @@
   "app_ports": {
     "acedirect": 9001,
     "managementportal": 9002,
-    "zendesk": 9003,
-    "mserver": 9004,    
+    "fognito": 9003,  
+    "sswebserver": 9004,      
+    "zendesk": 9005,
+    "mserver": 9006,    
     "videomail": 9007,
-    "sswebserver": 9009,
-    "fognito": 9010,
     "nginx": 443,
     "asterisk_ws": 443,
     "asterisk_ami": 5038,
@@ -53,7 +53,7 @@
   },  
   "signaling_server": {
     "protocol": "wss",
-    "path": "/<SOMEUSER>/acedirect-kurento/signaling"
+    "path": "/acedirect-kurento/signaling"
   },
   "nginx": {
     "ad_path": "/ACEDirect",

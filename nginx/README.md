@@ -55,7 +55,6 @@ $  ./install_nginx.sh  # to see the usage, then execute it with the correct para
 1. Edit the configuration file `sudo vi /etc/nginx/nginx.conf`:
 
 * Globally replace `<ACE_DIRECT_FQDN>` with your application server FQDN: `acenode.domain.com`
-* Globally replace `<SOMEUSER>` with the ACE Direct user account name, e.g. `ec2-user`.
 
 1. Copy files from the `html` folder in this repo to `/etc/nginx/html`.
 1. Copy files from the `images` folder in this repo to `/etc/nginx/images`.

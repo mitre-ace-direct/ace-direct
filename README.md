@@ -368,7 +368,6 @@ The ACE Direct application servers are Node.js servers.
     * Review all lines in the file and make necessary edits.
     * Many of the default values will work as-is for a default ACE Direct installation. The installation scripts in this repo assume default values.
     * View `~/ace-direct/dat/parameter_desc.json` for a description of each configuration variable.
-    * Change the `<SOMEUSER>` value to your ACE Direct home user account on the `acenode` server, e.g., `ec2-user` .
     * Supply FQDNs, IP addresses, etc. for the ACE Direct components that were installed in the previous steps.
 
 1. Ensure SSH access to external libraries. This will avoid very long build times. Edit your `~/.gitconfig` file to make sure it has this entry:
