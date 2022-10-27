@@ -616,8 +616,9 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
     ```
 
 * When upgrading to MySQL8, make sure to disable strict mode, e.g.: `USE acedirect; SET GLOBAL sql_mode='';`. When strict mode is on, [fognito/db/create-user.sh](fognito/db/create-user.sh) may fail to add MySQL users.
-
 * When the agent logs in, an error appears in the agent portal browser console: `WebSocket connection to 'wss://...' failed:`. One possible solution is to make sure the `common.https.csr` file specified in `dat/config.json` actually exists on the Node server. It can be an empty file. It is created in the dat folder by the build process.
+* Some VRS provider calls get into queue, some don't. Make sure the SIP Proxy server database has the appropriate IP entries for each provider.
+* Consumer web calls are not queueing. The acedirect-kurento error log shows a silent error: `'media_server.ace_direct_webrtc_session' doesn't exist`. Make sure to run `npm run config` to create the media_server tables at the start of a deployment. Restart node `pm2 restart all` and try again.
 
 ---
 
