@@ -576,41 +576,41 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 
 1. **ISSUE**: `acedirect-kurento` takes _too long_ to build. **SOLUTION**:
 
-  ```bash
-  $  cd ~/ace-direct/acedirect-kurento/vendor/reconnect-ws
-  $
-  $  rm package-lock.json
-  $  npm run clean
-  $  npm run build
-  $
-  $  cd ~/ace-direct/acedirect-kurento
-  $  npm run clean
-  $  npm run build
-  $
-  ```
+    ```bash
+    $  cd ~/ace-direct/acedirect-kurento/vendor/reconnect-ws
+    $
+    $  rm package-lock.json
+    $  npm run clean
+    $  npm run build
+    $
+    $  cd ~/ace-direct/acedirect-kurento
+    $  npm run clean
+    $  npm run build
+    $
+    ```
 
 1. **ISSUE**: The Node builds on `acenode` are taking _too long_. **SOLUTION**: See the instructions above for creating the `~/.gitconfig` file.
 1. **ISSUE**: A specific node server is failing to build or start. **SOLUTION**: The `package-lock.json` file may be outdated. Delete the file and rebuild. For example, for `videomail-service`:
 
-  ```bash
-  $  cd ~/ace-direct/videomail-service
-  $
-  $  rm package-lock.json
-  $  npm run build
-  $  pm2 restart all  # restart the node servers
-  $
-  ```
+    ```bash
+    $  cd ~/ace-direct/videomail-service
+    $
+    $  rm package-lock.json
+    $  npm run build
+    $  pm2 restart all  # restart the node servers
+    $
+    ```
 
 1. **ISSUE**: The Node server builds on `acenode` are failing. **SOLUTION**: Verify the `npm` version and update it if necessary:
 
-  ```bash
-  $  npm -v
-  7.19.1
-  $
-  $  # to update to 7.19.1 (for example):
-  $  npm install -g npm@7.19.1
-  $
-  ```
+    ```bash
+    $  npm -v
+    7.19.1
+    $
+    $  # to update to 7.19.1 (for example):
+    $  npm install -g npm@7.19.1
+    $
+    ```
 
 1. **ISSUE**: All Node services appear to be working, but calls are not queuing. **SOLUTION**: The signaling server (`acedirect-kurento`) may have trouble connecting to Asterisk. There may be reconnect messages in the signaling server log file. Asterisk may have a successful status, but it could be unresponsive. Try restarting the Asterisk service: `sudo service asterisk restart`.
 1. **ISSUE**: On an incoming consumer portal call, the agent portal sees the consumer extension instead of the VRS number as the caller ID number. Also, the agent has no incoming video after answering the call. **SOLUTION**: Try restarting REDIS: `sudo service redis restart`. Also make sure the agent URL environment matches the consumer portal URL environment.
