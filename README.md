@@ -564,15 +564,15 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 1. **ISSUE**: NGINX errors occur when trying to connect to the portals, but all servers are up and running. **SOLUTION**: Make sure all servers have the **correct time, synced with each other**.
 1. **ISSUE**: `acedirect-kurento` fails to build. **SOLUTION**:
 
-  ```bash
-  $  cd ~/ace-direct/acedirect-kurento
-  $
-  $  npm run clean
-  $  npm run build2
-  $  npm run config
-  $
-  $  pm2 restart all  # restart all application servers
-  ```
+    ```bash
+    $  cd ~/ace-direct/acedirect-kurento
+    $
+    $  npm run clean
+    $  npm run build2
+    $  npm run config
+    $
+    $  pm2 restart all  # restart all application servers
+    ```
 
 1. **ISSUE**: `acedirect-kurento` takes _too long_ to build. **SOLUTION**:
 
