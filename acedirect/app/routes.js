@@ -712,47 +712,41 @@ router.get('/logout', (req, res) => {
   });
 });
 
+function sendAnonImage(res) {
+  try {
+    const image = fs.readFileSync('./public/images/anon.png');
+    res.send(image);
+  } catch (errReadFileSync) {
+    console.log('Could not read image!', errReadFileSync);
+  }
+}
 router.get('/profilePic', (req, res) => {
   let key = '';
-
   let image;
 
   getAgent(req.session.user.username).then((data) => {
     if (data.data[0].profile_picture && data.data[0].profile_picture !== '') {
       key = data.data[0].profile_picture;
-    } else {
-      throw new Error('No profile Pic!');
-    }
-    console.log('TYPEOF DATA:', typeof data);
-    console.log('data.data[0].profile_picture:', data.data[0].profile_picture);
-    console.log('typeof data.data[0].profile_picture', typeof data.data[0].profile_picture);
-    const options = {
-      Bucket: config.s3.bucketname,
-      Key: key
-    };
-    s3.getObject(options, (err, s3Data) => {
-      if (err) {
-        console.log('Error retrieving file from bucket!', err);
-        try {
-          image = fs.readFileSync('./public/images/anon.png');
+      const options = {
+        Bucket: config.s3.bucketname,
+        Key: key
+      };
+      s3.getObject(options, (err, s3Data) => {
+        if (err) {
+          console.log('Error retrieving file from bucket!', err);
+          sendAnonImage(res);
+        } else {
+          console.log('success! Data retrieveed:', s3Data.Body);
+          image = s3Data.Body;
           res.send(image);
-        } catch (errReadFileSync) {
-          console.log('Could not read image!', errReadFileSync);
         }
-      } else {
-        console.log('success! Data retrieveed:', s3Data.Body);
-        image = s3Data.Body;
-        res.send(image);
-      }
-    });
+      });
+    } else {
+      sendAnonImage(res);
+    }
   }).catch((err) => {
     console.log('Error finding agent!', err);
-    try {
-      image = fs.readFileSync('./public/images/anon.png');
-      res.send(image);
-    } catch (errImage) {
-      console.log('Could not read image!', errImage);
-    }
+    sendAnonImage(res);
   });
 });
 

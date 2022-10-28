@@ -368,7 +368,6 @@ The ACE Direct application servers are Node.js servers.
     * Review all lines in the file and make necessary edits.
     * Many of the default values will work as-is for a default ACE Direct installation. The installation scripts in this repo assume default values.
     * View `~/ace-direct/dat/parameter_desc.json` for a description of each configuration variable.
-    * Change the `<SOMEUSER>` value to your ACE Direct home user account on the `acenode` server, e.g., `ec2-user` .
     * Supply FQDNs, IP addresses, etc. for the ACE Direct components that were installed in the previous steps.
 
 1. Ensure SSH access to external libraries. This will avoid very long build times. Edit your `~/.gitconfig` file to make sure it has this entry:
@@ -506,18 +505,17 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 
 ---
 
-## ACE Direct troubleshooting
+## ACE Direct Troubleshooting and Configuration Tips
 
-* Check the status of application servers on `acenode.domain.com`:
+1. Check the status of application servers on `acenode.domain.com`:
 
-  * Run `pm2 status`:
+* Run `pm2 status`:
 
-    * Are all `status` fields `online (OK)`? If not, errors are present. View all `~/ace-direct/*/logs/*.log` files for errors.
-    * Are any `restart` counts? Are they increasing? If so, errors are present.
+  * Are all `status` fields `online (OK)`? If not, errors are present. View all `~/ace-direct/*/logs/*.log` files for errors.
+  * Are any `restart` counts? Are they increasing? If so, errors are present.
 
-  * To restart the application servers: `pm2 restart all`
-
-* Perform an ACE Direct self-test on the `acenode` server:
+1. To restart the application servers: `pm2 restart all`
+1. Perform an ACE Direct self-test on the `acenode` server (requires `ssh` access to all servers):
 
   ```bash
   $  cd ~/ace-direct
@@ -525,90 +523,99 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
   $  npm run status  # should have all green checkmarks
   ```
 
-* Set the `common:debug_level` parameter in `/home/acedirect/ace-direct/dat/config.json` to `ALL` to see all messages in the application server log files.
-* Check the `logs` folder in each application folder for errors or warnings: `~/ace-direct/*/logs/*.log`
-* Verify that all back end servers (e.g., Redis, MongoDB, NGINX, MySQL, Asterisk, SIP Proxy, ...) are running.
-* Verify that there are _no firewalls_ blocking internal ports (e.g., `firewalld` on `acenode.domain.com` would block access to some internal ports).
-* Does the BusyLight device respond? Try the self-test mode on the BusyLight server app.
-* Verify that the `/etc/hosts` file is configured correctly.
-* Verify that the NGINX `/etc/nginx/nginx.conf` file is configured correctly.
-* Verify that the global `~/ace-direct/dat/config.json` file is configured correctly.
-* Management Portal installation - for any `lodash` errors, try installing the `lodash` library globally as root: `sudo npm install lodash -g`.
-* NGINX cannot proxy to the NODE server - when using FQDNs for ACEDirect in `/etc/nginx/nginx.conf`, the FQDNs may force traffic through a proxy. To resolve this, map the FQDN to the private IP instead, using a private host zone. _Or_, simply use private IP addresses in place of FQDNs in `/etc/nginx/nginx.conf` for the ACEDirect, ManagementPortal, and login (`/ace`) paths.
-* No CDR records in the Management Portal - Make sure Asterisk (`acesip.domain.com`) is configured to have the MySQL database credentials, CDR database name, and CDR table name (see `~/ace-direct/dat/config.json` for database credentials). Also make sure that the _ODBC C_ library is installed on `acesip.domain.com`; this library is normally installed by the automated installation script.
-* Consumer portal cannot reach Asterisk (`acesip.domain.com`); `ERR_CONNECTION_REFUSED` - make sure Asterisk is configured to use valid certificates.
-* Cannot connect to portals - possibly remap the elastic IPs or try running `nslookup` on the NGINX FQDN and verify its public FQDN and public IP.
-* NGINX errors when trying to connect to portals, but all servers are up and running - make sure all servers have the **correct time, synced with each other**.
-* Rebooting servers - the reboot order is:
+1. Set the logging level. Change the `common:debug_level` parameter in `~/ace-direct/dat/config.json` to `ALL` to see all messages in the application server log files. Run `pm2 restart all` to enable the new log level.
 
-  * `aceturn` - TURN
-  * `acestun` - STUN
-  * `acesip` - Asterisk and ACE Quill
-  * `aceproxy` - SIP proxy
-  * `portal` - NGINX
-  * `acekms` - media server
-  * `acenode` - Node.js
+1. Check the `logs` folder in each application folder for errors or warnings: `~/ace-direct/*/logs/*.log` .
+1. Verify that all back-end servers (e.g., Redis, MongoDB, NGINX, MySQL, Asterisk, SIP Proxy, Kurento, ...) are running.
+1. Verify that there are _no firewalls_ blocking internal ports (e.g., `firewalld` on `acenode.domain.com` could block access to some internal ports).
+1. Does the BusyLight device respond? Try the self-test mode on the BusyLight server app.
+1. Verify that the `/etc/hosts` file is configured correctly on all back-end servers.
+1. Verify that the NGINX `/etc/nginx/nginx.conf` file is configured correctly.
+1. Verify that the global `~/ace-direct/dat/config.json` file is configured correctly. This must be configured _before_ building the application.
+1. When rebooting servers, the order is:
 
-    * Set SE Linux variable: `sudo setsebool -P httpd_can_network_connect 1`
-    * Start Redis: `sudo service redis start`
-    * Start MongoDB
-    * Start MySQL
-    * Start all Node.js servers: `pm2 start process.json` or `pm2 start all`
+* `aceturn` - TURN
+* `acestun` - STUN
+* `acesip` - Asterisk and ACE Quill
+* `aceproxy` - SIP proxy
+* `portal` - NGINX
+* `acekms` - media server
+* `acenode` - Node.js
 
-* If `acedirect-kurento` fails to build, try running `build2`:
+  * Set SE Linux variable: `sudo setsebool -P httpd_can_network_connect 1`
+  * Start Redis: `sudo service redis start`
+  * Start MongoDB
+  * Start MySQL
+  * Start all Node.js servers: `pm2 start ~/ace-direct/dat/process.json` or `pm2 start all`
 
-  ```bash
-  $  cd ~/ace-direct/acedirect-kurento
-  $
-  $  npm run clean
-  $  npm run build2
-  $  npm run config
-  $
-  $  pm2 restart all  # restart all application servers
-  ```
+1. To use a custom videomail intro video for Consumer videomail, put the video in `acedirect/public/media/` . Set the filename in `dat/config.json`: `web_videomail.introVideo` .
+1. To use custom Consumer portal intro videos, put them in `acedirect/public/media` and update the `complaint_videos` section in `dat/config.json`.
 
-* If `acedirect-kurento` takes too long to build, try:
+---
 
-  ```bash
-  $  cd ~/ace-direct/acedirect-kurento/vendor/reconnect-ws
-  $
-  $  rm package-lock.json
-  $  npm run clean
-  $  npm run build
-  $
-  ```
+## ACE Direct Issues and Solutions
 
-* The Node builds on `acenode` are taking too long - see instructions above for creating the `~/.gitconfig` file.
-* A node server is failing to build or start - the `package-lock.json` file may be outdated. Delete the file and rebuild. For example, for `videomail-service`:
+1. **ISSUE**: Management portal build has `lodash` errors. **SOLUTION**: Installing the `lodash` library globally as root: `sudo npm install lodash -g` and rebuild.
+1. **ISSUE**: NGINX cannot proxy to the `acenode` server. **SOLUTION**: When using FQDNs for ACE Direct in `/etc/nginx/nginx.conf`, the FQDNs may force traffic through a proxy. To resolve this, map the FQDN to the private IP instead, using a private host zone. _Or_, simply use private IP addresses in place of FQDNs in `/etc/nginx/nginx.conf` for all the paths.
+1. **ISSUE**: There are no CDR records in the management portal. **SOLUTION**: Make sure Asterisk (`acesip.domain.com`) is configured to have the MySQL database credentials, CDR database name, and CDR table name (see `~/ace-direct/dat/config.json` for these values). Make sure that the _ODBC C_ library is installed on `acesip.domain.com`.
+1. **ISSUE**: The consumer portal cannot reach Asterisk (`acesip.domain.com`); `ERR_CONNECTION_REFUSED`. **SOLUTION**: Make sure Asterisk is configured to use valid certificates.
+1. **ISSUE**: Server certificates may have expired. **SOLUTION**: Check certificate expiration: `openssl x509 -enddate -noout -in cert.pem`
+1. **ISSUE**: Cannot connect to the agent, consumer, or management portals from a browser. **SOLUTION**: Remap the AWS elastic IPs. Run `nslookup` on the NGINX FQDN and verify its public FQDN and public IP.
+1. **ISSUE**: NGINX errors occur when trying to connect to the portals, but all servers are up and running. **SOLUTION**: Make sure all servers have the correct time, synced with each other.
+1. **ISSUE**: `acedirect-kurento` fails to build. **SOLUTION**:
 
-  ```bash
-  $  cd ~/ace-direct/videomail-service
-  $
-  $  rm package-lock.json
-  $  npm run build
-  ...
-  $  pm2 restart all  # restart the node servers
-  ```
+    ```bash
+    $  cd ~/ace-direct/acedirect-kurento
+    $
+    $  npm run clean
+    $  npm run build2
+    $  npm run config
+    $
+    $  pm2 restart all  # restart all application servers
+    ```
 
-* The Node builds on `acenode` are failing - verify the `npm` version and try updating it:
+1. **ISSUE**: `acedirect-kurento` takes _too long_ to build. **SOLUTION**:
 
-  ```bash
-  $  npm -v
-  7.19.1
-  $
-  $  # to update to 7.19.1 (for example):
-  $  npm install -g npm@7.19.1
-  $
-  ```
+    ```bash
+    $  cd ~/ace-direct/acedirect-kurento/vendor/reconnect-ws
+    $
+    $  rm package-lock.json
+    $  npm run clean
+    $  npm run build
+    $
+    $  cd ~/ace-direct/acedirect-kurento
+    $  npm run clean
+    $  npm run build
+    $
+    ```
 
-* All services appear to be working, but calls are not queuing - The signaling server (`acedirect-kurento`) may have trouble connecting to Asterisk. There will be reconnect messages in the signaling server. Asterisk may have a successful status, but it is responsive. Try restarting the Asterisk service: `sudo service asterisk restart`.
-* On an incoming consumer portal call, the agent portal sees the consumer extension instead of the VRS number as the caller ID number. Also, the agent has no incoming video after answering the call.
-  * Solution 1: Try restarting REDIS: `sudo service redis restart` .
-  * Solution 2: Make sure the agent URL environment matches the consumer portal URL environment.
-* To use a custom videomail intro video for Consumer videomail, put the video in `acedirect/public/media/` . Set the filename in `dat/config.json`: `web_videomail.introVideo` .
-* To use custom Consumer portal intro videos, put them in `acedirect/public/media` and update the `complaint_videos` section in `dat/config.json`.
-* If you see a message like [agent] _has an account but ACE Direct Agent extensions have not yet been configured by a Manager_, make sure the `agent_table` has been updated for `v6.1`: `ALTER TABLE agent_data ADD profile_picture varchar(50);`
-* If Node clients have a MySQL error: _ER_NOT_SUPPORTED_AUTH_MODE: Client does not support authentication protocol requested by server; consider upgrading MySQL client_. Make sure to grant full privileges to the primary database user has on all databases, for example:
+1. **ISSUE**: The Node builds on `acenode` are taking _too long_. **SOLUTION**: See the instructions above for creating the `~/.gitconfig` file.
+1. **ISSUE**: A specific node server is failing to build or start. **SOLUTION**: The `package-lock.json` file may be outdated. Delete the file and rebuild. For example, for `videomail-service`:
+
+    ```bash
+    $  cd ~/ace-direct/videomail-service
+    $
+    $  rm package-lock.json
+    $  npm run build
+    $  pm2 restart all  # restart the node servers
+    $
+    ```
+
+1. **ISSUE**: The Node server builds on `acenode` are failing. **SOLUTION**: Verify the `npm` version and update it if necessary:
+
+    ```bash
+    $  npm -v
+    7.19.1
+    $
+    $  # to update to 7.19.1 (for example):
+    $  npm install -g npm@7.19.1
+    $
+    ```
+
+1. **ISSUE**: All Node services appear to be working, but calls are not queuing. **SOLUTION**: The signaling server (`acedirect-kurento`) may have trouble connecting to Asterisk. There may be reconnect messages in the signaling server log file. Asterisk may have a successful status, but it could be unresponsive. Try restarting the Asterisk service: `sudo service asterisk restart`.
+1. **ISSUE**: On an incoming consumer portal call, the agent portal sees the consumer extension instead of the VRS number as the caller ID number. Also, the agent has no incoming video after answering the call. **SOLUTION**: Try restarting REDIS: `sudo service redis restart`. Also make sure the agent URL environment matches the consumer portal URL environment.
+1. **ISSUE**: This message appears: [agent] _has an account but ACE Direct Agent extensions have not yet been configured by a Manager_. **SOLUTION**: Make sure the MySQL `agent_table` has been updated for `v6.1`: `ALTER TABLE agent_data ADD profile_picture varchar(50);`.
+1. **ISSUE**: Node servers have this MySQL error: `ER_NOT_SUPPORTED_AUTH_MODE: Client does not support authentication protocol requested by server; consider upgrading MySQL client`. **SOLUTION**: Grant full privileges to the primary database user has on all databases, for example:
 
     ```bash
     GRANT ALL PRIVILEGES ON acedirect.* TO 'acedirect'@'%';
@@ -616,7 +623,13 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
     GRANT SELECT ON asterisk.* to 'acedirect'@'%';
     ```
 
-* When upgrading to MySQL8, make sure to disable strict mode, e.g.: `USE acedirect; SET GLOBAL sql_mode='';`. When strict mode is on, [fognito/db/create-user.sh](fognito/db/create-user.sh) may fail to add MySQL users.
+1. **ISSUE**: Database queries are failing in MySQL8. **SOLUTION**: Disable strict mode: `USE acedirect; SET GLOBAL sql_mode='';`. Note, when strict mode is on, [fognito/db/create-user.sh](fognito/db/create-user.sh) may fail to add MySQL users.
+1. **ISSUE**: When the agent logs in, an error appears in the agent portal browser console: `WebSocket connection to 'wss://...' failed:`. **SOLUTION**: Make sure the `common.https.csr` file specified in `dat/config.json` actually exists on the Node server. It can be an empty file. It is created in the dat folder by the build process.
+1. **ISSUE**: Some incoming VRS provider calls get into queue, but some don't. **SOLUTION**: Make sure the SIP Proxy server database has the appropriate IP entries for each provider.
+1. **ISSUE**: Consumer web calls are not queueing. The acedirect-kurento error log shows a silent error: `'media_server.ace_direct_webrtc_session' doesn't exist`. **SOLUTION**: Run `cd ~/ace-direct; npm run config` to create the media_server tables at the start of a deployment. Restart node `pm2 restart all` and try again.
+1. **ISSUE**: Agents do not appear in the management portal. SOLUTIN: Make sure the `/etc/asterisk/agents.conf` file has the correct agent names and extensions.
+1. **ISSUE**: Inbound VRS calls are not connecting. There is no IVVR shown. The call just disconnects. **SOLUTION**: Make sure the call center is open. Use the management portal to _open_ the call center.
+1. **ISSUE**: Inbound web calls are connecting, but there is no incoming video on either side. **SOLUTION**: Make sure the STUN and TURN servers are running. Make sure the STUN and TURN servers are properly configured in `~/ace-direct/dat/config.json`.
 
 ---
 
