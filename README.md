@@ -561,7 +561,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 1. **ISSUE**: The consumer portal cannot reach Asterisk (`acesip.domain.com`); `ERR_CONNECTION_REFUSED`. **SOLUTION**: Make sure Asterisk is configured to use valid certificates.
 1. **ISSUE**: Server certificates may have expired. **SOLUTION**: Check certificate expiration: `openssl x509 -enddate -noout -in cert.pem`
 1. **ISSUE**: Cannot connect to the agent, consumer, or management portals from a browser. **SOLUTION**: Remap the AWS elastic IPs. Run `nslookup` on the NGINX FQDN and verify its public FQDN and public IP.
-1. **ISSUE**: NGINX errors occur when trying to connect to the portals, but all servers are up and running. **SOLUTION**: Make sure all servers have the **correct time, synced with each other**.
+1. **ISSUE**: NGINX errors occur when trying to connect to the portals, but all servers are up and running. **SOLUTION**: Make sure all servers have the correct time, synced with each other.
 1. **ISSUE**: `acedirect-kurento` fails to build. **SOLUTION**:
 
     ```bash
