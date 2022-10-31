@@ -57,7 +57,8 @@
             <div id="input-group" class="input-group">
               <label for="vrs_number" style="float:left">Videophone Number</label>
               <input type="text" pattern="\d*" class="form-control input-lg" id="vrs_number" data-inputmask="'mask': '(999) 999-9999'"
-                data-mask required tabindex="0">
+              data-mask required tabindex="0">
+              <div id="message-mobile" hidden aria-live="assertive" style="text-align:left;"></div>
               <span class="input-group-btn" style="vertical-align:bottom">
                 <button id="continueButton" class="btn input-lg button"
                   tabindex="0">
