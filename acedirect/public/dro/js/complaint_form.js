@@ -140,8 +140,8 @@ $(document).ready(() => {
     unmuteAudio();
     disableVideoPrivacy();
     socket.emit('consumer-closed-translation-modal', {
-      agentExt: translationAgentExt // TODO remove hardcoded value
-    })
+      agentExt: translationAgentExt
+    });
   });
 
   if (fileSharingEnabled === 'false') {
@@ -660,15 +660,16 @@ function ConnectSocket() {
                 speakerExt: exten
               });
             } else {
-              updateCaptions(data);
+              updateCaptions(transcripts);
             }
           })
           .on('consumer-caption', (transcripts) => {
             // receiving own captions
             // eslint-disable-next-line no-use-before-define
             updateCaptions(transcripts);
-          }).on('receive-agent-language', (data) => {
-            console.log('got agent language!')
+          })
+          .on('receive-agent-language', (data) => {
+            console.log('got agent language!');
             agentLanguage = data.agentLanguage;
             translationAgentExt = data.agentExt; // TODO find a better spot for this
             if (agentLanguage !== userLanguage) {
@@ -835,10 +836,10 @@ function toggleCaptions() {
 }
 
 function setupLanguageTranslation() {
-  console.log('in setupLanguageTranslation')
+  console.log('in setupLanguageTranslation');
   settingUpTranslation = true;
   $('#consumerDefaultLanguage').html(userLanguage);
-  $('#agentDefaultLanguage').html(agentLanguage)
+  $('#agentDefaultLanguage').html(agentLanguage);
 
   if ($('#waitingModal').is(':visible')) {
     $('#waitingModal').modal('hide');
@@ -855,7 +856,6 @@ function enableTranslation() {
   isTranslationEnabled = true;
   tempConsumerLanguage = userLanguage;
   tempAgentLanguage = agentLanguage;
-
 }
 
 function disableTranslation() {
@@ -1042,8 +1042,8 @@ function registerJssip(myExtension, myPassword) {
           captionsStart();
         }
 
-        if (languageTranslationEnabled && $('#beginCallLanguageTranslationModal').is(':visible')) {
-          console.log(`your language: ${userLanguage} agent language: ${agentLanguage}`)
+        if (isTranslationEnabled && $('#beginCallLanguageTranslationModal').is(':visible')) {
+          console.log(`your language: ${userLanguage} agent language: ${agentLanguage}`);
           muteAudio();
           enableVideoPrivacy();
         }

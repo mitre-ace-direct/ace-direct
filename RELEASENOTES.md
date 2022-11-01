@@ -2,6 +2,22 @@
 
 ![ACE Direct](images/adsmall.png)
 
+## Release v6.1, 11/04/2022
+
+* _Consumer Portal UI/UX Redesign_ - The consumer portal user-interface is enhanced. The call flow is more usable, efficient, and straightforward.
+* _Consumer Portal ASL Video Capability_ - The consumer portal has the ability to play customizable ASL videos to assist consumers while placing calls, waiting in queue, leaving videomails, etc. The ASL videos can be configured to be auto-play or click-to-play.
+* _Consumer Portal 508 Compliance Enhancements_ - The consumer portal has been enhanced to comply with 508 Compliance requirements. This includes transcripts for ASL videos, text for screen readers, and more.
+* _Agent Portal Screen Recording - Both Sides_ - The agent portal screen recording feature now records both sides (agent and consumer) of a call.
+* _ACE Direct Configurable Call Features_ - ACE Direct features such as file-sharing, captions, language translation, and others are now configurable. These features may be enable/disabled through the config.json configuration file.
+* _Asterisk Availability Warning_ - The agent portal has a new alert feature to let the agent know when the back-end Asterisk server is unavailable or unreachable.
+* _Agent Profile Pictures_ - The agent and management portals now allow agent profile pictures. Agents may configure their own profile pictures. Managers can see/manage all profile pictures.
+* _Consumer Web-based Videomail_ - Consumer portal videomail now uses browser-based videomail which is more straightforward and responsive.
+* _Web-based Captioning_ - The agent and consumer captions use browser-based captions, which are more responsive and accurate.
+* _Hardware Acceleration Warning_ - Check if browser has hardware acceleration enabled and warn the user to disable hardware acceleration for best interoperability results.
+* _Added Support for MySQL8_ - Update the database creation script to enable support for MySQL 8.
+* _Configurable Chat Text_ - Allow consumers to increase/decrease the size of chat text.
+* _Passport Authentication and Authorization_ - Replaced legacy OpenAM authentication with Node Passport authentication for more current, industry standard authentication methods.
+
 ## Release v6.0, 07/23/2021
 
 * _Call Monitoring_ – The Agent portal now allows for an Agent to passively monitor an ongoing call between another Agent and a consumer.
