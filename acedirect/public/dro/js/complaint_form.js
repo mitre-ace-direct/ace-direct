@@ -140,7 +140,7 @@ $(document).ready(() => {
     unmuteAudio();
     disableVideoPrivacy();
     socket.emit('consumer-closed-translation-modal', {
-      agentExt: translationAgentExt // TODO remove hardcoded value
+      agentExt: translationAgentExt
     });
   });
 
