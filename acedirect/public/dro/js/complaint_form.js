@@ -1122,14 +1122,20 @@ function toggleTranscripts(video) {
     // open the transcript
     $(transcript).attr('hidden', false);
     $(transcript).attr('aria-hidden', 'false');
-    $(transcriptButton).html('Hide Video Transcript <i class="fa fa-chevron-up" alt="" aria-hidden="true"></i>');
+    $(transcriptButton).html('<i class="fa fa-file-text fa-lg" alt="" aria-hidden="true"></i>');
     $(transcriptButton).blur();
     $(transcript).focus();
+    $(transcriptButton).css('border-bottom', '2px solid #073863');
+    $(transcriptButton).attr('title', 'Close video transcript');
+    $(transcriptButton).attr('aria-label', 'Close video transcript');
   } else {
     // close the transcript
     $(transcript).attr('hidden', true);
     $(transcript).attr('aria-hidden', 'true');
-    $(transcriptButton).html('Show Video Transcript <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>');
+    $(transcriptButton).html('<i class="fa fa-file-text fa-lg" alt="" aria-hidden="true"></i>');
+    $(transcriptButton).css('border-bottom', 'none');
+    $(transcriptButton).attr('title', 'Show video transcript');
+    $(transcriptButton).attr('aria-label', 'Show video transcript');
   }
 }
 
@@ -2317,3 +2323,186 @@ function captionsEnd() {
   recognition = null;
   recognitionStarted = false;
 }
+
+// #region Instructions Video Controls
+$('#instructions-custom-seekbar').on('click', function changeSeekbarTime(e) {
+  const offset = $(this).offset();
+  const left = (e.pageX - offset.left);
+  const totalWidth = $('#instructions-custom-seekbar').width();
+  const percentage = (left / totalWidth);
+  const vidTime = $('#instructionsVideo')[0].duration * percentage;
+  $('#instructionsVideo')[0].currentTime = vidTime;
+});
+
+$('#instructionsPlayPauseBtn').on('click', () => {
+  if (document.getElementById('instructionsVideo').paused) {
+    document.getElementById('instructionsVideo').play();
+  } else {
+    document.getElementById('instructionsVideo').pause();
+  }
+});
+
+$('#instructionsVideo')
+  .on('play', (_evt) => {
+    console.log('playing');
+    $('#instructionsVideo').attr('title', 'Pause Video');
+    $('#instructionsPlayPauseBtnIcon').removeClass('fa-play').addClass('fa-pause')
+      .attr('title', 'Pause instructions video')
+      .attr('aria-label', 'Pause instructions video');
+  })
+  .on('pause', (_evt) => {
+    console.log('pause');
+    $('#instructionsVideo').attr('title', 'Play Video');
+    $('#instructionsPlayPauseBtnIcon').removeClass('fa-pause').addClass('fa-play')
+      .attr('title', 'Play instructions video')
+      .attr('aria-label', 'Play instructions video');
+  })
+  .on('ended', (_evt) => {
+    console.log('ended');
+  })
+  .on('timeupdate', (_evt) => {
+    const cTime = $('#instructionsVideo')[0].currentTime;
+    const dur = $('#instructionsVideo')[0].duration;
+    const percentage = (cTime / dur) * 100;
+    $('#instructions-custom-seekbar span').css('width', `${percentage}%`);
+    const date = new Date(0);
+    date.setSeconds(cTime); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#instructionsCurrentTime').html(timeString);
+  })
+  .on('loadedmetadata', (_evt) => {
+    const date = new Date(0);
+    date.setSeconds($('#instructionsVideo')[0].duration); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#instructionsDuration').html(timeString);
+  })
+  .on('click', (_evt) => {
+    if ($('#instructionsVideo').get(0).paused) {
+      $('#instructionsVideo').get(0).play();
+    } else {
+      $('#instructionsVideo').get(0).pause();
+    }
+  });
+// #endregion
+
+// #region Waiting Video Controls
+$('#waitingVideo-custom-seekbar').on('click', function changeSeekbarTime(e) {
+  const offset = $(this).offset();
+  const left = (e.pageX - offset.left);
+  const totalWidth = $('#waitingVideo-custom-seekbar').width();
+  const percentage = (left / totalWidth);
+  const vidTime = $('#waitingVideo')[0].duration * percentage;
+  $('#waitingVideo')[0].currentTime = vidTime;
+});
+
+$('#waitingVideoPlayPauseBtn').on('click', () => {
+  if (document.getElementById('waitingVideo').paused) {
+    document.getElementById('waitingVideo').play();
+  } else {
+    document.getElementById('waitingVideo').pause();
+  }
+});
+
+$('#pleaseWaitVideo')
+  .on('play', (_evt) => {
+    console.log('playing');
+    $('#pleaseWaitVideo').attr('title', 'Pause Video');
+    $('#pleaseWaitVideoPlayPauseBtnIcon').removeClass('fa-play').addClass('fa-pause')
+      .attr('title', 'Pause waiting video')
+      .attr('aria-label', 'Pause waiting video');
+  })
+  .on('pause', (_evt) => {
+    console.log('pause');
+    $('#pleaseWaitVideo').attr('title', 'Play Video');
+    $('#pleaseWaitVideoPlayPauseBtnIcon').removeClass('fa-pause').addClass('fa-play')
+      .attr('title', 'Play waiting video')
+      .attr('aria-label', 'Play waiting video');
+  })
+  .on('ended', (_evt) => {
+    console.log('ended');
+  })
+  .on('timeupdate', (_evt) => {
+    const cTime = $('#pleaseWaitVideo')[0].currentTime;
+    const dur = $('#pleaseWaitVideo')[0].duration;
+    const percentage = (cTime / dur) * 100;
+    $('#pleaseWaitVideo-custom-seekbar span').css('width', `${percentage}%`);
+    const date = new Date(0);
+    date.setSeconds(cTime); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#pleaseWaitVideoCurrentTime').html(timeString);
+  })
+  .on('loadedmetadata', (_evt) => {
+    const date = new Date(0);
+    date.setSeconds($('#pleaseWaitVideo')[0].duration); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#pleaseWaitVideoDuration').html(timeString);
+  })
+  .on('click', (_evt) => {
+    if ($('#pleaseWaitVideo').get(0).paused) {
+      $('#pleaseWaitVideo').get(0).play();
+    } else {
+      $('#pleaseWaitVideo').get(0).pause();
+    }
+  });
+// #endregion
+
+// #region No Agents Video Controls
+$('#noAgentsVideo-custom-seekbar').on('click', function changeSeekbarTime(e) {
+  const offset = $(this).offset();
+  const left = (e.pageX - offset.left);
+  const totalWidth = $('#noAgentsVideo-custom-seekbar').width();
+  const percentage = (left / totalWidth);
+  const vidTime = $('#noAgentsVideo')[0].duration * percentage;
+  $('#noAgentsVideo')[0].currentTime = vidTime;
+});
+
+$('#noAgentsVideoPlayPauseBtn').on('click', () => {
+  if (document.getElementById('noAgentsVideo').paused) {
+    document.getElementById('noAgentsVideo').play();
+  } else {
+    document.getElementById('noAgentsVideo').pause();
+  }
+});
+
+$('#noAgentsVideo')
+  .on('play', (_evt) => {
+    console.log('playing');
+    $('#noAgentsVideo').attr('title', 'Pause Video');
+    $('#noAgentsVideoPlayPauseBtnIcon').removeClass('fa-play').addClass('fa-pause')
+      .attr('title', 'Pause no agents video')
+      .attr('aria-label', 'Pause no agents video');
+  })
+  .on('pause', (_evt) => {
+    console.log('pause');
+    $('#noAgentsVideo').attr('title', 'Play Video');
+    $('#noAgentsVideoPlayPauseBtnIcon').removeClass('fa-pause').addClass('fa-play')
+      .attr('title', 'Play no agents video')
+      .attr('aria-label', 'Play no agents video');
+  })
+  .on('ended', (_evt) => {
+    console.log('ended');
+  })
+  .on('timeupdate', (_evt) => {
+    const cTime = $('#noAgentsVideo')[0].currentTime;
+    const dur = $('#noAgentsVideo')[0].duration;
+    const percentage = (cTime / dur) * 100;
+    $('#noAgentsVideo-custom-seekbar span').css('width', `${percentage}%`);
+    const date = new Date(0);
+    date.setSeconds(cTime); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#noAgentsVideoCurrentTime').html(timeString);
+  })
+  .on('loadedmetadata', (_evt) => {
+    const date = new Date(0);
+    date.setSeconds($('#noAgentsVideo')[0].duration); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#noAgentsVideoDuration').html(timeString);
+  })
+  .on('click', (_evt) => {
+    if ($('#noAgentsVideoPlayPauseBtn').get(0).paused) {
+      $('#noAgentsVideo').get(0).play();
+    } else {
+      $('#noAgentsVideo').get(0).pause();
+    }
+  });
+// #endregion
