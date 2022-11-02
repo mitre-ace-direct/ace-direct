@@ -307,7 +307,7 @@ function connect_socket() {
           // Initialize agent language to English
           console.log('Initializing agent language to English');
           socket.emit('set-agent-language', {
-            language:'en',
+            language:'en-US',
             extension: extensionMe
           });
           socket.emit('get-dial-in-number', {extension: extensionMe});

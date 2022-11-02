@@ -660,14 +660,15 @@ function ConnectSocket() {
                 speakerExt: exten
               });
             } else {
-              updateCaptions(data);
+              updateCaptions(transcripts);
             }
           })
           .on('consumer-caption', (transcripts) => {
             // receiving own captions
             // eslint-disable-next-line no-use-before-define
             updateCaptions(transcripts);
-          }).on('receive-agent-language', (data) => {
+          })
+          .on('receive-agent-language', (data) => {
             console.log('got agent language!')
             agentLanguage = data.agentLanguage;
             translationAgentExt = data.agentExt; // TODO find a better spot for this
