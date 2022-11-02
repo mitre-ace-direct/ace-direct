@@ -911,8 +911,14 @@ function disableTranslation() {
 
 function enableChatTranslation() {
   isChatTranslationEnabled = true;
-  userLanguageChat = $('#language-select').val()
+  userLanguageChat = $('#language-select').val();
   // userLanguageChat = 'es-US' 
+}
+
+window.onload = function checkTranslationEnabled() {
+  if (!languageTranslationEnabled) {
+    document.getElementById('chat-translate-btn').style.display = 'none';
+  }
 }
 
 function chatTranslationModalDropdown() {
@@ -927,13 +933,13 @@ function chatTranslationModalDropdown() {
   
 }
 function chatTranslationToggleSwitch() {
-  var enableTranslationDropdown = document.getElementById("languageSwitch").checked
+  var enableTranslationDropdown = document.getElementById("languageSwitch").checked;
   if (!enableTranslationDropdown) {
-    document.getElementById("language-select").disabled = true
+    document.getElementById("language-select").disabled = true;
     document.getElementById("language-select").selectedIndex = -1;
-    disableTranslation()
+    disableTranslation();
   } else {
-    document.getElementById("language-select").disabled = false
+    document.getElementById("language-select").disabled = false;
   }
 }
 
