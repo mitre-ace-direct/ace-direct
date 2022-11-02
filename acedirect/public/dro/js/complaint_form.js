@@ -54,11 +54,13 @@ let body1globalFontSize;
 let body2globalFontSize;
 let wasMutedBeforePrivacy = false;
 let currentPosition;
-let userLanguage = '';
+let userLanguageCaptions = '';
+let userLanguageChat = '';
 let agentLanguage = '';
-let isTranslationEnabled = false;
-let tempConsumerLanguage = '';
-let tempAgentLanguage = '';
+let isCaptionTranslationEnabled = false;
+let isChatTranslationEnabled = false;
+// let tempConsumerLanguage = '';
+// let tempAgentLanguage = '';
 let settingUpTranslation = false;
 let translationAgentExt = '';
 
@@ -140,8 +142,8 @@ $(document).ready(() => {
     unmuteAudio();
     disableVideoPrivacy();
     socket.emit('consumer-closed-translation-modal', {
-      agentExt: translationAgentExt // TODO remove hardcoded value
-    })
+      agentExt: translationAgentExt
+    });
   });
 
   if (fileSharingEnabled === 'false') {
@@ -187,7 +189,47 @@ $(document).ready(() => {
   });
 
   // Get browser language
-  userLanguage = window.navigator.language;
+  let browserLanguage = window.navigator.language;
+  switch (browserLanguage) {
+    case 'en': // English US
+      browserLanguage = 'en-US';
+      break;
+    case 'es': // Spanish (Mexican)
+      browserLanguage = 'es-US';
+      break;
+    case 'ar': // Arabic (Modern Standard)
+      browserLanguage = 'ar-EG';
+      break;
+    case 'pt': // Brazilian Portuguese
+      browserLanguage = 'pt-PT';
+      break;
+    case 'zh': // Chinese (Mandarin)
+      browserLanguage = 'zh';
+      break;
+    case 'nl': // Dutch
+      browserLanguage = 'nl-NL';
+      break;
+    case 'fr': // French
+      browserLanguage = 'fr-FR';
+      break;
+    case 'de': // German
+      browserLanguage = 'de-DE';
+      break;
+    case 'it': // Italian
+      browserLanguage = 'it-IT';
+      break;
+    case 'ja': // Japanese
+      browserLanguage = 'ja-JP';
+      break;
+    case 'ko': // Korean
+      browserLanguage = 'ko-KR';
+      break;
+    default:
+      browserLanguage = 'en-US';
+  }
+
+  userLanguageCaptions = browserLanguage;
+  userLanguageChat = browserLanguage;
 });
 
 $(window).bind('fullscreenchange', (_e) => {
@@ -407,9 +449,10 @@ function ConnectSocket() {
             }
           })
           .on('chat-message-new', (data) => {
-            if (isTranslationEnabled) {
+            // eslint-disable-next-line no-undef
+            if (isChatTranslationEnabled && languageTranslationEnabled) {
               // Translate incoming message
-              const localLanguage = userLanguage;
+              const localLanguage = userLanguageChat;
               console.log(`Selected language is ${localLanguage}`);
               // var localLanguage = 'es';
               data['toLanguage'] = localLanguage;
@@ -651,8 +694,8 @@ function ConnectSocket() {
             updateCaptions(transcripts);
           })
           .on('multiparty-caption', (transcripts) => {
-            // eslint-disable-next-line no-use-before-define
-            if (isTranslationEnabled) {
+            // eslint-disable-next-line no-use-before-define, no-undef
+            if (isCaptionTranslationEnabled && languageTranslationEnabled) {
               socket.emit('translate-caption', {
                 transcripts,
                 callerNumber: exten,
@@ -669,10 +712,12 @@ function ConnectSocket() {
             updateCaptions(transcripts);
           })
           .on('receive-agent-language', (data) => {
-            console.log('got agent language!')
+            console.log('got agent language!');
             agentLanguage = data.agentLanguage;
-            translationAgentExt = data.agentExt; // TODO find a better spot for this
-            if (agentLanguage !== userLanguage) {
+            translationAgentExt = data.agentExt;
+            // eslint-disable-next-line no-undef
+            if (languageTranslationEnabled
+              && (agentLanguage !== userLanguageCaptions || agentLanguage !== userLanguageChat)) {
               // Ask user if they want to enable language translation
               muteAudio();
               enableVideoPrivacy();
@@ -836,10 +881,8 @@ function toggleCaptions() {
 }
 
 function setupLanguageTranslation() {
-  console.log('in setupLanguageTranslation')
+  console.log('in setupLanguageTranslation');
   settingUpTranslation = true;
-  $('#consumerDefaultLanguage').html(userLanguage);
-  $('#agentDefaultLanguage').html(agentLanguage)
 
   if ($('#waitingModal').is(':visible')) {
     $('#waitingModal').modal('hide');
@@ -853,16 +896,53 @@ function setupLanguageTranslation() {
 }
 
 function enableTranslation() {
-  isTranslationEnabled = true;
-  tempConsumerLanguage = userLanguage;
-  tempAgentLanguage = agentLanguage;
-
+  isCaptionTranslationEnabled = true;
+  isChatTranslationEnabled = true;
+  // tempConsumerLanguage = userLanguage;
+  // tempAgentLanguage = agentLanguage;
 }
 
 function disableTranslation() {
-  isTranslationEnabled = false;
-  tempConsumerLanguage = '';
-  tempAgentLanguage = '';
+  isCaptionTranslationEnabled = false;
+  isChatTranslationEnabled = false;
+  // tempConsumerLanguage = '';
+  // tempAgentLanguage = '';
+}
+
+function enableChatTranslation() {
+  isChatTranslationEnabled = true;
+  userLanguageChat = $('#language-select').val();
+  // userLanguageChat = 'es-US' 
+}
+
+window.onload = function checkTranslationEnabled() {
+  if (languageTranslationEnabled === 'true') {
+    document.getElementById('chat-translate-btn').style.display = 'block';
+  } else {
+    document.getElementById('chat-translate-btn').style.display = 'none';
+  }
+}
+
+function chatTranslationModalDropdown() {
+  document.getElementById("toggleChatTranslationModal").classList.toggle("show");
+
+  // var toggleChatTranslationModal = document.getElementById("toggleChatTranslationModal");
+  // if (toggleChatTranslationModal.classList.contains('show')) {
+  //   toggleChatTranslationModal.classList.remove('show');
+  // } else {
+  //   document.getElementById("toggleChatTranslationModal").classList.toggle("show");
+  // }
+  
+}
+function chatTranslationToggleSwitch() {
+  var enableTranslationDropdown = document.getElementById("languageSwitch").checked;
+  if (!enableTranslationDropdown) {
+    document.getElementById("language-select").disabled = true;
+    document.getElementById("language-select").selectedIndex = -1;
+    disableTranslation();
+  } else {
+    document.getElementById("language-select").disabled = false;
+  }
 }
 
 // Function to change the text of the feedback for the buttons.
@@ -1043,8 +1123,9 @@ function registerJssip(myExtension, myPassword) {
           captionsStart();
         }
 
+        // eslint-disable-next-line no-undef
         if (languageTranslationEnabled && $('#beginCallLanguageTranslationModal').is(':visible')) {
-          console.log(`your language: ${userLanguage} agent language: ${agentLanguage}`)
+          console.log(`your language: ${userLanguageCaptions} agent language: ${agentLanguage}`);
           muteAudio();
           enableVideoPrivacy();
         }
@@ -1077,14 +1158,20 @@ function toggleTranscripts(video) {
     // open the transcript
     $(transcript).attr('hidden', false);
     $(transcript).attr('aria-hidden', 'false');
-    $(transcriptButton).html('Hide Video Transcript <i class="fa fa-chevron-up" alt="" aria-hidden="true"></i>');
+    $(transcriptButton).html('<i class="fa fa-file-text fa-lg" alt="" aria-hidden="true"></i>');
     $(transcriptButton).blur();
     $(transcript).focus();
+    $(transcriptButton).css('border-bottom', '2px solid #073863');
+    $(transcriptButton).attr('title', 'Close video transcript');
+    $(transcriptButton).attr('aria-label', 'Close video transcript');
   } else {
     // close the transcript
     $(transcript).attr('hidden', true);
     $(transcript).attr('aria-hidden', 'true');
-    $(transcriptButton).html('Show Video Transcript <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>');
+    $(transcriptButton).html('<i class="fa fa-file-text fa-lg" alt="" aria-hidden="true"></i>');
+    $(transcriptButton).css('border-bottom', 'none');
+    $(transcriptButton).attr('title', 'Show video transcript');
+    $(transcriptButton).attr('aria-label', 'Show video transcript');
   }
 }
 
@@ -1097,7 +1184,7 @@ function enterQueue() {
     toggleTranscripts('instructionsVideo');
   }
 
-  const language = userLanguage;
+  const language = userLanguageCaptions;
   socket.emit('call-initiated', {
     language,
     vrs
@@ -1625,7 +1712,7 @@ $('#chatsend').submit((evt) => {
   // console.log('utc time: ' + date.utc().format());
   // const timestamp = date.utc();
 
-  const language = userLanguage;
+  const language = userLanguageChat;
 
   $('#newchatmessage').val('');
   $('#newchatmessage').height(0);
@@ -2173,7 +2260,7 @@ let recognition = null;
 let lastResult;
 function captionsStart() {
   isCaptioning = true;
-  let language = userLanguage;
+  let language = userLanguageCaptions;
   switch (language) {
     case 'en': // English US
       language = 'en-US';
@@ -2272,3 +2359,186 @@ function captionsEnd() {
   recognition = null;
   recognitionStarted = false;
 }
+
+// #region Instructions Video Controls
+$('#instructions-custom-seekbar').on('click', function changeSeekbarTime(e) {
+  const offset = $(this).offset();
+  const left = (e.pageX - offset.left);
+  const totalWidth = $('#instructions-custom-seekbar').width();
+  const percentage = (left / totalWidth);
+  const vidTime = $('#instructionsVideo')[0].duration * percentage;
+  $('#instructionsVideo')[0].currentTime = vidTime;
+});
+
+$('#instructionsPlayPauseBtn').on('click', () => {
+  if (document.getElementById('instructionsVideo').paused) {
+    document.getElementById('instructionsVideo').play();
+  } else {
+    document.getElementById('instructionsVideo').pause();
+  }
+});
+
+$('#instructionsVideo')
+  .on('play', (_evt) => {
+    console.log('playing');
+    $('#instructionsVideo').attr('title', 'Pause Video');
+    $('#instructionsPlayPauseBtnIcon').removeClass('fa-play').addClass('fa-pause')
+      .attr('title', 'Pause instructions video')
+      .attr('aria-label', 'Pause instructions video');
+  })
+  .on('pause', (_evt) => {
+    console.log('pause');
+    $('#instructionsVideo').attr('title', 'Play Video');
+    $('#instructionsPlayPauseBtnIcon').removeClass('fa-pause').addClass('fa-play')
+      .attr('title', 'Play instructions video')
+      .attr('aria-label', 'Play instructions video');
+  })
+  .on('ended', (_evt) => {
+    console.log('ended');
+  })
+  .on('timeupdate', (_evt) => {
+    const cTime = $('#instructionsVideo')[0].currentTime;
+    const dur = $('#instructionsVideo')[0].duration;
+    const percentage = (cTime / dur) * 100;
+    $('#instructions-custom-seekbar span').css('width', `${percentage}%`);
+    const date = new Date(0);
+    date.setSeconds(cTime); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#instructionsCurrentTime').html(timeString);
+  })
+  .on('loadedmetadata', (_evt) => {
+    const date = new Date(0);
+    date.setSeconds($('#instructionsVideo')[0].duration); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#instructionsDuration').html(timeString);
+  })
+  .on('click', (_evt) => {
+    if ($('#instructionsVideo').get(0).paused) {
+      $('#instructionsVideo').get(0).play();
+    } else {
+      $('#instructionsVideo').get(0).pause();
+    }
+  });
+// #endregion
+
+// #region Waiting Video Controls
+$('#waitingVideo-custom-seekbar').on('click', function changeSeekbarTime(e) {
+  const offset = $(this).offset();
+  const left = (e.pageX - offset.left);
+  const totalWidth = $('#waitingVideo-custom-seekbar').width();
+  const percentage = (left / totalWidth);
+  const vidTime = $('#waitingVideo')[0].duration * percentage;
+  $('#waitingVideo')[0].currentTime = vidTime;
+});
+
+$('#waitingVideoPlayPauseBtn').on('click', () => {
+  if (document.getElementById('waitingVideo').paused) {
+    document.getElementById('waitingVideo').play();
+  } else {
+    document.getElementById('waitingVideo').pause();
+  }
+});
+
+$('#pleaseWaitVideo')
+  .on('play', (_evt) => {
+    console.log('playing');
+    $('#pleaseWaitVideo').attr('title', 'Pause Video');
+    $('#pleaseWaitVideoPlayPauseBtnIcon').removeClass('fa-play').addClass('fa-pause')
+      .attr('title', 'Pause waiting video')
+      .attr('aria-label', 'Pause waiting video');
+  })
+  .on('pause', (_evt) => {
+    console.log('pause');
+    $('#pleaseWaitVideo').attr('title', 'Play Video');
+    $('#pleaseWaitVideoPlayPauseBtnIcon').removeClass('fa-pause').addClass('fa-play')
+      .attr('title', 'Play waiting video')
+      .attr('aria-label', 'Play waiting video');
+  })
+  .on('ended', (_evt) => {
+    console.log('ended');
+  })
+  .on('timeupdate', (_evt) => {
+    const cTime = $('#pleaseWaitVideo')[0].currentTime;
+    const dur = $('#pleaseWaitVideo')[0].duration;
+    const percentage = (cTime / dur) * 100;
+    $('#pleaseWaitVideo-custom-seekbar span').css('width', `${percentage}%`);
+    const date = new Date(0);
+    date.setSeconds(cTime); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#pleaseWaitVideoCurrentTime').html(timeString);
+  })
+  .on('loadedmetadata', (_evt) => {
+    const date = new Date(0);
+    date.setSeconds($('#pleaseWaitVideo')[0].duration); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#pleaseWaitVideoDuration').html(timeString);
+  })
+  .on('click', (_evt) => {
+    if ($('#pleaseWaitVideo').get(0).paused) {
+      $('#pleaseWaitVideo').get(0).play();
+    } else {
+      $('#pleaseWaitVideo').get(0).pause();
+    }
+  });
+// #endregion
+
+// #region No Agents Video Controls
+$('#noAgentsVideo-custom-seekbar').on('click', function changeSeekbarTime(e) {
+  const offset = $(this).offset();
+  const left = (e.pageX - offset.left);
+  const totalWidth = $('#noAgentsVideo-custom-seekbar').width();
+  const percentage = (left / totalWidth);
+  const vidTime = $('#noAgentsVideo')[0].duration * percentage;
+  $('#noAgentsVideo')[0].currentTime = vidTime;
+});
+
+$('#noAgentsVideoPlayPauseBtn').on('click', () => {
+  if (document.getElementById('noAgentsVideo').paused) {
+    document.getElementById('noAgentsVideo').play();
+  } else {
+    document.getElementById('noAgentsVideo').pause();
+  }
+});
+
+$('#noAgentsVideo')
+  .on('play', (_evt) => {
+    console.log('playing');
+    $('#noAgentsVideo').attr('title', 'Pause Video');
+    $('#noAgentsVideoPlayPauseBtnIcon').removeClass('fa-play').addClass('fa-pause')
+      .attr('title', 'Pause no agents video')
+      .attr('aria-label', 'Pause no agents video');
+  })
+  .on('pause', (_evt) => {
+    console.log('pause');
+    $('#noAgentsVideo').attr('title', 'Play Video');
+    $('#noAgentsVideoPlayPauseBtnIcon').removeClass('fa-pause').addClass('fa-play')
+      .attr('title', 'Play no agents video')
+      .attr('aria-label', 'Play no agents video');
+  })
+  .on('ended', (_evt) => {
+    console.log('ended');
+  })
+  .on('timeupdate', (_evt) => {
+    const cTime = $('#noAgentsVideo')[0].currentTime;
+    const dur = $('#noAgentsVideo')[0].duration;
+    const percentage = (cTime / dur) * 100;
+    $('#noAgentsVideo-custom-seekbar span').css('width', `${percentage}%`);
+    const date = new Date(0);
+    date.setSeconds(cTime); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#noAgentsVideoCurrentTime').html(timeString);
+  })
+  .on('loadedmetadata', (_evt) => {
+    const date = new Date(0);
+    date.setSeconds($('#noAgentsVideo')[0].duration); // specify value for SECONDS here
+    const timeString = date.toISOString().substr(15, 4);
+    $('#noAgentsVideoDuration').html(timeString);
+  })
+  .on('click', (_evt) => {
+    if ($('#noAgentsVideoPlayPauseBtn').get(0).paused) {
+      $('#noAgentsVideo').get(0).play();
+    } else {
+      $('#noAgentsVideo').get(0).pause();
+    }
+  });
+// #endregion

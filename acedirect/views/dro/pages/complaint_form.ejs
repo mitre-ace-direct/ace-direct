@@ -166,6 +166,35 @@
                         aria-label="Increase font size by 10%">A</button>
                     </div>
                   </div>
+                  <span id="dropdown-menu" class="dropdown pull-left" style="overflow:visible">
+                    <button id="chat-translate-btn" data-toggle="dropdown" animation="true" style="height: 40px" onclick="chatTranslationModalDropdown()">
+                      <i class="fa fa-language"></i>
+                    </button>
+                    <div class="dropdown-menu" id="toggleChatTranslationModal" style="width: 300px">
+                      <span class="dropdown-content body1" style="margin-left: 10px"><b>Language Translation</b></span>
+                      <p class="dropdown-content" style="margin-left: 10px">Turn on language translation to translate incoming chat messages into a selected language</p>
+                      <label class="switch" style="margin-left: 10px">
+                        <input type="checkbox" onclick="chatTranslationToggleSwitch()" id="languageSwitch">
+                        <span class="slider round"></span>
+                      </label>
+                      <div class="modal-body">
+                        <select disabled="disabled" name="webmenu" id="language-select" style="width: 210px;margin-left:10px" class="dropdown-content" onchange="enableChatTranslation()">
+                          <option selected="true" disabled="disabled">Select a Language</option>
+                          <option value="en-US" selected title="images/flags/us.png">English</option>
+                          <option value="ar" title="images/flags/ae.png">Arabic</option>
+                          <option value="zh" title="images/flags/cn.png">Chinese (Mandarin)</option>
+                          <option value="nl" title="images/flags/nl.png">Dutch</option>
+                          <option value="fr" title="images/flags/fr.png">French</option>
+                          <option value="de" title="images/flags/de.png">German</option>
+                          <option value="it" title="images/flags/in.png">Italian</option>
+                          <option value="ja" title="images/flags/jp.png">Japanese</option>
+                          <option value="ko" title="images/flags/kr.png">Korean</option>
+                          <option value="pt" title="images/flags/pt.png">Portuguese</option>
+                          <option value="es" title="images/flags/mx.png">Spanish</option>
+                        </select>
+                      </div>
+                    </div>
+                  </span>
                   <hr id="chat-separator" />
                   <div class="box-body" id="chat-box-body" style="display:flex; flex-direction: column; overflow: hidden;"
                     role="region" aria-label="chat window">
@@ -333,15 +362,36 @@
 <div id="optionsModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
-      <div class="modal-header" style="padding-bottom: 5px !important;">
-        <video muted controls class="video-element" id="instructionsVideo" title="Play Video" tabindex="0">
+      <!-- <div class="modal-header" style="padding-bottom: 5px !important;"> -->
+      <div class="modal-header">
+        <video muted class="video-element" id="instructionsVideo" title="Play Video" tabindex="-1">
           <source src="/media/<%= instructionsVideo %>" type="video/mp4">
           <source src="/media/<%= instructionsVideo %>" type="video/webm">
         </video>
-        <button type="button" id="instructionsVideoTranscriptBtn" class="btn btn-style btn-block button btn-tertiary" onclick="toggleTranscripts('instructionsVideo')">
-          Show Video Transcript
-          <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>
-        </button>
+
+        <div class="modalVideoButtonBar">
+          <div style="display:inline-block; vertical-align:middle">
+            <button class="modalVideoButton" id="instructionsPlayPauseBtn" tabindex="0"
+              data-toggle="tooltip" data-placement="bottom" title="Play instructions video" aria-label="Play instructions video">
+              <i id="instructionsPlayPauseBtnIcon" class="fa fa-play fa-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div style="display:inline-block; vertical-align:middle; " class="body1"><span
+              id="instructionsCurrentTime">0:00</span>/<span id="instructionsDuration">0:00</span></div>
+          <div id="instructions-custom-seekbar" class="video-custom-seekbar" role="progressbar" aria-label="progress bar">
+            <span></span></div>
+          <span>|</span>
+
+          <div style="display:inline-block; vertical-align:middle">
+            <button class="modalVideoButton pull-right" id="instructionsVideoTranscriptBtn" tabindex="0"
+              data-toggle="tooltip" data-placement="bottom" title="Show video transcript" aria-label="Show video transcript"
+              onclick="toggleTranscripts('instructionsVideo')">
+              <i id="instructionsTranscriptBtnIcon" class="fa fa-file-text fa-lg" alt="" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
         <div id="instructionsVideoTranscript" tabindex="0" aria-hidden="true" hidden>
           <section class="transcript" role="transcript">
             <p><%= instructionsVideoTranscript %></p>
@@ -395,18 +445,40 @@
 <div id="waitingModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="waiting-header">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
-      <div class="modal-header text-center" style="padding-bottom: 5px !important;">
-        <p id="callingBanner"><b>Calling...</b></p>
-        <p class="waiting-header body1" role="heading" aria-level="3" aria-live="assertive" style="padding-bottom:0px"><b>Waiting for the next available agent</b></p>
+      <!-- <div class="modal-header" style="padding-bottom: 5px !important;"> -->
+      <div class="modal-header">
+        <p id="callingBanner" class="text-center"><b>Calling...</b></p>
+        <p class="waiting-header body1 text-center" role="heading" aria-level="3" aria-live="assertive"
+          style="padding-bottom:0px">
+          <b>Waiting for the next available agent</b>
+        </p>
         <hr />
-        <video muted controls class="video-element" id="pleaseWaitVideo" title="Play Video" tabindex="0">
+        <video muted class="video-element" id="pleaseWaitVideo" title="Play Video" tabindex="-1">
           <source src="/media/<%= pleaseWaitVideo %>" type="video/mp4">
           <source src="/media/<%= pleaseWaitVideo %>" type="video/webm">
         </video>
-        <button type="button" id="pleaseWaitTranscriptBtn" class="btn btn-style btn-block button btn-tertiary" onclick="toggleTranscripts('pleaseWait')">
-          Show Video Transcript
-          <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>
-        </button>
+        <div class="modalVideoButtonBar">
+          <div style="display:inline-block; vertical-align:middle">
+            <button class="modalVideoButton" id="pleaseWaitVideoPlayPauseBtn" tabindex="0"
+              data-toggle="tooltip" data-placement="bottom" title="Play instructions video" aria-label="Play waiting video">
+              <i id="pleaseWaitVideoPlayPauseBtnIcon" class="fa fa-play fa-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div style="display:inline-block; vertical-align:middle; " class="body1"><span
+              id="pleaseWaitVideoCurrentTime">0:00</span>/<span id="pleaseWaitVideoDuration">0:00</span></div>
+          <div id="pleaseWaitVideo-custom-seekbar" class="video-custom-seekbar" role="progressbar" aria-label="progress bar">
+            <span></span></div>
+
+          <div style="display:inline-block; vertical-align:middle">
+            <button class="modalVideoButton" id="pleaseWaitTranscriptBtn" tabindex="0"
+              data-toggle="tooltip" data-placement="bottom" title="Show video transcript" aria-label="Show video transcript"
+              onclick="toggleTranscripts('pleaseWait')">
+              <i id="pleaseWaitVideoTranscriptBtnIcon" class="fa fa-file-text fa-lg" alt="" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
         <div id="pleaseWaitTranscript" tabindex="0" aria-hidden="true" hidden>
           <section class="transcript" role="transcript">
             <p><%= pleaseWaitVideoTranscript %></p>
@@ -447,17 +519,38 @@
 <div id="noAgentsModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="no-agents-header">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
-      <div class="modal-header text-center" style="padding-bottom: 5px !important;">
-        <div class="no-agents-header" aria-live="assertive" style="font-size:26px !important">No agents are available to take your call at this time.</div>
+      <!-- <div class="modal-header" style="padding-bottom: 5px !important;"> -->
+      <div class="modal-header">
+        <div class="no-agents-header text-center" aria-live="assertive" style="font-size:26px !important">No agents are available to take your call at this time.</div>
         <hr/>
-        <video muted controls class="video-element" id="noAgentsVideo" title="Play Video" tabindex="0">
+        <video muted class="video-element" id="noAgentsVideo" title="Play Video" tabindex="-1">
           <source src="/media/<%= noAgentsVideo %>" type="video/mp4">
           <source src="/media/<%= noAgentsVideo %>" type="video/webm">
         </video>
-        <button type="button" id="noAgentsTranscriptBtn" class="btn btn-style btn-block button btn-tertiary" onclick="toggleTranscripts('noAgents')">
-          Show Video Transcript
-          <i class="fa fa-chevron-down" alt="" aria-hidden="true"></i>
-        </button>
+
+        <div class="modalVideoButtonBar">
+          <div style="display:inline-block; vertical-align:middle">
+            <button class="modalVideoButton" id="noAgentsVideoPlayPauseBtn" tabindex="0"
+              data-toggle="tooltip" data-placement="bottom" title="Play no agents video" aria-label="Play no agents video">
+              <i id="noAgentsVideoPlayPauseBtnIcon" class="fa fa-play fa-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+
+          <div style="display:inline-block; vertical-align:middle; " class="body1"><span
+              id="noAgentsVideoCurrentTime">0:00</span>/<span id="noAgentsVideoDuration">0:00</span></div>
+          <div id="noAgentsVideo-custom-seekbar" class="video-custom-seekbar" role="progressbar" aria-label="progress bar">
+            <span></span>
+          </div>
+
+          <div style="display:inline-block; vertical-align:middle">
+            <button class="modalVideoButton" id="noAgentsTranscriptBtn" tabindex="0"
+              data-toggle="tooltip" data-placement="bottom" title="Show video transcript" aria-label="Show video transcript"
+              onclick="toggleTranscripts('noAgents')">
+              <i id="noAgentsVideoTranscriptBtnIcon" class="fa fa-file-text fa-lg" alt="" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
         <div id="noAgentsTranscript" tabindex="0" aria-hidden="true" aria-label="Video Transcript" hidden>
           <section class="transcript" role="transcript">
             <p><%= noAgentsVideoTranscript %></p>
@@ -549,7 +642,7 @@
         <div class="modal-body" style="position: relative;min-height:300px; padding: 0px;">
           <div class="center text-center body1" style="width:100%; padding: 30px;"><!--style="width: 75%"-->
             <br /><br />
-            <p>The agent you will be connected to is fluent in ASL, but they may speak or type in a different language than the language set as default in your browser. 
+            <p>The agent you will be connected to is fluent in ASL, but they may speak or type in a different language than the language set as default in your browser.
               Do you want to turn on language translation for captions and chat for this call?
             </p>
           </div>

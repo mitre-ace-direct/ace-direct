@@ -25,13 +25,32 @@ function fnBrowserDetect() {
   }
 }
 
+let messageId = '#message';
+const mobileDetect = () => {
+  if (window.innerWidth > 500) {
+    console.log(`Desktop: ${window.innerWidth}`);
+    messageId = '#message';
+  } else {
+    console.log(`Mobile: ${window.innerWidth}`);
+    messageId = '#message-mobile';
+  }
+};
+
+window.addEventListener('load', () => {
+  mobileDetect();
+});
+
+window.addEventListener('resize', () => {
+  mobileDetect();
+});
+
 $(window).on('load', () => {
   fnBrowserDetect();
   $('[data-mask]').inputmask();
   $('#form-login').submit((evt) => {
     evt.preventDefault();
-    $('#message').hide();
-    $('#message').text('');
+    $(messageId).hide();
+    $(messageId).text('');
     $('#input-group').removeClass('has-error');
     const vrsnumber = $('#vrs_number').val().replace(/^1|[^\d]/g, '');
     if (vrsnumber.length === 10) {
@@ -49,25 +68,25 @@ $(window).on('load', () => {
             // sessionStorage.accesstoken = data.token;
             window.location.reload();
           } else {
-            $('#message').text(`${data.message} ${$('#vrs_number').val()}`);
-            $('#message').css({ color: 'red' });
-            $('#message').show();
+            $(messageId).text(`${data.message} ${$('#vrs_number').val()}`);
+            $(messageId).css({ color: 'red' });
+            $(messageId).show();
           }
         },
         error(xhr, _status, _error) {
           if (xhr.responseJSON && xhr.responseJSON.message === 'Number blocked') {
             window.location = xhr.responseJSON.redirectUrl;
           } else {
-            $('#message').text('An Error Occured.');
-            $('#message').show();
+            $(messageId).text('An Error Occured.');
+            $(messageId).show();
           }
         }
       });
     } else {
       $('#input-group').addClass('has-error');
-      $('#message').text('Invalid phone number format');
-      $('#message').css({ color: 'red' });
-      $('#message').show();
+      $(messageId).text('Invalid phone number format');
+      $(messageId).css({ color: 'red' });
+      $(messageId).show();
     }
   });
 });
@@ -83,12 +102,12 @@ $(document).ready(() => {
 });
 
 function hideMessage() {
-  $('#message').hide();
+  $(messageId).hide();
 }
 
 function login() {
-  $('#message').hide();
-  $('#message').text('');
+  $(messageId).hide();
+  $(messageId).text('');
   $('#input-group').removeClass('has-error');
   hideMessage();
   const vrsnumber = $('#vrs_number').val().replace(/^1|[^\d]/g, '');
@@ -107,26 +126,26 @@ function login() {
           // sessionStorage.accesstoken = data.token;
           window.location.reload();
         } else {
-          $('#message').text(`${data.message} ${$('#vrs_number').val()}`);
-          $('#message').css({ color: 'red' });
-          $('#message').show();
+          $(messageId).text(`${data.message} ${$('#vrs_number').val()}`);
+          $(messageId).css({ color: 'red' });
+          $(messageId).show();
         }
       },
       error(xhr, _status, _error) {
         if (xhr.responseJSON && xhr.responseJSON.message === 'Number blocked') {
           window.location = xhr.responseJSON.redirectUrl;
         } else {
-          $('#message').text('An Error Occured.');
-          $('#message').css({ color: 'red' });
-          $('#message').show();
+          $(messageId).text('An Error Occured.');
+          $(messageId).css({ color: 'red' });
+          $(messageId).show();
         }
       }
     });
   } else {
     $('#input-group').addClass('has-error');
-    $('#message').text('Invalid phone number');
-    $('#message').css({ color: 'red' });
-    $('#message').show();
+    $(messageId).text('Invalid phone number');
+    $(messageId).css({ color: 'red' });
+    $(messageId).show();
   }
 }
 
