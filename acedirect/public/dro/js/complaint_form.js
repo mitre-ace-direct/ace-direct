@@ -909,6 +909,34 @@ function disableTranslation() {
   // tempAgentLanguage = '';
 }
 
+function enableChatTranslation() {
+  isChatTranslationEnabled = true;
+  userLanguageChat = $('#language-select').val()
+  // userLanguageChat = 'es-US' 
+}
+
+function chatTranslationModalDropdown() {
+  document.getElementById("toggleChatTranslationModal").classList.toggle("show");
+
+  // var toggleChatTranslationModal = document.getElementById("toggleChatTranslationModal");
+  // if (toggleChatTranslationModal.classList.contains('show')) {
+  //   toggleChatTranslationModal.classList.remove('show');
+  // } else {
+  //   document.getElementById("toggleChatTranslationModal").classList.toggle("show");
+  // }
+  
+}
+function chatTranslationToggleSwitch() {
+  var enableTranslationDropdown = document.getElementById("languageSwitch").checked
+  if (!enableTranslationDropdown) {
+    document.getElementById("language-select").disabled = true
+    document.getElementById("language-select").selectedIndex = -1;
+    disableTranslation()
+  } else {
+    document.getElementById("language-select").disabled = false
+  }
+}
+
 // Function to change the text of the feedback for the buttons.
 function setFeedbackText(text) {
   if ($('#button-feedback').is(':hidden')) {
