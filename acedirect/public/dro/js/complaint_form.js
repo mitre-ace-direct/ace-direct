@@ -916,7 +916,7 @@ function enableChatTranslation() {
 }
 
 window.onload = function checkTranslationEnabled() {
-  if (languageTranslationEnabled) {
+  if (languageTranslationEnabled === 'true') {
     document.getElementById('chat-translate-btn').style.display = 'block';
   } else {
     document.getElementById('chat-translate-btn').style.display = 'none';
