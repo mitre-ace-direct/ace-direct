@@ -84,7 +84,7 @@
             </div>
 
             <div style="box-sizing: border-box;" class="row">
-              <p class="alert alert-info body2" id="button-feedback" style="display: flex;margin-bottom: 0px;text-indent: 30px;" aria-live="assertive"></p>
+              <p class="alert alert-info body2" id="button-feedback" style="display: flex; margin-bottom: 0px; text-indent: 30px;" aria-live="assertive"></p>
             </div>
 
             <div class="box-body" id="fullscreen-element">
@@ -369,23 +369,25 @@
           <source src="/media/<%= instructionsVideo %>" type="video/webm">
         </video>
 
-        <div class="modalVideoButtonBar">
-          <div style="display:inline-block; vertical-align:middle">
-            <button class="modalVideoButton" id="instructionsPlayPauseBtn" tabindex="0"
-              data-toggle="tooltip" data-placement="bottom" title="Play instructions video" aria-label="Play instructions video">
+        <div class="modalVideoButtonBar" style="display:flex;">
+          <div style="vertical-align:middle">
+            <button class="modalVideoButton" id="instructionsPlayPauseBtn" tabindex="0" data-toggle="tooltip"
+              data-placement="bottom" title="Play instructions video" aria-label="Play instructions video">
               <i id="instructionsPlayPauseBtnIcon" class="fa fa-play fa-lg" aria-hidden="true"></i>
             </button>
           </div>
 
-          <div style="display:inline-block; vertical-align:middle; " class="body1"><span
-              id="instructionsCurrentTime">0:00</span>/<span id="instructionsDuration">0:00</span></div>
-          <div id="instructions-custom-seekbar" class="video-custom-seekbar" role="progressbar" aria-label="progress bar">
-            <span></span></div>
-          <span>|</span>
+          <div class="videoTimeSeekbar">
+            <span id="instructionsCurrentTime">0:00</span>/<span id="instructionsDuration">0:00</span>
+          </div>
+          <span id="instructions-custom-seekbar" class="video-custom-seekbar" role="progressbar" aria-label="progress bar">
+            <span></span>
+          </span>
+          <div class="videoTimeSeekbar" style="margin-top: 6px; font-weight: 800; font-size: 30px; color: #8F8F8F">|</div>
 
-          <div style="display:inline-block; vertical-align:middle">
-            <button class="modalVideoButton pull-right" id="instructionsVideoTranscriptBtn" tabindex="0"
-              data-toggle="tooltip" data-placement="bottom" title="Show video transcript" aria-label="Show video transcript"
+          <div style="float:right; vertical-align:middle">
+            <button class="modalVideoButton" id="instructionsVideoTranscriptBtn" tabindex="0" data-toggle="tooltip"
+              data-placement="bottom" title="Show video transcript" aria-label="Show video transcript"
               onclick="toggleTranscripts('instructionsVideo')">
               <i id="instructionsTranscriptBtnIcon" class="fa fa-file-text fa-lg" alt="" aria-hidden="true"></i>
             </button>
@@ -457,20 +459,23 @@
           <source src="/media/<%= pleaseWaitVideo %>" type="video/mp4">
           <source src="/media/<%= pleaseWaitVideo %>" type="video/webm">
         </video>
-        <div class="modalVideoButtonBar">
-          <div style="display:inline-block; vertical-align:middle">
+        <div class="modalVideoButtonBar" style="display:flex;">
+          <div style="vertical-align:middle">
             <button class="modalVideoButton" id="pleaseWaitVideoPlayPauseBtn" tabindex="0"
               data-toggle="tooltip" data-placement="bottom" title="Play instructions video" aria-label="Play waiting video">
               <i id="pleaseWaitVideoPlayPauseBtnIcon" class="fa fa-play fa-lg" aria-hidden="true"></i>
             </button>
           </div>
 
-          <div style="display:inline-block; vertical-align:middle; " class="body1"><span
-              id="pleaseWaitVideoCurrentTime">0:00</span>/<span id="pleaseWaitVideoDuration">0:00</span></div>
-          <div id="pleaseWaitVideo-custom-seekbar" class="video-custom-seekbar" role="progressbar" aria-label="progress bar">
-            <span></span></div>
+          <div class="videoTimeSeekbar">
+            <span id="pleaseWaitVideoCurrentTime">0:00</span>/<span id="pleaseWaitVideoDuration">0:00</span>
+          </div>
+          <span id="pleaseWaitVideo-custom-seekbar" class="video-custom-seekbar" role="progressbar" aria-label="progress bar">
+            <span></span>
+          </span>
+          <div class="videoTimeSeekbar" style="margin-top: 6px; font-weight: 800; font-size: 30px; color: #8F8F8F">|</div>
 
-          <div style="display:inline-block; vertical-align:middle">
+          <div style="float:right; vertical-align:middle">
             <button class="modalVideoButton" id="pleaseWaitTranscriptBtn" tabindex="0"
               data-toggle="tooltip" data-placement="bottom" title="Show video transcript" aria-label="Show video transcript"
               onclick="toggleTranscripts('pleaseWait')">
@@ -528,7 +533,7 @@
           <source src="/media/<%= noAgentsVideo %>" type="video/webm">
         </video>
 
-        <div class="modalVideoButtonBar">
+        <div class="modalVideoButtonBar" style="display:flex;">
           <div style="display:inline-block; vertical-align:middle">
             <button class="modalVideoButton" id="noAgentsVideoPlayPauseBtn" tabindex="0"
               data-toggle="tooltip" data-placement="bottom" title="Play no agents video" aria-label="Play no agents video">
@@ -536,13 +541,15 @@
             </button>
           </div>
 
-          <div style="display:inline-block; vertical-align:middle; " class="body1"><span
-              id="noAgentsVideoCurrentTime">0:00</span>/<span id="noAgentsVideoDuration">0:00</span></div>
-          <div id="noAgentsVideo-custom-seekbar" class="video-custom-seekbar" role="progressbar" aria-label="progress bar">
-            <span></span>
+          <div class="videoTimeSeekbar">
+            <span id="noAgentsVideoCurrentTime">0:00</span>/<span id="noAgentsVideoDuration">0:00</span>
           </div>
+          <span id="noAgentsVideo-custom-seekbar" class="video-custom-seekbar" role="progressbar" aria-label="progress bar">
+            <span></span>
+          </span>
+          <div class="videoTimeSeekbar" style="margin-top: 6px; font-weight: 800; font-size: 30px; color: #8F8F8F">|</div>
 
-          <div style="display:inline-block; vertical-align:middle">
+          <div style="float:right; vertical-align:middle">
             <button class="modalVideoButton" id="noAgentsTranscriptBtn" tabindex="0"
               data-toggle="tooltip" data-placement="bottom" title="Show video transcript" aria-label="Show video transcript"
               onclick="toggleTranscripts('noAgents')">

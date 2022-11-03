@@ -107,18 +107,22 @@ $(document).ready(() => {
   $('#optionsModal').on('shown.bs.modal', () => {
     $('#optionsModal').css('overflow-y', 'auto');
     window.openDialog('optionsModal', window);
+    $(':focus').blur();
   });
   $('#noAgentsModal').on('shown.bs.modal', () => {
     $('#noAgentsModal').css('overflow-y', 'auto');
     window.openDialog('noAgentsModal', window);
+    $(':focus').blur();
   });
   $('#waitingModal').on('shown.bs.modal', () => {
     $('#waitingModal').css('overflow-y', 'auto');
     window.openDialog('waitingModal', window);
+    $(':focus').blur();
   });
   $('#callEndedModal').on('shown.bs.modal', () => {
     $('#callEndedModal').css('overflow-y', 'auto');
     window.openDialog('callEndedModal', window);
+    $(':focus').blur();
   });
   $('#beginCallLanguageTranslationModal').on('shown.bs.modal', () => {
     $('#beginCallLanguageTranslationModal').css('overflow-y', 'auto');
@@ -2528,7 +2532,7 @@ $('#noAgentsVideo')
     $('#noAgentsVideoDuration').html(timeString);
   })
   .on('click', (_evt) => {
-    if ($('#noAgentsVideoPlayPauseBtn').get(0).paused) {
+    if ($('#noAgentsVideo').get(0).paused) {
       $('#noAgentsVideo').get(0).play();
     } else {
       $('#noAgentsVideo').get(0).pause();
