@@ -2233,7 +2233,10 @@ io.sockets.on('connection', (socket) => {
     const callerNumber = data.callerNumber.toString();
     const { msgid } = data.transcripts;
     const { final } = data.transcripts;
-    const displayname = data.displayname || 'Caller';
+    let displayname = data.displayname || 'Consumer';
+    if (displayname === ' ') {
+      displayname = 'Consumer';
+    }
 
     console.log('translating', data);
 
@@ -2270,7 +2273,7 @@ io.sockets.on('connection', (socket) => {
                 languageFrom = language;
                 console.log('language from for user', fromNumber, languageFrom);
                 if (!languageFrom) {
-                  languageFrom = 'en'; // default English
+                  languageFrom = 'en-US'; // default English
                 }
 
                 resolve();
@@ -2303,7 +2306,7 @@ io.sockets.on('connection', (socket) => {
             console.log('same language!');
             socket.emit('caption-translated', {
               transcript: data.transcripts.transcript.trim(),
-              displayname: data.transcripts.displayname,
+              displayname,
               agent: data.transcripts.agent,
               msgid,
               final,
@@ -2337,7 +2340,7 @@ io.sockets.on('connection', (socket) => {
                 // fixme will this be wrong if multiple clients/agents?
                 socket.emit('caption-translated', {
                   transcript: translationData.translation,
-                  displayname: data.transcripts.displayname,
+                  displayname,
                   agent: data.transcripts.agent,
                   msgid,
                   final

@@ -912,7 +912,7 @@ function disableTranslation() {
 function enableChatTranslation() {
   isChatTranslationEnabled = true;
   userLanguageChat = $('#language-select').val();
-  // userLanguageChat = 'es-US' 
+  // userLanguageChat = 'es-US'
 }
 
 window.onload = function checkTranslationEnabled() {
@@ -921,10 +921,10 @@ window.onload = function checkTranslationEnabled() {
   } else {
     document.getElementById('chat-translate-btn').style.display = 'none';
   }
-}
+};
 
 function chatTranslationModalDropdown() {
-  document.getElementById("toggleChatTranslationModal").classList.toggle("show");
+  document.getElementById('toggleChatTranslationModal').classList.toggle('show');
 
   // var toggleChatTranslationModal = document.getElementById("toggleChatTranslationModal");
   // if (toggleChatTranslationModal.classList.contains('show')) {
@@ -932,16 +932,15 @@ function chatTranslationModalDropdown() {
   // } else {
   //   document.getElementById("toggleChatTranslationModal").classList.toggle("show");
   // }
-  
 }
 function chatTranslationToggleSwitch() {
-  var enableTranslationDropdown = document.getElementById("languageSwitch").checked;
+  var enableTranslationDropdown = document.getElementById('languageSwitch').checked;
   if (!enableTranslationDropdown) {
-    document.getElementById("language-select").disabled = true;
-    document.getElementById("language-select").selectedIndex = -1;
+    document.getElementById('language-select').disabled = true;
+    document.getElementById('language-select').selectedIndex = -1;
     disableTranslation();
   } else {
-    document.getElementById("language-select").disabled = false;
+    document.getElementById('language-select').disabled = false;
   }
 }
 
@@ -2380,14 +2379,12 @@ $('#instructionsPlayPauseBtn').on('click', () => {
 
 $('#instructionsVideo')
   .on('play', (_evt) => {
-    console.log('playing');
     $('#instructionsVideo').attr('title', 'Pause Video');
     $('#instructionsPlayPauseBtnIcon').removeClass('fa-play').addClass('fa-pause')
       .attr('title', 'Pause instructions video')
       .attr('aria-label', 'Pause instructions video');
   })
   .on('pause', (_evt) => {
-    console.log('pause');
     $('#instructionsVideo').attr('title', 'Play Video');
     $('#instructionsPlayPauseBtnIcon').removeClass('fa-pause').addClass('fa-play')
       .attr('title', 'Play instructions video')
@@ -2441,14 +2438,12 @@ $('#waitingVideoPlayPauseBtn').on('click', () => {
 
 $('#pleaseWaitVideo')
   .on('play', (_evt) => {
-    console.log('playing');
     $('#pleaseWaitVideo').attr('title', 'Pause Video');
     $('#pleaseWaitVideoPlayPauseBtnIcon').removeClass('fa-play').addClass('fa-pause')
       .attr('title', 'Pause waiting video')
       .attr('aria-label', 'Pause waiting video');
   })
   .on('pause', (_evt) => {
-    console.log('pause');
     $('#pleaseWaitVideo').attr('title', 'Play Video');
     $('#pleaseWaitVideoPlayPauseBtnIcon').removeClass('fa-pause').addClass('fa-play')
       .attr('title', 'Play waiting video')
@@ -2502,14 +2497,12 @@ $('#noAgentsVideoPlayPauseBtn').on('click', () => {
 
 $('#noAgentsVideo')
   .on('play', (_evt) => {
-    console.log('playing');
     $('#noAgentsVideo').attr('title', 'Pause Video');
     $('#noAgentsVideoPlayPauseBtnIcon').removeClass('fa-play').addClass('fa-pause')
       .attr('title', 'Pause no agents video')
       .attr('aria-label', 'Pause no agents video');
   })
   .on('pause', (_evt) => {
-    console.log('pause');
     $('#noAgentsVideo').attr('title', 'Play Video');
     $('#noAgentsVideoPlayPauseBtnIcon').removeClass('fa-pause').addClass('fa-play')
       .attr('title', 'Play no agents video')
