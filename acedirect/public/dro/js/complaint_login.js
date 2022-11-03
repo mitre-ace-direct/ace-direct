@@ -28,10 +28,8 @@ function fnBrowserDetect() {
 let messageId = '#message';
 const mobileDetect = () => {
   if (window.innerWidth > 500) {
-    console.log(`Desktop: ${window.innerWidth}`);
     messageId = '#message';
   } else {
-    console.log(`Mobile: ${window.innerWidth}`);
     messageId = '#message-mobile';
   }
 };
