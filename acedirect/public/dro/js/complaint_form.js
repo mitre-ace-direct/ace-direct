@@ -290,8 +290,12 @@ function ConnectSocket() {
           $('#lastName').val(payload.last_name);
           $('#callerPhone').val(payload.vrs);
           vrs = payload.vrs;
-          // $('#callerEmail').val(payload.email);
-          $('#displayname').val(`${payload.first_name} ${payload.last_name}`);
+          if (payload.first_name || payload.last_name) {
+            $('#displayname').val(`${payload.first_name} ${payload.last_name}`);
+          }
+          else {
+            $('#displayname').val('Consumer');
+          }
           const { isOpen } = payload;
           if (!isOpen) { // after hours processing; if after hours, then show this modal
             // TODO Review potentially having config variable to determine if enabled per user
@@ -480,15 +484,17 @@ function ConnectSocket() {
                 $('#rtt-typing').css('display', 'block');
                 setTimeout(() => {
                   $('#rtt-typing').css('display', 'block');
-                  $('#rtt-typing').html(`<b>${data.displayname}</b>`, `<br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
+                  $('#rtt-typing').html(`<b>${data.displayname}</b><br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
                   $('#rtt-typing').appendTo($('#chat-messages'));
                   $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
                 }, 100);
               } else {
-                $('#rtt-typing').css('display', 'block');
-                $('#rtt-typing').html(`<b>${data.displayname}</b>`, `<br/>${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
-                $('#rtt-typing').appendTo($('#chat-messages'));
-                $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+                setTimeout(() => {
+                  $('#rtt-typing').css('display', 'block');
+                  $('#rtt-typing').html(`<b>${data.displayname}</b><br />${data.rttmsg}`).addClass('direct-chat-text chat-body1').addClass('direct-chat-timestamp text-bold body2');
+                  $('#rtt-typing').appendTo($('#chat-messages'));
+                  $('#chat-messages').scrollTop($('#chat-messages')[0].scrollHeight);
+                }, 100);
               }
               isAgentTyping = true;
             }
