@@ -2534,7 +2534,7 @@ $('#noAgentsVideo')
     $('#noAgentsVideoDuration').html(timeString);
   })
   .on('click', (_evt) => {
-    if ($('#noAgentsVideoPlayPauseBtn').get(0).paused) {
+    if ($('#noAgentsVideo').get(0).paused) {
       $('#noAgentsVideo').get(0).play();
     } else {
       $('#noAgentsVideo').get(0).pause();

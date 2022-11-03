@@ -703,7 +703,7 @@ body {
   height: 34px;
 }
 
-.switch input { 
+.switch input {
   opacity: 0;
   width: 0;
   height: 0;
@@ -760,11 +760,11 @@ input:checked + .slider:before {
   height: 5px;
   overflow: hidden;
   position: relative;
-  width: 55%;
-  display: inline-block;
+  width: 100%;
   padding-left: 1em;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-top: 25px;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .video-custom-seekbar span {
@@ -774,6 +774,16 @@ input:checked + .slider:before {
   left: 0;
   height: 5px;
   width: 0px;
+}
+
+.videoTimeSeekbar {
+  border: none;
+  height: 45px;
+  margin-top: 18px;
+}
+
+.transcript p {
+  padding-top: 5px;
 }
 
 .modalVideoButton {
@@ -786,8 +796,8 @@ input:checked + .slider:before {
   color: #073863 !important;
   vertical-align: initial !important;
   margin-right: 5px;
-  margin-top: 11px;
-  margin-bottom: 11px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 .modalVideoButton:hover {
@@ -802,6 +812,7 @@ input:checked + .slider:before {
 
 .modalVideoButtonBar {
   background-color: #f2f2f2 !important;
+  height: 55px;
   margin: 0px !important;
   border: 0px !important;
   padding: 0px !important;
