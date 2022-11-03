@@ -174,17 +174,22 @@
   /* entire grid */
   #consumerBackground {
     display: grid;
-    grid-template-rows: min-content 1fr;
+    /* grid-template-rows: min-content 1fr; */
     grid-template-areas:
+      "hw-acc"
       "header"
       "main"
       "footer";
   }
-
+  
+  #hw-acc {
+    grid-area: hw-acc;
+  }
+  
   header {
     grid-area: header;
   }
-
+  
   main {
     grid-area: main;
     display: grid;

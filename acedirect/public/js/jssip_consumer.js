@@ -695,7 +695,7 @@ function updateConsumerCaptions(transcripts) {
 }
 
 // Default to English
-sessionStorage.consumerLanguage = 'en';
+sessionStorage.consumerLanguage = 'en-US';
 
 /* eslint no-undef: "error" */
 // eslint-disable-next-line no-unused-vars -- used by complaint_form.js
