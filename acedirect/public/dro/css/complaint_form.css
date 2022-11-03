@@ -782,6 +782,10 @@ input:checked + .slider:before {
   margin-top: 18px;
 }
 
+.transcript p {
+  padding-top: 5px;
+}
+
 .modalVideoButton {
   /* border-radius: 50% !important; */
   border: none;
