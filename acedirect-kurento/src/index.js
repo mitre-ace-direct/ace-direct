@@ -22,7 +22,7 @@ async function main() {
         host: dbHost,
         user: dbUser,
         password: dbPassword,
-        database: 'media_server',
+        database: dbName,
         port: dbPort
       }
     );
