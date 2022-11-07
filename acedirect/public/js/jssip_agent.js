@@ -1573,14 +1573,16 @@ function updateCaptions(transcripts) {
 }
 
 function updateCaptionsMultiparty(transcripts) {
-  var tDiv = document.getElementById(transcripts.msgid);
-  if (!tDiv) { // prevents duplicate captions
-    var temp = document.createElement('div');
-    temp.id = transcripts.msgid;
-    temp.innerHTML = createCaptionHtml(transcripts.displayname, transcripts);
-    temp.classList.add('transcripttext');
-    document.getElementById('transcriptoverlay').prepend(temp);
-    // setTimeout(function () { temp.remove() }, 5000);
+  if (transcripts.final) { // For now, only show final captions on agent side
+    var tDiv = document.getElementById(transcripts.msgid);
+    if (!tDiv) { // prevents duplicate captions
+      var temp = document.createElement('div');
+      temp.id = transcripts.msgid;
+      temp.innerHTML = createCaptionHtml(transcripts.displayname, transcripts);
+      temp.classList.add('transcripttext');
+      document.getElementById('transcriptoverlay').prepend(temp);
+      // setTimeout(function () { temp.remove() }, 5000);
+    }
   }
 }
 
