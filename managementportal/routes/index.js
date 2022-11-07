@@ -129,17 +129,31 @@ router.get('/getVideomail', restrict, (req, res) => {
     if (errQuery) {
       console.log('GET VIDEOMAIL ERROR: ', errQuery.code);
     } else {
-      try {
-        const videoFile = result[0].filepath + result[0].filename;
-        const stat = fs.statSync(videoFile);
+      if (result[0].filepath === 's3') {
+        console.log(result[0].filename);
+        const file = s3.getObject(
+          { Bucket: config.s3.bucketname, Key: result[0].filename }
+        );
+
         res.writeHead(200, {
           'Content-Type': 'video/webm',
-          'Content-Length': stat.size
+          'Accept-Ranges': 'bytes'
         });
-        const readStream = fs.createReadStream(videoFile);
-        readStream.pipe(res);
-      } catch (err) {
-        console.log(err);
+        const filestream = file.createReadStream();
+        filestream.pipe(res);
+      } else {
+        try {
+          const videoFile = result[0].filepath + result[0].filename;
+          const stat = fs.statSync(videoFile);
+          res.writeHead(200, {
+            'Content-Type': 'video/webm',
+            'Content-Length': stat.size
+          });
+          const readStream = fs.createReadStream(videoFile);
+          readStream.pipe(res);
+        } catch (err) {
+          console.log(err);
+        }
       }
     }
   });

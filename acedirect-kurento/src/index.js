@@ -13,7 +13,7 @@ async function main() {
     const dbHost = param('servers.mysql_fqdn');
     const dbUser = param('database_servers.mysql.user');
     const dbPassword = param('database_servers.mysql.password');
-    const dbName = param('database_servers.mysql.ad_database_name');
+    const dbName = param('database_servers.mysql.ssdatabase');
     const dbPort = parseInt(param('app_ports.mysql'));
 
     // check for required media server table, if not there, abort with an error
@@ -22,7 +22,7 @@ async function main() {
         host: dbHost,
         user: dbUser,
         password: dbPassword,
-        database: 'media_server',
+        database: dbName,
         port: dbPort
       }
     );
