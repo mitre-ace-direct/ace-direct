@@ -49,34 +49,33 @@
                 <span id="callTime" class="pull-left body1"></span>
                 <button id="mute-audio" type="button" class="btn btn-gray circleButton" onclick="muteAudio()"
                   aria-label="Mute Audio">
-                  <i id="mute-audio-icon" class="call-btn-icon fa fa-microphone"></i>
+                  <i id="mute-audio-icon" class="call-btn-icon fa fa-microphone" alt="" aria-hidden="true"></i>
                 </button>
                 <button id="hide-video" type="button" class="btn btn-gray circleButton" onclick="enableVideoPrivacy()"
                   aria-label="Enable Video Privacy">
-                  <!--<i id="mute-camera-off-icon" class="call-btn-icon fa fa-video-camera"></i>-->
-                  <i id="mute-camera-off-icon" class="call-btn-icon fa-stack">
-                    <i class="fa fa-video-camera fa-stack-1x"></i>
+                  <i id="mute-camera-off-icon" class="call-btn-icon fa-stack" alt="" aria-hidden="true">
+                    <i class="fa fa-video-camera fa-stack-1x" alt="" aria-hidden="true"></i>
                   </i>
                 </button>
 
                 <button type="button" class="btn btn-gray circleButton" onclick="enterFullscreen()" aria-label="Enter Fullscreen">
-                  <i id="fullscreen-icon" class="call-btn-icon fa fa-expand"></i>
+                  <i id="fullscreen-icon" class="call-btn-icon fa fa-expand" alt="" aria-hidden="true"></i>
                 </button>
 
-                <button id="mute-captions" type="button" class="btn btn-gray circleButton" onclick="toggleCaptions()" style="display:none" aria-label="Toggle Captions">
+                <button id="mute-captions" type="button" class="btn btn-gray circleButton" onclick="toggleCaptions()" style="display:none" aria-label="Hide Captions">
                   <i class="call-btn-icon-cc fa-stack">
-                    <i id="mute-captions-icon" class="fa fa-cc fa-stack-1x"></i>
-                    <i id="mute-captions-off-icon" class="fa fa-ban fa-stack-2x text-danger mute-ban-cc" style="display:none;"></i>
+                    <i id="mute-captions-icon" class="fa fa-cc fa-stack-1x" alt="" aria-hidden="true"></i>
+                    <i id="mute-captions-off-icon" class="fa fa-ban fa-stack-2x text-danger mute-ban-cc" alt="" aria-hidden="true" style="display:none;"></i>
                   </i>
                 </button>
 
                 <button type="button" class="btn btn-gray button <%= screenSharingVisibility %>" id="startScreenshare" onclick="toggleScreenShare(true)"
                   aria-label="Toggle Screenshare">
-                  <i id="screenshare-icon" class="call-btn-icon fa fa-desktop"></i> Start Screenshare
+                  <i id="screenshare-icon" class="call-btn-icon fa fa-desktop" alt="" aria-hidden="true"></i> Start Screenshare
                 </button>
                 <button id="end-call" type="button" class="btn btn-danger button" style="background-color: #C70000 !important;"
                   onclick="terminateCall()" aria-label="End Call">
-                  <i id="end-call-icon" class="call-btn-icon fa fa-phone fa-rotate-135"></i> End Call
+                  <i id="end-call-icon" class="call-btn-icon fa fa-phone fa-rotate-135" alt="" aria-hidden="true"></i> End Call
                 </button>
               </div>
             </section>
@@ -364,7 +363,6 @@
 <div id="optionsModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
-      <!-- <div class="modal-header" style="padding-bottom: 5px !important;"> -->
       <div class="modal-header">
         <video muted class="video-element" id="instructionsVideo" title="Play Video" tabindex="-1" style="display: block">
           <source src="/media/<%= instructionsVideo %>" type="video/mp4">
@@ -448,7 +446,6 @@
 <div id="waitingModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="waiting-header">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
-      <!-- <div class="modal-header" style="padding-bottom: 5px !important;"> -->
       <div class="modal-header">
         <p id="callingBanner" class="text-center"><b>Calling...</b></p>
         <p class="waiting-header body1 text-center" role="heading" aria-level="3" aria-live="assertive"
@@ -525,7 +522,6 @@
 <div id="noAgentsModal" class="modal fade complaint-modal" data-keyboard="false" data-backdrop="static" role="dialog" aria-labelledby="no-agents-header">
   <div class="modal-dialog modal-dialog">
     <div class="modal-content">
-      <!-- <div class="modal-header" style="padding-bottom: 5px !important;"> -->
       <div class="modal-header">
         <div class="no-agents-header text-center" aria-live="assertive" style="font-size:26px !important">No agents are available to take your call at this time.</div>
         <hr/>

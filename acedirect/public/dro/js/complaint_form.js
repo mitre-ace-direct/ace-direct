@@ -292,8 +292,7 @@ function ConnectSocket() {
           vrs = payload.vrs;
           if (payload.first_name || payload.last_name) {
             $('#displayname').val(`${payload.first_name} ${payload.last_name}`);
-          }
-          else {
+          } else {
             $('#displayname').val('Consumer');
           }
           const { isOpen } = payload;
@@ -452,14 +451,15 @@ function ConnectSocket() {
               console.log('error - something went wrong when getting an extension');
             }
           })
-          .on('chat-message-new', (data) => {
+          .on('chat-message-new', (dataIn) => {
+            const data = dataIn;
             // eslint-disable-next-line no-undef
             if (isChatTranslationEnabled && languageTranslationEnabled) {
               // Translate incoming message
               const localLanguage = userLanguageChat;
               console.log(`Selected language is ${localLanguage}`);
               // var localLanguage = 'es';
-              data['toLanguage'] = localLanguage;
+              data.toLanguage = localLanguage;
               if (localLanguage === data.fromLanguage) {
                 newChatMessage(data);
               } else {
@@ -877,10 +877,14 @@ function toggleCaptions() {
     captionsOn = false;
     muteCaptionsOffIcon.style.display = 'block';
     $('#captions-area').hide();
+    setFeedbackText('Captions off');
+    $('#mute-captions').attr('aria-label', 'Show captions');
   } else {
     captionsOn = true;
     muteCaptionsOffIcon.style.display = 'none';
     $('#captions-area').show();
+    setFeedbackText('Captions on');
+    $('#mute-captions').attr('aria-label', 'Hide captions');
   }
 
   setColumnSize();
@@ -940,7 +944,7 @@ function chatTranslationModalDropdown() {
   // }
 }
 function chatTranslationToggleSwitch() {
-  var enableTranslationDropdown = document.getElementById('languageSwitch').checked;
+  const enableTranslationDropdown = document.getElementById('languageSwitch').checked;
   if (!enableTranslationDropdown) {
     document.getElementById('language-select').disabled = true;
     document.getElementById('language-select').selectedIndex = -1;
