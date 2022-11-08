@@ -1499,45 +1499,6 @@ $('#opacity-slider-agent').on('change mousemove', function () {
   document.documentElement.style.setProperty('--caption-bg-color', color);
 })
 
-var demo_running = false;
-function testCaptions() {
-
-  if (!demo_running) {
-    demo_running = true;
-    var temp = document.createElement('div');
-    temp.classList.add('transcripttext');
-
-    document.getElementById('transcriptoverlay').appendChild(temp);
-    temp.innerHTML = 'Hi - I am having trouble with captions on my TV';
-
-    var count = 0;
-    var intervalId = window.setInterval(function () {
-      switch (count) {
-        case 0:
-          temp.innerHTML = 'They were working fine all day yesterday, but, stopped at 4:00';
-          break;
-        case 1:
-          temp.innerHTML = 'Do you think that will fix the problem?';
-          break;
-        case 2:
-          temp.innerHTML = 'Looks like that did it, everything seems to be working again';
-          break;
-        case 3:
-          temp.innerHTML = 'Thanks for the help and have a nice day';
-          break;
-      }
-      count++;
-
-      if (count > 4) {
-        window.clearInterval(intervalId);
-        temp.innerHTML = '';
-        demo_running = false;
-      }
-    }, 6000);
-  } else { console.log('demo running'); }
-}
-
-
 function createCaptionHtml(displayName, transcripts) {
   console.log(displayName, transcripts);
   let caption = transcripts.transcript;
