@@ -1428,7 +1428,7 @@ function enableVideoPrivacy() {
   // .addClass('call-btn-icon fa-stack');
   $('#mute-camera-off-icon').children().remove();
   $('#mute-camera-off-icon').append(
-    '<i class="fa fa-video-camera fa-stack-1x"></i><i class="fa fa-ban fa-stack-2x text-danger"></i>'
+    '<i class="fa fa-video-camera fa-stack-1x" alt="" aria-hidden="true"></i><i class="fa fa-ban fa-stack-2x text-danger" alt="" aria-hidden="true"></i>'
   );
   $('#hide-video').attr('onclick', 'disableVideoPrivacy()');
   $('#hide-video').attr('aria-label', 'Disable Video Privacy');
@@ -1479,7 +1479,7 @@ function disableVideoPrivacy() {
   //   .addClass('call-btn-icon fa fa-video-camera');
   $('#mute-camera-off-icon').children().remove();
   $('#mute-camera-off-icon').append(
-    '<i class="fa fa-video-camera fa-stack-1x"></i>'
+    '<i class="fa fa-video-camera fa-stack-1x" alt="" aria-hidden="true"></i>'
   );
   $('#hide-video').attr('onclick', 'enableVideoPrivacy()');
   $('#hide-video').attr('aria-label', 'Enable Video Privacy');
