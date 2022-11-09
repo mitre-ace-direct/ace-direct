@@ -617,6 +617,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 1. **ISSUE**: Agents do not appear in the management portal. SOLUTIN: Make sure the `/etc/asterisk/agents.conf` file has the correct agent names and extensions.
 1. **ISSUE**: Inbound VRS calls are not connecting. There is no IVVR shown. The call just disconnects. **SOLUTION**: Make sure the call center is open. Use the management portal to _open_ the call center.
 1. **ISSUE**: Inbound web calls are connecting, but there is no incoming video on either side. **SOLUTION**: Make sure the STUN and TURN servers are running. Make sure the STUN and TURN servers are properly configured in `~/ace-direct/dat/config.json`.
+1. **ISSUE**: Node builds fail with `MODULE_NOT_FOUND` errors on `ProcessContainerFork.js` and `loader.js`. **SOLUTION**: The Node.js installation and library locations may have changed. Run `pm2 stop all; pm2 delete all; pm2 save; cd ~/ace-direct ; pm2 start dat/process.json; pm2 save`
 
 ---
 
