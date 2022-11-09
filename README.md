@@ -165,7 +165,7 @@ Complete these prerequisite prior to installation:
       $  rm -rf .n >/dev/null 2>&1
       $
       $  # Install NVM: get curl from https://nvm.sh - Installing and Updating
-      $  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+      $  curl -o- -k https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
       $
       $  *CLOSE and REOPEN your termninal*
       $
