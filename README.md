@@ -162,34 +162,21 @@ Complete these prerequisite prior to installation:
       ```bash
       $  cd /home/ec2-user  # go to the ACE Direct user home folder
       $  rm -rf .nvm >/dev/null 2>&1
-      $  rm -rf .n >/dev/null 2>&1
       $
-      $  # Install NVM: get curl from https://nvm.sh - Installing and Updating
+      $  # Install NVM: get recent curl command from https://nvm.sh - Installing and Updating
       $  curl -o- -k https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
       $
-      $  *CLOSE and REOPEN your termninal*
+      $  # CLOSE and REOPEN your termninal !!!
       $
-      $  nvm install 16
-      $  npm install -g n
+      $  nvm install v16.15.1  # install preferred Node version
+      $  nvm use v16.15.1  # use the version
+      $  nvm use --delete-prefix v16.15.1  # if prompted
+      $  nvm alias default v16.15.1  # set the default version  
+      $
       $  npm install -g pm2
       $
-      $  which node ; which n ; which pm2  # should all be local
-      ```
-
-    * Add the following lines to the _end_ of the  `~/.bash_profile` file:
-
-      ```bash
-      N_PREFIX=$HOME/.n
-      PATH=$N_PREFIX/bin:/usr/local/bin:$PATH
-      export PATH N_PREFIX
-      ```
-
-    * Select Node version:
-
-      ```bash
-      $  source ~/.bash_profile
+      $  which node ; which pm2  # should point to home folder
       $
-      $  n 16.15.1  # required Node version
       ```
 
 #### Redis
