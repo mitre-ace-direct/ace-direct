@@ -662,13 +662,24 @@ body {
 }
 
 .fa-cc {
-  left: -9px !important;
-  top: -3px;
+  left: -5px !important;
+  top: -1px;
 }
 
 .mute-ban {
   left: -9px !important;
   top: -3px;
+}
+
+.mute-ban-cc {
+  left: -6px !important;
+  top: -4px;
+  font-size: 40px !important;
+}
+
+.call-btn-icon-cc
+{
+  font-size: 16px;
 }
 
 .btn-tertiary {
