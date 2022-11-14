@@ -618,6 +618,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 1. **ISSUE**: Inbound VRS calls are not connecting. There is no IVVR shown. The call just disconnects. **SOLUTION**: Make sure the call center is open. Use the management portal to _open_ the call center.
 1. **ISSUE**: Inbound web calls are connecting, but there is no incoming video on either side. **SOLUTION**: Make sure the STUN and TURN servers are running. Make sure the STUN and TURN servers are properly configured in `~/ace-direct/dat/config.json`.
 1. **ISSUE**: Node builds fail with `MODULE_NOT_FOUND` errors on `ProcessContainerFork.js` and `loader.js`. **SOLUTION**: The Node.js installation and library locations may have changed. Run `pm2 stop all; pm2 delete all; pm2 save; cd ~/ace-direct ; pm2 start dat/process.json; pm2 save`
+1. **ISSUE**: A Node server runtime error occurs: `...options?.modules  SyntaxError: Unexpected token '.'`.  **SOLUTION**: Make sure you are using the correct version of Node.js(`node -v`). As of ACE Direct v6.1, it should be `v16.15.1`.
 
 ---
 
