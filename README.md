@@ -166,7 +166,8 @@ Complete these prerequisite prior to installation:
       $  # Install NVM: get recent curl command from https://nvm.sh - Installing and Updating
       $  curl -o- -k https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
       $
-      $  # CLOSE and REOPEN your termninal !!!
+      $  # CLOSE and REOPEN your termninal!!! or...
+      $  source ~/.bashrc
       $
       $  nvm install v16.15.1  # install preferred Node version
       $  nvm use v16.15.1  # use the version
