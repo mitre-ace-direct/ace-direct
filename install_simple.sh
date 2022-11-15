@@ -88,6 +88,34 @@ then
   sudo mysql_secure_installation 
 fi
 
+# create databases
+printf "\n"
+read -p "${Q} Create databases (y/n)? " -n 1 -r
+printf "\n"
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  cd ~/ace-direct
+  EXTENSION_PASSWORD=`python scripts/parseSingleJson.py dat/config.json asterisk:extensions:secret`
+  ACEDIRECT_USER=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:user`
+  ASTERISK_USER="asterisk"
+  ACEDIRECT_PASSWORD=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:password`
+  ASTERISK_PASSWORD=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:password`
+  ACEDIRECT_DB=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:ad_database_name`
+  ASTERISK_DB=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:cdr_database_name`
+  MEDIA_DB=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:ssdatabase`
+  CDR_TABLE=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:cdr_table_name`
+
+  cd ~/ace-direct/dat
+
+  TMP_FILE3=/tmp/sql_123_456.sql
+  cat acedirectdefault_maria.sql | sed -e "s/_EXTENSION_PASSWORD_/${EXTENSION_PASSWORD}/g" | sed -e "s/_ACEDIRECT_USER_/${ACEDIRECT_USER}/g" | sed -e "s/_ASTERISK_USER_/${ASTERISK_USER}/g" | sed -e "s/_ACEDIRECT_PASSWORD_/${ACEDIRECT_PASSWORD}/g" | sed -e "s/_ASTERISK_PASSWORD_/${ASTERISK_PASSWORD}/g" | sed -e "s/_ACEDIRECT_DB_/${ACEDIRECT_DB}/g" | sed -e "s/_ASTERISK_DB_/${ASTERISK_DB}/g" | sed -e "s/_MEDIA_DB_/${MEDIA_DB}/g" | sed -e "s/_CDR_TABLE_/${CDR_TABLE}/g" >  $TMP_FILE3
+
+  echo "Running SQL script (root)..."
+  mysql -u root -p -h localhost < $TMP_FILE3
+  rm -f $TMP_FILE3 >/dev/null 2>&1
+  cd ~
+fi
+
 # install Node
 NODE_VER='v16.15.1'
 printf "\n"
@@ -159,7 +187,6 @@ then
   sudo service redis start
 fi
 
-
 # install MongoDB
 printf "\n"
 read -p "${Q} Install MongoDB (y/n)? " -n 1 -r
@@ -175,28 +202,6 @@ then
   sudo systemctl start mongod  # if it fails: sudo systemctl daemon-reload
   sudo systemctl enable mongod  # start at boot time
 fi
-
-# create database
-cd ~/ace-direct
-EXTENSION_PASSWORD=`python scripts/parseSingleJson.py dat/config.json asterisk:extensions:secret`
-ACEDIRECT_USER=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:user`
-ASTERISK_USER="asterisk"
-ACEDIRECT_PASSWORD=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:password`
-ASTERISK_PASSWORD=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:password`
-ACEDIRECT_DB=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:ad_database_name`
-ASTERISK_DB=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:cdr_database_name`
-MEDIA_DB=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:ssdatabase`
-CDR_TABLE=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:cdr_table_name`
-
-cd ~/ace-direct/dat
-
-TMP_FILE3=/tmp/sql_123_456.sql
-cat acedirectdefault_maria.sql | sed -e "s/_EXTENSION_PASSWORD_/${EXTENSION_PASSWORD}/g" | sed -e "s/_ACEDIRECT_USER_/${ACEDIRECT_USER}/g" | sed -e "s/_ASTERISK_USER_/${ASTERISK_USER}/g" | sed -e "s/_ACEDIRECT_PASSWORD_/${ACEDIRECT_PASSWORD}/g" | sed -e "s/_ASTERISK_PASSWORD_/${ASTERISK_PASSWORD}/g" | sed -e "s/_ACEDIRECT_DB_/${ACEDIRECT_DB}/g" | sed -e "s/_ASTERISK_DB_/${ASTERISK_DB}/g" | sed -e "s/_MEDIA_DB_/${MEDIA_DB}/g" | sed -e "s/_CDR_TABLE_/${CDR_TABLE}/g" >  $TMP_FILE3
-
-echo "Running SQL script (root)..."
-mysql -u root -p -h localhost < $TMP_FILE3
-rm -f $TMP_FILE3 >/dev/null 2>&1
-cd ~
 
 # build Node
 printf "\n"
