@@ -1,3 +1,9 @@
+/* global
+  sponsor
+  consumerPortalLogo
+  consumerPortalDisclaimer
+*/
+
 function fnBrowserDetect() {
   const { userAgent } = navigator;
   let isChrome = false;
@@ -36,6 +42,9 @@ const mobileDetect = () => {
 
 window.addEventListener('load', () => {
   mobileDetect();
+  document.getElementById('consumerLogo').src = consumerPortalLogo;
+  document.getElementById('consumerLogo').alt = `${sponsor} Logo`;
+  document.getElementById('disclaimer').innerText = consumerPortalDisclaimer;
 });
 
 window.addEventListener('resize', () => {

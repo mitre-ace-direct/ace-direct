@@ -39,7 +39,7 @@
     <section id="vrs-container" aria-label="logos">
       <div id="logoContainer">
         <img src="dro/images/DVC2.png" style="margin-right: 3%;" width="20%" alt="Direct Video Calling Logo">
-        <img src="dro/images/fcc-logo.jpg" width="7%" alt="FCC Logo">
+        <img id="consumerLogo" width="7%">
       </div>
       <!-- <img id="heroLogo" src="dro/images/acedirect-loginbackground.jpg" width="100vw" aria-hidden="true" alt=""> -->
     </section>
@@ -70,11 +70,7 @@
           </div>
 
           <div id="infoBox">
-            <p class="caption">You are entering an Official United States Government System, which may be used only for
-              authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby
-              notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized
-              attempts
-              to upload or change information on this web site is prohibited.</p>
+            <p id="disclaimer" class="caption"></p>
           </div>
         </div>
       </section>
@@ -133,10 +129,16 @@
   }
 </script>
 
+<script>
+  let sponsor = '<%= sponsor %>';
+  let consumerPortalLogo = '<%= consumerPortalLogo %>';
+  let consumerPortalDisclaimer = '<%= consumerPortalDisclaimer %>';
+</script>
+
 <script type="text/javascript" src="/assets/js/jquery.min.js"></script>
 <script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/dro/js/dialog.js"></script>
 <script type="text/javascript" src="/dro/js/complaint_login.js" async></script>
+<script type="text/javascript" src="/dro/js/dialog.js"></script>
 <script type="text/javascript" src="/assets/js/inputmask.min.js"></script>
 <script type="text/javascript" src="/assets/js/jquery.inputmask.min.js" async></script>
 <script type="module" src="/dro/js/hardware_acc.js"></script>

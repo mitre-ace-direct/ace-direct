@@ -40,8 +40,15 @@
 
 
   <div id="consumerNavbar" class="Navbar row display-flex-center">
-    <div class="appTitle col-xs-12 col-md-6">FCC ASL Consumer Support</div>
+    <div id="navText" class="appTitle col-xs-12 col-md-6"></div>
   </div>
+
+  <script>
+    let consumerPortalTitle = '<%= consumerPortalTitle %>'
+    window.onload = () => {
+      document.getElementById('navText').innerText = consumerPortalTitle;
+    }
+  </script>
 
   <script>
     function logout() {
