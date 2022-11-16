@@ -623,7 +623,7 @@
         <div class="center text-center body1" style="width:100%; padding: 30px;"><!--style="width: 75%"-->
           <!--<i class="fa fa-check-circle fa-2x text-success" aria-hidden="true"></i>-->
           <br /><br />
-          <p id="goodbyeDescription" style="font-size: 26px; line-height: 32.5px;">Your call with an FCC ASL Consumer Support agent has ended.</p>
+          <p id="goodbyeDescriptionCall" style="font-size: 26px; line-height: 32.5px;"></p>
           <hr class="text-black"
             style="width:50%;height:2px;background-color:black;border:none;margin-top: 50px;margin-bottom: 50px;">
             You are being redirected in <b>10</b> seconds to <a id="redirectUrlDesc" class="link"></a>
@@ -676,6 +676,7 @@
   let screenSharingEnabled = '<%= screenSharingEnabled %>';
   let autoplayEnabled = '<%= autoplayEnabled %>';
   let languageTranslationEnabled = '<%= languageTranslationEnabled %>';
+  let consumerPortalEndMessage = '<%= consumerPortalEndMessage %>';
 
   //not instrumenting complaint web page right now
   let logWebRTCStats = false;

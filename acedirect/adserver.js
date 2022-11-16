@@ -422,8 +422,7 @@ const customizationDefaults = {
   consumerPortalLogo: 'dro/images/fcc-logo.jpg',
   consumerPortalDisclaimer: 'You are entering an Official United States Government System, which may be used only for authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized attempts to upload or change information on this web site is prohibited.',
   consumerPortalEndMessage: 'Your call with an FCC ASL Consumer Support agent has ended.',
-  consumerPortalEndRedirectSite: 'Disablity Rights Office',
-  agentPortalLoginLogo: 'd/images/AD-logo-trim.png',
+  agentPortalLoginLogo: '/images/AD-logo-trim.png',
   agentPortalLoginEmail: 'info@email.com',
   agentPortalLoginPhone: '111-222-3333',
   agentPortalLoginDisclaimer: 'You are entering an official system, which may be used only for authorized purposes. Unauthorized use of this website is prohibited.'
@@ -438,7 +437,6 @@ const consumerPortalTitle = getCustomValue('consumerPortalTitle');
 const consumerPortalLogo = getCustomValue('consumerPortalLogo');
 const consumerPortalDisclaimer = getCustomValue('consumerPortalDisclaimer');
 const consumerPortalEndMessage = getCustomValue('consumerPortalEndMessage');
-const consumerPortalEndRedirectSite = getCustomValue('consumerPortalEndRedirectSite');
 const agentPortalLoginLogo = getCustomValue('agentPortalLoginLogo');
 const agentPortalLoginEmail = getCustomValue('agentPortalLoginEmail');
 const agentPortalLoginPhone = getCustomValue('agentPortalLoginPhone');
@@ -4002,7 +4000,6 @@ app.use((req, res, next) => {
     consumerPortalLogo,
     consumerPortalDisclaimer,
     consumerPortalEndMessage,
-    consumerPortalEndRedirectSite,
     agentPortalLoginLogo,
     agentPortalLoginEmail,
     agentPortalLoginPhone,

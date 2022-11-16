@@ -11,6 +11,7 @@
   ACEKurento
   dayjs
   io
+  consumerPortalEndMessage
 */
 
 let socket;
@@ -2545,3 +2546,8 @@ $('#noAgentsVideo')
     }
   });
 // #endregion
+
+// from config
+window.addEventListener('load', () => {
+  document.getElementById('goodbyeDescriptionCall').innerText = consumerPortalEndMessage;
+});
