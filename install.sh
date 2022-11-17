@@ -1,136 +1,28 @@
 #!/bin/bash
 
+# IMPORTANT
+# 1. Create and fully populate ~/ace-direct/dat/config.json.
+# 2. Execute this script
+
 OLDIFS=$IFS
 RS='\u001b[0m'
 FG_RED='\u001b[31m'
 OK_ICON='✅'
 NOTOK_ICON='❌'
-Q='🤔 '
+Q='🤔'
+CONFIG_FILE=${HOME}/ace-direct/dat/config.json
 
+# intro message
 printf "\n"
 printf "****************************************\n"
 printf "*  ACE Direct acenode installation     *\n"
 printf "****************************************\n"
 printf "\n"
-
-AD_USER=""
-STUN_FQDN=""
-TURN_FQDN=""
-MAIN_FQDN=""
-MAIN_IP=""
-NGINX_FQDN=""
-NGINX_IP=""
-ASTERISK_FQDN=""
-ASTERISK_IP=""
-KURENTO_FQDN=""
-KURENTO_IP=""
-KEY_PEM=""
-CERT_PEM=""
-
-usage() {
-  echo ""
-  printf "usage:\n\n"
-  echo "     $0 -u <AD home username> \\"
-  echo "        -s <STUN_FQDN> \\"
-  echo "        -t <TURN FQDN> \\"
-  echo "        -m <Main FQDN and private IP> \\"
-  echo "        -n <NGINX FQDN and private IP> \\"
-  echo "        -k <Kurento FQDN and private IP> \\"
-  echo "        -a <ASTERISK FQDN and private IP> \\"
-  echo "        [-c <ssl cert file path>] \\"
-  echo "        [-y <ssl key file path>]"
-  echo ""
-  echo "e.g."
-  echo "     $0 -u ec2-user \\"
-  echo "        -s acestun.domain.com \\"
-  echo "        -t aceturn.domain.com \\"
-  echo "        -m \"acenode.domain.com 1.0.0.1\" \\"
-  echo "        -n \"portal.domain.com  1.0.0.2\" \\"
-  echo "        -k \"acekms.domain.com  1.0.0.3\" \\"
-  echo "        -a \"acesip.domain.com  1.0.0.4\" \\"
-  echo "        -c /etc/ssl/cert.pem \\"  
-  echo "        -y /etc/ssl/key.pem"
-  echo ""
-  exit 1;
-}
-
-while getopts ":u:s:t:m:n:k:a:c:y:" arg; do
-  case "${arg}" in
-    u)
-      AD_USER=${OPTARG}
-      ;;
-    s)
-      STUN_FQDN=${OPTARG}
-      ;;
-    t)
-      TURN_FQDN=${OPTARG}
-      ;;            
-    m)
-      set -f
-      IFS=' '
-      array=($OPTARG)
-      MAIN_FQDN=${array[0]}
-      MAIN_IP=${array[1]}
-      ;;      
-    n)
-      set -f
-      IFS=' '
-      array=($OPTARG)
-      NGINX_FQDN=${array[0]}
-      NGINX_IP=${array[1]}    
-      ;;
-    k)
-      set -f
-      IFS=' '
-      array=($OPTARG)
-      KURENTO_FQDN=${array[0]}
-      KURENTO_IP=${array[1]}        
-      ;;
-    a)
-      set -f
-      IFS=' '
-      array=($OPTARG)
-      ASTERISK_FQDN=${array[0]}
-      ASTERISK_IP=${array[1]}        
-      ;;
-    c)
-      CERT_PEM=${OPTARG}
-      ;;
-    y)
-      KEY_PEM=${OPTARG}
-      ;;                  
-    *)
-      usage
-      ;;
-  esac
-done
-shift $((OPTIND-1))
-
-if [ -z "${AD_USER}" ] || [ -z "${STUN_FQDN}" ] || [ -z "${TURN_FQDN}" ] || [ -z "${MAIN_FQDN}" ] || [ -z "${MAIN_IP}" ] || [ -z "${NGINX_FQDN}" ] || [ -z "${NGINX_IP}" ] || [ -z "${ASTERISK_FQDN}" ] || [ -z "${ASTERISK_IP}" ] || [ -z "${KURENTO_FQDN}" ] || [ -z "${KURENTO_IP}" ]; then
-  usage
-fi
-IFS=$OLDIFS
-
-printf "Your params:\n\n"
-printf "  AD USER:            ${AD_USER}\n"
-printf "  STUN_FQDN:          ${STUN_FQDN}\n"
-printf "  TURN FQDN:          ${TURN_FQDN}\n"
-printf "  MAIN FQDN , IP:     ${MAIN_FQDN} , ${MAIN_IP}\n"
-printf "  NGINX FQDN , IP:    ${NGINX_FQDN}  , ${NGINX_IP}\n"
-printf "  KURENTO FQDN , IP:  ${KURENTO_FQDN}  , ${KURENTO_IP}\n"
-printf "  ASTERISK FQDN , IP: ${ASTERISK_FQDN}  , ${ASTERISK_IP}\n"
+printf "This script will install ACE Direct in user account ${USER}.\n"
 printf "\n"
-
-printf "This script will install the following components on acenode:\n"
+printf "IMPORTANT: Create and populate the ~/ace-direct/dat/config.json file before executing this installation script.\n"
 printf "\n"
-printf "Node servers\n"
-printf "Redis\n"
-printf "MongoDB\n"
-printf "MySQL\n"
-printf "NGINX\n"
-printf "\n"
-
-read -p "${Q}Continue (y/n)? " -n 1 -r
+read -p "${Q} OK to continue (y/n)? " -n 1 -r
 printf "\n"
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
@@ -140,240 +32,75 @@ else
   exit 1
 fi
 
-# make sure ace-direct repo was cloned in home folder
+printf "\nchecking requirements...\n\n"
+
+# check ace-direct repo folder location
 if cd ~/ace-direct >/dev/null 2>&1
 then
-  printf "Found ~/ace-direct folder ${OK_ICON}\n"
+  printf "${OK_ICON} found ~/ace-direct folder\n"
 else
-  printf "${FG_RED} error - ace-direct folder must be in the home folder: ~/ace-direct ${RS} ${NOTOK_ICON}\n"
-  printf "Please clone the ace-direct repo to the home folder (e.g., /home/ec2-user/ace-direct).\n"
-  printf "Exiting...\n"
+  printf "${NOTOK_ICON} ${CONFIG_FILE} error - ace-direct folder must be in the home folder: ~/ace-direct\n"
   exit 1
 fi
 
-# get the REDIS AUTH password from the user
-REDIS_AUTH=""
-RDPASS1=""
-RDPASS2=""
-while true
-do
-  printf "\n"
-  read -p "${Q}Enter a REDIS AUTH password: " -rs
-  RDPASS1=${REPLY}
-  printf "\n"
-  read -p "${Q}Please re-enter the REDIS AUTH password: " -rs
-  RDPASS2=${REPLY}
-  printf "\n"
-  if [ "$RDPASS1" == "$RDPASS2" ] && [ ! -z "${RDPASS1}" ] ; then
-    break
-  fi
-  printf "\n*** ERROR Passwords do not match or are empty! Please try again... ***\n"
-done
-REDIS_AUTH=${RDPASS1}
-
-# get the MySQL acedirect user password
-ADPASS1=""
-ADPASS2=""
-while true
-do
-  printf "\nEnter a password for the MySQL acedirect user.\n"
-  printf "The password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n"
-  read -p "${Q}Enter the password: " -rs
-  ADPASS1=${REPLY}
-  printf "\n"
-  read -p "${Q}Please re-enter the password: " -rs
-  ADPASS2=${REPLY}
-  printf "\n"
-  if [ "$ADPASS1" == "$ADPASS2" ] && [ ! -z "${ADPASS1}" ] ; then
-    break
-  fi
-  printf "\n*** ERROR Passwords do not match or are empty! Please try again... ***\n"
-done
-printf "\n"
-
-# get the MySQL asterisk user password
-ASPASS1=""
-ASPASS2=""
-while true
-do
-  printf "Enter a password for the MySQL asterisk user.\n"
-  printf "The password must be at least 8 characters and an uppercase, lowercase, number, and special character.\n"
-  read -p "${Q}Enter the new password: " -rs
-  ASPASS1=${REPLY}
-  printf "\n"
-  read -p "${Q}Please re-enter the password: " -rs
-  ASPASS2=${REPLY}
-  printf "\n"
-  if [ "$ASPASS1" == "$ASPASS2" ] && [ ! -z "${ASPASS1}" ] ; then
-    break
-  fi
-  printf "\n*** ERROR Passwords do not match or are empty! Please try again... ***\n"
-done
-printf "\n"
-
-# get the Asterisk AMI userid and password
-printf "Please supply the Asterisk AMI userid and password...\n"
-printf "You can find this on the Asterisk server in /etc/asterisk/manager.conf...\n"
-AMUSER=""
-AMPASS1=""
-AMPASS2=""
-while true
-do
-  read -p "${Q}Enter the Asterisk AMI userid: " -r
-  AMUSER=${REPLY}
-  read -p "${Q}Enter the Asterisk AMI password: " -rs
-  AMPASS1=${REPLY}
-  printf "\n"
-  read -p "${Q}Re-enter the Asterisk AMI password: " -rs
-  AMPASS2=${REPLY}
-  printf "\n"
-  if [ "$AMPASS1" == "$AMPASS2" ] && [ ! -z "${AMPASS1}" ]  && [ ! -z "${AMUSER}" ] ; then
-    break
-  fi
-  printf "\n*** ERROR Passwords do not match or some fields are empty! Please try again... ***\n"
-done
-printf "\n"
-
-# get the Asterisk extensions password
-EXPASS1=""
-EXPASS2=""
-while true
-do
-  printf "What is the Asterisk extensions password?\n"
-  printf "Get this from the 'password=' field in the /etc/asterisk/pjsip.conf file.\n"
-  read -p "${Q}Enter the extensions password: " -rs
-  EXPASS1=${REPLY}
-  printf "\n"
-  read -p "${Q}Please re-enter extensions password: " -rs
-  EXPASS2=${REPLY}
-  printf "\n"
-  if [ "$EXPASS1" == "$EXPASS2" ] && [ ! -z "${EXPASS1}" ] ; then
-    break
-  fi
-  printf "\n*** ERROR Passwords do not match or are empty! Please try again... ***\n"
-done
-printf "\n"
-
-# get the turn user, turn password, stun user
-printf "Please supply the STUN server user, TURN server user and password...\n"
-printf "Retrieve these values from your TURN and STUN installations...\n"
-STUNUSER=
-TURNUSER=""
-TURNPASS1=""
-TURNPASS2=""
-while true
-do
-  read -p "${Q}Enter the STUN user: " -r
-  STUNUSER=${REPLY}
-  read -p "${Q}Enter the TURN user: " -r
-  TURNUSER=${REPLY}  
-  read -p "${Q}Enter the TURN password: " -rs
-  TURNPASS1=${REPLY}
-  printf "\n"
-  read -p "${Q}Re-enter the TURN password: " -rs
-  TURNPASS2=${REPLY}
-  printf "\n"
-  if [ "$TURNPASS1" == "$TURNPASS2" ] && [ ! -z "${TURNPASS1}" ]  && [ ! -z "${STUNUSER}" ] && [ ! -z "${TURNUSER}" ] ; then
-    break
-  fi
-  printf "\n*** ERROR Passwords do not match or some fields are empty! Please try again... ***\n"
-done
-printf "\n"
-
-# config file
-
-# back up config if it's there
-if [ -f dat/config.json ]; then
-  CONFIG_BKUP=dat/config_backup_`date +%s`.json
-  printf "Backing up existing dat/config.json file to: ${CONFIG_BKUP} .\n"
-  cp dat/config.json $CONFIG_BKUP >/dev/null 2>&1
-fi
-
-# copy template to config
-cp dat/config.json_TEMPLATE dat/config.json
-
-# Update vars in config.json
-TMP_CONFIG1=dat/config_temp1_`date +%s`.json
-TMP_CONFIG2=dat/config_temp2_`date +%s`.json
-python scripts/parseSingleJson.py dat/config.json servers:main_fqdn $MAIN_FQDN > $TMP_CONFIG1
-python scripts/parseSingleJson.py $TMP_CONFIG1 servers:main_private_ip $MAIN_IP > $TMP_CONFIG2
-python scripts/parseSingleJson.py $TMP_CONFIG2 servers:nginx_fqdn $NGINX_FQDN > $TMP_CONFIG1
-python scripts/parseSingleJson.py $TMP_CONFIG1 servers:nginx_private_ip $NGINX_IP > $TMP_CONFIG2 
-python scripts/parseSingleJson.py $TMP_CONFIG2 servers:asterisk_fqdn $ASTERISK_FQDN > $TMP_CONFIG1 
-python scripts/parseSingleJson.py $TMP_CONFIG1 servers:asterisk_private_ip $ASTERISK_IP > $TMP_CONFIG2 
-python scripts/parseSingleJson.py $TMP_CONFIG2 servers:stun_fqdn $STUN_FQDN > $TMP_CONFIG1
-python scripts/parseSingleJson.py $TMP_CONFIG1 servers:turn_fqdn $TURN_FQDN > $TMP_CONFIG2
-python scripts/parseSingleJson.py $TMP_CONFIG2 servers:kurento_fqdn $KURENTO_FQDN > $TMP_CONFIG1 
-python scripts/parseSingleJson.py $TMP_CONFIG1 servers:kurento_private_ip $KURENTO_IP > $TMP_CONFIG2 
-python scripts/parseSingleJson.py $TMP_CONFIG2 signaling_server:path "/${AD_USER}/acedirect-kurento/signaling" > $TMP_CONFIG1
-python scripts/parseSingleJson.py $TMP_CONFIG1 database_servers:redis:auth $REDIS_AUTH > $TMP_CONFIG2 
-python scripts/parseSingleJson.py $TMP_CONFIG2 database_servers:mysql:password $ADPASS1 > $TMP_CONFIG1 
-python scripts/parseSingleJson.py $TMP_CONFIG1 asterisk:ami:passwd $AMPASS1 > $TMP_CONFIG2 
-python scripts/parseSingleJson.py $TMP_CONFIG2 asterisk:ami:id $AMUSER > $TMP_CONFIG1
-python scripts/parseSingleJson.py $TMP_CONFIG1 asterisk:sip:stun_user $STUNUSER > $TMP_CONFIG2 
-python scripts/parseSingleJson.py $TMP_CONFIG2 asterisk:sip:turn_user $TURNUSER > $TMP_CONFIG1 
-python scripts/parseSingleJson.py $TMP_CONFIG1 asterisk:sip:turn_cred $TURNPASS1 > $TMP_CONFIG2 
-python scripts/parseSingleJson.py $TMP_CONFIG2 asterisk:extensions:secret $EXPASS1 > $TMP_CONFIG1 
-python scripts/parseArrayJson.py $TMP_CONFIG1 videomail:agents 0 sipPass $EXPASS1 > $TMP_CONFIG2 
-python scripts/parseArrayJson.py $TMP_CONFIG2 videomail:agents 1 sipPass $EXPASS1 > $TMP_CONFIG1 
-python scripts/parseArrayJson.py $TMP_CONFIG1 videomail:agents 2 sipPass $EXPASS1 > $TMP_CONFIG2 
-python scripts/parseArrayJson.py $TMP_CONFIG2 videomail:agents 3 sipPass $EXPASS1 > $TMP_CONFIG1 
-python scripts/parseArrayJson.py $TMP_CONFIG1 videomail:agents 4 sipPass $EXPASS1 > $TMP_CONFIG2 
-
-cp $TMP_CONFIG2 dat/config.json
-
-rm $TMP_CONFIG1 $TMP_CONFIG2 >/dev/null 2>&1
-
-# get pem file locations from config if not sent on command line
-if [ -z "$KEY_PEM" ]; then
-  KEY_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:private_key`
+# check for config.json
+cd ~/ace-direct
+if [ ! -f ${CONFIG_FILE} ]; then
+  printf "${NOTOK_ICON} ${CONFIG_FILE} does not exist. Please create it.\n"
+  exit 1
 else
-  python scripts/parseSingleJson.py dat/config.json common:https:private_key ${KEY_PEM} > $TMP_CONFIG1
-  cp $TMP_CONFIG1 dat/config.json
-  rm $TMP_CONFIG1
-fi
-if [ -z "$CERT_PEM" ]; then
-  CERT_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:certificate`
-else
-  python scripts/parseSingleJson.py dat/config.json common:https:certificate ${CERT_PEM} > $TMP_CONFIG1
-  cp $TMP_CONFIG1 dat/config.json
-  rm $TMP_CONFIG1
+  printf "${OK_ICON} found ${CONFIG_FILE}\n"
 fi
 
-# validate certs
-printf "validatig certs...\n"
-if [[ ! -f ${KEY_PEM} || ! -f ${CERT_PEM} ]]; then
-  printf "${NOTOK_ICON} error - One or both cert files are missing...\n\n"
+# check for sudo permissions
+if sudo ls >/dev/null 2>&1
+then
+  printf "${OK_ICON} sudo permissions good\n"
+else
+  printf "${NOTOK_ICON} error - user does not have sudo permissions! exiting...\n"
   exit 99
-else
-  printf "Verifying certs...\n"
-  if openssl x509 -checkend 86400 -noout -in ${CERT_PEM}
-  then
-    printf "${CERT_PEM} is good!\n"  
-  else
-    printf "\n\n"
-    printf "${NOTOK_ICON} error - ${CERT_PEM} has expired or will expire within 24 hours, please acquire new certs\n\n\n"
-    exit 99
-  fi
 fi
 
+# check certs
+KEY_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:private_key`
+CERT_PEM=`python scripts/parseSingleJson.py dat/config.json common:https:certificate`
 
-# BEGIN INSTALLATION
-INSTALL_START=`date +%s` # start the clock
-printf "\n"
+if [ ! -f ${KEY_PEM} ]; then
+  printf "${NOTOK_ICON} error - cert file is missing: ${KEY_PEM}.\n\n"
+  exit 99
+fi
+if [ ! -f ${CERT_PEM} ]; then
+  printf "${NOTOK_ICON} error - cert file is missing: ${CERT_PEM}.\n\n"
+  exit 99
+fi
+
+if openssl x509 -checkend 86400 -noout -in ${CERT_PEM} >/dev/null 2>&1
+then
+  printf "${OK_ICON} ${CERT_PEM} is good\n"
+else
+  printf "${NOTOK_ICON} error - ${CERT_PEM} has expired or will expire in 24 hours, please acquire new certs\n\n"
+  read -p "${Q} Continue anyway (y/n)? " -n 1 -r
+  printf "\n"
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    printf "\n"
+  else
+    printf "Aborting installation...\n\n"
+    exit 1
+  fi
+fi
 
 # check for Git
 if git --version >/dev/null 2>&1
 then
   printf "${OK_ICON} found git\n"
 else
-  printf "No git, installing now...\n"
+  printf "No git, installing it now...\n"
   sudo yum install git -y
 fi
 # create .gitconfig file
 echo '[url "https://"]' > ~/.gitconfig
 echo '    insteadOf = git://' >> ~/.gitconfig
-printf "\n"
 
 # check for cc
 if which cc >/dev/null 2>&1
@@ -385,53 +112,183 @@ else
 fi
 printf "\n"
 
-# check for sudo permissions
-printf "Checking sudo permissions...\n"
-if sudo ls >/dev/null 2>&1
-then
-  printf "${OK_ICON} sudo permissions good\n"
-else
-  printf "${NOTOK_ICON} No sudo permissions! exiting...\n\n"
-  exit 99
-fi
-printf "\n"
+### BEGIN INSTALLATION ###
 
-# verify HOME account/folder
-set -f
-IFS='/'
-array=(${HOME})
-HOME_USER=${array[${#array[@]} - 1]}
-if [[ "$HOME_USER" != "${AD_USER}" ]]
-then
-  printf "${NOTOK_ICON} ACE Direct user does not match actual home user account. Exiting...\n" 
-  exit 99
-else
-  printf "${OK_ICON} user account matches\n" 
-fi
-
-IFS=$OLDIFS
-printf "\nBeginning installation...\n\n"
-
-read -p "${Q}Install core node components (y/n)? " -n 1 -r
+# install MySQL and create databases
+read -p "${Q} Install MariaDB (y/n)? " -n 1 -r
 printf "\n"
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  # install node components
-  acedirect/install_node.sh -h /home/${AD_USER} -r ${REDIS_AUTH} -p ${ADPASS1} -a ${ASPASS1} -e ${EXPASS1}
+  sudo systemctl stop mariadb >/dev/null 2>&1
+  sudo yum list installed | grep maria | awk 'NR>2' | cut -d' ' -f1 | xargs sudo yum remove -y
+  sudo rm -rf /var/lib/mysql  >/dev/null 2>&1
+  sudo rm /etc/my.cnf >/dev/null 2>&1
+  sudo rm ~/.my.cnf >/dev/null 2>&1
+  sudo yum update -y
+  sudo yum install -y mariadb-server
+  sudo systemctl start mariadb
+  sudo systemctl enable mariadb
+  sudo mysql_secure_installation 
 fi
 
-read -p "${Q}Build ace-direct (y/n)? " -n 1 -r
+# create databases
+printf "\n"
+read -p "${Q} Create databases (y/n)? " -n 1 -r
 printf "\n"
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  # build AD
   cd ~/ace-direct
-  scripts/build.sh
+  EXTENSION_PASSWORD=`python scripts/parseSingleJson.py dat/config.json asterisk:extensions:secret`
+  ACEDIRECT_USER=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:user`
+  ASTERISK_USER="asterisk"
+  ACEDIRECT_PASSWORD=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:password`
+  ASTERISK_PASSWORD=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:password`
+  ACEDIRECT_DB=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:ad_database_name`
+  ASTERISK_DB=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:cdr_database_name`
+  MEDIA_DB=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:ssdatabase`
+  CDR_TABLE=`python scripts/parseSingleJson.py dat/config.json database_servers:mysql:cdr_table_name`
+
+  cd ~/ace-direct/dat
+
+  TMP_FILE3=/tmp/sql_123_456.sql
+  cat acedirectdefault_maria.sql | sed -e "s/_EXTENSION_PASSWORD_/${EXTENSION_PASSWORD}/g" | sed -e "s/_ACEDIRECT_USER_/${ACEDIRECT_USER}/g" | sed -e "s/_ASTERISK_USER_/${ASTERISK_USER}/g" | sed -e "s/_ACEDIRECT_PASSWORD_/${ACEDIRECT_PASSWORD}/g" | sed -e "s/_ASTERISK_PASSWORD_/${ASTERISK_PASSWORD}/g" | sed -e "s/_ACEDIRECT_DB_/${ACEDIRECT_DB}/g" | sed -e "s/_ASTERISK_DB_/${ASTERISK_DB}/g" | sed -e "s/_MEDIA_DB_/${MEDIA_DB}/g" | sed -e "s/_CDR_TABLE_/${CDR_TABLE}/g" >  $TMP_FILE3
+
+  echo "Running SQL script (root)..."
+  mysql -u root -p -h localhost < $TMP_FILE3
+  rm -f $TMP_FILE3 >/dev/null 2>&1
+  cd ~
 fi
 
-# done
-INSTALL_END=`date +%s`
-EQU="scale=2; (${INSTALL_END} - ${INSTALL_START})/60"
-RESULT=`bc <<< $EQU`
-printf "\n*** Installation took $RESULT minutes. ***\n\n"
-printf "\n\ndone.\n"
+# install Node
+NODE_VER='v16.15.1'
+printf "\n"
+read -p "${Q} Install Node.js (y/n)? " -n 1 -r
+printf "\n"
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  read -p "${Q} Node.js version [${NODE_VER}]: " -r
+  VAL=`echo ${REPLY} | sed 's/ *$//g'`
+  if [ ! -z "$VAL" ]; then
+    NODE_VER=$VAL
+  fi
+  cd ~
+  rm -rf .nvm >/dev/null 2>&1
+ 
+  # this line may need updating in the future
+  curl -o- -k https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+
+  source ~/.bashrc
+
+  nvm install ${NODE_VER}
+  nvm use ${NODE_VER}
+  nvm use --delete-prefix ${NODE_VER}
+  nvm alias default ${NODE_VER}
+
+  npm install -g pm2
+  which node
+  which pm2  # should point to home folder
+fi
+
+# install REDIS
+TMP_FILE1=/tmp/inst.123.456
+sudo rm -f $TMP_FILE1 >/dev/null 2>&1
+cat > $TMP_FILE1 <<- EndOfMessage
+[Unit]
+Description=Redis In-Memory Data Store
+After=network.target
+
+[Service]
+User=root
+Group=root
+ExecStart=/usr/local/bin/redis-server /etc/redis/redis.conf
+ExecStop=/usr/local/bin/redis-cli shutdown
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EndOfMessage
+
+printf "\n"
+read -p "${Q} Install REDIS (y/n)? " -n 1 -r
+printf "\n"
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  cd ~
+  sudo service redis stop >/dev/null 2>&1
+  sudo rm -rf redis-stable >/dev/null 2>&1
+  sudo rm -f redis-stable.tar.gz >/dev/null 2>&1
+  sudo rm -f /etc/redis/redis.conf
+  wget http://download.redis.io/redis-stable.tar.gz
+  tar xvzf redis-stable.tar.gz
+  cd redis-stable
+  sudo make distclean
+  sudo make
+  sudo make install
+  ls /usr/local/bin/redis-server /usr/local/bin/redis-cli  # both folders should exist
+  sudo yum install -y tcl
+  sudo mkdir -p /var/lib/redis
+  sudo mkdir -p /etc/redis
+  sudo cp redis.conf /etc/redis/redis.conf  
+  sudo chmod 666 /etc/redis/redis.conf
+  sudo rm -rf redis-stable >/dev/null 2>&1
+  sudo rm -f redis-stable.tar.gz >/dev/null 2>&1
+
+  cd ~/ace-direct
+  REDIS_PASSWORD=`python scripts/parseSingleJson.py dat/config.json database_servers:redis:auth`
+  cd ~
+  sudo echo 'supervised systemd' >> /etc/redis/redis.conf
+  sudo echo 'logfile "/var/log/redis.log"' >> /etc/redis/redis.conf
+  sudo echo "requirepass ${REDIS_PASSWORD}" >> /etc/redis/redis.conf
+
+  sudo bash -c "cat ${TMP_FILE1} > /etc/systemd/system/redis.service"
+  sudo rm -f $TMP_FILE1 >/dev/null 2>&1
+
+  sudo systemctl daemon-reload
+  sudo systemctl enable redis.service
+  sudo service redis start
+fi
+
+# install MongoDB
+TMP_FILE2=/tmp/inst.456.123
+sudo rm -f $TMP_FILE2 >/dev/null 2>&1
+cat > $TMP_FILE2 <<- EndOfMessage
+[mongodb-org-4.4]
+name=MongoDB Repository
+baseurl=https://repo.mongodb.org/yum/amazon/2/mongodb-org/4.4/x86_64/
+gpgcheck=1
+enabled=1
+gpgkey=https://www.mongodb.org/static/pgp/server-4.4.asc
+EndOfMessage
+
+printf "\n"
+read -p "${Q} Install MongoDB (y/n)? " -n 1 -r
+printf "\n"
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  sudo service mongod stop >/dev/null 2>&1
+  sudo systemctl stop mongod >/dev/null 2>&1
+  sudo yum list installed | grep mongo  | awk 'NR>2' | cut -d' ' -f1 | xargs sudo yum remove -y
+  sudo bash -c "cat ${TMP_FILE2} > /etc/yum.repos.d/mongodb-org-4.4.repo"
+  sudo rm -f $TMP_FILE1 >/dev/null 2>&1
+  sudo yum install -y mongodb-org
+  sudo systemctl start mongod  # if it fails: sudo systemctl daemon-reload
+  sudo systemctl enable mongod  # start at boot time
+fi
+
+# build Node
+printf "\n"
+read -p "${Q} Build Node servers (y/n)? " -n 1 -r
+printf "\n"
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+  cd ~/ace-direct
+  pm2 stop all >/dev/null 2>&1
+  pm2 delete all >/dev/null 2>&1
+  npm run clean
+  npm run build
+  npm run config
+  printf "Starting node servers...\n"
+  pm2 start dat/process.json
+fi
+
+echo "done."
