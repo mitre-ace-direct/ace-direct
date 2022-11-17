@@ -130,7 +130,7 @@ $  ./install.sh
 .
 ```
 
-After executing this script, try to access the portals. See [Accessing the websites](#accessing-the-websites) .
+After executing this script, try to access the portals. See [Accessing the websites](#accessing-the-websites).
 
 ### Building and deploying the application servers
 
