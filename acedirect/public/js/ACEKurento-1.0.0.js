@@ -345,7 +345,11 @@
         function setRemoteVideo() {
           if (remoteVideo) {
             remoteVideo.pause();
-            var stream = pc.getRemoteStreams()[0];
+             var receivers = pc.getReceivers();
+             var stream = new MediaStream();
+             receivers.forEach(rec => {
+               stream.addTrack(rec.track)
+             })
             remoteVideo.srcObject = stream;
             logger.debug('Remote stream:', stream);
             remoteVideo.load();
@@ -377,10 +381,10 @@
           if (pc.signalingState === 'closed') {
             return callback('PeerConnection is closed');
           }
-          pc.setRemoteDescription(answer, function () {
+          pc.setRemoteDescription(answer).then(function () {
             setRemoteVideo();
             callback();
-          }, callback);
+          }).catch((err)=>{callback('An Error occurred setting Remote Description');});
         };
         this.processOffer = function (sdpOffer, callback) {
           callback = callback.bind(this);
