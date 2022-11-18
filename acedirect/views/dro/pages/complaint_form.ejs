@@ -88,11 +88,11 @@
             <div class="box-body" id="fullscreen-element">
               <div id="callVideosRow" class="row">
                 <div class="col-xs-3" id="selfViewCol">
-                  <video id="selfView" autoplay muted="true" class="mirror-mode" aria-label="Self Video"></video>
+                  <video id="selfView" playsinline autoplay muted="true" class="mirror-mode" aria-label="Self Video"></video>
                   <button id="exitFullscreen" onclick="exitFullscreen()" aria-label="Exit Fullscreen">Exit Fullscreen</button>
                 </div>
                 <div class="col-xs-9 pull-right" id="remoteViewCol">
-                  <video id="remoteView" autoplay aria-label="Remote Video"></video>
+                  <video id="remoteView" playsinline autoplay aria-label="Remote Video"></video>
                 </div>
               </div>
               <div id="captions-area" class="row" style="display:none">
