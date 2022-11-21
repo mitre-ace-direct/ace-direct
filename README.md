@@ -342,7 +342,13 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
     $
     ```
 
-1. **ISSUE**: The Node builds on `acenode` are taking _too long_. **SOLUTION**: See the instructions above for creating the `~/.gitconfig` file.
+1. **ISSUE**: The Node builds on `acenode` are taking _too long_. **SOLUTION**: Create the `~/.gitconfig` file and try again:
+
+    ```bash
+    [url "https://"]
+            insteadOf = git://
+    ```
+
 1. **ISSUE**: A specific node server is failing to build or start. **SOLUTION**: The `package-lock.json` file may be outdated. Delete the file and rebuild. For example, for `videomail-service`:
 
     ```bash
