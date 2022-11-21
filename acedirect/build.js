@@ -25,7 +25,8 @@ const FONT = [
   'font-awesome/fonts/fontawesome-webfont.woff2',
   'bootstrap/fonts/glyphicons-halflings-regular.woff',
   'bootstrap/fonts/glyphicons-halflings-regular.woff2',
-  'bootstrap/fonts/glyphicons-halflings-regular.ttf'
+  'bootstrap/fonts/glyphicons-halflings-regular.ttf',
+  '@fontsource/roboto/files/file-list.json'
 ];
 
 const JS = [

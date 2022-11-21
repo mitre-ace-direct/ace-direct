@@ -94,9 +94,22 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 
 ### Automatic installer for acenode
 
-> :warning: **This installer assumes that you already installed:**: Asterisk, NGINX, STUN, TURN, Kurento, and Kamailio.
+:warning: **Before running the installer on acenode**:
 
-For convenience, the automatic installer installs all the core components on `acenode`. The recommended instance size for `acenode` is `t3a.medium`. `acenode` should **not** have a public FQDN.
+* The AWS server type for `acenode` is _Amazon Linux 2_.
+* The recommended instance size for `acenode` is `t3a.medium`. `acenode` should **not** have a public FQDN.
+* An Internet connection is required.
+* When creating the home user account, e.g., `/home/ec2-user`, select the `bash` shell.
+* Install, configure, and deploy the Asterisk, NGINX, STUN, TURN, Kurento, and Kamailio servers _first_.
+* Clone this repo to the home folder on `acenode`.
+* Create the config. file:
+
+  ```bash
+  $  cd ~/ace-direct/dat  
+  $  cp config.json_TEMPLATE config.json
+  $  vi config.json  # edit/verify all fields
+  $
+  ```
 
 The automatic installer script is [install.sh](install.sh). This script will perform the following on `acenode`:
 
@@ -104,272 +117,24 @@ The automatic installer script is [install.sh](install.sh). This script will per
 * Install Redis, MongoDB, MySQL, and Node.js app servers
 * Populate databases
 * Deploy ACE Direct
-* Perform status checks
 
-To use the script:
+To run the script:
 
 ```bash
-$  # clone this repo to the ACE Direct user account (e.g., /home/ec2-user) on the acenode server
+$  # git clone this repo to the ACE Direct user account (e.g., /home/ec2-user) on the acenode server
 $
 $  cd /home/ec2-user/ace-direct
-$  ./install.sh  # see the usage, then run with the required parameters
+$  ./install.sh
 .
 .
 .
 ```
 
-For example...
+After executing this script, try to access the portals. See [Accessing the websites](#accessing-the-websites).
 
-```bash
-$  ./install.sh -u ec2-user \
-     -s acestun.domain.com \
-     -t aceturn.domain.com \
-     -m "acenode.domain.com 1.0.0.1" \
-     -n "portal.domain.com 1.0.0.1" \
-     -k "acekms.domain.com  1.0.0.2" \
-     -a "acesip.domain.com  1.0.0.3" \
-     -c /etc/ssl/cert.pem \
-     -y /etc/ssl/key.pem
-```
+### Building and deploying the application servers
 
-After executing this script, try to access the portals. See [Accessing the websites](#accessing-the-websites) .
-
-For manual installation and customization of your ACE Direct deployment, continue to [Manual installation of acenode](#manual-installation-of-acenode).
-
-### Manual installation of acenode
-
-Here are detailed installation instructions, if you do not use the overall installer above.
-
-#### Prerequisites for acenode
-
-Complete these prerequisite prior to installation:
-
-1. An Internet connection is required during the build process.
-1. Log into the `acenode` server.
-1. Create/identify an ACE Direct user account, for example `/home/ec2-user`. Select the `bash` shell for the user.
-1. Install in the home folder `/home/ec2-user`.
-1. Make sure Git is installed: `git --version`, otherwise, install it: `sudo yum install git -y`
-1. Make sure `cc` is present: `which cc`, othwerise, install _Development Tools_: `sudo yum groupinstall "Development Tools"`
-1. Copy/clone this `ace-direct` repo to the ACE Direct user home folder: `/home/ec2-user`.
-1. Make sure that the ACE Direct home user, e.g., `/home/ec2-user`, has `sudo` privileges.
-
-#### Setup
-
-1. Install _Node.js_ locally:
-
-    * Amazon Linux 2 example:
-
-      ```bash
-      $  cd /home/ec2-user  # go to the ACE Direct user home folder
-      $  rm -rf .nvm >/dev/null 2>&1
-      $
-      $  # Install NVM: get recent curl command from https://nvm.sh - Installing and Updating
-      $  curl -o- -k https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-      $
-      $  # CLOSE and REOPEN your termninal!!! or...
-      $  source ~/.bashrc
-      $
-      $  nvm install v16.15.1  # install preferred Node version
-      $  nvm use v16.15.1  # use the version
-      $  nvm use --delete-prefix v16.15.1  # if prompted
-      $  nvm alias default v16.15.1  # set the default version  
-      $
-      $  npm install -g pm2
-      $
-      $  which node ; which pm2  # should point to home folder
-      $
-      ```
-
-#### Redis
-
-Install and configure _Redis_. For an overview, read [Redis Quick Start](https://redis.io/topics/quickstart). Follow these instructions to install Redis on `acenode.domain.com`:
-
-1. Download and install Redis:
-
-    ```bash
-    $  cd
-    $
-    $  sudo rm -rf redis-stable >/dev/null 2>&1
-    $  wget http://download.redis.io/redis-stable.tar.gz
-    $  tar xvzf redis-stable.tar.gz
-    $  cd redis-stable
-    $  sudo make distclean
-    $  sudo make
-    $  sudo make install
-    $  ls /usr/local/bin/redis-server /usr/local/bin/redis-cli  # both folders should exist
-    $  sudo yum install -y tcl
-    $
-    $  sudo mkdir -p /var/lib/redis
-    $  sudo mkdir -p /etc/redis
-    $  sudo cp redis.conf /etc/redis/redis.conf  
-    $  sudo chmod 666 /etc/redis/redis.conf
-    ```
-
-1. Configure Redis by editing `/etc/redis/redis.conf`. Enable and set the fields below, selecting your own value for the secret Redis password: `myRedisPassword`:
-
-    ```bash
-    supervised systemd
-    logfile "/var/log/redis.log"
-    requirepass myRedisPassword
-    ```
-
-1. Enable Redis as a service by creating `/etc/systemd/system/redis.service`:
-
-    ```bash
-    [Unit]
-    Description=Redis In-Memory Data Store
-    After=network.target
-
-    [Service]
-    User=root
-    Group=root
-    ExecStart=/usr/local/bin/redis-server /etc/redis/redis.conf
-    ExecStop=/usr/local/bin/redis-cli shutdown
-    Restart=always
-
-    [Install]
-    WantedBy=multi-user.target
-    ```
-
-1. Reload the Redis service and make it start on reboot:
-
-    ```bash
-    $  sudo systemctl daemon-reload
-    $
-    $  sudo systemctl enable redis.service
-    ```
-
-1. Managing the Redis service:
-
-    ```bash
-    $  sudo service redis start
-    $
-    $  sudo service redis status
-    $  sudo service redis stop
-    ```
-
-#### MongoDB
-
-ACE Direct uses a _MongoDB_ database for call statistics. Follow the instructions below to install ACE Direct on `acenode.domain.com`.
-
-1. Create a `/etc/yum.repos.d/mongodb-org-4.4.repo` file with the following contents:
-
-    ```bash
-    [mongodb-org-4.4]
-    name=MongoDB Repository
-    baseurl=https://repo.mongodb.org/yum/amazon/2/mongodb-org/4.4/x86_64/
-    gpgcheck=1
-    enabled=1
-    gpgkey=https://www.mongodb.org/static/pgp/server-4.4.asc
-    ```
-
-1. Install MongoDB and make it start on reboot:
-
-    ```bash
-    $  sudo yum install -y mongodb-org
-    $
-    $  sudo systemctl start mongod  # if it fails: sudo systemctl daemon-reload
-    $  sudo systemctl status mongod  # check status
-    $  sudo systemctl enable mongod  # start at boot time
-    $
-    $  sudo systemctl stop mongod  # in case you need to stop MongoDB
-    ```
-
-1. MongoDB uses port `27017` by default.
-
-#### MySQL
-
-ACE Direct uses a MySQL database for application data. Install MySQL locally on `acenode.domain.com` _or_ deploy an Amazon AWS RDS service.
-
-The instructions below describe how to install MySQL locally on `acenode.domain.com`.
-
-1. Install MySQL Server Version `5.6.37` or a similar version and note the database root user and password:
-
-    ```bash
-    $  sudo yum remove mysql mysql-server  > /dev/null 2>&1  # remove old version
-    $
-    $  sudo rm -rf /var/lib/mysql >/dev/null 2>&1
-    $  sudo rm -rf /etc/mysql >/dev/null 2>&1
-    $  sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
-    $  sudo yum update -y 
-    $  wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
-    $  sudo yum localinstall mysql57-community-release-el7-11.noarch.rpm 
-    $  sudo yum install mysql-community-server
-    $  sudo rm mysql57-community-release-el7-11.noarch.rpm* >/dev/null 2>&1
-    ```
-
-1. Enable MySQL as a service and start it on reboot:
-
-    ```bash
-    $
-    $  sudo systemctl start mysqld.service  # if it fails: sudo systemctl daemon-reload
-    $  sudo systemctl status mysqld.service  # check status
-    $  sudo systemctl enable mysqld.service  # start at boot time
-    $
-    $  sudo systemctl stop mysqld.service  # in case you need to stop MySQL
-    ```
-
-1. With MySQL started secure the installation::
-
-    ```bash
-    $  # get the temporary root password
-    $  sudo grep 'temporary password' /var/log/mysqld.log  # get the temporary root password
-    $
-    $  mysql_secure_installation  # reset the root password (REMEMBER IT!); configure security options
-    $  
-    ```
-
-1. On `acenode.domain.com`, modify the `~/ace-direct/dat/acedirectdefault.sql` script:
-
-   * Globally replace `_EXTENSION_PASSWORD_` with the _actual extension password_ from Asterisk. See the `password=` field in `/etc/asterisk/pjsip.conf` on `acesip.domain.com`.
-   * Change `_ACEDIRECT_PASSWORD_` to the desired password for the `acedirect` database user.
-   * Change `_ASTERISK_PASSWORD_` to the desired password for the `asterisk` database user.
-
-1. Execute the `~/ace-direct/dat/acedirectdefault.sql` script to create the ACE Direct databases and user accounts. You will need your MySQL `root` user and password. Here is an example, assuming a root user `root`:
-
-    ```bash
-    $  mysql -u root -p -h localhost < acedirectdefault.sql  # you will be prompted for the password
-    $
-    ```
-
-1. MySQL uses port `3306` by default.
-1. The ACE Direct database users are: `acedirect` and `asterisk`.
-
-#### Application servers
-
-##### Configure application servers
-
-The ACE Direct application servers are Node.js servers.
-
-> :warning: **Important**: All previous installation steps must be completed before installing the application servers.
-
-1. Log into `acenode.domain.com`.
-1. For a new ACE Direct deployment, create the initial global configuration:
-
-    ```bash
-    $  cp ~/ace-direct/dat/config.json_TEMPLATE ~/ace-direct/dat/config.json
-    $
-    ```
-
-1. **Edit all values in the  `~/ace-direct/dat/config.json` global configuration file to match your environment**.
-
-    * Review all lines in the file and make necessary edits.
-    * Many of the default values will work as-is for a default ACE Direct installation. The installation scripts in this repo assume default values.
-    * View `~/ace-direct/dat/parameter_desc.json` for a description of each configuration variable.
-    * Supply FQDNs, IP addresses, etc. for the ACE Direct components that were installed in the previous steps.
-
-1. Ensure SSH access to external libraries. This will avoid very long build times. Edit your `~/.gitconfig` file to make sure it has this entry:
-
-    ```bash
-    [url "https://"]
-            insteadOf = git://
-    ```
-
-1. Create initial `fognito` users. See [fognito/README.md](fognito/README.md). Use the same agent and manager usernames found in [dat/acedirectdefault.sql](dat/acedirectdefault.sql) when creating `fognito/db/data/users.csv`.
-
-##### Build and deploy application servers
-
-1. Build the application servers:
+1. Building the application servers:
 
     ```bash
     $  cd ~/ace-direct
@@ -386,19 +151,19 @@ The ACE Direct application servers are Node.js servers.
     $  npm run clean:logs  # remove log files
     ```
 
-1. Deploy the application servers - ACE Direct services use [pm2](https://pm2.keymetrics.io/) for process management:
+1. Deploying the application servers - ACE Direct services use [pm2](https://pm2.keymetrics.io/) for process management:
 
     ```bash
     $  cd ~/ace-direct
     $
-    $  # starting
+    $  # initial start
     $  pm2 start dat/process.json   # first time or clean build
-    $  pm2 status  # check status of app servers
     $
-    $  # other commands
+    $  # regular commands
     $
-    $  pm2 start all  # ongoing
-    $  pm2 restart all  # ongoing
+    $  pm2 status  # check status of app servers    
+    $  pm2 start all
+    $  pm2 restart all
     $  pm2 restart 0  # restart just ID 0, for example
     $
     $  # stopping
@@ -411,7 +176,7 @@ The ACE Direct application servers are Node.js servers.
     $
     $  # deleting services
     $  pm2 stop all
-    $  pm2 delete all
+    $  pm2 delete all  # removes the applicaition from pm2 management
     ```
 
 1. Make app servers start on reboot:
@@ -623,6 +388,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 1. **ISSUE**: When creating users with `~/ace-direct/fognito/db/create-user.sh`, there is an error that `password` does not have a default value. **SOLUTION**: As the root MySQL user, execute `USE acedirect; SET GLOBAL sql_mode='';` to disable strict mode. Or, add this line to `/etc/my.cnf`: `sql-mode = "NO_ENGINE_SUBSTITUTION"`  Then restart MySQL : `sudo service mysqld stop ; sudo service mysqld start` .
 1. **ISSUE**: Adding users with `~/ace-direct/fognito/db/create-user.sh` appears to be working, but the agent portal is stating that extensions haven't been configured for the users. **SOLUTION**: The MySQL `agent_table` is outdated. Recreate the table using the schema in `~/ace-direct/dat/acedirectdefault.sql`.
 1. **ISSUE**: When updating agents in the Management Portal, an error occurs: `Error! Update agent`. **SOLUTION**: Enter the password and confirm password before clicking _Update Agent_.
+1. **ISSUE**: When updating agent names in the Management Portal, the Call Agent Summary in the Management Dashboard still shows the old names. **SOLUTION**: A workaround is to restart the `managementportal` service on the `acenode` server.
 
 ---
 
