@@ -421,11 +421,7 @@ const customizationDefaults = {
   consumerPortalTitle: 'FCC ASL Consumer Support',
   consumerPortalLogo: 'dro/images/fcc-logo.jpg',
   consumerPortalDisclaimer: 'You are entering an Official United States Government System, which may be used only for authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized attempts to upload or change information on this web site is prohibited.',
-  consumerPortalEndMessage: 'Your call with an FCC ASL Consumer Support agent has ended.',
-  agentPortalLoginLogo: '/images/AD-logo-trim.png',
-  agentPortalLoginEmail: 'info@email.com',
-  agentPortalLoginPhone: '111-222-3333',
-  agentPortalLoginDisclaimer: 'You are entering an official system, which may be used only for authorized purposes. Unauthorized use of this website is prohibited.'
+  consumerPortalEndMessage: 'Your call with an FCC ASL Consumer Support agent has ended.'
 };
 
 function getCustomValue(customization) {
@@ -437,10 +433,6 @@ const consumerPortalTitle = getCustomValue('consumerPortalTitle');
 const consumerPortalLogo = getCustomValue('consumerPortalLogo');
 const consumerPortalDisclaimer = getCustomValue('consumerPortalDisclaimer');
 const consumerPortalEndMessage = getCustomValue('consumerPortalEndMessage');
-const agentPortalLoginLogo = getCustomValue('agentPortalLoginLogo');
-const agentPortalLoginEmail = getCustomValue('agentPortalLoginEmail');
-const agentPortalLoginPhone = getCustomValue('agentPortalLoginPhone');
-const agentPortalLoginDisclaimer = getCustomValue('agentPortalLoginDisclaimer');
 
 // Create MySQL connection and connect to the database
 dbConnection = mysql.createConnection({
@@ -4000,10 +3992,10 @@ app.use((req, res, next) => {
     consumerPortalLogo,
     consumerPortalDisclaimer,
     consumerPortalEndMessage,
-    agentPortalLoginLogo,
-    agentPortalLoginEmail,
-    agentPortalLoginPhone,
-    agentPortalLoginDisclaimer
+    // agentPortalLoginLogo,
+    // agentPortalLoginEmail,
+    // agentPortalLoginPhone,
+    // agentPortalLoginDisclaimer
   };
   next();
 });
