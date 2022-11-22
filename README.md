@@ -229,7 +229,7 @@ The enterprise service bus (esb) is an optional component. Use it to integrate w
 
 :checkered_flag: **This completes ACE Direct installation, configuration, and deployment**.
 
-## Creating initial users
+## Creating users
 
 Create agent and manager users: [fognito/README.md#creating-initial-users](fognito/README.md#creating-initial-users)
 
