@@ -102,7 +102,7 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
 * When creating the home user account, e.g., `/home/ec2-user`, select the `bash` shell.
 * Install, configure, and deploy the Asterisk, NGINX, STUN, TURN, Kurento, and Kamailio servers _first_.
 * Clone this repo to the home folder on `acenode`.
-* Create the config. file:
+* Create and fully populate the `config.json` file:
 
   ```bash
   $  cd ~/ace-direct/dat  
@@ -111,10 +111,12 @@ Install a `strongSwan` server. See [STRONGSWAN.md](./docs/installation/STRONGSWA
   $
   ```
 
+* Run the [install.sh](install.sh) script. Read on...
+
 The automatic installer script is [install.sh](install.sh). This script will perform the following on `acenode`:
 
 * Install prerequisites
-* Install Redis, MongoDB, MySQL, and Node.js app servers
+* Install Redis, MongoDB, MariaDB, and Node.js app servers
 * Populate databases
 * Deploy ACE Direct
 
@@ -227,7 +229,7 @@ The enterprise service bus (esb) is an optional component. Use it to integrate w
 
 :checkered_flag: **This completes ACE Direct installation, configuration, and deployment**.
 
-## Creating initial users
+## Creating users
 
 Create agent and manager users: [fognito/README.md#creating-initial-users](fognito/README.md#creating-initial-users)
 
