@@ -63,7 +63,7 @@ function getConfigVal(paramName) {
   return (decodedString.toString());
 }
 
-// agent portal customizations || defaults
+// agent portal customization defaults
 const customizationDefaults = {
   agentPortalLoginLogo: 'public/images/AD-logo-trim.png',
   agentPortalLoginEmail: 'info@email.com',

@@ -415,7 +415,7 @@ const dbName = getConfigVal('database_servers:mysql:ad_database_name');
 const dbPort = getConfigVal('app_ports:mysql');
 const vmTable = 'videomail';
 
-// consumer portal customizations || defaults
+// consumer portal customization defaults
 const customizationDefaults = {
   sponsor: 'FCC',
   consumerPortalTitle: 'FCC ASL Consumer Support',
@@ -425,6 +425,7 @@ const customizationDefaults = {
 };
 
 function getCustomValue(customization) {
+  // console.log(`found ${getConfigVal(`customizations:${customization}`)}`);
   return (getConfigVal(`customizations:${customization}`).length > 0) ? getConfigVal(`customizations:${customization}`) : customizationDefaults[customization];
 }
 
