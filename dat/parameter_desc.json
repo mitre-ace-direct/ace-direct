@@ -279,5 +279,16 @@
   },
   "autoplay_videos": {
     "enabled": "enable or disable autoplay of ASL videos; default is 'false' "
-  }  
+  },
+  "customizations": {
+    "sponsor": "FCC",
+    "consumerPortalTitle": "FCC ASL Consumer Support",
+    "consumerPortalLogo": "dro/images/fcc-logo.jpg",
+    "consumerPortalDisclaimer": "You are entering an Official United States Government System, which may be used only for authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized attempts to upload or change information on this web site is prohibited.",
+    "consumerPortalEndMessage": "Your call with an FCC ASL Consumer Support agent has ended.",
+    "agentPortalLoginLogo": "public/images/AD-logo-trim.png",
+    "agentPortalLoginEmail": "info@email.com",
+    "agentPortalLoginPhone": "111-222-3333",
+    "agentPortalLoginDisclaimer": "You are entering an official system, which may be used only for authorized purposes. Unauthorized use of this website is prohibited."
+  } 
 }
