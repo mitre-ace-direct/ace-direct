@@ -11,6 +11,8 @@
   ACEKurento
   dayjs
   io
+  consumerPortalEndMessage
+  consumerPortalTitle
 */
 
 let socket;
@@ -2545,3 +2547,10 @@ $('#noAgentsVideo')
     }
   });
 // #endregion
+
+// from config
+window.addEventListener('load', () => {
+  document.getElementById('goodbyeDescriptionCall').innerText = consumerPortalEndMessage;
+  document.getElementById('complaint_form_title').innerText = consumerPortalTitle;
+  document.getElementById('complaint_form_meta').setAttribute('content', `${consumerPortalTitle} Call`);
+});

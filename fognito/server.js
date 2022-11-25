@@ -63,6 +63,23 @@ function getConfigVal(paramName) {
   return (decodedString.toString());
 }
 
+// agent portal customization defaults
+const customizationDefaults = {
+  agentPortalLoginLogo: 'public/images/AD-logo-trim.png',
+  agentPortalLoginEmail: 'info@email.com',
+  agentPortalLoginPhone: '111-222-3333',
+  agentPortalLoginDisclaimer: 'You are entering an official system, which may be used only for authorized purposes. Unauthorized use of this website is prohibited.'
+};
+
+function getCustomValue(customization) {
+  return (getConfigVal(`customizations:${customization}`).length > 0) ? getConfigVal(`customizations:${customization}`) : customizationDefaults[customization];
+}
+
+const agentPortalLoginLogo = getCustomValue('agentPortalLoginLogo');
+const agentPortalLoginEmail = getCustomValue('agentPortalLoginEmail');
+const agentPortalLoginPhone = getCustomValue('agentPortalLoginPhone');
+const agentPortalLoginDisclaimer = getCustomValue('agentPortalLoginDisclaimer');
+
 // nginx params
 const ad_path = getConfigVal('nginx:ad_path');
 const mp_path = getConfigVal('nginx:mp_path');
@@ -155,6 +172,16 @@ app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 app.use(favicon(path.join(__dirname, 'public', 'images', 'favicon.ico')));
+
+app.use((req, res, next) => {
+  res.locals = {
+    agentPortalLoginLogo,
+    agentPortalLoginEmail,
+    agentPortalLoginPhone,
+    agentPortalLoginDisclaimer
+  };
+  next();
+});
 
 app.locals = require('./helpers/home');
 

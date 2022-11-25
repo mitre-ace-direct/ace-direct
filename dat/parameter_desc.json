@@ -279,5 +279,16 @@
   },
   "autoplay_videos": {
     "enabled": "enable or disable autoplay of ASL videos; default is 'false' "
-  }  
+  },
+  "customizations": {
+    "sponsor": "The name of the current sponsor, which will also serve as alt text for sponsor logo fed by 'consumerPortalLogo' ",
+    "consumerPortalTitle": "Title of consumer portal header",
+    "consumerPortalLogo": "Main image of consumer portal",
+    "consumerPortalDisclaimer": "Consumer portal disclaimer",
+    "consumerPortalEndMessage": "Message sent when call ends, 'goodbye_video' must be disabled in order to view ",
+    "agentPortalLoginLogo": "Agent portal main image",
+    "agentPortalLoginEmail": "Agent portal footer email information",
+    "agentPortalLoginPhone": "Agent portal footer phone information",
+    "agentPortalLoginDisclaimer": "Agent portal footer disclaimer information"
+  } 
 }

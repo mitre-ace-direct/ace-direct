@@ -415,6 +415,26 @@ const dbName = getConfigVal('database_servers:mysql:ad_database_name');
 const dbPort = getConfigVal('app_ports:mysql');
 const vmTable = 'videomail';
 
+// consumer portal customization defaults
+const customizationDefaults = {
+  sponsor: 'FCC',
+  consumerPortalTitle: 'FCC ASL Consumer Support',
+  consumerPortalLogo: 'dro/images/fcc-logo.jpg',
+  consumerPortalDisclaimer: 'You are entering an Official United States Government System, which may be used only for authorized purposes. The Government may monitor and audit usage of this system, and all persons are hereby notified that use of this system constitutes consent to such monitoring and auditing. Unauthorized attempts to upload or change information on this web site is prohibited.',
+  consumerPortalEndMessage: 'Your call with an FCC ASL Consumer Support agent has ended.'
+};
+
+function getCustomValue(customization) {
+  // console.log(`found ${getConfigVal(`customizations:${customization}`)}`);
+  return (getConfigVal(`customizations:${customization}`).length > 0) ? getConfigVal(`customizations:${customization}`) : customizationDefaults[customization];
+}
+
+const sponsor = getCustomValue('sponsor');
+const consumerPortalTitle = getCustomValue('consumerPortalTitle');
+const consumerPortalLogo = getCustomValue('consumerPortalLogo');
+const consumerPortalDisclaimer = getCustomValue('consumerPortalDisclaimer');
+const consumerPortalEndMessage = getCustomValue('consumerPortalEndMessage');
+
 // Create MySQL connection and connect to the database
 dbConnection = mysql.createConnection({
   host: dbHost,
@@ -3967,7 +3987,16 @@ app.use((req, res, next) => {
     screenSharingEnabled,
     goodbyeVideo,
     autoplayEnabled,
-    year
+    year,
+    sponsor,
+    consumerPortalTitle,
+    consumerPortalLogo,
+    consumerPortalDisclaimer,
+    consumerPortalEndMessage,
+    // agentPortalLoginLogo,
+    // agentPortalLoginEmail,
+    // agentPortalLoginPhone,
+    // agentPortalLoginDisclaimer
   };
   next();
 });

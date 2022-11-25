@@ -2,8 +2,19 @@
 
   <!-- Copyright -->
   <div class="footer-copyright text-center py-2 mx-5 text-secondary">
-    <a href="mailto: info@email.com">info@email.com</a> , or phone 111-222-3333.
+    <a id="agentEmail"></a> , or phone <span id="agentPhone"></span>
   </div>
-  <div class="footer-copyright text-left py-0 mx-5 text-secondary">You are entering an official system, which may be used only for authorized purposes. Unauthorized use of this website is prohibited.</div><br><br>
+  <div class="footer-copyright text-left py-0 mx-5 text-secondary" id="agentDisclaimer"></div><br><br>
   <!-- Copyright -->
 </footer>
+<script>
+  let agentPortalLoginEmail = '<%= agentPortalLoginEmail %>'
+  let agentPortalLoginPhone = '<%= agentPortalLoginPhone %>'
+  let agentPortalLoginDisclaimer = '<%= agentPortalLoginDisclaimer %>'
+  window.addEventListener('load', () => {
+    document.getElementById('agentEmail').innerText = agentPortalLoginEmail;
+    document.getElementById('agentEmail').href = `mailto:${agentPortalLoginEmail}`;
+    document.getElementById('agentPhone').innerText = agentPortalLoginPhone;
+    document.getElementById('agentDisclaimer').innerText = agentPortalLoginDisclaimer;
+  });
+</script>
