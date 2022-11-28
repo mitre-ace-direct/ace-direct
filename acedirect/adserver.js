@@ -1047,8 +1047,6 @@ io.sockets.on('connection', (socket) => {
 
   // language translation
   socket.on('send-agent-language', (data) => {
-    console.log('in send-agent-language')
-    console.log(data)
     const vrs = data.vrs;
     const agentLanguage = data.agentLanguage;
     const agentExt = data.agentExt;
@@ -1745,7 +1743,6 @@ io.sockets.on('connection', (socket) => {
       for (let i = 0; i < results.length; i += 1) {
         if (results[i].name.includes('chatHistory')) {
           const colChatHistory = mongodb.collection(results[i].name);
-          console.log(results[i].name);
           colChatHistory.drop((err, success) => {
             if (err) throw err;
             if (success) console.log('collection dropped');
@@ -1948,7 +1945,8 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('translate', (data) => {
-    console.log(`Received data is ${JSON.stringify(data)}`);
+    //Remove comment for Debugging only, privacy violation to write transcripts to log file
+    //console.log(`Received data is ${JSON.stringify(data)}`);
     request({
       method: 'GET',
       url: `${translationServerUrl}/translate?languageFrom=${data.fromLanguage}&text=${encodeURI(data.message)}&languageTo=${data.toLanguage}`,
@@ -1963,7 +1961,8 @@ io.sockets.on('connection', (socket) => {
         socket.emit('translate-language-error', error);
       } else {
         const dataObj = JSON.parse(newData);
-        console.log(`Translation is ${dataObj.translation}`);
+        //Remove comment for Debugging only, privacy violation to write transcripts to log file
+        //console.log(`Translation is ${dataObj.translation}`);
         data.message = dataObj.translation;
         socket.emit('chat-message-new-translated', data);
       }
@@ -2257,8 +2256,8 @@ io.sockets.on('connection', (socket) => {
     if (displayname === ' ') {
       displayname = 'Consumer';
     }
-
-    console.log('translating', data);
+    //Remove comment for Debugging only, privacy violation to write transcripts to log file
+    //console.log('translating', data);
 
     let fromNumber;
     let toNumber;
@@ -2270,17 +2269,14 @@ io.sockets.on('connection', (socket) => {
         logger.error(`Redis Error${errHgeTail}`);
         console.log(`Redis Error${errHgeTail}`);
       } else {
-        console.log('csr', callerNumber, tuples);
         for (const clientNumber in tuples) {
           const agentNumber = tuples[clientNumber];
-          console.log(callerNumber, `${clientNumber} => ${agentNumber}`, typeof (callerNumber), typeof (agentNumber), callerNumber === agentNumber);
           if (callerNumber === agentNumber) {
             fromNumber = clientNumber;
             toNumber = agentNumber;
           } else if (callerNumber === clientNumber) {
             fromNumber = agentNumber;
             toNumber = clientNumber;
-            console.log(agentNumber, clientNumber);
           }
         }
         const promises = [
@@ -2291,7 +2287,6 @@ io.sockets.on('connection', (socket) => {
                 reject(err);
               } else {
                 languageFrom = language;
-                console.log('language from for user', fromNumber, languageFrom);
                 if (!languageFrom) {
                   languageFrom = 'en-US'; // default English
                 }
@@ -2317,13 +2312,13 @@ io.sockets.on('connection', (socket) => {
         ];
 
         Promise.all(promises).then((_values) => {
-          console.log('language', fromNumber, toNumber, languageFrom, languageTo);
-          console.log('translating', data.transcripts.transcript, 'from', languageFrom, 'to', languageTo);
+          //Remove comment for Debugging only, privacy violation to write transcripts to log file
+          //console.log('language', fromNumber, toNumber, languageFrom, languageTo);
+          //console.log('translating', data.transcripts.transcript, 'from', languageFrom, 'to', languageTo);
           const encodedText = encodeURI(data.transcripts.transcript.trim());
           const translationUrl = `${translationServerUrl}/translate?languageFrom=${languageFrom}&text=${encodedText}&languageTo=${languageTo}`;
-          console.log('is agent here? if so use color', data);
+          
           if (languageTo === languageFrom) {
-            console.log('same language!');
             socket.emit('caption-translated', {
               transcript: data.transcripts.transcript.trim(),
               displayname,
@@ -2333,7 +2328,6 @@ io.sockets.on('connection', (socket) => {
               speakerExt: data.speakerExt
             });
           } else {
-            console.log('trying', translationUrl);
             request({
               method: 'GET',
               url: translationUrl,
@@ -2345,17 +2339,12 @@ io.sockets.on('connection', (socket) => {
               if (error) {
                 logger.error(`GET translation: ${error}`);
                 console.error(`GET translation error: ${error}`);
-                // socket.emit('caption-translated', {
-                // 'transcript' : 'Error using translation server: ' + translationUrl,
-                // 'displayname' : data.transcripts.displayname,
-                // 'msgid': msgid,
-                // 'final': final
-                // });
               } else if (!translationData.translation) {
                 console.error('No translation was received from translation server');
               } else {
-                console.log('received translation', translationData);
-                console.log(languageFrom, languageTo, translationUrl);
+                //Remove comment for Debugging only, privacy violation to write transcripts to log file
+                //console.log('received translation', translationData);
+                //console.log(languageFrom, languageTo, translationUrl);
 
                 // fixme will this be wrong if multiple clients/agents?
                 socket.emit('caption-translated', {
@@ -2365,12 +2354,6 @@ io.sockets.on('connection', (socket) => {
                   msgid,
                   final
                 });
-                // io.to(Number(callerNumber)).emit('caption-translated', {
-                // 'transcript' : data.translation,
-                // 'msgid': msgid,
-                // 'final': final
-                // });
-                // console.log(data.translation, 'sent to', callerNumber)
               }
             });
           }
