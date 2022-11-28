@@ -340,14 +340,12 @@ function connect_socket() {
         }).on('typing', function (data) {
           debugtxt('typing', data);
           if ($('#displayname').val() !== data.displayname) {
-            console.log('typing event', data);
             $('#rtt-typing').html(data.displayname + ': ' + data.rttmsg).addClass('alert alert-secondary rttChatBubble chat-body1').addClass('text-bold body2');
             $('#rtt-typing').appendTo($('#chat-messages'));
           }
         }).on('typing-clear', function (data) {
           debugtxt('typing-clear', data);
           if ($('#displayname').val() !== data.displayname) {
-            console.log('typing clear event', data);
             $('#chat-messages').remove($('#rtt-typing'));
             $('#rtt-typing').html('').removeClass('alert alert-secondary rttChatBubble chat-body1 text-bold body2');
           }
@@ -391,7 +389,6 @@ function connect_socket() {
 
           // Translate incoming message
           var localLanguage = $('#language-select').val();
-          console.log('Selected language is ' + $('#language-select').val());
           // var localLanguage = 'es';
           data['toLanguage'] = localLanguage;
           if (localLanguage == data.fromLanguage) {
@@ -792,7 +789,6 @@ function connect_socket() {
             });
           }
         }).on('caption-translated', function (transcripts) {
-            console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
           if (acekurento.isMultiparty || isMonitoring) {
             updateCaptionsMultiparty(transcripts);
           } else {
@@ -1345,7 +1341,6 @@ $('#chatsend').submit(function (evt) {
 
   // var language = 'en';
   var language = $('#language-select').val();
-  console.log('Sending translated text with language', language);
   $('#newchatmessage').val('');
   socket.emit('chat-message', {
     message: msg,
@@ -1844,12 +1839,10 @@ function changeStatusIcon(newColor, statusName, blinking) {
 
 
 function newChatMessage(data) {
-  console.log('Data is ' + JSON.stringify(data));
 
   var msg = data.message;
   var displayname = data.displayname;
   var timestamp = data.timestamp;
-  console.log('Also ' + data.displayname + ' ' + data.timestamp);
 
   msg = msg.replace(/:\)/, '<i class="fa fa-smile-o fa-2x"></i>');
   msg = msg.replace(/:\(/, '<i class="fa fa-frown-o fa-2x"></i>');
