@@ -1,16 +1,18 @@
 <footer class="page-footer font-small blue bg-light">
 
   <!-- Copyright -->
+  <br>
   <div class="footer-copyright text-center py-2 mx-5 text-secondary">
     <a id="agentEmail"></a> , or phone <span id="agentPhone"></span>
   </div>
-  <div class="footer-copyright text-left py-0 mx-5 text-secondary" id="agentDisclaimer"></div><br><br>
+  <div class="footer-copyright text-center py-2 mx-5 text-secondary" id="agentDisclaimer"></div>
+  <br>
   <!-- Copyright -->
 </footer>
 <script>
-  let agentPortalLoginEmail = '<%= agentPortalLoginEmail %>'
-  let agentPortalLoginPhone = '<%= agentPortalLoginPhone %>'
-  let agentPortalLoginDisclaimer = '<%= agentPortalLoginDisclaimer %>'
+  let agentPortalLoginEmail = '<%= agentPortalLoginEmail %>';
+  let agentPortalLoginPhone = '<%= agentPortalLoginPhone %>';
+  let agentPortalLoginDisclaimer = '<%= agentPortalLoginDisclaimer %>';
   window.addEventListener('load', () => {
     document.getElementById('agentEmail').innerText = agentPortalLoginEmail;
     document.getElementById('agentEmail').href = `mailto:${agentPortalLoginEmail}`;
