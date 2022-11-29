@@ -2189,8 +2189,8 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('recording-deleted', (data) => {
-    const recordingSqlQuery = 'UPDATE call_recordings SET deleted_time = CURRENT_TIMESTAMP, deleted_by = ?, deleted = 1  WHERE fileName = ?;';
-    const recordingSqlParams = [data.extension, data.fileName];
+    const recordingSqlQuery = 'UPDATE call_recordings SET deleted = 1  WHERE fileName = ?;';
+    const recordingSqlParams = [data.fileName];
 
     logger.debug(`${recordingSqlQuery} ${recordingSqlParams}`);
 

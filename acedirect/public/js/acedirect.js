@@ -2194,7 +2194,6 @@ function toggle_recording_buttons(make_visible) {
 function recording_deleted(id) {
   socket.emit('recording-deleted', {
     fileName: id,
-    extension: extensionMe
   });
 }
 
