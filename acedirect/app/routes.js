@@ -321,7 +321,7 @@ router.get(utils.getConfigVal(config.nginx.agent_route), agentRestrict, (req, re
   } else {
     const { username } = req.session.user;
     utils.getUserInfo(username, (user) => {
-      console.log(`AGENT LOGIN ${JSON.stringify(user)}`);
+      console.log(`AGENT LOGIN ${user.username}`);
       if (user.message === 'success') {
         req.redisClient.hget(c.R_STATUS_MAP, user.data[0].username, (_err, status) => {
           if (status !== null) {

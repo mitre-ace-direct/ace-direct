@@ -2853,7 +2853,7 @@ function handleManagerEvent(evt) {
           logger.info('extensionToVrs contents:');
           redisClient.hgetall(c.R_EXTENSION_TO_VRS, (err, reply) => {
             for (const id in reply) {
-              logger.info(`${id} => ${reply[id]}`);
+              logger.info(`id: ${id}`);
             }
           });
 
@@ -2923,7 +2923,7 @@ function handleManagerEvent(evt) {
         logger.info('extensionToVrs contents:');
         redisClient.hgetall(c.R_EXTENSION_TO_VRS, (err, reply) => {
           for (const id in reply) {
-            logger.info(`${id} => ${reply[id]}`);
+            logger.info(`id: ${id}`);
           }
         });
 
@@ -3724,7 +3724,7 @@ function findNextAvailableExtension(callback) {
       logger.error(`Redis Error${err}`);
     } else if (reply) {
       for (const id in reply) {
-        logger.info(`${id} => ${reply[id]}`);
+        logger.info(`id: ${id}`);
         const val = JSON.parse(reply[id]);
         if (val.inuse === false) {
           logger.info(`Found an open extension in consumerExtensions: ${id}`);
