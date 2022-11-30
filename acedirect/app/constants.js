@@ -10,5 +10,6 @@ module.exports = {
   R_LINPHONE_TO_AGENT_MAP: `${pfx}linphoneToAgentMap`, // Maps Linphone caller extension to agent extension
   R_CONSUMER_TO_CSR: `${pfx}consumerToCsr`, // Maps consumer extension to CSR extension
   R_AGENT_INFO_MAP: `${pfx}agentInfoMap`, // Map of Agent information, key agent_id value JSON object
-  R_TOKEN_MAP: `${pfx}tokenMap` // Map of Token to status, key token value {status, date}.
+  R_TOKEN_MAP: `${pfx}tokenMap`, // Map of Token to status, key token value {status, date}.
+  R_VRS_MAP: `${pfx}vrsMap` // Map of VRS number to true/false if logged in or not
 };
