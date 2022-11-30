@@ -177,7 +177,6 @@ router.post('/consumer_login', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   const vrsnum = req.body.vrsnumber;
   req.redisClient.hget(c.R_VRS_MAP, vrsnum, (_err, status) => {
-    console.log(vrsnum, ' is logged in?', _err, status, status === true, status === 'true');
     if (status === 'true') {
       res.status(409).json({ message: 'Number logged in from another device' });
     } else if (/^\d+$/.test(vrsnum)) {
