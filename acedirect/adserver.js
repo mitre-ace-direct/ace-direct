@@ -1494,7 +1494,7 @@ io.sockets.on('connection', (socket) => {
       if (err) {
         logger.error(`Error - Request Assistance: ${err}`);
         io.to(token.extension).emit('request-assistance-response', {
-          message: 'An Error Occured'
+          message: 'An Error Occurred'
         });
       } else {
         io.to(token.extension).emit('request-assistance-response', data);

@@ -271,7 +271,7 @@ function ConnectSocket() {
     },
     error(_xhr, _status, _error) {
       console.log('Error');
-      $('#message').text('An Error Occured.');
+      $('#message').text('An Error Occurred.');
     }
   });
 }

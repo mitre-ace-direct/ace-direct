@@ -87,7 +87,7 @@ $(window).on('load', () => {
           if (xhr.responseJSON && xhr.responseJSON.message === 'Number blocked') {
             window.location = xhr.responseJSON.redirectUrl;
           } else {
-            $(messageId).text('An Error Occured.');
+            $(messageId).text('An Error Occurred.');
             $(messageId).show();
           }
         }
@@ -149,7 +149,7 @@ function login() {
           $(messageId).css({ color: 'red' });
           $(messageId).show();
         } else {
-          $(messageId).text('An Error Occured.');
+          $(messageId).text('An Error Occurred.');
           $(messageId).css({ color: 'red' });
           $(messageId).show();
         }
