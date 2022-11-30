@@ -377,6 +377,7 @@ redisClient.on('connect', () => {
   redisClient.del(c.R_LINPHONE_TO_AGENT_MAP);
   redisClient.del(c.R_CONSUMER_TO_CSR);
   redisClient.del(c.R_AGENT_INFO_MAP);
+  redisClient.del(c.R_VRS_MAP);
 
   // Populate the consumerExtensions map
   prepareExtensions();

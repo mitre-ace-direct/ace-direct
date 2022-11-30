@@ -15,6 +15,13 @@
   consumerPortalTitle
 */
 
+window.onbeforeunload = function unload() {
+  $.ajax({
+    url: './signoutvrs',
+    type: 'GET'
+  });
+};
+
 let socket;
 
 // eslint-disable-next-line no-constant-condition
