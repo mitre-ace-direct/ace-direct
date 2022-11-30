@@ -5321,11 +5321,6 @@ function ACEKurento(config) {
     } catch (e) {
       message = message.data;
     }
-    //Where the multi party call participant list is
-    console.info('Received message data: ' + JSON.stringify(message));
-
-    //Where the multi party call participant list is
-    console.info('Received message data: ' + JSON.stringify(message));
 
     if (message.id === 'participantList') {
       console.log("Participant size is " + message.participants.length);

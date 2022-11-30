@@ -1,3 +1,10 @@
+/* global
+  sponsor
+  consumerPortalLogo
+  consumerPortalDisclaimer
+  consumerPortalTitle
+*/
+
 function fnBrowserDetect() {
   const { userAgent } = navigator;
   let isChrome = false;
@@ -36,6 +43,11 @@ const mobileDetect = () => {
 
 window.addEventListener('load', () => {
   mobileDetect();
+  document.getElementById('consumerLogo').src = consumerPortalLogo;
+  document.getElementById('consumerLogo').alt = `${sponsor} Logo`;
+  document.getElementById('disclaimer').innerText = consumerPortalDisclaimer;
+  document.getElementById('complaint_login_title').innerText = consumerPortalTitle;
+  document.getElementById('complaint_login_meta').setAttribute('content', `${consumerPortalTitle} Call`);
 });
 
 window.addEventListener('resize', () => {

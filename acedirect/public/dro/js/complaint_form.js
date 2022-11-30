@@ -11,6 +11,8 @@
   ACEKurento
   dayjs
   io
+  consumerPortalEndMessage
+  consumerPortalTitle
 */
 
 let socket;
@@ -686,7 +688,6 @@ function ConnectSocket() {
           })
           .on('caption-config', (data) => {
             if (data && data !== 'false') {
-              console.log(data, typeof data);
               captionsEnabled = data;
               if (captionsEnabled) {
                 $('#mute-captions').show();
@@ -695,7 +696,6 @@ function ConnectSocket() {
             }
           })
           .on('caption-translated', (transcripts) => {
-            console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
             // eslint-disable-next-line no-use-before-define
             updateCaptions(transcripts);
           })
@@ -840,9 +840,7 @@ function refreshCaptions() {
 
 // Updates the caption arrays and calls refreshCaptions()
 function updateCaptions(caption) {
-  console.log(caption);
   if (caption.final) {
-    console.log('final!');
     // Remove caption from current captions
     currentCaptions.forEach((element, captionIndex) => {
       if (element.extension === caption.extension) {
@@ -1773,7 +1771,6 @@ function newChatMessage(data) {
   const msgsender = document.createElement('span');
   const msgtime = document.createElement('span');
   const msgtext = document.createElement('div');
-  console.log(`Data is ${JSON.stringify(data)}`);
   console.log(`Also ${data.displayname} ${data.timestamp}`);
 
   msg = msg.replace(/:\)/, '<i class="fa fa-smile-o fa-2x"></i>');
@@ -2545,3 +2542,10 @@ $('#noAgentsVideo')
     }
   });
 // #endregion
+
+// from config
+window.addEventListener('load', () => {
+  document.getElementById('goodbyeDescriptionCall').innerText = consumerPortalEndMessage;
+  document.getElementById('complaint_form_title').innerText = consumerPortalTitle;
+  document.getElementById('complaint_form_meta').setAttribute('content', `${consumerPortalTitle} Call`);
+});

@@ -114,21 +114,30 @@ printf "\n"
 
 ### BEGIN INSTALLATION ###
 
-# install MySQL and create databases
+# uninstall MySQL and MariaDB; install MariaDB and create databases
 read -p "${Q} Install MariaDB (y/n)? " -n 1 -r
 printf "\n"
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  sudo systemctl stop mariadb >/dev/null 2>&1
-  sudo yum list installed | grep maria | awk 'NR>2' | cut -d' ' -f1 | xargs sudo yum remove -y
-  sudo rm -rf /var/lib/mysql  >/dev/null 2>&1
-  sudo rm /etc/my.cnf >/dev/null 2>&1
-  sudo rm ~/.my.cnf >/dev/null 2>&1
-  sudo yum update -y
-  sudo yum install -y mariadb-server
-  sudo systemctl start mariadb
-  sudo systemctl enable mariadb
-  sudo mysql_secure_installation 
+  read -p "${Q} The next step will uninstall existing installations of MySQL or MariaDB. Continue (y/n)? " -n 1 -r
+  printf "\n"
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    sudo systemctl stop mariadb >/dev/null 2>&1
+    sudo systemctl stop mysqld >/dev/null 2>&1
+    sudo service mysqld stop >/dev/null 2>&1
+    sudo yum list installed | grep maria | awk 'NR>2' | cut -d' ' -f1 | xargs sudo yum remove -y
+    sudo yum list installed | grep mysql | awk 'NR>2' | cut -d' ' -f1 | xargs sudo yum remove -y
+    sudo rm -rf /var/lib/mysql  >/dev/null 2>&1
+    sudo rm /etc/my.cnf >/dev/null 2>&1
+    sudo rm ~/.my.cnf >/dev/null 2>&1
+    sudo yum update -y
+    sudo yum install -y mariadb-server
+    sudo systemctl start mariadb
+    sudo systemctl enable mariadb
+    printf "Securing the database installation. Please remember your root password...\n"
+    sudo mysql_secure_installation 
+  fi
 fi
 
 # create databases
