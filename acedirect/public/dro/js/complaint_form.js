@@ -15,6 +15,13 @@
   consumerPortalTitle
 */
 
+window.onbeforeunload = function unload() {
+  $.ajax({
+    url: './signoutvrs',
+    type: 'GET'
+  });
+};
+
 let socket;
 
 // eslint-disable-next-line no-constant-condition
@@ -736,7 +743,7 @@ function ConnectSocket() {
     },
     error: (_xhr, _status, _error) => {
       console.log('Error');
-      $('#message').text('An Error Occured.');
+      $('#message').text('An Error Occurred.');
     }
   });
 }
