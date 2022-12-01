@@ -177,7 +177,8 @@ router.post('/consumer_login', (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   const vrsnum = req.body.vrsnumber;
   req.redisClient.hget(c.R_VRS_MAP, vrsnum, (_err, status) => {
-    if (status === 'true') {
+    // if (status === 'true') {
+    if (false) { // fixme turning vrs checking off for now
       res.status(409).json({ message: 'Number logged in from another device' });
     } else if (/^\d+$/.test(vrsnum)) {
       req.dbConnection.query('SELECT reason FROM call_block WHERE vrs = ?;', vrsnum, (err, results) => {
