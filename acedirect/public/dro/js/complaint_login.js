@@ -87,7 +87,7 @@ $(window).on('load', () => {
           if (xhr.responseJSON && xhr.responseJSON.message === 'Number blocked') {
             window.location = xhr.responseJSON.redirectUrl;
           } else {
-            $(messageId).text('An Error Occured.');
+            $(messageId).text('An Error Occurred.');
             $(messageId).show();
           }
         }
@@ -144,8 +144,12 @@ function login() {
       error(xhr, _status, _error) {
         if (xhr.responseJSON && xhr.responseJSON.message === 'Number blocked') {
           window.location = xhr.responseJSON.redirectUrl;
+        } else if (xhr.status === 409) {
+          $(messageId).text('That phone number is already in use.');
+          $(messageId).css({ color: 'red' });
+          $(messageId).show();
         } else {
-          $(messageId).text('An Error Occured.');
+          $(messageId).text('An Error Occurred.');
           $(messageId).css({ color: 'red' });
           $(messageId).show();
         }

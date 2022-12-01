@@ -176,35 +176,41 @@ router.post('/consumer_login', (req, res) => {
   // All responses will be JSON sets response header.
   res.setHeader('Content-Type', 'application/json');
   const vrsnum = req.body.vrsnumber;
-  if (/^\d+$/.test(vrsnum)) {
-    req.dbConnection.query('SELECT reason FROM call_block WHERE vrs = ?;', vrsnum, (err, results) => {
-      if (err || results.length > 0) {
-        res.status(401).json({ message: 'Number blocked', redirectUrl: complaintRedirectUrl });
-      } else {
-        utils.getCallerInfo(vrsnum, (vrs) => {
-          if (vrs.message === 'success') {
-            req.session.user = {};
-            req.session.user.role = 'VRS';
-            req.session.user.vrs = vrs.data[0].vrs;
-            req.session.user.phone = vrs.data[0].vrs;
-            req.session.user.firstname = vrs.data[0].first_name;
-            req.session.user.lastname = vrs.data[0].last_name;
-            req.session.user.email = vrs.data[0].email;
-            res.status(200).json({
-              message: 'success'
-            });
-          } else {
-            res.status(200).json(vrs);
-          }
-        });
-      }
-    });
-  } else {
-    console.log('bad vrs format?');
-    res.status(200).json({
-      message: 'Error: Phone number format incorrect'
-    });
-  }
+  req.redisClient.hget(c.R_VRS_MAP, vrsnum, (_err, status) => {
+    if (status === 'true') {
+      res.status(409).json({ message: 'Number logged in from another device' });
+    } else if (/^\d+$/.test(vrsnum)) {
+      req.dbConnection.query('SELECT reason FROM call_block WHERE vrs = ?;', vrsnum, (err, results) => {
+        if (err || results.length > 0) {
+          res.status(401).json({ message: 'Number blocked', redirectUrl: complaintRedirectUrl });
+        } else {
+          utils.getCallerInfo(vrsnum, (vrs) => {
+            req.redisClient.hset(c.R_VRS_MAP, vrsnum, true);
+
+            if (vrs.message === 'success') {
+              req.session.user = {};
+              req.session.user.role = 'VRS';
+              req.session.user.vrs = vrs.data[0].vrs;
+              req.session.user.phone = vrs.data[0].vrs;
+              req.session.user.firstname = vrs.data[0].first_name;
+              req.session.user.lastname = vrs.data[0].last_name;
+              req.session.user.email = vrs.data[0].email;
+              res.status(200).json({
+                message: 'success'
+              });
+            } else {
+              res.status(200).json(vrs);
+            }
+          });
+        }
+      });
+    } else {
+      console.log('bad vrs format?');
+      res.status(200).json({
+        message: 'Error: Phone number format incorrect'
+      });
+    }
+  });
 });
 
 router.get('/token', restrict, (req, res) => {
@@ -710,6 +716,20 @@ router.get('/logout', (req, res) => {
       res.redirect(req.get('referer'));
     });
   });
+});
+
+/**
+ * Handles a GET request for /signoutvrs.
+ * Signs out VRS number so it can be used
+ *
+ * @param {string} '/signoutvrs'
+ * @param {function} function(req, res)
+ */
+
+router.get('/signoutvrs', (req) => {
+  // Set VRS number as logged out in redis
+  req.redisClient.hset(c.R_VRS_MAP, req.session.user.vrs, false);
+  req.session.destroy();
 });
 
 function sendAnonImage(res) {
