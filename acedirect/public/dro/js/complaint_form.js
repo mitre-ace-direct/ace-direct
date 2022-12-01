@@ -15,12 +15,12 @@
   consumerPortalTitle
 */
 
-window.onbeforeunload = function unload() {
+window.addEventListener('beforeunload', () => {
   $.ajax({
     url: './signoutvrs',
     type: 'GET'
   });
-};
+});
 
 let socket;
 
