@@ -645,7 +645,7 @@ function connect_socket() {
     },
     error: (xhr, status, error) => {
       console.log('Error');
-      $('#message').text('An Error Occured.');
+      $('#message').text('An Error Occurred.');
     }
   });
 }
