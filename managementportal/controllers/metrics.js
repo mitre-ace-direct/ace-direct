@@ -74,8 +74,12 @@ exports.createMetrics = function CreateMetrics(db, metricsStartDate, metricsEndD
 
           // Persist target some other way.
           const averageCallsInQueueTarget = 0.5;
-          const targetData = CreateTargetLine(metrics.averageCallsInQueue,
-            averageCallsInQueueTarget);
+
+          const targetData = CreateTargetLine(
+            metrics.averageCallsInQueue,
+            averageCallsInQueueTarget
+          );
+
           metrics.averageCallsInQueueTarget = targetData;
         } else {
           // clear chart data

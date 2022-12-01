@@ -63,11 +63,14 @@ function updateCallStatusLineChart(dataIn) {
       }
     ];
 
-    $.plot('#callSummaryLineChart', chartdata,
+    $.plot(
+      '#callSummaryLineChart',
+      chartdata,
       {
         legend: legendSettings,
         xaxis: { mode: 'time', timeBase: 'milliseconds' }
-      });
+      }
+    );
   });
 }
 

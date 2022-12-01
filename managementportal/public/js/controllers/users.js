@@ -130,36 +130,39 @@ $(document).ready(() => {
       const url = `./GetAgent/${data.username}`;
       console.log(`GetAgent url: ${url}`);
       selectedUser = data.userId;
-      $.get('./GetAgent', {
-        username: data.username
-      },
-      (result, _status) => {
-        console.log(`GetAgent returned: ${JSON.stringify(result)}`);
+      $.get(
+        './GetAgent',
+        {
+          username: data.username
+        },
+        (result, _status) => {
+          console.log(`GetAgent returned: ${JSON.stringify(result)}`);
 
-        agentProfilePicture = result.profile_picture;
-        checkProfilePic(result.username);
+          agentProfilePicture = result.profile_picture;
+          checkProfilePic(result.username);
 
-        agentExt = result.extension;
-        agentUsername = result.username;
+          agentExt = result.extension;
+          agentUsername = result.username;
 
-        $('#inputProfilePic').attr('src', `./ProfilePic/${result.username}`);
+          $('#inputProfilePic').attr('src', `./ProfilePic/${result.username}`);
 
-        $('#inputUsername').val(result.username);
-        $('#inputFirstname').val(result.first_name);
-        $('#inputLastname').val(result.last_name);
-        $('#inputEmail').val(result.email);
-        $('#inputPhone').val(result.phone);
-        $('#inputOrganization').val(result.organization);
-        $('#inputExtension').val(result.extension);
-        if (result.queue_name != null) {
-          $('#inputComplaintsQueue').prop('checked', true);
+          $('#inputUsername').val(result.username);
+          $('#inputFirstname').val(result.first_name);
+          $('#inputLastname').val(result.last_name);
+          $('#inputEmail').val(result.email);
+          $('#inputPhone').val(result.phone);
+          $('#inputOrganization').val(result.organization);
+          $('#inputExtension').val(result.extension);
+          if (result.queue_name != null) {
+            $('#inputComplaintsQueue').prop('checked', true);
+          }
+          if (result.queue2_name != null) {
+            $('#inputGeneralQueue').prop('checked', true);
+          }
+          console.log(`complaintsQueue value is: ${$('#inputComplaintsQueue').val()}`);
+          console.log(`generalQueue value is: ${$('#inputGeneralQueue').val()}`);
         }
-        if (result.queue2_name != null) {
-          $('#inputGeneralQueue').prop('checked', true);
-        }
-        console.log(`complaintsQueue value is: ${$('#inputComplaintsQueue').val()}`);
-        console.log(`generalQueue value is: ${$('#inputGeneralQueue').val()}`);
-      });
+      );
 
       $('#inputUsername').prop('disabled', true);
       $('#inputPassword').prop('disabled', false);
@@ -282,32 +285,35 @@ $(document).ready(() => {
 
     $('#passwordMatchError').attr('hidden', true);
 
-    $.post('./AddAgent', {
-      username: $('#inputUsername').val(),
-      password: $('#inputPassword').val(),
-      first_name: $('#inputFirstname').val(),
-      last_name: $('#inputLastname').val(),
-      email: $('#inputEmail').val(),
-      phone: $('#inputPhone').val(),
-      organization: $('#inputOrganization').val(),
-      extension: $('#inputExtension').val(),
-      queue_id: ($('#inputComplaintsQueue').prop('checked')) ? ($('#inputComplaintsQueue').val()) : 0,
-      queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0
-    },
-    (data, _status) => {
-      if (data.result === 'success') {
-        // console.log('Saved!!!!');
-        $('#actionError').attr('hidden', true);
-        $('#btnAddAgent').prop('disabled', false);
-        window.location.reload();
-      } else {
-        console.log(`POST failed: ${JSON.stringify(data)}`);
-        $('#errorMessage').text(' Add agent');
-        $('#actionError').attr('hidden', false);
-        $('#actionError').show();
-        $('#btnAddAgent').prop('disabled', false);
+    $.post(
+      './AddAgent',
+      {
+        username: $('#inputUsername').val(),
+        password: $('#inputPassword').val(),
+        first_name: $('#inputFirstname').val(),
+        last_name: $('#inputLastname').val(),
+        email: $('#inputEmail').val(),
+        phone: $('#inputPhone').val(),
+        organization: $('#inputOrganization').val(),
+        extension: $('#inputExtension').val(),
+        queue_id: ($('#inputComplaintsQueue').prop('checked')) ? ($('#inputComplaintsQueue').val()) : 0,
+        queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0
+      },
+      (data, _status) => {
+        if (data.result === 'success') {
+          // console.log('Saved!!!!');
+          $('#actionError').attr('hidden', true);
+          $('#btnAddAgent').prop('disabled', false);
+          window.location.reload();
+        } else {
+          console.log(`POST failed: ${JSON.stringify(data)}`);
+          $('#errorMessage').text(' Add agent');
+          $('#actionError').attr('hidden', false);
+          $('#actionError').show();
+          $('#btnAddAgent').prop('disabled', false);
+        }
       }
-    });
+    );
   });
 
   $('#btnDeleteAgent').on('click', (event) => {
@@ -340,34 +346,37 @@ $(document).ready(() => {
     /* This is a little kludgey.  The call to ./UpdateAgent nukes the profile pic and
      then the emit to profile-pic-set below resets it correctly */
 
-    $.post('./UpdateAgent', {
-      agent_id: selectedUser,
-      username: $('#inputUsername').val(),
-      password: $('#inputPassword').val(),
-      first_name: $('#inputFirstname').val(),
-      last_name: $('#inputLastname').val(),
-      email: $('#inputEmail').val(),
-      phone: $('#inputPhone').val(),
-      organization: $('#inputOrganization').val(),
-      extension: $('#inputExtension').val(),
-      queue_id: ($('#inputComplaintsQueue').prop('checked')) ? ($('#inputComplaintsQueue').val()) : 0,
-      queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0,
-      profile_picture: agentProfilePicture
-    },
-    (data, _status) => {
-      if (data.result === 'success') {
-        // console.log(`POST succ: ${JSON.stringify(data)}`);
-        $('#actionError').attr('hidden', true);
-        $('#btnUpdateAgent').prop('disabled', false);
-        window.location.reload();
-      } else {
-        // console.log(`POST failed: ${JSON.stringify(data)}`);
-        $('#errorMessage').text(' Update agent');
-        $('#actionError').attr('hidden', false);
-        $('#actionError').show();
-        $('#btnUpdateAgent').prop('disabled', false);
+    $.post(
+      './UpdateAgent',
+      {
+        agent_id: selectedUser,
+        username: $('#inputUsername').val(),
+        password: $('#inputPassword').val(),
+        first_name: $('#inputFirstname').val(),
+        last_name: $('#inputLastname').val(),
+        email: $('#inputEmail').val(),
+        phone: $('#inputPhone').val(),
+        organization: $('#inputOrganization').val(),
+        extension: $('#inputExtension').val(),
+        queue_id: ($('#inputComplaintsQueue').prop('checked')) ? ($('#inputComplaintsQueue').val()) : 0,
+        queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0,
+        profile_picture: agentProfilePicture
+      },
+      (data, _status) => {
+        if (data.result === 'success') {
+          // console.log(`POST succ: ${JSON.stringify(data)}`);
+          $('#actionError').attr('hidden', true);
+          $('#btnUpdateAgent').prop('disabled', false);
+          window.location.reload();
+        } else {
+          // console.log(`POST failed: ${JSON.stringify(data)}`);
+          $('#errorMessage').text(' Update agent');
+          $('#actionError').attr('hidden', false);
+          $('#actionError').show();
+          $('#btnUpdateAgent').prop('disabled', false);
+        }
       }
-    });
+    );
 
     const file = document.getElementById('profile-pic-file-upload').files[0];
     console.log(typeof file !== 'undefined');
@@ -418,21 +427,24 @@ $(document).ready(() => {
         // + " agent username is: " + value.username);
 
         // Issue delete at backend
-        $.post('./DeleteAgent', {
-          id: value.userId,
-          username: value.username
-        },
-        (data, _status) => {
-          if (data.result === 'success') {
-            // console.log(`POST succ: ${JSON.stringify(data)}`);
-            $('#actionError').attr('hidden', true);
-            window.location.reload();
-          } else {
-            // console.log(`DeleteAgent ${value.username} failed: ${JSON.stringify(data)}`);
-            $('#errorMessage').text(' Delete agent');
-            $('#actionError').attr('hidden', false);
+        $.post(
+          './DeleteAgent',
+          {
+            id: value.userId,
+            username: value.username
+          },
+          (data, _status) => {
+            if (data.result === 'success') {
+              // console.log(`POST succ: ${JSON.stringify(data)}`);
+              $('#actionError').attr('hidden', true);
+              window.location.reload();
+            } else {
+              // console.log(`DeleteAgent ${value.username} failed: ${JSON.stringify(data)}`);
+              $('#errorMessage').text(' Delete agent');
+              $('#actionError').attr('hidden', false);
+            }
           }
-        });
+        );
       }
     });
 
@@ -461,14 +473,17 @@ $('#add_user_btn').on('click', () => {
 });
 
 function deleteUser() {
-  $.post('./DeleteAgent', {
-    id: selectedUser,
-    username: $('#inputUsername').val()
-  },
-  (_data, _status) => {
-    console.log('Deleted!!!!');
-    window.location.reload();
-  });
+  $.post(
+    './DeleteAgent',
+    {
+      id: selectedUser,
+      username: $('#inputUsername').val()
+    },
+    (_data, _status) => {
+      console.log('Deleted!!!!');
+      window.location.reload();
+    }
+  );
 }
 
 $('#delete_user_confirm_btn').on('click', () => {
