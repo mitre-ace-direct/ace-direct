@@ -176,7 +176,7 @@ $(document).ready(function () {
 });
 
 function checkProfilePic() {
-  console.log('checkProfilePic()');
+  // console.log('checkProfilePic()');
   $.ajax({
     url: './profilePicPoll',
     type: 'GET',
