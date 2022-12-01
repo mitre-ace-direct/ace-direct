@@ -1,3 +1,5 @@
+/* eslint-disable function-call-argument-newline */
+/* eslint-disable function-paren-newline */
 // node modules
 let dbconn = null;
 let dbConnection = null;
@@ -49,27 +51,26 @@ const getAgent = (usnm) => new Promise((resolve, reject) => {
   // console.log('get agent link', `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`)
   request({
     method: 'GET',
-    headers: { 'Accept': 'application/json' },
+    headers: { Accept: 'application/json' },
     url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`
   }, (error, _response, data) => {
     if (error) {
       console.error('Error! Could not get agent:', error);
       reject(error);
-    } else {
+    } else if (data.length > 0) {
       // console.log('Success! Agent found!');
       // console.log('Data: ', typeof data)
       // console.log("TEXT " + JSON.parse(data));
-      if (data.length > 0) {
-        const jsonData = JSON.parse(data);
-        resolve(jsonData);
-      } else reject('Agent cannot be found!');
-    }
+
+      const jsonData = JSON.parse(data);
+      resolve(jsonData);
+    } else reject(new Error('Agent cannot be found!'));
   });
 });
 
 const updateAgent = (aId, first, last, role, phone, email, org,
-  isApp, isAct, ext, q1_id, q2_id, profPic) => new Promise((resolve, reject) => {
-  console.log('update agent data: ', aId, first, last, role, phone, email, org, isApp, isAct, ext, q1_id, q2_id, profPic);
+  isApp, isAct, ext, q1Id, q2Id, profPic) => new Promise((resolve, reject) => {
+  console.log('update agent data: ', aId, first, last, role, phone, email, org, isApp, isAct, ext, q1Id, q2Id, profPic);
 
   request({
     method: 'POST',
@@ -85,8 +86,8 @@ const updateAgent = (aId, first, last, role, phone, email, org,
       isApproved: isApp,
       isActive: isAct,
       extension: ext,
-      queue_id: q1_id,
-      queue2_id: q2_id,
+      queue_id: q1Id,
+      queue2_id: q2Id,
       profile_picture: profPic
     }
   }, (error, _response, _data) => {
@@ -843,6 +844,8 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('reset-all-counters', (_data) => {
     resetAllCounters();
+
+    // eslint-disable-next-line no-use-before-define
     mapAgents();
   });
 
@@ -2131,6 +2134,7 @@ app.use((err, req, res, next) => {
  * @param {type} callback Returns retrieved JSON
  * @returns {undefined} Not used
  */
+// eslint-disable-next-line no-unused-vars
 function getUserInfo(username, callback) {
   const urlGetAgentRec = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}/getagentrec/${username}`;
   request({
