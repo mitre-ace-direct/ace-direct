@@ -176,24 +176,26 @@ $(document).ready(function () {
 });
 
 function checkProfilePic() {
+  // console.log('checkProfilePic()');
   $.ajax({
     url: './profilePicPoll',
     type: 'GET',
     dataType: 'json',
     success: (data) => {
-      console.log("Profile Picture Poll:", JSON.stringify(data))
-      var response = data.profilePicExists // Parsing the value of response for checking Profile Pic
+      console.log('Profile Picture Poll:', JSON.stringify(data));
+      // Parsing the value of response for checking Profile Pic
+      const response = data.profilePicExists;
 
-      if(response) {
-        $('#deleteProfilePic').show()
+      if (response) {
+        $('#deleteProfilePic').show();
       } else {
-        $('#deleteProfilePic').hide()
+        $('#deleteProfilePic').hide();
       }
     },
     error: (error) => {
-      console.log("Error checking profile pic!", error);
+      console.log('Error checking profile pic!', error);
     }
-  })
+  });
 }
 
 function connect_socket() {
@@ -3348,24 +3350,25 @@ function ShareFile() {
 
 // Event emitting for handling profile pic setting.
 function setProfilePic() {
-  if(document.getElementById('profile-pic-file-upload').files && document.getElementById('profile-pic-file-upload').files[0]) {
-    var fileReader = new FileReader();
-    var file = document.getElementById('profile-pic-file-upload').files[0]
-
-    var fileExt = file.name.split('.')[1].toLowerCase()
+  const profilePicObj = document.getElementById('profile-pic-file-upload');
+  if(profilePicObj.files && profilePicObj.files[0]) {
+    let fileReader = new FileReader();
+    let file = profilePicObj.files[0]
+  
+    let fileExt = file.name.split('.')[1].toLowerCase()
     console.log('You have uploaded a picture! File name:', file.name.split('.')[1])
-
+  
     fileReader.readAsDataURL(file)
-
+  
     fileReader.onload = (e) => {
       $('#sidebar-profile-pic').attr('src', e.target.result)
       $('#agent-pic-header').attr('src', e.target.result)
       $('#agent-pic-dropdown').attr('src', e.target.result)
-
+  
       $('#deleteProfilePic').show();
-
+  
       console.log('Emitting profile-pic-set event now...')
-
+  
       socket.emit('profile-pic-set', {
         picture : file,
         agentExtension : extensionMe.toString(),
@@ -3374,6 +3377,10 @@ function setProfilePic() {
       }, (res) => {
         console.log(res)
       })
+    }
+    // clear file object
+    fileReader.onloadend = (e) => {
+      profilePicObj.value = "";
     }
   }
 }

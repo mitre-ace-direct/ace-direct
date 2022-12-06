@@ -1,3 +1,5 @@
+/* eslint-disable function-call-argument-newline */
+/* eslint-disable function-paren-newline */
 // node modules
 let dbconn = null;
 let dbConnection = null;
@@ -23,15 +25,15 @@ const Json2csvParser = require('json2csv').Parser;
 const redis = require('redis');
 const socketIO = require('socket.io');
 const proxy = require('proxy-agent');
-const AWS = require('aws-sdk')
-const datConfig = require('./../dat/config.json');
+const AWS = require('aws-sdk');
+const datConfig = require('../dat/config.json');
 
 AWS.config.update({
   region: datConfig.s3.region,
   httpOptions: {
     agent: proxy(datConfig.common.proxy)
   }
-})
+});
 
 const s3 = new AWS.S3();
 
@@ -44,64 +46,61 @@ const webrtcstats = require('./controllers/webrtcstats');
 const { setRgbValues } = require('./helpers/utility');
 const validator = require('./utils/validator');
 
-const getAgent = (usnm) => {
-  return new Promise((resolve, reject) => {
-    // console.log('Getting agent! Username: ', usnm)
-    // console.log('get agent link', `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`)
-    request({
-      method: 'GET',
-      headers : {'Accept': 'application/json'},
-      url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`,
-    }, function (error, response, data) {
-      if (error) {
-        console.error("Error! Could not get agent:", error);
-        reject(error)
-      } else {
-        // console.log("Success! Agent found!");
-        // console.log('Data: ', typeof data)
-        // console.log("TEXT " + JSON.parse(data));
-        if(data.length > 0) {
-          var jsonData = JSON.parse(data)
-          resolve(jsonData)
-        }
-        else reject("Agent cannot be found!")
-      }
-    });
+const getAgent = (usnm) => new Promise((resolve, reject) => {
+  // console.log('Getting agent! Username: ', usnm)
+  // console.log('get agent link', `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`)
+  request({
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+    url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/getagentrec/${usnm}`
+  }, (error, _response, data) => {
+    if (error) {
+      console.error('Error! Could not get agent:', error);
+      reject(error);
+    } else if (data.length > 0) {
+      // console.log('Success! Agent found!');
+      // console.log('Data: ', typeof data)
+      // console.log("TEXT " + JSON.parse(data));
+
+      const jsonData = JSON.parse(data);
+      resolve(jsonData);
+    } else reject(new Error('Agent cannot be found!'));
   });
-}
-const updateAgent = (aId, first, last, role, phone, email, org, isApp, isAct, ext, q1_id, q2_id, profPic) => {
-  return new Promise((resolve, reject) => {
-    console.log("update agent data: ", aId, first, last, role, phone, email, org, isApp, isAct, ext, q1_id, q2_id, profPic)
-    request({
-      method: 'POST',
-      url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/updateProfile`,
-      form : {
-          agent_id : aId,
-          first_name : first,
-          last_name : last,
-          role,
-          phone,
-          email,
-          organization : org,
-          isApproved : isApp,
-          isActive : isAct,
-          extension : ext,
-          queue_id : q1_id,
-          queue2_id : q2_id,
-          profile_picture : profPic
-      }
-    }, function (error, response, data) {
-      if (error) {
-        console.log("Error", error);
-        reject(error)
-      } else {
-        console.log("**Updating the agent was a success!**");
-        // console.log('response:', response)
-        // console.log('data:', data)
-      }
-    });
+});
+
+const updateAgent = (aId, first, last, role, phone, email, org,
+  isApp, isAct, ext, q1Id, q2Id, profPic) => new Promise((resolve, reject) => {
+  console.log('update agent data: ', aId, first, last, role, phone, email, org, isApp, isAct, ext, q1Id, q2Id, profPic);
+
+  request({
+    method: 'POST',
+    url: `https://${datConfig.servers.main_private_ip}:${datConfig.app_ports.mserver}/updateProfile`,
+    form: {
+      agent_id: aId,
+      first_name: first,
+      last_name: last,
+      role,
+      phone,
+      email,
+      organization: org,
+      isApproved: isApp,
+      isActive: isAct,
+      extension: ext,
+      queue_id: q1Id,
+      queue2_id: q2Id,
+      profile_picture: profPic
+    }
+  }, (error, _response, _data) => {
+    if (error) {
+      console.log('Error', error);
+      reject(error);
+    } else {
+      console.log('**Updating the agent was a success!**');
+      // console.log('response:', response)
+      // console.log('data:', data)
+    }
   });
-}
+});
 
 let port = null; // set the port
 let ami = null; // Asterisk AMI
@@ -845,6 +844,8 @@ io.sockets.on('connection', (socket) => {
 
   socket.on('reset-all-counters', (_data) => {
     resetAllCounters();
+
+    // eslint-disable-next-line no-use-before-define
     mapAgents();
   });
 
@@ -910,7 +911,7 @@ io.sockets.on('connection', (socket) => {
           // returns Report Data
           io.to(socket.id).emit('reporttable-csv', csv);
         } else {
-        // returns JSON object of Report
+          // returns JSON object of Report
           io.to(socket.id).emit('reporttable-data', reportdata);
         }
       });
@@ -1508,105 +1509,110 @@ io.sockets.on('connection', (socket) => {
   });
 
   socket.on('profile-pic-set', (data, callback) => {
-    callback("Emitter signal received!")
+    callback('Emitter signal received!');
 
-    var profilePic = data.picture
-    var agentExt = data.agentExtension
-    var agentUsnm = data.agentUsername
-    var fileExt = data.fileExt
+    const profilePic = data.picture;
+    const agentExt = data.agentExtension;
+    const agentUsnm = data.agentUsername;
+    const { fileExt } = data;
 
-    console.log("Bucket: " + datConfig.s3.bucketname)
+    console.log(`Bucket: ${datConfig.s3.bucketname}`);
 
-    var getParams = { Bucket : datConfig.s3.bucketname, Key : agentExt+'.'+fileExt }
-    var uploadParams = { ...getParams, Body : profilePic, ContentType : 'image/*' }
+    const getParams = { Bucket: datConfig.s3.bucketname, Key: `${agentExt}.${fileExt}` };
+    const uploadParams = { ...getParams, Body: profilePic, ContentType: 'image/*' };
 
     // console.log("Upload parameters: " + JSON.stringify(uploadParams))
 
-    s3.getObject(getParams, (err, data) => {
-      if(err) {
-        s3.upload(uploadParams, (err) => {
-          if(err) {
-            console.log("Error! Could not upload to S3 bucket: " + err)
+    s3.getObject(getParams, (err, _data) => {
+      if (err) {
+        s3.upload(uploadParams, (errUpload) => {
+          if (errUpload) {
+            console.log(`Error! Could not upload to S3 bucket: ${errUpload}`);
           } else {
-            getAgent(agentUsnm).then(agentInfoArray => {
-              let agentInfo = agentInfoArray.data[0];
-              
-              console.log('agentInfo1', agentInfoArray.data[0])
+            getAgent(agentUsnm).then((agentInfoArray) => {
+              const agentInfo = agentInfoArray.data[0];
 
-              updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
-                agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
+              console.log('agentInfo1', agentInfoArray.data[0]);
+
+              updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name,
+                agentInfo.role, agentInfo.phone, agentInfo.email,
+                agentInfo.organization, agentInfo.is_approved, agentInfo.is_active,
+                agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
                 getParams.Key);
-            }).catch(err => {
-              console.log("Error getting agent!", err)
-            })
+            }).catch((errCatch) => {
+              console.log('Error getting agent!', errCatch);
+            });
           }
-        })
+        });
       } else {
-        s3.deleteObject(getParams, (err, data) => {
-          if (err) {
-            console.log('Error deleting object', err)
+        s3.deleteObject(getParams, (errDelete, _dataDeleteObject) => {
+          if (errDelete) {
+            console.log('Error deleting object', errDelete);
           } else {
-            s3.upload(uploadParams, (err) => {
-              if (err) {
-                console.log("Error! Could not upload to S3 bucket: " + err)
+            s3.upload(uploadParams, (errUpload) => {
+              if (errUpload) {
+                console.log(`Error! Could not upload to S3 bucket: ${errUpload}`);
               } else {
-                getAgent(agentUsnm).then(agentInfoArray => {
-                  let agentInfo = agentInfoArray.data[0];
+                getAgent(agentUsnm).then((agentInfoArray) => {
+                  const agentInfo = agentInfoArray.data[0];
 
-                  console.log('agentInfo2', agentInfoArray.data[0])
+                  console.log('agentInfo2', agentInfoArray.data[0]);
 
-                  updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
-                    agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
+                  updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name,
+                    agentInfo.role, agentInfo.phone, agentInfo.email,
+                    agentInfo.organization, agentInfo.is_approved, agentInfo.is_active,
+                    agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
                     getParams.Key);
-                })
+                });
               }
-            })
+            });
           }
-        })
+        });
       }
-    })
-
+    });
   });
 
-  socket.on('delete-profile-pic', (data, callback) => {
-    fs.readFile('./public/images/anon.png', (err, data) => {
-      if(err) {
-        console.log("Could not read image!", err);
+  socket.on('delete-profile-pic', (dataDeleteProfilePic, callback) => {
+    fs.readFile('./public/images/anon.png', (err, dataReadFile) => {
+      if (err) {
+        console.log('Could not read image!', err);
         callback('', err);
       } else {
-        let image = data
-        console.log("fs.readFileSync image:", image)
+        const image = dataReadFile;
+        console.log('fs.readFileSync image:', image);
         callback(image);
       }
-    })
+    });
 
-    let username = data.agentUsername;
-    let key = ''
+    const username = dataDeleteProfilePic.agentUsername;
+    let key = '';
 
     getAgent(username).then((data) => {
-      if(data.data[0].profile_picture) {
-        key = data.data[0].profile_picture
+      if (data.data[0].profile_picture) {
+        key = data.data[0].profile_picture;
       } else {
-        throw new Error("No profile Pic!")
+        throw new Error('No profile Pic!');
       }
 
-      let agentInfo = data.data[0];
+      const agentInfo = data.data[0];
 
-      updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name, agentInfo.role, agentInfo.phone, agentInfo.email,
-        agentInfo.organization, agentInfo.is_approved, agentInfo.is_active, agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
+      updateAgent(agentInfo.agent_id, agentInfo.first_name, agentInfo.last_name,
+        agentInfo.role, agentInfo.phone, agentInfo.email,
+        agentInfo.organization, agentInfo.is_approved, agentInfo.is_active,
+        agentInfo.extension, agentInfo.queue_id, agentInfo.queue2_id,
         '');
 
-      let deleteParams = { Bucket : datConfig.s3.bucketname, Key : key }
+      const deleteParams = { Bucket: datConfig.s3.bucketname, Key: key };
 
-      s3.deleteObject(deleteParams, (err, data) => {
-        if(err) {
-          console.log("There was an error deleting the user profile picture in S3 bucket!", err);
+      s3.deleteObject(deleteParams, (err, dataDeleteObject) => {
+        if (err) {
+          console.log('There was an error deleting the user profile picture in S3 bucket!', err);
         } else {
-          console.log("Deleting image successful!", data)
+          console.log('Deleting image successful!', dataDeleteObject);
         }
-      })
-    }).catch(e => {
-      console.log("Error deleting profile pic!", e)
+      });
+    }).catch((e) => {
+      console.log('Error deleting profile pic!', e);
     });
   });
 });
@@ -1751,7 +1757,7 @@ function HandleManagerEvent(evt) {
       if (!a) {
         if (AgentMap.has(agentInt)) {
           const evtNewAgent = evt;
-          console.log("EVT New Agent:", evtNewAgent)
+          console.log('EVT New Agent:', evtNewAgent);
           logger.debug('Agents: New Agent');
           evtNewAgent.name = AgentMap.get(agentInt).name;
           evtNewAgent.talktime = 0;
@@ -2076,7 +2082,7 @@ function mapAgents() {
             queues += `, ${data.data[i].queue2_name}`;
           }
         }
-        
+
         const usr = {
           name: `${data.data[i].first_name} ${data.data[i].last_name}`,
           username: data.data[i].username,
@@ -2128,6 +2134,7 @@ app.use((err, req, res, next) => {
  * @param {type} callback Returns retrieved JSON
  * @returns {undefined} Not used
  */
+// eslint-disable-next-line no-unused-vars
 function getUserInfo(username, callback) {
   const urlGetAgentRec = `https://${getConfigVal(COMMON_PRIVATE_IP)}:${parseInt(getConfigVal(AGENT_SERVICE_PORT), 10)}/getagentrec/${username}`;
   request({
