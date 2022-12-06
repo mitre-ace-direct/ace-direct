@@ -943,7 +943,7 @@ io.sockets.on('connection', (socket) => {
       });
   });
 
-  // Sockets for WebRtcStats
+  // #region Sockets for WebRtcStats
   socket.on('webrtcstats-get-agents-data', () => {
     webrtcstats.getAgents(mongodb, (agentsdata) => {
       io.to(socket.id).emit('webrtcstats-agents-data', agentsdata);
@@ -978,6 +978,7 @@ io.sockets.on('connection', (socket) => {
         });
     });
   });
+  // #endregion
 
   // socket.on('metrics-get-data', (data) => {
   //   if (data.start && data.end) {
@@ -992,7 +993,8 @@ io.sockets.on('connection', (socket) => {
   //   }
   // });
 
-  // ######################################
+  // #region videomail
+
   // Retrieval of videomail records from the database
   socket.on('get-videomail', (data) => {
     logger.debug('entered get-videomail');
@@ -1098,6 +1100,7 @@ io.sockets.on('connection', (socket) => {
       }
     });
   });
+  // #endregion
 
   // Socket for Light Configuration
   // read color_config.json file for light configuration
@@ -1203,6 +1206,7 @@ io.sockets.on('connection', (socket) => {
     }
   });
 
+  // #region Call Blocking
   socket.on('get-callblocks', (_dataIn) => {
     logger.debug('entered get-callblocks');
 
@@ -1507,6 +1511,7 @@ io.sockets.on('connection', (socket) => {
       }
     });
   });
+  // #endregion
 
   socket.on('profile-pic-set', (data, callback) => {
     callback('Emitter signal received!');
@@ -1778,6 +1783,13 @@ function HandleManagerEvent(evt) {
 
         }
       } else {
+        // Update the name and username with the current values from AgentMap.
+        // It can change if an admin updates agent info.
+        if (AgentMap.has(agentInt)) {
+          a.name = AgentMap.get(agentInt).name;
+          a.username = AgentMap.get(agentInt).username;
+        }
+
         const mongoAgent = getAgentFromStats(a.agent);
         if (mongoAgent) {
           if (mongoAgent.talktime > 0 && a.talktime === 0) {
