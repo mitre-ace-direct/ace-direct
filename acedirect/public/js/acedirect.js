@@ -3420,9 +3420,14 @@ function showAlert(alertType, alertText) {
   $('#generalAlert').attr('class','alert alert-' + alertType + ' alert-dismissible');
   $('#alertText').html(alertText);
   $('#generalAlert').show();
+  $('#alertCloseButton').show();
   setTimeout(function() {
     $('#generalAlert').hide();
   },4000)
+}
+
+function closeAlert() {
+  $('#generalAlert').hide();
 }
 
 // Error Alert message function
