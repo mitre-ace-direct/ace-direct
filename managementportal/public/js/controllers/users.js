@@ -1,4 +1,3 @@
-// 'use strict';
 let selectedUser = 0;
 let socket;
 let agentExt;
@@ -54,7 +53,7 @@ $(document).ready(() => {
     },
     error(_xhr, _status, _error) {
       console.log('Error');
-      $('#message').text('An Error Occured.');
+      $('#message').text('An Error Occurred.');
     }
   });
 
@@ -131,36 +130,39 @@ $(document).ready(() => {
       const url = `./GetAgent/${data.username}`;
       console.log(`GetAgent url: ${url}`);
       selectedUser = data.userId;
-      $.get('./GetAgent', {
-        username: data.username
-      },
-      (result, _status) => {
-        console.log(`GetAgent returned: ${JSON.stringify(result)}`);
+      $.get(
+        './GetAgent',
+        {
+          username: data.username
+        },
+        (result, _status) => {
+          console.log(`GetAgent returned: ${JSON.stringify(result)}`);
 
-        agentProfilePicture = result.profile_picture;
-        checkProfilePic(result.username);
+          agentProfilePicture = result.profile_picture;
+          checkProfilePic(result.username);
 
-        agentExt = result.extension;
-        agentUsername = result.username;
+          agentExt = result.extension;
+          agentUsername = result.username;
 
-        $('#inputProfilePic').attr('src', `./ProfilePic/${result.username}`);
+          $('#inputProfilePic').attr('src', `./ProfilePic/${result.username}`);
 
-        $('#inputUsername').val(result.username);
-        $('#inputFirstname').val(result.first_name);
-        $('#inputLastname').val(result.last_name);
-        $('#inputEmail').val(result.email);
-        $('#inputPhone').val(result.phone);
-        $('#inputOrganization').val(result.organization);
-        $('#inputExtension').val(result.extension);
-        if (result.queue_name != null) {
-          $('#inputComplaintsQueue').prop('checked', true);
+          $('#inputUsername').val(result.username);
+          $('#inputFirstname').val(result.first_name);
+          $('#inputLastname').val(result.last_name);
+          $('#inputEmail').val(result.email);
+          $('#inputPhone').val(result.phone);
+          $('#inputOrganization').val(result.organization);
+          $('#inputExtension').val(result.extension);
+          if (result.queue_name != null) {
+            $('#inputComplaintsQueue').prop('checked', true);
+          }
+          if (result.queue2_name != null) {
+            $('#inputGeneralQueue').prop('checked', true);
+          }
+          console.log(`complaintsQueue value is: ${$('#inputComplaintsQueue').val()}`);
+          console.log(`generalQueue value is: ${$('#inputGeneralQueue').val()}`);
         }
-        if (result.queue2_name != null) {
-          $('#inputGeneralQueue').prop('checked', true);
-        }
-        console.log(`complaintsQueue value is: ${$('#inputComplaintsQueue').val()}`);
-        console.log(`generalQueue value is: ${$('#inputGeneralQueue').val()}`);
-      });
+      );
 
       $('#inputUsername').prop('disabled', true);
       $('#inputPassword').prop('disabled', false);
@@ -169,12 +171,109 @@ $(document).ready(() => {
       $('.glyphicon-eye-open').css('display', 'none'); // HERE
       $('#btnDeleteAgent').show();
       $('#btnAddAgent').hide();
+      $('#actionError').attr('hidden', true);
+      $('#actionError').hide();
       $('#configModal').modal();
     }
   });
 
+  function validate() {
+    let message = '';
+
+    const username = $('#inputUsername').val().trim();
+    if (username || username.length === 0) {
+      const legalChars = /^[a-zA-Z0-9_]+$/; // allow letters, numbers, and underscores
+      if (!((username.length >= 4) && (username.length <= 10)
+          && (legalChars.test(username)))) {
+        message = 'Please enter a username 4 to 10 characters. Allowed characters are letters, numbers, and underscores.';
+        return message;
+      }
+    }
+
+    const pass = $('#inputPassword').val().trim();
+    if (pass || pass.length === 0) {
+      const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,15}$/;
+      if (!((pass.length >= 6) && (pass.length <= 15)
+          && (re.test(pass)))) {
+        message = 'Please enter a password. It must be 6 to 15 characters and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.';
+        return message;
+      }
+    }
+
+    const pass2 = $('#inputPassword2').val().trim();
+    if (pass2 || pass2.length === 0) {
+      const re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{6,15}$/;
+      if (!((pass2.length >= 6) && (pass2.length <= 15)
+          && (re.test(pass2)))) {
+        message = 'Please enter a confirm password. It must be 6 to 15 characters and contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.';
+        return message;
+      }
+    }
+
+    const firstName = $('#inputFirstname').val().trim();
+    if (firstName || firstName.length === 0) {
+      const legalChars = /^[A-Za-z/\s.'-]+$/; // allow letters, numbers, and underscores
+      if (!((firstName.length >= 1) && (firstName.length <= 20)
+          && (legalChars.test(firstName)))) {
+        message = 'Please enter a first name 1 to 20 characters. Allowed characters are letters, numbers, and underscores.';
+        return message;
+      }
+    }
+
+    const lastName = $('#inputLastname').val().trim();
+    if (lastName || lastName.length === 0) {
+      const legalChars = /^[A-Za-z/\s.'-]+$/; // allow letters, numbers, and underscores
+      if (!(lastName.length >= 1 && (lastName.length <= 20)
+          && (legalChars.test(lastName)))) {
+        message = 'Please enter a last name 1 to 20 characters. Allowed characters are letters, numbers, and underscores.';
+        return message;
+      }
+    }
+
+    const email = $('#inputEmail').val().trim();
+    if (email || email.length === 0) {
+      const legalChars = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+      if (!((email.length >= 1) && (email.length <= 40) && (legalChars.test(email)))) {
+        message = 'Please enter a valid email address under 40 characters long.';
+        return message;
+      }
+    }
+
+    const phone = $('#inputPhone').val().trim();
+    if (phone || phone.length === 0) {
+      const legalChars = /^[1-9]\d{2}-\d{3}-\d{4}/;
+      if (!((phone.length >= 1) && (phone.length <= 12) && (legalChars.test(phone)))) {
+        message = 'Please enter a valid phone number.';
+        return message;
+      }
+    }
+
+    const organization = $('#inputOrganization').val().trim();
+    if (!organization || organization.length === 0) {
+      message = 'Please enter an organization.';
+      return message;
+    }
+
+    if (!($('#inputComplaintsQueue').prop('checked') || $('#inputGeneralQueue').prop('checked'))) {
+      message = 'Please select at least one queue.';
+      return message;
+    }
+
+    return message;
+  }
+
   $('#btnAddAgent').on('click', (_event) => {
     $('#btnAddAgent').prop('disabled', true);
+
+    const message = validate();
+    if (message && message.length > 0) {
+      $('#errorMessage').text(` ${message}`);
+      $('#actionError').attr('hidden', false);
+      $('#actionError').show();
+      $('#btnAddAgent').prop('disabled', false);
+      return;
+    }
+
     /* check if both password inputs match */
     const pass = $('#inputPassword').val();
     const pass2 = $('#inputPassword2').val();
@@ -183,42 +282,38 @@ $(document).ready(() => {
       $('#btnAddAgent').prop('disabled', false);
       return;
     }
-    const org = $('#inputOrganization').val().trim();
-    if (!org || org.length === 0) {
-      $('#errorMessage').text(' Add agent - fields missing');
-      $('#actionError').attr('hidden', false);
-      $('#actionError').show();
-      $('#btnAddAgent').prop('disabled', false);
-      return;
-    }
+
     $('#passwordMatchError').attr('hidden', true);
 
-    $.post('./AddAgent', {
-      username: $('#inputUsername').val(),
-      password: $('#inputPassword').val(),
-      first_name: $('#inputFirstname').val(),
-      last_name: $('#inputLastname').val(),
-      email: $('#inputEmail').val(),
-      phone: $('#inputPhone').val(),
-      organization: $('#inputOrganization').val(),
-      extension: $('#inputExtension').val(),
-      queue_id: ($('#inputComplaintsQueue').prop('checked')) ? ($('#inputComplaintsQueue').val()) : 0,
-      queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0
-    },
-    (data, _status) => {
-      if (data.result === 'success') {
-        // console.log('Saved!!!!');
-        $('#actionError').attr('hidden', true);
-        $('#btnAddAgent').prop('disabled', false);
-        window.location.reload();
-      } else {
-        console.log(`POST failed: ${JSON.stringify(data)}`);
-        $('#errorMessage').text(' Add agent');
-        $('#actionError').attr('hidden', false);
-        $('#actionError').show();
-        $('#btnAddAgent').prop('disabled', false);
+    $.post(
+      './AddAgent',
+      {
+        username: $('#inputUsername').val(),
+        password: $('#inputPassword').val(),
+        first_name: $('#inputFirstname').val(),
+        last_name: $('#inputLastname').val(),
+        email: $('#inputEmail').val(),
+        phone: $('#inputPhone').val(),
+        organization: $('#inputOrganization').val(),
+        extension: $('#inputExtension').val(),
+        queue_id: ($('#inputComplaintsQueue').prop('checked')) ? ($('#inputComplaintsQueue').val()) : 0,
+        queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0
+      },
+      (data, _status) => {
+        if (data.result === 'success') {
+          // console.log('Saved!!!!');
+          $('#actionError').attr('hidden', true);
+          $('#btnAddAgent').prop('disabled', false);
+          window.location.reload();
+        } else {
+          console.log(`POST failed: ${JSON.stringify(data)}`);
+          $('#errorMessage').text(' Add agent');
+          $('#actionError').attr('hidden', false);
+          $('#actionError').show();
+          $('#btnAddAgent').prop('disabled', false);
+        }
       }
-    });
+    );
   });
 
   $('#btnDeleteAgent').on('click', (event) => {
@@ -230,6 +325,15 @@ $(document).ready(() => {
   $('#btnUpdateAgent').on('click', (_event) => {
     $('#btnUpdateAgent').prop('disabled', true);
 
+    const message = validate();
+    if (message && message.length > 0) {
+      $('#errorMessage').text(` ${message}`);
+      $('#actionError').attr('hidden', false);
+      $('#actionError').show();
+      $('#btnUpdateAgent').prop('disabled', false);
+      return;
+    }
+
     const pass = $('#inputPassword').val();
     const pass2 = $('#inputPassword2').val();
     if (pass !== pass2) {
@@ -239,46 +343,40 @@ $(document).ready(() => {
     }
     $('#passwordMatchError').attr('hidden', true);
 
-    const org = $('#inputOrganization').val().trim();
-    if (!org || org.length === 0) {
-      $('#errorMessage').text(' Update agent');
-      $('#actionError').attr('hidden', false);
-      $('#actionError').show();
-      $('#btnUpdateAgent').prop('disabled', false);
-      return;
-    }
-
     /* This is a little kludgey.  The call to ./UpdateAgent nukes the profile pic and
      then the emit to profile-pic-set below resets it correctly */
 
-    $.post('./UpdateAgent', {
-      agent_id: selectedUser,
-      username: $('#inputUsername').val(),
-      password: $('#inputPassword').val(),
-      first_name: $('#inputFirstname').val(),
-      last_name: $('#inputLastname').val(),
-      email: $('#inputEmail').val(),
-      phone: $('#inputPhone').val(),
-      organization: $('#inputOrganization').val(),
-      extension: $('#inputExtension').val(),
-      queue_id: ($('#inputComplaintsQueue').prop('checked')) ? ($('#inputComplaintsQueue').val()) : 0,
-      queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0,
-      profile_picture: agentProfilePicture
-    },
-    (data, _status) => {
-      if (data.result === 'success') {
-        // console.log(`POST succ: ${JSON.stringify(data)}`);
-        $('#actionError').attr('hidden', true);
-        $('#btnUpdateAgent').prop('disabled', false);
-        window.location.reload();
-      } else {
-        // console.log(`POST failed: ${JSON.stringify(data)}`);
-        $('#errorMessage').text(' Update agent');
-        $('#actionError').attr('hidden', false);
-        $('#actionError').show();
-        $('#btnUpdateAgent').prop('disabled', false);
+    $.post(
+      './UpdateAgent',
+      {
+        agent_id: selectedUser,
+        username: $('#inputUsername').val(),
+        password: $('#inputPassword').val(),
+        first_name: $('#inputFirstname').val(),
+        last_name: $('#inputLastname').val(),
+        email: $('#inputEmail').val(),
+        phone: $('#inputPhone').val(),
+        organization: $('#inputOrganization').val(),
+        extension: $('#inputExtension').val(),
+        queue_id: ($('#inputComplaintsQueue').prop('checked')) ? ($('#inputComplaintsQueue').val()) : 0,
+        queue2_id: ($('#inputGeneralQueue').prop('checked')) ? ($('#inputGeneralQueue').val()) : 0,
+        profile_picture: agentProfilePicture
+      },
+      (data, _status) => {
+        if (data.result === 'success') {
+          // console.log(`POST succ: ${JSON.stringify(data)}`);
+          $('#actionError').attr('hidden', true);
+          $('#btnUpdateAgent').prop('disabled', false);
+          window.location.reload();
+        } else {
+          // console.log(`POST failed: ${JSON.stringify(data)}`);
+          $('#errorMessage').text(' Update agent');
+          $('#actionError').attr('hidden', false);
+          $('#actionError').show();
+          $('#btnUpdateAgent').prop('disabled', false);
+        }
       }
-    });
+    );
 
     const file = document.getElementById('profile-pic-file-upload').files[0];
     console.log(typeof file !== 'undefined');
@@ -329,21 +427,24 @@ $(document).ready(() => {
         // + " agent username is: " + value.username);
 
         // Issue delete at backend
-        $.post('./DeleteAgent', {
-          id: value.userId,
-          username: value.username
-        },
-        (data, _status) => {
-          if (data.result === 'success') {
-            // console.log(`POST succ: ${JSON.stringify(data)}`);
-            $('#actionError').attr('hidden', true);
-            window.location.reload();
-          } else {
-            // console.log(`DeleteAgent ${value.username} failed: ${JSON.stringify(data)}`);
-            $('#errorMessage').text(' Delete agent');
-            $('#actionError').attr('hidden', false);
+        $.post(
+          './DeleteAgent',
+          {
+            id: value.userId,
+            username: value.username
+          },
+          (data, _status) => {
+            if (data.result === 'success') {
+              // console.log(`POST succ: ${JSON.stringify(data)}`);
+              $('#actionError').attr('hidden', true);
+              window.location.reload();
+            } else {
+              // console.log(`DeleteAgent ${value.username} failed: ${JSON.stringify(data)}`);
+              $('#errorMessage').text(' Delete agent');
+              $('#actionError').attr('hidden', false);
+            }
           }
-        });
+        );
       }
     });
 
@@ -357,6 +458,8 @@ function addUserModal() {
   $('.glyphicon-eye-open').css('display', ''); // HERE
   $('#btnDeleteAgent').hide();
   $('#btnAddAgent').show();
+  $('#actionError').attr('hidden', true);
+  $('#actionError').hide();
   $('#configModal').modal();
 
   $('#inputUsername').prop('disabled', false);
@@ -370,14 +473,17 @@ $('#add_user_btn').on('click', () => {
 });
 
 function deleteUser() {
-  $.post('./DeleteAgent', {
-    id: selectedUser,
-    username: $('#inputUsername').val()
-  },
-  (_data, _status) => {
-    console.log('Deleted!!!!');
-    window.location.reload();
-  });
+  $.post(
+    './DeleteAgent',
+    {
+      id: selectedUser,
+      username: $('#inputUsername').val()
+    },
+    (_data, _status) => {
+      console.log('Deleted!!!!');
+      window.location.reload();
+    }
+  );
 }
 
 $('#delete_user_confirm_btn').on('click', () => {
@@ -402,7 +508,7 @@ function setProfilePic() {
     const fileReader = new FileReader();
     const file = document.getElementById('profile-pic-file-upload').files[0];
 
-    const fileExt = file.name.split('.')[1].toLowerCase();
+    // const fileExt = file.name.split('.')[1].toLowerCase();
     console.log('You have uploaded a picture! File name:', file.name.split('.')[1]);
 
     fileReader.readAsDataURL(file);
@@ -439,18 +545,15 @@ function deleteProfilePicture() {
     if (error) {
       console.log('Could not read file!');
     } else {
-      const fileReader = new FileReader();
-
       console.log('Delete image response:', res);
 
       const fileBlob = new Blob([res], { type: 'image/*' });
-
       console.log('Response Blob:', fileBlob);
 
       console.log('Profile Picture is being deleted!');
 
+      const fileReader = new FileReader();
       fileReader.readAsDataURL(fileBlob);
-
       fileReader.onload = (e) => {
         console.log('File reader onload event:', e);
         $('#inputProfilePic').attr('src', e.target.result);

@@ -171,7 +171,7 @@
     },
     "error":
     {
-      "message": "an error has occured",
+      "message": "an error has occurred",
       "code": 666
     }
   }

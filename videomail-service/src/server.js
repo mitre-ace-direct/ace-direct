@@ -164,7 +164,7 @@ function newIncomingCall(ext, data) {
             debuglog("Redis map extension", vrsTemp, "to", value)
             callee.incomingCaller = value;
         }).catch(() => {
-            debuglog("Redis Error: Occured during vrs to extension lookup.")
+            debuglog("Redis Error: Occurred during vrs to extension lookup.")
         })
     }
 

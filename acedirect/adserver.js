@@ -377,6 +377,7 @@ redisClient.on('connect', () => {
   redisClient.del(c.R_LINPHONE_TO_AGENT_MAP);
   redisClient.del(c.R_CONSUMER_TO_CSR);
   redisClient.del(c.R_AGENT_INFO_MAP);
+  redisClient.del(c.R_VRS_MAP);
 
   // Populate the consumerExtensions map
   prepareExtensions();
@@ -1493,7 +1494,7 @@ io.sockets.on('connection', (socket) => {
       if (err) {
         logger.error(`Error - Request Assistance: ${err}`);
         io.to(token.extension).emit('request-assistance-response', {
-          message: 'An Error Occured'
+          message: 'An Error Occurred'
         });
       } else {
         io.to(token.extension).emit('request-assistance-response', data);

@@ -63,11 +63,14 @@ function updateCallStatusLineChart(dataIn) {
       }
     ];
 
-    $.plot('#callSummaryLineChart', chartdata,
+    $.plot(
+      '#callSummaryLineChart',
+      chartdata,
       {
         legend: legendSettings,
         xaxis: { mode: 'time', timeBase: 'milliseconds' }
-      });
+      }
+    );
   });
 }
 
@@ -210,7 +213,7 @@ $.ajax({
   },
   error(_xhr, _status, _error) {
     console.log('Error');
-    $('#message').text('An Error Occured.');
+    $('#message').text('An Error Occurred.');
   }
 });
 

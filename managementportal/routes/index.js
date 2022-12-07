@@ -128,32 +128,30 @@ router.get('/getVideomail', restrict, (req, res) => {
   req.dbConnection.query('SELECT video_filepath AS filepath, video_filename AS filename FROM videomail WHERE id = ?', videoId, (errQuery, result) => {
     if (errQuery) {
       console.log('GET VIDEOMAIL ERROR: ', errQuery.code);
-    } else {
-      if (result[0].filepath === 's3') {
-        console.log(result[0].filename);
-        const file = s3.getObject(
-          { Bucket: config.s3.bucketname, Key: result[0].filename }
-        );
+    } else if (result[0].filepath === 's3') {
+      console.log(result[0].filename);
+      const file = s3.getObject(
+        { Bucket: config.s3.bucketname, Key: result[0].filename }
+      );
 
+      res.writeHead(200, {
+        'Content-Type': 'video/webm',
+        'Accept-Ranges': 'bytes'
+      });
+      const filestream = file.createReadStream();
+      filestream.pipe(res);
+    } else {
+      try {
+        const videoFile = result[0].filepath + result[0].filename;
+        const stat = fs.statSync(videoFile);
         res.writeHead(200, {
           'Content-Type': 'video/webm',
-          'Accept-Ranges': 'bytes'
+          'Content-Length': stat.size
         });
-        const filestream = file.createReadStream();
-        filestream.pipe(res);
-      } else {
-        try {
-          const videoFile = result[0].filepath + result[0].filename;
-          const stat = fs.statSync(videoFile);
-          res.writeHead(200, {
-            'Content-Type': 'video/webm',
-            'Content-Length': stat.size
-          });
-          const readStream = fs.createReadStream(videoFile);
-          readStream.pipe(res);
-        } catch (err) {
-          console.log(err);
-        }
+        const readStream = fs.createReadStream(videoFile);
+        readStream.pipe(res);
+      } catch (err) {
+        console.log(err);
       }
     }
   });
