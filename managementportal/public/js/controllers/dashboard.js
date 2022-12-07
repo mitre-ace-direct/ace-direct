@@ -1,4 +1,4 @@
-const dbController = angular.module('dashboardModule', ['csrService', 'angularDurationFormat'])
+const dbController = angular.module('dashboardModule', ['csrService'])
   .controller('dashboardController', ($scope, $http, $window, socket) => {
     $scope.Queues = [];
     $scope.qNames = [];
@@ -207,6 +207,12 @@ dbController.filter('shownum', () => function ShowNumFilter(input) {
   return input;
 });
 
+function minTommss(minutes) {
+  const min = Math.floor(Math.abs(minutes));
+  const sec = Math.floor((Math.abs(minutes) * 60) % 60);
+  return `${(min < 10 ? '0' : '') + min}:${sec < 10 ? '0' : ''}${sec}`;
+}
+
 dbController.filter('minsectimeformat', () => function MinSecTimeFormatFilter(input) {
-  return moment.duration(Number(input), 'minutes').format('mm:ss', { trim: false });
+  return minTommss(input);
 });
