@@ -57,8 +57,7 @@ const JS = [
   'angular-datatables/dist/angular-datatables.min.js',
   // angular-ui-bootstrap
   'angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
-  // angular-moment-duration-format
-  'angular-moment-duration-format/angular-moment-duration-format.min.js',
+
   // angular-route
   'angular-route/angular-route.min.js',
   'angular-route/angular-route.min.js.map',
@@ -93,8 +92,7 @@ const JS = [
   'izitoast/dist/js/iziToast.min.js',
   // flot-axislabels
   'flot-axislabels/jquery.flot.axislabels.js',
-  // moment-duration-format
-  'moment-duration-format/lib/moment-duration-format.js',
+
   // moment
   'moment/min/moment.min.js',
   'moment/min/moment.min.js.map',

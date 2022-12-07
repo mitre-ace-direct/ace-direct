@@ -1,4 +1,4 @@
-const dbController = angular.module('dashboardModule', ['csrService', 'angularDurationFormat'])
+const dbController = angular.module('dashboardModule', ['csrService'])
   .controller('dashboardController', ($scope, $http, $window, socket) => {
     $scope.Queues = [];
     $scope.qNames = [];
@@ -126,14 +126,18 @@ const dbController = angular.module('dashboardModule', ['csrService', 'angularDu
         for (let i = 0; i < data.agents.length; i += 1) {
           const a = findAgent($scope.Agents, data.agents[i]);
           if (a) {
-            Object.keys(data.agents[i]).forEach((prop) => { a[prop] = data.agents[i][prop]; console.log('Agent data:', data.agents[i][prop]); });
+            Object.keys(data.agents[i]).forEach((prop) => {
+              a[prop] = data.agents[i][prop];
+              // This console.log is useful for debugging, but not all the time.
+              // console.log('Agent data', prop, ': ', data.agents[i][prop]);
+            });
 
             // for (const prop in data.agents[i]) {
             //   a[prop] = data.agents[i][prop];
             // }
           } else {
             $scope.Agents.push(data.agents[i]);
-            console.log('Agent data:', data.agents[i]);
+            console.log('Agent data (initial):', data.agents[i]);
           }
         }
 
@@ -203,6 +207,12 @@ dbController.filter('shownum', () => function ShowNumFilter(input) {
   return input;
 });
 
+function minTommss(minutes) {
+  const min = Math.floor(Math.abs(minutes));
+  const sec = Math.floor((Math.abs(minutes) * 60) % 60);
+  return `${(min < 10 ? '0' : '') + min}:${sec < 10 ? '0' : ''}${sec}`;
+}
+
 dbController.filter('minsectimeformat', () => function MinSecTimeFormatFilter(input) {
-  return moment.duration(Number(input), 'minutes').format('mm:ss', { trim: false });
+  return minTommss(input);
 });

@@ -2196,7 +2196,6 @@ function toggle_recording_buttons(make_visible) {
 function recording_deleted(id) {
   socket.emit('recording-deleted', {
     fileName: id,
-    extension: extensionMe
   });
 }
 
@@ -3428,9 +3427,14 @@ function showAlert(alertType, alertText) {
   $('#generalAlert').attr('class','alert alert-' + alertType + ' alert-dismissible');
   $('#alertText').html(alertText);
   $('#generalAlert').show();
+  $('#alertCloseButton').show();
   setTimeout(function() {
     $('#generalAlert').hide();
   },4000)
+}
+
+function closeAlert() {
+  $('#generalAlert').hide();
 }
 
 // Error Alert message function

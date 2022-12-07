@@ -1,3 +1,4 @@
+/* eslint-disable function-paren-newline */
 const { ObjectId } = require('mongodb');
 const logger = require('../helpers/logger');
 
@@ -74,7 +75,7 @@ GetAgents(db, callback) {
 };
 
 exports.getCalls = function
-GetCalls(db, reportStartDate, reportEndDate, timezone, username, callback) {
+GetCalls(db, reportStartDate, reportEndDate, _timezone, username, callback) {
   logger.debug('WebRTC Stats GetCalls');
   logger.debug(`start and end: ${reportStartDate}, ${reportEndDate}`);
   logger.debug(`start and end: ${new Date(reportStartDate)}, ${new Date(reportEndDate)}`);
@@ -170,7 +171,7 @@ GetCalls(db, reportStartDate, reportEndDate, timezone, username, callback) {
 };
 
 exports.getCallDetails = function
-GetCallDetails(db, reportStartDate, reportEndDate, timezone, username, callId, chartName,
+GetCallDetails(db, reportStartDate, reportEndDate, _timezone, username, callId, chartName,
   callback) {
   logger.debug('WebRTC Stats GetCallDetails');
   logger.debug(`start and end: ${reportStartDate}, ${reportEndDate}`);
