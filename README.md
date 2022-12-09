@@ -397,6 +397,7 @@ See the [RELEASE](RELEASE.md) notes for ACE Direct version information.
 1. **ISSUE**: Adding users with `~/ace-direct/fognito/db/create-user.sh` appears to be working, but the agent portal is stating that extensions haven't been configured for the users. **SOLUTION**: The MySQL `agent_table` is outdated. Recreate the table using the schema in `~/ace-direct/dat/acedirectdefault.sql`.
 1. **ISSUE**: When updating agents in the Management Portal, an error occurs: `Error! Update agent`. **SOLUTION**: Enter the password and confirm password before clicking _Update Agent_.
 1. **ISSUE**: When updating agent names in the Management Portal, the Call Agent Summary in the Management Dashboard still shows the old names. **SOLUTION**: A workaround is to restart the `managementportal` service on the `acenode` server.
+1. **ISSUE**: When logging in as an agent, the URL redirects to the consumer portal instead of the agent login page. **SOLUTION**: Old URLs are in the cache. Use the direct login URL, e.g., `https://portal.domain.com/ace-auth/login` .
 
 ---
 
