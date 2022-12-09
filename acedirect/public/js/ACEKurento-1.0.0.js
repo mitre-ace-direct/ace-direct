@@ -190,7 +190,6 @@
           }
         });
         if (!pc) {
-          console.log(JSON.stringify(configuration,null,2))
           pc = new RTCPeerConnection(configuration);
           if (useDataChannels && !dataChannel) {
             var dcId = 'WebRtcPeer-' + self.id;
