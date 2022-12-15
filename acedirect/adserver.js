@@ -1590,9 +1590,8 @@ io.sockets.on('connection', (socket) => {
       logout(token);
     }
 
-    // Remove the consumer from the extension and VRS maps.
+    // Remove the consumer from the extension map.
     if (token.vrs) {
-      redisClient.hset(c.R_VRS_MAP, token.vrs, false);
       redisClient.hget(c.R_EXTENSION_TO_VRS, Number(token.vrs), (_err, ext) => {
         const regexStr = `/^PJSIP/${ext}-.*$/`;
         ami.action({
@@ -1621,12 +1620,6 @@ io.sockets.on('connection', (socket) => {
         });
       });
     }
-
-    sessionStore.destroy(token.sessionId, (err) => {
-      if (err) {
-        console.error(err);
-      }
-    });
   });
 
   // ######################################################

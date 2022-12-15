@@ -173,12 +173,12 @@ router.get(utils.getConfigVal(config.nginx.consumer_route), (req, res, _next) =>
  * If it is blocked, return 401 and send the FCC URL for the front end to redirect to.
  */
 router.post('/consumer_login', (req, res) => {
-  console.log('sessionid: ', req.session.id);
   // All responses will be JSON sets response header.
   res.setHeader('Content-Type', 'application/json');
   const vrsnum = req.body.vrsnumber;
   req.redisClient.hget(c.R_VRS_MAP, vrsnum, (_err, status) => {
-    if (status === 'true') {
+    // if (status === 'true') {
+    if (false) { // fixme turning vrs checking off for now
       res.status(409).json({ message: 'Number logged in from another device' });
     } else if (/^\d+$/.test(vrsnum)) {
       req.dbConnection.query('SELECT reason FROM call_block WHERE vrs = ?;', vrsnum, (err, results) => {
@@ -227,7 +227,7 @@ router.get('/token', restrict, (req, res) => {
           // add start/end time; operating hours
           vrs.data[0].startTimeUTC = res.locals.startTimeUTC; // hh:mm in UTC
           vrs.data[0].endTimeUTC = res.locals.endTimeUTC; // hh:mm in UTC
-          vrs.data[0].sessionId = req.session.id;
+
           const token = jwt.sign(vrs.data[0],
             utils.getConfigVal(config.web_security.json_web_token.secret_key), {
               expiresIn: '2000'
