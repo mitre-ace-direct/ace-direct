@@ -719,20 +719,6 @@ router.get('/logout', (req, res) => {
   });
 });
 
-/**
- * Handles a GET request for /signoutvrs.
- * Signs out VRS number so it can be used
- *
- * @param {string} '/signoutvrs'
- * @param {function} function(req, res)
- */
-
-router.get('/signoutvrs', (req) => {
-  // Set VRS number as logged out in redis
-  req.redisClient.hset(c.R_VRS_MAP, req.session.user.vrs, false);
-  req.session.destroy();
-});
-
 function sendAnonImage(res) {
   try {
     const image = fs.readFileSync('./public/images/anon.png');
