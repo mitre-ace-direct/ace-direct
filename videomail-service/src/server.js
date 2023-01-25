@@ -248,8 +248,8 @@ function connectIncomingCall(ext, sdpOffer, callback) {
             callee.pipeline = pipeline;
 
             // Check the incoming sdp to determine the correct incomingMediaProfile
-            callee.incomingMediaProfile = 'WEBM_VIDEO_ONLY';//getMediaProfile(sdpOffer, ext);
-            //callee.incomingMediaProfile = 'MP4_VIDEO_ONLY';//getMediaProfile(sdpOffer, ext);
+            //callee.incomingMediaProfile = 'WEBM_VIDEO_ONLY';//getMediaProfile(sdpOffer, ext);
+            callee.incomingMediaProfile = 'MP4_VIDEO_ONLY';//getMediaProfile(sdpOffer, ext);
             //callee.incomingMediaProfile = getMediaProfile(sdpOffer, ext);
             log(callee.ext, "Detected Incoming Media Profile: " + callee.incomingMediaProfile);
 
@@ -331,15 +331,18 @@ function rtpEvents(callee, rtpEndpoint, recorderEndpoint, playerEndpoint1, playe
 
 
     rtpEndpoint.on('MediaStateChanged', (state) => {
-        callee.session.sendInfo('application/media_control+xml', body);
+        if(callee.session)
+            callee.session.sendInfo('application/media_control+xml', body);
     });
 
     playerEndpoint1.on('EndOfStream', () => {
         debuglog("Endpoint1 Has finished playing video file. Play2");
         switchPlayers(rtpEndpoint, playerEndpoint1, playerEndpoint2, () => {
             setTimeout(function () {
-                callee.session.sendInfo('application/media_control+xml', body);
-                startPlayerEndpoint(playerEndpoint2)
+                if(callee.session){
+                    callee.session.sendInfo('application/media_control+xml', body);
+                    startPlayerEndpoint(playerEndpoint2)
+                }
             }, videoDelay);
         });
     });
@@ -348,8 +351,10 @@ function rtpEvents(callee, rtpEndpoint, recorderEndpoint, playerEndpoint1, playe
         debuglog("Endpoint2 Has finished playing video file. Play3");
         switchPlayers(rtpEndpoint, playerEndpoint2, playerEndpoint3, () => {
             setTimeout(function () {
-                callee.session.sendInfo('application/media_control+xml', body);
-                startPlayerEndpoint(playerEndpoint3)
+                if(callee.session){
+                    callee.session.sendInfo('application/media_control+xml', body);
+                    startPlayerEndpoint(playerEndpoint3)
+                }
             }, videoDelay);
         });
     });
@@ -358,34 +363,35 @@ function rtpEvents(callee, rtpEndpoint, recorderEndpoint, playerEndpoint1, playe
     playerEndpoint3.on('EndOfStream', () => {
         debuglog("Endpoint3 Has finished playing video file. Start Recording");
         setTimeout(function () {
-            callee.session.sendInfo('application/media_control+xml', body);
-
-
-
-            if (callee.incomingExtension != callee.incomingCaller) {
-                var eventHandlers = {
-                    'succeeded': function (e) { console.log('PASSED ' + JSON.stringify(e)) },
-                    'failed': function (e) { console.log('FAILED ' + JSON.stringify(e)) }
-                };
-
-                var options = {
-                    'eventHandlers': eventHandlers
-                };
-
-                callee.ua.sendMessage(callee.incomingExtension, 'STARTRECORDING', options);
-            }
-
-            recorderEndpoint.record().then(() => {
-                log(callee.ext, "---Starting recorder---");
+            if(callee.session){
                 callee.session.sendInfo('application/media_control+xml', body);
-            });
-        });
+
+                if (callee.incomingExtension != callee.incomingCaller) {
+                    var eventHandlers = {
+                        'succeeded': function (e) { console.log('PASSED ' + JSON.stringify(e)) },
+                        'failed': function (e) { console.log('FAILED ' + JSON.stringify(e)) }
+                    };
+
+                    var options = {
+                        'eventHandlers': eventHandlers
+                    };
+
+                    callee.ua.sendMessage(callee.incomingExtension, 'STARTRECORDING', options);
+                }
+
+                recorderEndpoint.record().then(() => {
+                    log(callee.ext, "---Starting recorder---");
+                    callee.session.sendInfo('application/media_control+xml', body);
+                });
+            }
+        }, videoDelay);
 
         rtpEndpoint.on('MediaFlowInStateChange', (param) => {
             debuglog('RTPEndpoint: MediaFlowInStateChange: ' + param.state);
-            callee.session.sendInfo('application/media_control+xml', body);
+            if(callee.session)
+                callee.session.sendInfo('application/media_control+xml', body);
         });
-    }, videoDelay)
+    })
 }
 
 /*
