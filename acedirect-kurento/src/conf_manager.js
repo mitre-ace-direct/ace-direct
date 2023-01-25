@@ -223,6 +223,7 @@ class ConfManager extends Events {
       call.on('finished', () => {
         this._calls.delete(callerExt);
         this._calls.delete(callee.ext);
+        clearInterval(callee._keyframeInterval)
         debug(`Calls: ${Array.from(this._calls.keys())}`);
       });
       session.on('ended', (evt) => {
@@ -247,9 +248,23 @@ class ConfManager extends Events {
       });
       session.on('confirmed', (evt) => {
         callee.sendSipConfirmedMessage(evt.originator);
-	// send keyframe then one every 5 seconds
-	callee.keyframe();
-	callee._keyframeInterval = setInterval(()=>{callee.keyframe();},5000);
+
+        // send keyframe then one every 5 seconds
+        const pfuBody = '<?xml version="1.0" encoding="utf-8" ?>'
+            + '<media_control>'
+            + '<vc_primitive>'
+            + '<to_encoder>'
+            + '<picture_fast_update/>'
+            + '</to_encoder>'
+            + '</vc_primitive>'
+            + '</media_control>';
+        session.sendInfo('application/media_control+xml', pfuBody);
+        callee.keyframe();
+        setTimeout(()=>{callee.keyframe();session.sendInfo('application/media_control+xml', pfuBody);},1000);
+        setTimeout(()=>{callee.keyframe();session.sendInfo('application/media_control+xml', pfuBody);},2000);
+        setTimeout(()=>{callee.keyframe();session.sendInfo('application/media_control+xml', pfuBody);},3000);
+        setTimeout(()=>{callee.keyframe();session.sendInfo('application/media_control+xml', pfuBody);},4000);
+        callee._keyframeInterval = setInterval(()=>{callee.keyframe();},5000)
       });
       await call.init();
 
