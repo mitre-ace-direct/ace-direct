@@ -18,7 +18,7 @@
     "body-parser": "^1.18.3",
     "clear": "^0.0.1",
     "debug": "^2.6.9",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "fresh": "^0.5.2",
     "https": "1.0.0",
     "json2csv": "^5.0.7",
