@@ -14,9 +14,9 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
-    "body-parser": "^1.15.0",
+    "body-parser": "^1.20.1",
     "clear": "0.0.1",
-    "express": "^4.13.4",
+    "express": "^4.18.2",
     "https": "^1.0.0",
     "ip": "^1.1.5",
     "log4js": "^3.0.6",
