@@ -39,7 +39,7 @@
     "proxy-agent": "^4.0.1",
     "redis": "^3.1.2",
     "request": "^2.88.2",
-    "sequelize": "^4.41.2",
+    "sequelize": "^6.28.2",
     "util": "0.10.3",
     "uuid": "^3.3.2",
     "ws": "^6.2.1"
