@@ -792,7 +792,6 @@ function connect_socket() {
             });
           }
         }).on('caption-translated', function (transcripts) {
-            //console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
           if (acekurento.isMultiparty || isMonitoring) {
             updateCaptionsMultiparty(transcripts);
           } else {
@@ -801,14 +800,12 @@ function connect_socket() {
             // }
           }
         }).on('multiparty-caption', function (transcripts) {
-          //     console.log(JSON.stringify(transcripts))
           socket.emit('translate-caption', {
             transcripts: transcripts,
             callerNumber: extensionMe,
             displayname: transcripts.displayname
           });
         }).on('consumer-caption', function (transcripts) {
-          //     console.log(JSON.stringify(transcripts))
           socket.emit('translate-caption', {
             transcripts: transcripts,
             callerNumber: extensionMe,
