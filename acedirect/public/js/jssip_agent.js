@@ -65,7 +65,6 @@ function register_jssip() {
         var transcripts = JSON.parse(e.msg);
         if (transcripts.transcript) {
           if (acekurento.isMultiparty) {
-            //  console.log('sending multiparty caption:', transcripts.transcript, extensionMe);
                         socket.emit('multiparty-caption-agent', {
               transcript: transcripts.transcript,
               final: transcripts.final,
@@ -88,7 +87,6 @@ function register_jssip() {
               });
             }
             // Acedirect will skip translation service if languages are the same
-            //console.log('sending caption:', transcripts.transcript, extensionMe);
             socket.emit('translate-caption', {
               transcripts: transcripts,
               callerNumber: extensionMe,
@@ -1539,7 +1537,6 @@ function testCaptions() {
 
 
 function createCaptionHtml(displayName, transcripts) {
-  //  console.log(displayName, transcripts);
   let caption = transcripts.transcript;
   if (!transcripts.final) {
     caption += '...';
@@ -1550,7 +1547,6 @@ function createCaptionHtml(displayName, transcripts) {
 
 function updateCaptions(transcripts) {
   
-  //  console.log('transcripts in UC are ', transcripts)
   if (transcripts.final) { // For now, only show final captions on agent side
     var tDiv = document.getElementById(transcripts.msgid);
     
@@ -1642,7 +1638,6 @@ function multipartyCaptionsStart() {
   recognition.onresult = function (event) {
     if (!isMuted && event && event.results && (event.results.length > 0)) {
       var lastResult = event.results.length - 1;
-      //console.log('sending multiparty-caption-agent caption:', event.results[lastResult][0].transcript, extensionMe);
       socket.emit('multiparty-caption-agent', {
         transcript:event.results[lastResult][0].transcript,
         final: event.results[lastResult].isFinal, 

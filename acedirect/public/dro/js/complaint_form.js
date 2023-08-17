@@ -695,7 +695,6 @@ function ConnectSocket() {
             }
           })
           .on('caption-translated', (transcripts) => {
-            //HERE console.log('received translation', transcripts.transcript, transcripts.msgid, transcripts.final);
             // eslint-disable-next-line no-use-before-define
             updateCaptions(transcripts);
           })
@@ -840,7 +839,6 @@ function refreshCaptions() {
 
 // Updates the caption arrays and calls refreshCaptions()
 function updateCaptions(caption) {
-  //HERE console.log(caption);
   if (caption.final) {
     console.log('final!');
     // Remove caption from current captions

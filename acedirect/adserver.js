@@ -2298,7 +2298,6 @@ io.sockets.on('connection', (socket) => {
 
         Promise.all(promises).then((_values) => {
           console.log('language', fromNumber, toNumber, languageFrom, languageTo);
-          //console.log('translating', data.transcripts.transcript, 'from', languageFrom, 'to', languageTo);
           const encodedText = encodeURI(data.transcripts.transcript.trim());
           const translationUrl = `${translationServerUrl}/translate?languageFrom=${languageFrom}&text=${encodedText}&languageTo=${languageTo}`;
           console.log('is agent here? if so use color', data);
@@ -2355,7 +2354,7 @@ io.sockets.on('connection', (socket) => {
             });
           }
         }).catch((err) => {
-          //console.log('Error in translate-caption', err.message); // some coding error in handling happened
+          console.log('Error in translate-caption'); // some coding error in handling happened
         });
       }
     });
