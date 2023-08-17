@@ -322,7 +322,7 @@ function registerJssip(myExtension, myPassword) {
           const transcripts = JSON.parse(e.msg);
           if (transcripts.transcript && !acekurento.isMultiparty) {
             // Acedirect will skip translation service if languages are the same
-            console.log('sending caption:', transcripts.transcript, myExtension);
+            //console.log('sending caption:', transcripts.transcript, myExtension);
             socket.emit('translate-caption', {
               transcripts,
               callerNumber: myExtension
@@ -660,7 +660,7 @@ $('#opacity-slider-consumer').on('change mousemove', () => {
 });
 
 function createCaptionHtml(displayName, transcripts) {
-  console.log(displayName, transcripts);
+  //console.log(displayName, transcripts);
   let caption = transcripts.transcript;
   if (!transcripts.final) {
     caption += '...';
@@ -675,7 +675,7 @@ function updateConsumerCaptions(transcripts) {
   const displayName = `CSR ${$('#agent-name').text()}`;
   const caption = createCaptionHtml(displayName, transcripts);
   console.log('--- WV: transcripts.transcript ---\n');
-  console.log('consumer uc: ', transcripts);
+  //console.log('consumer uc: ', transcripts);
 
   if (!tDiv) {
     const temp = document.createElement('div');

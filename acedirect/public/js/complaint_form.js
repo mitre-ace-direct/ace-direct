@@ -574,7 +574,7 @@ function connect_socket() {
             }
           })
           .on('multiparty-caption', (transcripts) => {
-            console.log('multiparty caption:', JSON.stringify(transcripts));
+            //console.log('multiparty caption:', JSON.stringify(transcripts));
             socket.emit('translate-caption', {
               transcripts,
               callerNumber: exten,
@@ -582,7 +582,7 @@ function connect_socket() {
             });
           })
           .on('caption-translated', (transcripts) => {
-            console.log('consumer received translation', transcripts);
+            //console.log('consumer received translation', transcripts);
             if (acekurento.isMultiparty) {
               // TODO: clear Regular Transcripts
               updateCaptionsMultiparty(transcripts);
