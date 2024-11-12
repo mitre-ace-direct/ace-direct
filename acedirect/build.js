@@ -50,7 +50,8 @@ const JS = [
   'datatables.net/js/jquery.dataTables.min.js',
   'datatables.net-bs/js/dataTables.bootstrap.min.js',
   'recordrtc/RecordRTC.min.js',
-  'getstats/getStats.js'
+  'getstats/getStats.js',
+  'timer.jquery/dist/timer.jquery.min.js'
   /*
     'admin-lte/plugins/bootstrap-slider/bootstrap-slider.js',
     'bootstrap-daterangepicker/daterangepicker.js',

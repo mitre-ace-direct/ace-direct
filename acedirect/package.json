@@ -44,7 +44,8 @@
     "redis": "^3.1.2",
     "shortid": "^2.2.16",
     "socket.io": "^4.1.3",
-    "socketio-jwt": "^4.6.2"
+    "socketio-jwt": "^4.6.2",
+    "timer.jquery" : "git://github.com/walmik/timer.jquery.git"
   },
   "devDependencies": {
     "bootstrap": "^3.4.1",
