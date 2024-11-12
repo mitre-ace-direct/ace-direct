@@ -34,6 +34,8 @@ const JS = [
   'bootstrap-toggle/js/bootstrap-toggle.js',
   'dayjs/dayjs.min.js',
   'dayjs/plugin/utc.js',
+  'detect-gpu/dist/detect-gpu.esm.js',
+  'detect-gpu/dist/detect-gpu.esm.js.map',
   'jquery/dist/jquery.min.js',
   'inputmask/dist/min/inputmask/inputmask.min.js',
   'inputmask/dist/min/inputmask/jquery.inputmask.min.js',
