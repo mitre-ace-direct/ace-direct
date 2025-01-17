@@ -39,12 +39,22 @@ if (config.language_translation && config.language_translation.translation_enabl
   languageTranslationEnabled = (utils.getConfigVal(config.language_translation.translation_enabled) === 'true') ? true : false;
 }
 
-AWS.config.update({
-  region: utils.getConfigVal(config.s3.region),
-  httpOptions: {
-    agent: proxy(utils.getConfigVal(config.common.proxy))
-  }
-});
+
+
+if (utils.getConfigVal(config.common.proxy)) {
+  console.log("Using Proxy to connect to AWS S3")
+  AWS.config.update({
+    region: utils.getConfigVal(config.s3.region),
+    httpOptions: {
+      agent: proxy(utils.getConfigVal(config.common.proxy))
+    }
+  });
+} else { 
+  AWS.config.update({
+    region: utils.getConfigVal(config.s3.region)
+  });
+}
+
 const s3 = new AWS.S3();
 
 function agentRestrict(req, res, next) {

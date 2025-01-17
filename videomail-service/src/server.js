@@ -386,8 +386,8 @@ function rtpEvents(callee, rtpEndpoint, recorderEndpoint, playerEndpoint1, playe
             }
         }, videoDelay);
 
-        rtpEndpoint.on('MediaFlowInStateChange', (param) => {
-            debuglog('RTPEndpoint: MediaFlowInStateChange: ' + param.state);
+        rtpEndpoint.on('MediaFlowInStateChanged', (param) => {
+            debuglog('RTPEndpoint: MediaFlowInStateChanged: ' + param.state);
             if(callee.session)
                 callee.session.sendInfo('application/media_control+xml', body);
         });

@@ -29,12 +29,19 @@ const ping = require('ping');
 const AMI_PING_ID = 'PING123';
 const AMI_PING_MS = 5000;
 
-AWS.config.update({
-  region: datConfig.s3.region,
-  httpOptions: {
-    agent: proxy(datConfig.common.proxy)
-  }
-})
+if (datConfig.common.proxy) {
+  console.log("Using Proxy to connect to AWS S3")
+  AWS.config.update({
+    region: datConfig.s3.region,
+    httpOptions: {
+      agent: proxy(datConfig.common.proxy)
+    }
+  });
+} else { 
+  AWS.config.update({
+    region: datConfig.s3.region
+  });
+}
 
 const s3 = new AWS.S3();
 

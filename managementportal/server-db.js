@@ -26,12 +26,19 @@ const proxy = require('proxy-agent');
 const AWS = require('aws-sdk')
 const datConfig = require('./../dat/config.json');
 
-AWS.config.update({
-  region: datConfig.s3.region,
-  httpOptions: {
-    agent: proxy(datConfig.common.proxy)
-  }
-})
+if (datConfig.common.proxy) {
+  console.log("Using Proxy to connect to AWS S3")
+  AWS.config.update({
+    region: datConfig.s3.region,
+    httpOptions: {
+      agent: proxy(datConfig.common.proxy)
+    }
+  });
+} else { 
+  AWS.config.update({
+    region: datConfig.s3.region
+  });
+}
 
 const s3 = new AWS.S3();
 
