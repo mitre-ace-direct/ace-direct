@@ -212,7 +212,6 @@ class WebRTCMediaSession extends Events {
       });
     });
     this._participants.forEach((p) => {
-      console.log("P.Type", p.type)
       if (p.type === PARTICIPANT_TYPE_WEBRTC && p.session
         && typeof p.session.updateParticipants === 'function') {
         p.session.updateParticipants(simplePartList);
