@@ -212,6 +212,7 @@ class WebRTCMediaSession extends Events {
       });
     });
     this._participants.forEach((p) => {
+      console.log("P.Type", p.type)
       if (p.type === PARTICIPANT_TYPE_WEBRTC && p.session
         && typeof p.session.updateParticipants === 'function') {
         p.session.updateParticipants(simplePartList);
@@ -222,7 +223,7 @@ class WebRTCMediaSession extends Events {
   async _addWebrtcPeer(peer, offer, bitrates) {
     const webrtc = await this._pipeline.create('WebRtcEndpoint');
     const customWebrtcCodec = param('kurento.video_webrtc_codec') || this._videoCodec;
-    webrtc.on('OnIceCandidate', (evt) => {
+    webrtc.on('IceCandidateFound', (evt) => {
       const candidate = Kurento.getComplexType('IceCandidate')(evt.candidate);
       peer.sendIce(candidate);
     });
@@ -270,11 +271,11 @@ class WebRTCMediaSession extends Events {
       })
     } : undefined);
     await rtp.addTag('PARTICIPANT_TYPE', PARTICIPANT_TYPE_RTP);
-    rtp.on('MediaFlowInStateChange', (evt) => {
-      debug('\nRTP MediaFlowInStateChange (%s)\n', evt.state);
+    rtp.on('MediaFlowInStateChanged', (evt) => {
+      debug('\nRTP MediaFlowInStateChanged (%s)\n', evt.state);
     });
-    rtp.on('MediaFlowOutStateChange', (evt) => {
-      debug('\nRTP MediaFlowOutStateChange (%s)\n', evt.state);
+    rtp.on('MediaFlowOutStateChanged', (evt) => {
+      debug('\nRTP MediaFlowOutStateChanged (%s)\n', evt.state);
     });
     return rtp;
   }
@@ -389,8 +390,8 @@ class WebRTCMediaSession extends Events {
     rtp.on('Error', (error) => {
       debug(`RTPEndpoint ${ext} error: ${error}`);
     });
-    await rtp.setMaxOutputBitrate(this._rtp_max_bitrate * 1000);
-    await rtp.setMinOutputBitrate(this._rtp_min_bitrate * 1000);
+    //await rtp.setMaxEncoderBitrate(this._rtp_max_bitrate * 1000);
+    //await rtp.setMinEncoderBitrate(this._rtp_min_bitrate * 1000);
     const p = this._participants.get(ext);
     if (p) {
       debug('EXTRA, connect audio only');

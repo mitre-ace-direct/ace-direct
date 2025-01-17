@@ -11,12 +11,19 @@ const AWS = require('aws-sdk');
 const proxy = require('proxy-agent');
 const execSync = require('child_process').execSync;
 
-AWS.config.update({
-  region: config.awsRegion,
-  httpOptions: {
-    agent: proxy(config.proxy)
-  }
-});
+if (config.proxy) {
+  console.log("Using Proxy to connect to AWS S3")
+  AWS.config.update({
+    region: config.awsRegion,
+    httpOptions: {
+      agent: proxy(config.proxy)
+    }
+  });
+} else {
+  AWS.config.update({
+    region: config.awsRegion
+  });
+}
 
 const s3 = new AWS.S3();
 
