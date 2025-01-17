@@ -9,12 +9,19 @@ const { getConfigVal } = require('../helpers/utility');
 const validator = require('../utils/validator');
 const config = require('../../dat/config.json');
 
-AWS.config.update({
-  region: config.s3.region,
-  httpOptions: {
-    agent: proxy(config.common.proxy)
-  }
-});
+if (config.common.proxy) {
+  console.log("Using Proxy to connect to AWS S3")
+  AWS.config.update({
+    region: config.s3.region,
+    httpOptions: {
+      agent: proxy(config.common.proxy)
+    }
+  });
+} else { 
+  AWS.config.update({
+    region: config.s3.region
+  });
+}
 const s3 = new AWS.S3();
 
 const router = express.Router();
