@@ -27,7 +27,7 @@
     "gridstack": "^1.2.1",
     "handlebars": "^4.7.7",
     "jquery": "^3.5.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^3.1.2",
     "lodash": "^4.17.21",
     "log4js": "^6.3.0",
