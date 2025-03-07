@@ -60,7 +60,7 @@
     "moment": "^2.29.1",
     "moment-duration-format": "^2.3.2",
     "mongodb": "^4.1.0",
-    "mongoose": "^5.13.5",
+    "mongoose": "^5.13.15",
     "mysql": "^2.18.1",
     "nconf": "^0.11.3",
     "proxy-agent": "^5.0.0",
