@@ -27,7 +27,7 @@
     "minimist": "^1.2.5",
     "morgan": "^1.9.1",
     "mysql": "^2.17.1",
-    "nconf": "0.8.4",
+    "nconf": "0.11.4",
     "negotiator": "^0.6.1",
     "supertest": "^6.1.3"
   },
